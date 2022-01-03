@@ -22,7 +22,7 @@ lerna-debug.log*
 /.idea
 .project
 .classpath
-.editorconfig
+*.env
 .c9/
 *.launch
 .settings/
