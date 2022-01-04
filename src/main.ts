@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { enviroments } from './enviroments';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -19,6 +20,6 @@ async function bootstrap() {
 			forbidNonWhitelisted: true,
 		}),
 	);
-	await app.listen(8080);
+	await app.listen(process.env.PORT);
 }
 bootstrap();

@@ -8,8 +8,10 @@ import { Shop } from 'src/shops/entities/shop.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Invoice } from './invoice.entity';
 
+//TODO: entity pendiente a cambiar por nombre más simple
+
 @Schema()
-export class Refund extends Document {
+export class ProductReturns extends Document {
 	@Prop()
 	order: Order;
 
@@ -35,4 +37,5 @@ export class Refund extends Document {
 	coupon: Coupon;
 }
 
-export const RefundSchema = SchemaFactory.createForClass(Refund);
+export const ProductReturnsSchema =
+	SchemaFactory.createForClass(ProductReturns);

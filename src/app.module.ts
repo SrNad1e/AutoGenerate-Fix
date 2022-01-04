@@ -10,6 +10,7 @@ import { ShopsModule } from './shops/shops.module';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { enviroments } from './enviroments';
+import { DatabasesModule } from './databases/databases.module';
 import config from './config';
 @Module({
 	imports: [
@@ -18,7 +19,13 @@ import config from './config';
 			load: [config],
 			isGlobal: true,
 			validationSchema: Joi.object({
-				//variables entornos que se desean desplegar name_variable: Joi.number.required()
+				MONGO_DB: Joi.string().required(),
+				MONGO_PORT: Joi.number().required(),
+				MONGO_USER: Joi.string().required(),
+				MONGO_PASSWORD: Joi.string().required(),
+				MONGO_HOST: Joi.string().required(),
+				MONGO_CONNECTION: Joi.string().required(),
+				PORT: Joi.number().required(),
 			}),
 		}),
 		InvoicesModule,
@@ -28,6 +35,7 @@ import config from './config';
 		ShopsModule,
 		UsersModule,
 		ProductsModule,
+		DatabasesModule,
 	],
 })
 export class AppModule {}

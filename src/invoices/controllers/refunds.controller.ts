@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ParseIntPipe } from 'src/common/parse-int-pipe.pipe';
 import { RefundsService } from '../services/refunds.service';
 
+@ApiTags('Devoluciones')
 @Controller('refunds')
 export class RefundsController {
 	constructor(private refundsService: RefundsService) {}
