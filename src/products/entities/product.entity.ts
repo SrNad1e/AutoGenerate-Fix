@@ -1,1 +1,4 @@
-export class Product {}
+export class Product {
+	salePriceUnit: number;
+	quantity: number;
+}

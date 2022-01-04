@@ -11,6 +11,9 @@ import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { enviroments } from './enviroments';
 import { DatabasesModule } from './databases/databases.module';
+import { ShippingsModule } from './shippings/shippings.module';
+import { TreasuryModule } from './treasury/treasury.module';
+import { ConfigsModule } from './configs/configs.module';
 import config from './config';
 @Module({
 	imports: [
@@ -36,6 +39,9 @@ import config from './config';
 		UsersModule,
 		ProductsModule,
 		DatabasesModule,
+		ShippingsModule,
+		TreasuryModule,
+		ConfigsModule,
 	],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ParseIntPipe } from 'src/common/parse-int-pipe.pipe';
+import { CreateRefundsDto, FiltersRefundsDto } from '../dtos/refunds.dto';
 import { RefundsService } from '../services/refunds.service';
 
 @ApiTags('Devoluciones')
@@ -9,25 +9,12 @@ export class RefundsController {
 	constructor(private refundsService: RefundsService) {}
 
 	@Get()
-	getAll(
-		@Query('limit', ParseIntPipe) limit,
-		@Query('skip', ParseIntPipe) skip,
-		@Query('order.code', ParseIntPipe) code,
-		@Query('invoice.number', ParseIntPipe) number,
-		@Query('shop.shopId', ParseIntPipe) shopId,
-	) {
-		return this.refundsService.getAll({ limit, skip, code, number, shopId });
-	}
-
-	@Get('/:id')
-	getOne(@Param('id') id: string) {
-		return `Este es tu id ${id}`;
+	getAll(@Query() params: FiltersRefundsDto) {
+		return this.refundsService.getAll(params);
 	}
 
 	@Post()
-	create(@Body() body: any) {
-		return {
-			message: 'Devolución creada correctamente',
-		};
+	async create(@Body() params: CreateRefundsDto) {
+		return this.refundsService.create(params);
 	}
 }

@@ -22,13 +22,13 @@ export class Refund extends Document {
 	@Prop({ type: Object, required: true })
 	user: User;
 
-	@Prop({ type: Object, required: true })
+	@Prop({ type: Object, required: true, index: true })
 	shop: Shop;
 
 	@Prop({ type: Number, required: true })
 	amount: number;
 
-	@Prop({ type: Number, required: true })
+	@Prop({ type: Number, required: true, index: true, unique: true })
 	code: number;
 
 	@Prop()
