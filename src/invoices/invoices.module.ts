@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import * as AutoIncrementFactory from 'mongoose-sequence';
+import { Connection } from 'mongoose';
 
 import { RefundsController } from './controllers/refunds.controller';
 import { InvoicesController } from './controllers/invoices.controller';
@@ -13,11 +15,17 @@ import {
 @Module({
 	imports: [
 		CouponsModule,
-		MongooseModule.forFeature([
+		MongooseModule.forFeatureAsync([
 			//TODO: modelo pendiente a cambiar por nombre más simple
 			{
 				name: ProductReturns.name,
-				schema: ProductReturnsSchema,
+				useFactory: async (connection: Connection) => {
+					const schema = ProductReturnsSchema;
+					const AutoIncrement = AutoIncrementFactory(connection);
+					schema.plugin(AutoIncrement, { inc_field: 'code' });
+					return schema;
+				},
+				inject: [getConnectionToken('')],
 			},
 		]),
 	],

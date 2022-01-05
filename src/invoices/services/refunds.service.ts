@@ -12,6 +12,7 @@ export class RefundsService {
 		@InjectModel(ProductReturns.name)
 		private productReturnsModel: Model<ProductReturns>,
 	) {}
+
 	async getAll(params: FiltersRefundsDto) {
 		const filters: FilterQuery<Refund> = {};
 		const {
@@ -52,14 +53,15 @@ export class RefundsService {
 		};
 	}
 
-	async create(params: CreateRefundsDto) {
+	//TODO: falta realizar validación de los productos con la factura
+	create(params: CreateRefundsDto) {
 		const { products } = params;
 		const amount = products.reduce(
 			(sum, product) => sum + product.quantity + product.salePriceUnit,
 			0,
 		);
-
 		const newRefund = new this.productReturnsModel({ ...params, amount });
+		//Crear cupón y enviar objeto de devolución y cupón
 		return newRefund.save();
 	}
 }

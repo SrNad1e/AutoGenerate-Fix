@@ -10,10 +10,10 @@ import { Invoice } from './invoice.entity';
 
 @Schema()
 export class Refund extends Document {
-	@Prop()
+	@Prop({ type: Object, required: true })
 	order: Order;
 
-	@Prop()
+	@Prop({ type: Object, required: true })
 	invoice: Invoice;
 
 	@Prop({ type: Array, required: true })
@@ -30,9 +30,6 @@ export class Refund extends Document {
 
 	@Prop({ type: Number, required: true, index: true, unique: true })
 	code: number;
-
-	@Prop()
-	coupon: Coupon;
 }
 
 export const RefundSchema = SchemaFactory.createForClass(Refund);

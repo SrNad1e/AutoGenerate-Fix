@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
@@ -10,12 +9,12 @@ import { Invoice } from './invoice.entity';
 
 //TODO: entity pendiente a cambiar por nombre más simple
 
-@Schema()
+@Schema({ timestamps: true })
 export class ProductReturns extends Document {
-	@Prop()
+	@Prop({ type: Object, required: true })
 	order: Order;
 
-	@Prop()
+	@Prop({ type: Object, required: true })
 	invoice: Invoice;
 
 	@Prop({ type: Array, required: true })
@@ -30,11 +29,8 @@ export class ProductReturns extends Document {
 	@Prop({ type: Number, required: true })
 	amount: number;
 
-	@Prop({ type: Number, required: true })
+	@Prop({ type: Number, required: true, default: 0 })
 	code: number;
-
-	@Prop()
-	coupon: Coupon;
 }
 
 export const ProductReturnsSchema =

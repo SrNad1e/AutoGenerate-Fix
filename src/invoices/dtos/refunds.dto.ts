@@ -1,5 +1,4 @@
 import { IsOptional, IsPositive, Min } from 'class-validator';
-import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
@@ -18,13 +17,16 @@ export class RefundsSortDto {
 }
 
 export class CreateRefundsDto {
+	@IsOptional()
 	invoice: Invoice;
+	@IsOptional()
+	order: Order;
+	@IsOptional()
 	products: Product[];
+	@IsOptional()
 	user: User;
+	@IsOptional()
 	shop: Shop;
-	amount: number;
-	code: number;
-	coupon: Coupon;
 }
 
 export class FiltersRefundsDto {
