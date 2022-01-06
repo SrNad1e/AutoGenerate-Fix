@@ -1,16 +1,19 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateCouponsDto, FilterCouponsDto } from '../dtos/coupons.dto';
+import { CouponsService } from '../services/coupons.service';
 @ApiTags('Cupones')
 @Controller('coupons')
 export class CouponsController {
+	constructor(private couponsService: CouponsService) {}
+
 	@Get()
-	getAll(@Query() query: any) {
-		const { limit = 20, skip = 0 } = query;
-		return `Estos son los datos de limit ${limit} y  skip ${skip}`;
+	getAll(@Query() params: FilterCouponsDto) {
+		return this.couponsService.getAll(params);
 	}
 
-	@Get('/:id')
-	getOne(@Param('id') id: string) {
-		return `Este es tu id ${id}`;
+	@Post()
+	create(@Body() params: CreateCouponsDto) {
+		return this.couponsService.create(params);
 	}
 }

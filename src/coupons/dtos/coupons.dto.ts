@@ -1,44 +1,44 @@
-import {
-	IsArray,
-	IsObject,
-	IsOptional,
-	IsPositive,
-	Min,
-} from 'class-validator';
+import { IsOptional, IsPositive, IsString, Min } from 'class-validator';
 import { Customer } from 'src/customers/entities/customer.entity';
+import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { Refund } from 'src/invoices/entities/refund.entity';
 import { Order } from 'src/invoices/entities/order.entity';
-import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Invoice } from '../entities/invoice.entity';
-import { Refund } from '../entities/refund.entity';
 
-export class RefundsSortDto {
+export class CouponsSortDto {
 	@IsOptional()
 	order?: Order;
-
-	@IsOptional()
-	invoice?: Invoice;
 
 	@IsOptional()
 	shop?: Shop;
 }
 
-export class CreateRefundsDto {
-	@IsObject()
+export class CreateCouponsDto {
+	@IsOptional()
+	@IsPositive()
+	amount: number;
+
+	@IsOptional()
+	shop: Shop;
+
+	@IsOptional()
+	user: User;
+
+	@IsOptional()
+	customer: Customer;
+
+	@IsOptional()
 	invoice: Invoice;
 
-	@IsObject()
+	@IsOptional()
 	order: Order;
 
-	@IsArray()
-	products: Product[];
-
-	@IsObject()
-	user: User;
+	@IsOptional()
+	refund: Refund;
 }
 
-export class FiltersRefundsDto {
+export class FilterCouponsDto {
 	@IsOptional()
 	@IsPositive()
 	limit?: number;
@@ -60,5 +60,9 @@ export class FiltersRefundsDto {
 	shopId?: number;
 
 	@IsOptional()
-	sort?: RefundsSortDto;
+	@IsString()
+	couponCode?: string;
+
+	@IsOptional()
+	sort?: CouponsSortDto;
 }

@@ -12,6 +12,9 @@ import {
 	ProductReturns,
 	ProductReturnsSchema,
 } from './entities/productreturns.entity';
+import { OrdersService } from './services/orders.service';
+import { Invoice } from './entities/invoice.entity';
+import { Order } from './entities/order.entity';
 @Module({
 	imports: [
 		CouponsModule,
@@ -27,9 +30,29 @@ import {
 				},
 				inject: [getConnectionToken('')],
 			},
+			{
+				name: Invoice.name,
+				useFactory: async (connection: Connection) => {
+					const schema = ProductReturnsSchema;
+					const AutoIncrement = AutoIncrementFactory(connection);
+					//schema.plugin(AutoIncrement, { inc_field: 'number' });
+					return schema;
+				},
+				inject: [getConnectionToken('')],
+			},
+			{
+				name: Order.name,
+				useFactory: async (connection: Connection) => {
+					const schema = ProductReturnsSchema;
+					const AutoIncrement = AutoIncrementFactory(connection);
+					//schema.plugin(AutoIncrement, { inc_field: 'code' });
+					return schema;
+				},
+				inject: [getConnectionToken('')],
+			},
 		]),
 	],
 	controllers: [RefundsController, InvoicesController],
-	providers: [RefundsService, InvoicesService],
+	providers: [RefundsService, InvoicesService, OrdersService],
 })
 export class InvoicesModule {}

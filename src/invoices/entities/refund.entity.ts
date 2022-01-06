@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-import { Coupon } from 'src/coupons/entities/coupon.entity';
-import { Order } from 'src/orders/entities/order.entity';
+import { Order } from 'src/invoices/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { User } from 'src/users/entities/user.entity';

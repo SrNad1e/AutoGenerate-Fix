@@ -1,4 +1,5 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 import { Status } from 'src/configs/entities/status.entity';
 import { StatusHistory } from 'src/configs/entities/statusHistory.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
@@ -9,10 +10,10 @@ import { Shop } from 'src/shops/entities/shop.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Invoice } from './invoice.entity';
 import { Summary } from './summary.entity';
 
-@Schema({ timestamps: true })
-export class Invoice {
+export class Order extends Document {
 	@Prop({ type: Object })
 	shipping: Shipping;
 
@@ -66,4 +67,7 @@ export class Invoice {
 
 	@Prop({ type: Number, required: true })
 	code: number;
+
+	@Prop({ type: Object })
+	invoice: Invoice;
 }

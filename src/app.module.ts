@@ -5,7 +5,6 @@ import * as Joi from 'joi';
 import { InvoicesModule } from './invoices/invoices.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { CustomersModule } from './customers/customers.module';
-import { OrdersModule } from './orders/orders.module';
 import { ShopsModule } from './shops/shops.module';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
@@ -34,7 +33,6 @@ import config from './config';
 		InvoicesModule,
 		CouponsModule,
 		CustomersModule,
-		OrdersModule,
 		ShopsModule,
 		UsersModule,
 		ProductsModule,
