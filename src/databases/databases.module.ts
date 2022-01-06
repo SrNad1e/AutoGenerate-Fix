@@ -8,12 +8,12 @@ import config from 'src/config';
 	imports: [
 		MongooseModule.forRootAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
-				const { connection, user, password, host, port, dbName } =
+				const { connection, /*user, password,*/ host, port, dbName } =
 					configService.mongo;
 				return {
 					uri: `${connection}://${host}:${port}`,
-					user,
-					pass: password,
+					//	user,
+					//	pass: password,
 					dbName,
 				};
 			},

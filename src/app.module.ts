@@ -23,8 +23,8 @@ import config from './config';
 			validationSchema: Joi.object({
 				MONGO_DB: Joi.string().required(),
 				MONGO_PORT: Joi.number().required(),
-				MONGO_USER: Joi.string().required(),
-				MONGO_PASSWORD: Joi.string().required(),
+				//	MONGO_USER: Joi.string().required(),
+				//	MONGO_PASSWORD: Joi.string().required(),
 				MONGO_HOST: Joi.string().required(),
 				MONGO_CONNECTION: Joi.string().required(),
 				PORT: Joi.number().required(),
