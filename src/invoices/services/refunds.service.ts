@@ -57,17 +57,16 @@ export class RefundsService {
 		};
 	}
 
-	//TODO: falta realizar validación de los productos con la factura
 	async create(params: CreateRefundsDto) {
-		const { products, order } = params;
+		const { products, orderId } = params;
 		const amount = products.reduce(
 			(sum, product) => sum + product.quantity * product.salePriceUnit,
 			0,
 		);
 
-		const orderFind = await this.orderService.findById(order?._id);
+		const orderFind = await this.orderService.findById(orderId);
 		if (!orderFind) {
-			return new NotFoundException(`Pedido No. ${order.code} no encontrados`);
+			return new NotFoundException(`Pedido no encontrado`);
 		}
 		const newRefund = new this.productReturnsModel({
 			...params,
@@ -84,7 +83,7 @@ export class RefundsService {
 			//Editamos el pedido para marcar los productos
 			const editOrder = await this.orderService.selectProductReturn(
 				products,
-				order._id,
+				orderId,
 			);
 
 			if (editOrder === true) {

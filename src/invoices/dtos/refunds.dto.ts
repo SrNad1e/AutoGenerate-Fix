@@ -3,6 +3,7 @@ import {
 	IsObject,
 	IsOptional,
 	IsPositive,
+	IsString,
 	Min,
 } from 'class-validator';
 import { Customer } from 'src/customers/entities/customer.entity';
@@ -25,11 +26,8 @@ export class RefundsSortDto {
 }
 
 export class CreateRefundsDto {
-	@IsObject()
-	invoice: Invoice;
-
-	@IsObject()
-	order: Order;
+	@IsString()
+	orderId: string;
 
 	@IsArray()
 	products: Product[];
