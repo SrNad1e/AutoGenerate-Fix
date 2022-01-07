@@ -35,18 +35,18 @@ export class RefundsService {
 
 		//TODO: pasar parametro a numero ya que el número es númerico
 		if (invoiceNumber) {
-			filters.invoice.number = invoiceNumber.toString();
+			filters['invoice.number'] = invoiceNumber.toString();
 		}
 
 		if (shopId) {
-			filters.shop.shopId = shopId;
+			filters['shop.shopId'] = shopId;
 		}
 
 		const result = await this.productReturnsModel
 			.find(filters)
+			.sort(sort)
 			.limit(limit)
 			.skip(skip)
-			.sort({ createdAt: -1, ...sort })
 			.exec();
 
 		return {
@@ -104,7 +104,7 @@ export class RefundsService {
 				};
 			} else {
 				return new NotFoundException(
-					`Error al crear la devolición, ${editOrder}`,
+					`Error al crear la devolución, ${editOrder}`,
 				);
 			}
 		} catch (e: any) {

@@ -46,7 +46,7 @@ export class OrdersService {
 									(sum, dato) => sum + dato.quantityReturn,
 									0,
 								) || 0) +
-									parseInt(product.quantity.toString()),
+									product.quantity,
 					);
 
 					if (!productFind) {
@@ -61,7 +61,7 @@ export class OrdersService {
 							{
 								createdAt: new Date(),
 								returnType: product.returnType,
-								quantityReturn: parseInt(product.quantity.toString()),
+								quantityReturn: product.quantity,
 							},
 						],
 					});
