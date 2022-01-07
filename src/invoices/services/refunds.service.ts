@@ -59,6 +59,7 @@ export class RefundsService {
 
 	async create(params: CreateRefundsDto) {
 		const { products, orderId } = params;
+
 		const amount = products.reduce(
 			(sum, product) => sum + product.quantity * product.salePriceUnit,
 			0,

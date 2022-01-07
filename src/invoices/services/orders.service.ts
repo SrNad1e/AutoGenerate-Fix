@@ -41,9 +41,14 @@ export class OrdersService {
 					const productFind = order.products.find(
 						(item) =>
 							item._id.toString() === product._id.toString() &&
-							item.returns.reduce((sum, dato) => sum + dato.quantityReturn, 0) <
-								product.quantity,
+							item.quantity >=
+								(item.returns.reduce(
+									(sum, dato) => sum + dato.quantityReturn,
+									0,
+								) || 0) +
+									parseInt(product.quantity.toString()),
 					);
+
 					if (!productFind) {
 						errorProduct = `El producto ${product.reference}/${product.color.name}/${product.size.value} no tiene unidades disponibles para devolver`;
 						return;
@@ -56,7 +61,7 @@ export class OrdersService {
 							{
 								createdAt: new Date(),
 								returnType: product.returnType,
-								quantityReturn: product.quantity,
+								quantityReturn: parseInt(product.quantity.toString()),
 							},
 						],
 					});
@@ -64,20 +69,21 @@ export class OrdersService {
 				if (errorProduct) {
 					return errorProduct;
 				}
+
 				//Actualizar orden con los productos
 				const productsOrder = order.products.filter((product) => {
-					let ok = false;
+					let ok = true;
 					products.forEach((item) => {
 						if (item._id.toString() === product._id.toString()) {
 							ok = false;
 							return;
 						}
-						ok = true;
 					});
 					return ok;
 				});
+
 				await this.orderModel.findByIdAndUpdate(orderId, {
-					$set: { products: [...productsOrder, ...productsUpdate] },
+					$set: { products: productsOrder.concat(productsUpdate) },
 				});
 
 				return true;
