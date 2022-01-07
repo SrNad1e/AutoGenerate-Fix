@@ -46,7 +46,7 @@ export class RefundsService {
 			.find(filters)
 			.limit(limit)
 			.skip(skip)
-			.sort(sort)
+			.sort({ createdAt: -1, ...sort })
 			.exec();
 
 		return {
@@ -61,18 +61,19 @@ export class RefundsService {
 	async create(params: CreateRefundsDto) {
 		const { products, order } = params;
 		const amount = products.reduce(
-			(sum, product) => sum + product.quantity + product.salePriceUnit,
+			(sum, product) => sum + product.quantity * product.salePriceUnit,
 			0,
 		);
-		const orderFind = await this.orderService.findById(order?.id);
+
+		const orderFind = await this.orderService.findById(order?._id);
 		if (!orderFind) {
-			return new NotFoundException(`Pedido No. ${order.code} no encontrado`);
+			return new NotFoundException(`Pedido No. ${order.code} no encontrados`);
 		}
 		const newRefund = new this.productReturnsModel({
 			...params,
 			amount,
 			invoice: orderFind.invoice,
-			order,
+			order: orderFind,
 			shop: orderFind.shop,
 		});
 		let idRefound;
@@ -80,20 +81,32 @@ export class RefundsService {
 			const result = await newRefund.save();
 
 			idRefound = result._id;
+			//Editamos el pedido para marcar los productos
+			const editOrder = await this.orderService.selectProductReturn(
+				products,
+				order._id,
+			);
 
-			const resultCoupon = await this.couponsService.create({
-				...params,
-				amount,
-				order: orderFind,
-				refund: result['_doc'],
-				invoice: orderFind.invoice,
-				shop: orderFind.shop,
-				customer: orderFind['_doc'].customer,
-			});
-			return {
-				...result['_doc'],
-				coupon: resultCoupon['_doc'],
-			};
+			if (editOrder === true) {
+				const resultCoupon = await this.couponsService.create({
+					...params,
+					amount,
+					order: orderFind,
+					refund: result['_doc'],
+					invoice: orderFind.invoice,
+					shop: orderFind.shop,
+					customer: orderFind['_doc'].customer,
+				});
+
+				return {
+					...result['_doc'],
+					coupon: resultCoupon['_doc'],
+				};
+			} else {
+				return new NotFoundException(
+					`Error al crear la devolición, ${editOrder}`,
+				);
+			}
 		} catch (e: any) {
 			//Si sucede un error en el proceso reversa todos los datos guardados en procesos anteriores
 			if (idRefound) {

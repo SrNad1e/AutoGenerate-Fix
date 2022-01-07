@@ -55,7 +55,7 @@ export class CouponsService {
 	}
 
 	create(params: CreateCouponsDto) {
-		const couponCode = shortid.generate();
+		const couponCode = shortid.generate().toUpperCase();
 		const dueDate = new Date();
 		dueDate.setDate(dueDate.getDate() + 30);
 		const newCoupon = new this.couponModel({ ...params, couponCode, dueDate });

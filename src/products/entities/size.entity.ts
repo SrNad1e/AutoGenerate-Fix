@@ -1,1 +1,3 @@
-export class Size {}
+export class Size {
+	value: string;
+}

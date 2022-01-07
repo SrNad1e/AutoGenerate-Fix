@@ -1,1 +1,3 @@
-export class Color {}
+export class Color {
+	name: string;
+}
