@@ -39,9 +39,8 @@ export class RefundsService {
 		}
 
 		if (shopId) {
-			filters['shop.shopId'] = shopId;
+			filters['shop.shopId'] = parseInt(shopId.toString());
 		}
-
 		const result = await this.productReturnsModel
 			.find(filters)
 			.sort(sort)
