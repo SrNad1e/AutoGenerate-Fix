@@ -110,7 +110,7 @@ export class RefundsService {
 						coupon: resultCoupon['_doc'],
 					};
 				} catch (e) {
-					return new NotFoundException(`Error al crear la devolución, ${e}`);
+					return new NotFoundException(`Error al crear la devolución, ${e} `);
 				}
 			} else {
 				return new NotFoundException(
