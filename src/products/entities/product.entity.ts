@@ -18,4 +18,7 @@ export class Product extends Document {
 		returnType: string;
 		quantityReturn: number;
 	}[];
+
+	//TODO: campo generico pendiente eliminarlo
+	product_id: number;
 }

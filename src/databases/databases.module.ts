@@ -1,7 +1,10 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import config from 'src/config';
+import { Inventories } from 'src/inventories/entities/inventories.entity';
 
 @Global()
 @Module({
@@ -19,7 +22,23 @@ import config from 'src/config';
 			},
 			inject: [config.KEY],
 		}),
+		TypeOrmModule.forRootAsync({
+			inject: [config.KEY],
+			useFactory: (configService: ConfigType<typeof config>) => {
+				const { user, password, port, dbName, host } = configService.mariadb;
+				return {
+					type: 'mariadb',
+					host,
+					port,
+					username: user,
+					password,
+					database: dbName,
+					entities:[Inventories]
+				};
+			},
+		}),
 	],
 	providers: [],
+	exports: [TypeOrmModule],
 })
 export class DatabasesModule {}

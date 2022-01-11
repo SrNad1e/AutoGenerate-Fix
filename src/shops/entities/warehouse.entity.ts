@@ -1,1 +1,4 @@
-export class Warehouse {}
+export class Warehouse {
+	warehouseId: number;
+	name: string;
+}

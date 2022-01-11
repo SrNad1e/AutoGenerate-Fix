@@ -13,6 +13,7 @@ import { DatabasesModule } from './databases/databases.module';
 import { ShippingsModule } from './shippings/shippings.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { ConfigsModule } from './configs/configs.module';
+import { InventoriesModule } from './inventories/inventories.module';
 import config from './config';
 @Module({
 	imports: [
@@ -40,6 +41,7 @@ import config from './config';
 		ShippingsModule,
 		TreasuryModule,
 		ConfigsModule,
+		InventoriesModule,
 	],
 })
 export class AppModule {}

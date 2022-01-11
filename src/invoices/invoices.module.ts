@@ -15,9 +15,11 @@ import {
 import { OrdersService } from './services/orders.service';
 import { Invoice } from './entities/invoice.entity';
 import { Order } from './entities/order.entity';
+import { InventoriesModule } from 'src/inventories/inventories.module';
 @Module({
 	imports: [
 		CouponsModule,
+		InventoriesModule,
 		MongooseModule.forFeatureAsync([
 			//TODO: modelo pendiente a cambiar por nombre más simple
 			{

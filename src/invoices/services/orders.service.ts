@@ -38,16 +38,17 @@ export class OrdersService {
 					}
 
 					//valida si el producto tiene unidades para cambiar
-					const productFind = order.products.find(
-						(item) =>
+					const productFind = order.products.find((item) => {
+						return (
 							item._id.toString() === product._id.toString() &&
 							item.quantity >=
 								(item.returns.reduce(
 									(sum, dato) => sum + dato.quantityReturn,
 									0,
 								) || 0) +
-									product.quantity,
-					);
+									parseInt(product.quantity.toString())
+						);
+					});
 
 					if (!productFind) {
 						errorProduct = `El producto ${product.reference}/${product.color.name}/${product.size.value} no tiene unidades disponibles para devolver`;

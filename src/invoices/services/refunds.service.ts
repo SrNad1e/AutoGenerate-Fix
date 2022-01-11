@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 import { CouponsService } from 'src/coupons/services/coupons.service';
+import { InventoriesService } from 'src/inventories/services/inventories/inventories.service';
 import { CreateRefundsDto, FiltersRefundsDto } from '../dtos/refunds.dto';
 import { ProductReturns } from '../entities/productreturns.entity';
 import { Refund } from '../entities/refund.entity';
@@ -15,6 +16,7 @@ export class RefundsService {
 		private productReturnsModel: Model<ProductReturns>,
 		private couponsService: CouponsService,
 		private orderService: OrdersService,
+		private inventoriesService: InventoriesService,
 	) {}
 
 	async getAll(params: FiltersRefundsDto) {
@@ -67,51 +69,64 @@ export class RefundsService {
 		const orderFind = await this.orderService.findById(orderId);
 		if (!orderFind) {
 			return new NotFoundException(`Pedido no encontrado`);
-		}
-		const newRefund = new this.productReturnsModel({
-			...params,
-			amount,
-			invoice: orderFind.invoice,
-			order: orderFind,
-			shop: orderFind.shop,
-		});
-		let idRefound;
-		try {
-			const result = await newRefund.save();
-
-			idRefound = result._id;
-			//Editamos el pedido para marcar los productos
+		} else {
+			//Validamos y editamos pedido
 			const editOrder = await this.orderService.selectProductReturn(
 				products,
 				orderId,
 			);
 
 			if (editOrder === true) {
-				const resultCoupon = await this.couponsService.create({
-					...params,
-					amount,
-					order: orderFind,
-					refund: result['_doc'],
-					invoice: orderFind.invoice,
-					shop: orderFind.shop,
-					customer: orderFind['_doc'].customer,
-				});
+				let refund;
+				try {
+					//Agregamos las unidades al inventario
+					await products.forEach(async (product) => {
+						await this.inventoriesService.addProductInventory(
+							product,
+							orderFind['_doc'].warehouse.warehouseId,
+						);
+					});
+					//Creamos devolución
+					refund = await this.createRefund({
+						...params,
+						amount,
+						invoice: orderFind.invoice,
+						order: orderFind,
+						shop: orderFind.shop,
+					});
+					//creamos cupón
+					const resultCoupon = await this.couponsService.create({
+						...params,
+						amount,
+						order: orderFind,
+						refund: refund['_doc'],
+						invoice: orderFind.invoice,
+						shop: orderFind.shop,
+						customer: orderFind['_doc'].customer,
+					});
 
-				return {
-					...result['_doc'],
-					coupon: resultCoupon['_doc'],
-				};
+					return {
+						...refund['_doc'],
+						coupon: resultCoupon['_doc'],
+					};
+				} catch (e) {
+					return new NotFoundException(`Error al crear la devolución, ${e}`);
+				}
 			} else {
 				return new NotFoundException(
-					`Error al crear la devolución, ${editOrder}`,
+					`Error al crear la devolución: ${editOrder}`,
 				);
 			}
-		} catch (e: any) {
-			//Si sucede un error en el proceso reversa todos los datos guardados en procesos anteriores
-			if (idRefound) {
-				await this.productReturnsModel.findByIdAndDelete(idRefound.toString());
-			}
-			return new NotFoundException(`Error al crear la devolición, ${e}`);
 		}
+	}
+
+	/**
+	 * crea devolucion
+	 * @param params datos para crear la devolucion
+	 * @returns si es verdadero devolucion de lo contrario un error
+	 */
+	createRefund(params: any) {
+		const newRefund = new this.productReturnsModel(params);
+		return newRefund.save();
 	}
 }
