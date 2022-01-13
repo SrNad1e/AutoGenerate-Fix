@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Global, Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -5,18 +6,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { Inventories } from 'src/inventories/entities/inventories.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Global()
 @Module({
 	imports: [
 		MongooseModule.forRootAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
-				const { connection, /*user, password,*/ host, port, dbName } =
+				const { connection, host, port, dbName } =
 					configService.mongo;
 				return {
 					uri: `${connection}://${host}:${port}`,
-					//	user,
-					//	pass: password,
 					dbName,
 				};
 			},
@@ -33,7 +33,7 @@ import { Inventories } from 'src/inventories/entities/inventories.entity';
 					username: user,
 					password,
 					database: dbName,
-					entities:[Inventories]
+					entities: [Inventories, User],
 				};
 			},
 		}),

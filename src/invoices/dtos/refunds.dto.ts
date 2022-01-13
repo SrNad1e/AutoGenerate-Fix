@@ -1,11 +1,5 @@
-import {
-	IsArray,
-	IsObject,
-	IsOptional,
-	IsPositive,
-	IsString,
-	Min,
-} from 'class-validator';
+/* eslint-disable prettier/prettier */
+import { IsArray, IsObject, IsOptional, IsString } from 'class-validator';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 

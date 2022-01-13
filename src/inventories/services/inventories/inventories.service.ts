@@ -1,10 +1,10 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Inventories } from 'src/inventories/entities/inventories.entity';
 import { Product } from 'src/products/entities/product.entity';
-import { Promise } from 'mongoose';
 
 @Injectable()
 export class InventoriesService {
@@ -20,7 +20,6 @@ export class InventoriesService {
 	 */
 	async addProductInventory(product: Product, warehouseId: number) {
 		try {
-			console.log('id warew', warehouseId);
 			const inventories = await this.inventoriesRepo.findOne({
 				warehouse_id: warehouseId,
 				product_id: product.product_id,

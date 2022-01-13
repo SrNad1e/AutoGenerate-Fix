@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -7,7 +8,7 @@ import { Shop } from 'src/shops/entities/shop.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Invoice } from './invoice.entity';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Refund extends Document {
 	@Prop({ type: Object, required: true })
 	order: Order;

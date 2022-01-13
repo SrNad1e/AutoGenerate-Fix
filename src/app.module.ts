@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -14,6 +15,7 @@ import { ShippingsModule } from './shippings/shippings.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { ConfigsModule } from './configs/configs.module';
 import { InventoriesModule } from './inventories/inventories.module';
+import { StockTransferModule } from './stock-transfer/stock-transfer.module';
 import config from './config';
 @Module({
 	imports: [
@@ -42,6 +44,7 @@ import config from './config';
 		TreasuryModule,
 		ConfigsModule,
 		InventoriesModule,
+		StockTransferModule,
 	],
 })
 export class AppModule {}
