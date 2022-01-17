@@ -21,23 +21,30 @@ export class StockTransfer extends Document {
 	userIdOrigin: number;
 
 	@Prop({ type: Array, required: true })
-	products: Product[];
+	detail: {
+		product: Product;
+		quantity: number;
+		quantityConfirmed?: number;
+		status: string;
+		createdAt: Date;
+		updateAt: Date;
+	}[];
 
 	@Prop({ type: String })
-	observationOrigin: string;
+	observationOrigin?: string;
 
 	@Prop({ type: Object })
-	warehouseDestination: Warehouse;
+	warehouseDestination?: Warehouse;
 
 	//TODO: pendiente pasar a mongo los usuarios
 	@Prop({ type: Number })
-	userIdDestination: number;
+	userIdDestination?: number;
 
 	@Prop({ type: String })
-	observationDestination: string;
+	observationDestination?: string;
 
 	@Prop({ type: String })
-	observation: string;
+	observation?: string;
 }
 
 export const StockTransferSchema = SchemaFactory.createForClass(StockTransfer);

@@ -1,6 +1,8 @@
 import {
+	Body,
 	Controller,
 	Get,
+	Post,
 	Query,
 	UsePipes,
 	ValidationPipe,
@@ -8,7 +10,10 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ParseSortPipePipe } from 'src/common/parse-sort-pipe.pipe';
 import { UsersService } from 'src/users/services/users.service';
-import { FiltersStockTransferDto } from '../dtos/stock-transfer.dto';
+import {
+	CreateStockTransferParamsDto,
+	FiltersStockTransferDto,
+} from '../dtos/stock-transfer.dto';
 import { StockTransferService } from '../services/stock-transfer.service';
 
 @ApiTags('Traslados de Mercancía')
@@ -29,5 +34,11 @@ export class StockTransferController {
 			...params,
 			sort,
 		});
+	}
+
+	@Post()
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async create(@Body() params: CreateStockTransferParamsDto) {
+		return this.stockTransferService.create(params);
 	}
 }

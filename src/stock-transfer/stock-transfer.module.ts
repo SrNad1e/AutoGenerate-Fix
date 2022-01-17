@@ -1,25 +1,36 @@
 import { Module } from '@nestjs/common';
+import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
+import * as AutoIncrementFactory from 'mongoose-sequence';
+import { Connection } from 'mongoose';
+
 import { StockTransferService } from './services/stock-transfer.service';
 import { StockTransferController } from './controllers/stock-transfer.controller';
-import * as AutoIncrementFactory from 'mongoose-sequence';
 import { UsersModule } from 'src/users/users.module';
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import {
 	StockTransfer,
 	StockTransferSchema,
 } from './entities/stock-transfer.entity';
-import { Connection } from 'typeorm';
+import { ProductsModule } from 'src/products/products.module';
+import { ShopsModule } from 'src/shops/shops.module';
+import { InventoriesModule } from 'src/inventories/inventories.module';
 
 @Module({
 	imports: [
 		UsersModule,
+		ProductsModule,
+		ShopsModule,
+		InventoriesModule,
 		MongooseModule.forFeatureAsync([
 			{
 				name: StockTransfer.name,
 				useFactory: async (connection: Connection) => {
 					const schema = StockTransferSchema;
-					//const AutoIncrement = AutoIncrementFactory(connection);
-					//schema.plugin(AutoIncrement, { inc_field: 'number' });
+					const AutoIncrement = AutoIncrementFactory(connection);
+					schema.plugin(AutoIncrement, {
+						id: 'stock_counter',
+						inc_field: 'number',
+						inc_amount: 14590,
+					});
 					return schema;
 				},
 				inject: [getConnectionToken('')],

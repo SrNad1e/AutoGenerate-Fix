@@ -16,6 +16,7 @@ import { TreasuryModule } from './treasury/treasury.module';
 import { ConfigsModule } from './configs/configs.module';
 import { InventoriesModule } from './inventories/inventories.module';
 import { StockTransferModule } from './stock-transfer/stock-transfer.module';
+import { ImagesModule } from './images/images.module';
 import config from './config';
 @Module({
 	imports: [
@@ -31,6 +32,11 @@ import config from './config';
 				MONGO_HOST: Joi.string().required(),
 				MONGO_CONNECTION: Joi.string().required(),
 				PORT: Joi.number().required(),
+				MARIADB_DB: Joi.string().required(),
+				MARIADB_USER: Joi.string().required(),
+				MARIADB_PASSWORD: Joi.string().required(),
+				MARIADB_PORT: Joi.number().required(),
+				MARIADB_HOST: Joi.string().required(),
 			}),
 		}),
 		InvoicesModule,
@@ -45,6 +51,7 @@ import config from './config';
 		ConfigsModule,
 		InventoriesModule,
 		StockTransferModule,
+		ImagesModule,
 	],
 })
 export class AppModule {}

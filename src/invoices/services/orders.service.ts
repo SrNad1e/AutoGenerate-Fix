@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Product } from 'src/products/entities/product.entity';
+import { Product, ProductOrder } from 'src/products/entities/product.entity';
 import { Order } from '../entities/order.entity';
 
 @Injectable()
@@ -18,7 +19,7 @@ export class OrdersService {
 	 * @param orderId orden para editar
 	 * @returns un string si hay un error de lo contrario un true
 	 */
-	async selectProductReturn(products: Product[], orderId: string) {
+	async selectProductReturn(products: ProductOrder[], orderId: string) {
 		try {
 			//Validar existencia de orden
 			const order = await this.findById(orderId);
