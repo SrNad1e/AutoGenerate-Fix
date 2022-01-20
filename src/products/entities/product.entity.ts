@@ -3,7 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Image } from 'src/images/entities/image.entity';
 import { Shipping } from 'src/shippings/entities/shipping.entity';
-import { User } from 'src/users/entities/user.entity';
 import { Category } from './category.entity';
 import { Color } from './color.entity';
 import { Provider } from './provider.entity';
@@ -47,8 +46,8 @@ export class Product extends Document {
 	@Prop({ type: Array, default: [] })
 	images: Image[];
 
-	@Prop({ type: Object, required: true })
-	user: User;
+	@Prop({ type: Number, required: true })
+	userId: number;
 
 	@Prop({ type: Object, required: true })
 	shipping: Shipping;

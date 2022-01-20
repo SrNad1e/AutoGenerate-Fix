@@ -6,7 +6,7 @@ import {
 	IsOptional,
 	IsString,
 } from 'class-validator';
-import { Product, ProductTransfer } from 'src/products/entities/product.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
 
@@ -69,6 +69,30 @@ export class CreateStockTransferParamsDto {
 	user: User;
 }
 
+export class UpdateStockTransferParamsDto {
+	@IsString()
+	status: string;
+
+	@IsString()
+	@IsOptional()
+	observationDestination?: string;
+
+	@IsString()
+	@IsOptional()
+	observationOrigin?: string;
+
+	@IsArray()
+	@IsOptional()
+	detail: {
+		product: Product;
+		quantity: number;
+		quantityConfirmed?: number;
+		status: string;
+		createdAt: Date;
+		updateAt: Date;
+	}[];
+}
+
 export class CreateStockTransferDto {
 	@IsObject()
 	detail: {
@@ -82,6 +106,9 @@ export class CreateStockTransferDto {
 	}[];
 
 	@IsOptional()
+	number?: number;
+
+	@IsOptional()
 	status?: string;
 
 	@IsOptional()
@@ -89,6 +116,9 @@ export class CreateStockTransferDto {
 
 	@IsOptional()
 	observationDestination?: string;
+
+	@IsOptional()
+	observation?: string;
 
 	@IsNumber()
 	warehouseOrigin: Warehouse;
@@ -98,4 +128,14 @@ export class CreateStockTransferDto {
 
 	@IsNumber()
 	userIdOrigin: number;
+
+	@IsNumber()
+	@IsOptional()
+	userIdDestination?: number;
+
+	@IsOptional()
+	code?: string;
+
+	@IsOptional()
+	createdAt?: Date;
 }

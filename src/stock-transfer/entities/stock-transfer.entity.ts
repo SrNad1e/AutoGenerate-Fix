@@ -45,6 +45,9 @@ export class StockTransfer extends Document {
 
 	@Prop({ type: String })
 	observation?: string;
+
+	@Prop({ type: String })
+	code?: string;
 }
 
 export const StockTransferSchema = SchemaFactory.createForClass(StockTransfer);

@@ -2,6 +2,8 @@ import {
 	Body,
 	Controller,
 	Get,
+	Param,
+	Patch,
 	Post,
 	Query,
 	UsePipes,
@@ -13,6 +15,7 @@ import { UsersService } from 'src/users/services/users.service';
 import {
 	CreateStockTransferParamsDto,
 	FiltersStockTransferDto,
+	UpdateStockTransferParamsDto,
 } from '../dtos/stock-transfer.dto';
 import { StockTransferService } from '../services/stock-transfer.service';
 
@@ -35,10 +38,30 @@ export class StockTransferController {
 			sort,
 		});
 	}
+	@Get('migrate')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	showMigrate() {
+		return this.stockTransferService.migrate();
+	}
+
+	@Get(':id')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	getById(@Param('id') id: string) {
+		return this.stockTransferService.getById(id);
+	}
 
 	@Post()
 	@UsePipes(new ValidationPipe({ transform: true }))
 	async create(@Body() params: CreateStockTransferParamsDto) {
 		return this.stockTransferService.create(params);
+	}
+
+	@Patch(':id')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async update(
+		@Param('id') id: string,
+		@Body() params: UpdateStockTransferParamsDto,
+	) {
+		return this.stockTransferService.update(id, params);
 	}
 }

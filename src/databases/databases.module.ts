@@ -6,6 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { Inventories } from 'src/inventories/entities/inventories.entity';
+import { ProductMysql } from 'src/products/entities/product.migration.entity';
+import { StockTransferDetailMysql } from 'src/stock-transfer/entities/stock-transfer-detail.migrate.entity';
+import { StockTransferMysql } from 'src/stock-transfer/entities/stock-transfer.migrate.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @Global()
@@ -13,8 +16,7 @@ import { User } from 'src/users/entities/user.entity';
 	imports: [
 		MongooseModule.forRootAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
-				const { connection, host, port, dbName } =
-					configService.mongo;
+				const { connection, host, port, dbName } = configService.mongo;
 				return {
 					uri: `${connection}://${host}:${port}`,
 					dbName,
@@ -33,7 +35,13 @@ import { User } from 'src/users/entities/user.entity';
 					username: user,
 					password,
 					database: dbName,
-					entities: [Inventories, User],
+					entities: [
+						Inventories,
+						User,
+						StockTransferMysql,
+						StockTransferDetailMysql,
+						ProductMysql,
+					],
 				};
 			},
 		}),

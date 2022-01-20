@@ -13,6 +13,9 @@ import {
 import { ProductsModule } from 'src/products/products.module';
 import { ShopsModule } from 'src/shops/shops.module';
 import { InventoriesModule } from 'src/inventories/inventories.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { StockTransferMysql } from './entities/stock-transfer.migrate.entity';
+import { StockTransferDetailMysql } from './entities/stock-transfer-detail.migrate.entity';
 
 @Module({
 	imports: [
@@ -20,6 +23,7 @@ import { InventoriesModule } from 'src/inventories/inventories.module';
 		ProductsModule,
 		ShopsModule,
 		InventoriesModule,
+		TypeOrmModule.forFeature([StockTransferMysql, StockTransferDetailMysql]),
 		MongooseModule.forFeatureAsync([
 			{
 				name: StockTransfer.name,
@@ -27,9 +31,9 @@ import { InventoriesModule } from 'src/inventories/inventories.module';
 					const schema = StockTransferSchema;
 					const AutoIncrement = AutoIncrementFactory(connection);
 					schema.plugin(AutoIncrement, {
-						id: 'stock_counter',
+						id: 'stock_increment',
 						inc_field: 'number',
-						inc_amount: 14590,
+						start_seq: 14590,
 					});
 					return schema;
 				},

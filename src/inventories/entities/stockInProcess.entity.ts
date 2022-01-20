@@ -8,6 +8,9 @@ export class StockInProcess extends Document {
 	@Prop({ type: String, required: true })
 	documentType: string;
 
+	@Prop({ type: ObjectId })
+	documentId: ObjectId;
+
 	@Prop({ type: ObjectId, required: true })
 	productId: ObjectId;
 
