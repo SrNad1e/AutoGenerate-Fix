@@ -11,6 +11,7 @@ import { WarehouseService } from 'src/shops/services/warehouses.service';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import {
+	ConfirmDetailTransferDto,
 	CreateStockTransferDto,
 	CreateStockTransferParamsDto,
 	FiltersStockTransferDto,
@@ -309,7 +310,7 @@ export class StockTransferService {
 	}
 
 	async update(id: string, params: UpdateStockTransferParamsDto) {
-		const { products, status, user, ...props } = params;
+		const { products, status, user, observation, ...props } = params;
 		try {
 			//obtenemos los datos para validarlos con los ya guardados
 			const stockTransfer = await this.stockTransferModel.findById(id);
@@ -434,10 +435,66 @@ export class StockTransferService {
 			if (status === 'canceled') {
 				if (stockTransfer.status === 'sent') {
 					//actualizar las reservas a canceled
-					//adicionar el inventario a la bodega origen
-				}
+					const updateStockInProcess =
+						await this.inventoryService.updateProductsStockInProcess(
+							stockTransfer._id,
+							status,
+						);
+					if (updateStockInProcess === true) {
+						//adicionar el inventario a la bodega origen
+						let addInventory;
+						for (let i = 0; i < stockTransfer.detail.length; i++) {
+							const item = stockTransfer.detail[i];
+							addInventory = await this.inventoryService.addProductInventory(
+								{
+									...item.product,
+									quantity: item.quantity,
+								} as ProductTransfer,
+								stockTransfer.warehouseOrigin.id,
+							);
+							if (addInventory !== true) {
+								for (let j = 0; j < i; j++) {
+									const item = stockTransfer.detail[i];
+									await this.inventoryService.deleteProductInventory(
+										{
+											...item.product,
+											quantity: item.quantity,
+										} as ProductTransfer,
+										stockTransfer.warehouseOrigin.id,
+									);
+								}
+								break;
+							}
+						}
+						if (addInventory === true) {
+							//se actualiza el estado a cancelado
+							return this.stockTransferModel.findByIdAndUpdate(
+								id,
+								{ status },
+								{ new: true },
+							);
+						} else {
+							await this.inventoryService.updateProductsStockInProcess(
+								stockTransfer._id,
+								'active',
+							);
+							return new NotFoundException(
+								`Error al agregar inventario en la bodega ${addInventory}`,
+							);
+						}
+					} else {
+						return new NotFoundException(
+							`Error al actualizar las reservas ${updateStockInProcess}`,
+						);
+					}
+				} else {
+					return this.stockTransferModel.findByIdAndUpdate(
+						id,
+						{ status, observation },
 
-				//se actualiza el estado a enviado
+						{ new: true },
+					);
+				}
 			}
 
 			if (status === 'confirmed') {
@@ -448,6 +505,47 @@ export class StockTransferService {
 		} catch (e) {
 			console.log(e);
 			return new NotFoundException(e);
+		}
+	}
+
+	async confirmItems(
+		transferId: string,
+		productId: string,
+		params: ConfirmDetailTransferDto,
+	) {
+		//Consultar el traslado
+		try {
+			const transfer = await this.stockTransferModel.findById(transferId);
+
+			if (transfer) {
+				//editar el detalle
+				const detail = (await transfer).detail.map((item) => {
+					if (productId === item.product._id.toString()) {
+						return {
+							...item,
+							...params,
+							status: 'confirmed',
+						};
+					}
+
+					return item;
+				});
+				//guardar el detalle del traslado
+
+				return this.stockTransferModel.findByIdAndUpdate(
+					transferId,
+					{
+						$set: { detail },
+					},
+					{ new: true },
+				);
+			} else {
+				return new NotFoundException(`El traslado no existe`);
+			}
+		} catch (e) {
+			return new NotFoundException(
+				`Error al confirmar productos del traslado ${e}`,
+			);
 		}
 	}
 

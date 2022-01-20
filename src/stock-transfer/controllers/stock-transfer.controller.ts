@@ -13,6 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ParseSortPipePipe } from 'src/common/parse-sort-pipe.pipe';
 import { UsersService } from 'src/users/services/users.service';
 import {
+	ConfirmDetailTransferDto,
 	CreateStockTransferParamsDto,
 	FiltersStockTransferDto,
 	UpdateStockTransferParamsDto,
@@ -54,6 +55,20 @@ export class StockTransferController {
 	@UsePipes(new ValidationPipe({ transform: true }))
 	async create(@Body() params: CreateStockTransferParamsDto) {
 		return this.stockTransferService.create(params);
+	}
+
+	@Patch('confirm/:transferId/:productId')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async confirmItems(
+		@Param('transferId') transferId: string,
+		@Param('productId') productId: string,
+		@Body() params: ConfirmDetailTransferDto,
+	) {
+		return this.stockTransferService.confirmItems(
+			transferId,
+			productId,
+			params,
+		);
 	}
 
 	@Patch(':id')

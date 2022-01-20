@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ObjectID, Repository } from 'typeorm';
 
 import { Inventories } from 'src/inventories/entities/inventories.entity';
 import { ProductTransfer } from 'src/products/entities/product.entity';
@@ -122,6 +122,25 @@ export class InventoriesService {
 		try {
 			const stockInProcess = this.stockInProcessModel
 				.findOneAndUpdate({ productId, warehouseId }, { $set: changes })
+				.exec();
+			if (!stockInProcess) {
+				return `Error al actualizar inventario en proceso, producto no existe`;
+			}
+			return true;
+		} catch (e) {
+			return `Error al agregar inventario en proceso ${e}`;
+		}
+	}
+
+	/**
+	 * @description se encarga de actualizar varios stock en proceso
+	 * @param params objeto de parametros usados para actualizar el documento
+	 * @returns string si se genera algun error o true si el proceso finaliza correctamente
+	 */
+	async updateProductsStockInProcess(documentId: ObjectID, status: string) {
+		try {
+			const stockInProcess = this.stockInProcessModel
+				.updateMany({ documentId }, { $set: { status } })
 				.exec();
 			if (!stockInProcess) {
 				return `Error al actualizar inventario en proceso, producto no existe`;
