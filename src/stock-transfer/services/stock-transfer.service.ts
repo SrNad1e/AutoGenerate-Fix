@@ -314,8 +314,8 @@ export class StockTransferService {
 		try {
 			//obtenemos los datos para validarlos con los ya guardados
 			const stockTransfer = await this.stockTransferModel.findById(id);
-			const productsConfirmed = await stockTransfer.detail.filter(
-				(item) => item.product.state === 'confirmed',
+			const productsConfirmed = await stockTransfer.detail.filter((item) =>
+				['incomplete', 'received'].includes(item.status),
 			);
 
 			//validaciones para cambio de estado
@@ -353,7 +353,7 @@ export class StockTransferService {
 			if (
 				status === 'confirmed' &&
 				(stockTransfer.status !== 'sent' ||
-					products.length !== stockTransfer.detail.length ||
+					productsConfirmed.length !== stockTransfer.detail.length ||
 					user.shop_id !== stockTransfer.warehouseDestination.shopId)
 			) {
 				return new NotFoundException(
@@ -498,9 +498,84 @@ export class StockTransferService {
 			}
 
 			if (status === 'confirmed') {
-				//cargar en bodega destino todas las prendas confirmadas
+				const detailIncomplete = stockTransfer.detail.filter(
+					(item) => item.status === 'incomplete',
+				);
+
 				//cambiar de estado el traslado
-				//crear las estadísticas del traslado
+				const transferUpdate = await this.stockTransferModel.findByIdAndUpdate(
+					id,
+					{
+						$set: {
+							status: detailIncomplete.length > 0 ? 'incomplete' : 'received',
+							observationDestination: observation,
+						},
+					},
+					{ new: true },
+				);
+				if (typeof transferUpdate === 'object') {
+					//cargar en bodega destino todas las prendas confirmadas
+					let addInventory;
+					for (let i = 0; i < stockTransfer.detail.length; i++) {
+						const item = stockTransfer.detail[i];
+						addInventory = await this.inventoryService.addProductInventory(
+							{
+								...item.product,
+								quantity: item.quantityConfirmed,
+							} as ProductTransfer,
+							stockTransfer.warehouseDestination.id,
+						);
+						if (addInventory !== true) {
+							for (let j = 0; j < i; j++) {
+								for (let j = 0; j < i; j++) {
+									const item = stockTransfer.detail[i];
+									await this.inventoryService.deleteProductInventory(
+										{
+											...item.product,
+											quantity: item.quantityConfirmed,
+										} as ProductTransfer,
+										stockTransfer.warehouseDestination.id,
+									);
+								}
+							}
+						}
+					}
+					if (addInventory === true) {
+						//actualiza el estado de los productos
+						await this.inventoryService.updateProductsStockInProcess(
+							stockTransfer._id,
+							'used',
+						);
+						//crea los nuevos registros por inconsistencias
+						for (let i = 0; i < detailIncomplete.length; i++) {
+							const item = detailIncomplete[i];
+
+							const quantity = item.quantity - item.quantityConfirmed;
+
+							await this.inventoryService.addProductStockInProcess({
+								documentType: 'transfer',
+								productId: item.product._id,
+								cost: item.product.cost,
+								quantity,
+								warehouseId: stockTransfer.warehouseOrigin._id,
+								documentId: stockTransfer._id,
+							});
+						}
+						return transferUpdate;
+					} else {
+						await this.stockTransferModel.findByIdAndUpdate(id, {
+							$set: {
+								status: stockTransfer.status,
+								observationDestination: '',
+							},
+						});
+						return new NotFoundException(
+							'Error al actualizar el inventario, intentelo nuevamente',
+						);
+					}
+				} else {
+					return new NotFoundException('Error al confirmar el traslado');
+				}
 			}
 		} catch (e) {
 			console.log(e);
@@ -521,10 +596,14 @@ export class StockTransferService {
 				//editar el detalle
 				const detail = (await transfer).detail.map((item) => {
 					if (productId === item.product._id.toString()) {
+						const status =
+							item.quantity === params.quantityConfirmed
+								? 'received'
+								: 'incomplete';
 						return {
 							...item,
 							...params,
-							status: 'confirmed',
+							status,
 						};
 					}
 
