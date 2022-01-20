@@ -59,27 +59,27 @@ export class InventoriesService {
 		const product_id = product.product_id || product.id;
 
 		try {
-			const inventories = await this.inventoriesRepo.findOne({
+			const inventory = await this.inventoriesRepo.findOne({
 				warehouse_id: warehouseId,
 				product_id,
 			});
 
 			//valida si hay inventario disponible
-			if (inventories?.available >= parseInt(product.quantity.toString())) {
-				this.inventoriesRepo.merge(inventories, {
-					stock: inventories.stock - parseInt(product.quantity.toString()),
+			if (inventory?.available >= parseInt(product.quantity.toString())) {
+				this.inventoriesRepo.merge(inventory, {
+					stock: inventory.stock - parseInt(product.quantity.toString()),
 				});
-				await this.inventoriesRepo.save(inventories);
+				await this.inventoriesRepo.save(inventory);
 
 				return true;
 			} else {
 				return {
-					message: `Error al eliminar productos al inventario, el producto ${product.reference} / ${product.color.name} / ${product.size.value} no tiene unidades suficientes, disponibles ${inventories.available}`,
+					message: `Error al eliminar productos del inventario, el producto ${product.reference} / ${product.color.name} / ${product.size.value} no tiene unidades suficientes, disponibles ${inventory.available}`,
 					product,
 				};
 			}
 		} catch (e: any) {
-			return { message: `Error al eliminar productos al inventario ${e}` };
+			return { message: `Error al eliminar productos del inventario ${e}` };
 		}
 	}
 

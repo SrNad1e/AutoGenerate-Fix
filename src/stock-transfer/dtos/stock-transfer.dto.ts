@@ -82,15 +82,12 @@ export class UpdateStockTransferParamsDto {
 	observationOrigin?: string;
 
 	@IsArray()
-	@IsOptional()
-	detail: {
-		product: Product;
+	products: {
+		product_id: number;
 		quantity: number;
-		quantityConfirmed?: number;
-		status: string;
-		createdAt: Date;
-		updateAt: Date;
 	}[];
+	@IsObject()
+	user: User;
 }
 
 export class CreateStockTransferDto {

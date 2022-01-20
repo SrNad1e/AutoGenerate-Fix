@@ -198,31 +198,16 @@ export class StockTransferService {
 			user,
 		} = params;
 
+		const productsError = products.find((product) => product.quantity <= 0);
+
+		if (productsError) {
+			return new NotFoundException(
+				`El traslado no puede ser creado, la cantidad del producto ${productsError.product_id} no puede ser 0`,
+			);
+		}
+
 		//consultar productos
-		const productsIds = products.map((product) => product.product_id);
-
-		const productsResponse: Product[] =
-			await this.productsService.getProductsIdSql(productsIds);
-
-		const detail = productsResponse.map((product) => {
-			const prod = products.find((item) => product.id === item.product_id);
-			if (prod) {
-				return {
-					product,
-					quantity: prod.quantity,
-					status: 'open',
-					createdAt: new Date(),
-					updateAt: new Date(),
-				};
-			}
-			return {
-				product,
-				quantity: 0,
-				status: 'open',
-				createdAt: new Date(),
-				updateAt: new Date(),
-			};
-		});
+		const detail = await this.getDetail(products, status);
 
 		//consultar bodegas
 		const warehouseOrigin = await this.warehousesService.getByIdMysql(
@@ -286,6 +271,10 @@ export class StockTransferService {
 				return { ...transferOk['_doc'], detail: detail['_doc'] };
 			} else {
 				//actualizar traslado
+				const detail = transferOk.detail.map((item) => ({
+					...item,
+					status: 'open',
+				}));
 				await this.stockTransferModel.findByIdAndUpdate(transferOk._id, {
 					$set: { status: 'open' },
 				});
@@ -320,70 +309,141 @@ export class StockTransferService {
 	}
 
 	async update(id: string, params: UpdateStockTransferParamsDto) {
-		const { detail, status, ...props } = params;
+		const { products, status, user, ...props } = params;
 		try {
 			//obtenemos los datos para validarlos con los ya guardados
 			const stockTransfer = await this.stockTransferModel.findById(id);
+			const productsConfirmed = await stockTransfer.detail.filter(
+				(item) => item.product.state === 'confirmed',
+			);
 
-			let updateInventories;
-			if (status === 'sent') {
-				for (let i = 0; i < detail.length; i++) {
-					const item = detail[i];
-					const product: any = item?.product;
+			//validaciones para cambio de estado
 
-					updateInventories = await this.inventoryService.reserveStock(
-						{
-							...product,
-							quantity: item.quantity,
-						},
-						stockTransfer.warehouseOrigin,
-						stockTransfer.warehouseDestination,
-						'transfer',
-						stockTransfer._id,
-					);
-					if (updateInventories !== true) return;
-				}
+			const productsError = products.find((product) => product.quantity <= 0);
+			if (
+				status === 'open' &&
+				(stockTransfer.status !== 'open' || productsError)
+			) {
+				return new NotFoundException(
+					`El traslado ${stockTransfer.number} no puede ser creado`,
+				);
 			}
 
 			if (
-				(status === 'sent' && updateInventories === true) ||
-				status !== 'sent'
+				status === 'sent' &&
+				(stockTransfer.status !== 'open' || productsError)
 			) {
-				const detailNew = detail.map((item) => {
-					const detailOld = stockTransfer.detail.find(
-						(itemOld) => item.product._id === itemOld.product._id,
-					);
-					if (detailOld) {
-						return {
-							...detailOld,
-							quantity: item.quantity,
-							updateAt: new Date(),
-						};
-					} else {
-						return {
-							product: item.product,
-							quantity: item.quantity,
-							status: 'open',
-							createdAt: new Date(),
-							updateAt: new Date(),
-						};
-					}
-				});
-
-				return this.stockTransferModel.findByIdAndUpdate(
-					id,
-					{
-						$set: { ...props, status, detail: detailNew },
-					},
-					{ new: true },
+				return new NotFoundException(
+					`El traslado ${stockTransfer.number} no puede ser cancelado`,
 				);
-			} else {
-				//actualiza el estado del traslado
-				await this.stockTransferModel.findByIdAndUpdate(stockTransfer._id, {
-					$set: { status: 'open' },
-				});
+			}
 
-				return new NotFoundException(updateInventories);
+			if (
+				status === 'canceled' &&
+				(stockTransfer.status === 'confirmed' ||
+					productsConfirmed.length > 0 ||
+					user.shop_id !== stockTransfer.warehouseOrigin.shopId)
+			) {
+				return new NotFoundException(
+					`El traslado ${stockTransfer.number} no puede ser cancelado`,
+				);
+			}
+
+			if (
+				status === 'confirmed' &&
+				(stockTransfer.status !== 'sent' ||
+					products.length !== stockTransfer.detail.length ||
+					user.shop_id !== stockTransfer.warehouseDestination.shopId)
+			) {
+				return new NotFoundException(
+					`El traslado ${stockTransfer.number} no puede ser confirmado`,
+				);
+			}
+
+			if (status === 'open' || status === 'sent') {
+				//proceso dependiendo del estado
+				const detail = await this.getDetail(products, status);
+				let updateInventories;
+
+				if (status === 'sent') {
+					for (let i = 0; i < detail.length; i++) {
+						const item = detail[i];
+						const product: any = item?.product;
+
+						updateInventories = await this.inventoryService.reserveStock(
+							{
+								...product['_doc'],
+								quantity: item.quantity,
+							},
+							stockTransfer.warehouseOrigin,
+							stockTransfer.warehouseDestination,
+							'transfer',
+							stockTransfer._id,
+						);
+						if (updateInventories !== true) break;
+					}
+				}
+
+				if (
+					(status === 'sent' && updateInventories === true) ||
+					status !== 'sent'
+				) {
+					const detailNew = detail.map((item) => {
+						const detailOld = stockTransfer.detail.find(
+							(itemOld) => item.product._id === itemOld.product._id,
+						);
+						if (detailOld) {
+							return {
+								...detailOld,
+								quantity: item.quantity,
+								updateAt: new Date(),
+							};
+						} else {
+							return {
+								product: item.product,
+								quantity: item.quantity,
+								status: 'sent',
+								createdAt: new Date(),
+								updateAt: new Date(),
+							};
+						}
+					});
+
+					return this.stockTransferModel.findByIdAndUpdate(
+						id,
+						{
+							$set: {
+								...props,
+								status,
+								detail: detailNew,
+								userIdOrigin: user.id,
+							},
+						},
+						{ new: true },
+					);
+				} else {
+					//actualiza el estado del traslado
+					await this.stockTransferModel.findByIdAndUpdate(stockTransfer._id, {
+						$set: { status: 'open' },
+					});
+
+					return new NotFoundException(updateInventories);
+				}
+			}
+
+			if (status === 'canceled') {
+				if (stockTransfer.status === 'sent') {
+					//actualizar las reservas a canceled
+					//adicionar el inventario a la bodega origen
+				}
+
+				//se actualiza el estado a enviado
+			}
+
+			if (status === 'confirmed') {
+				//cargar en bodega destino todas las prendas confirmadas
+				//cambiar de estado el traslado
+				//crear las estadísticas del traslado
 			}
 		} catch (e) {
 			console.log(e);
@@ -540,5 +600,43 @@ export class StockTransferService {
 		} catch (e) {
 			return new NotFoundException(e);
 		}
+	}
+
+	/**
+	 * @description se encarga de consultar los productos y crear el detail
+	 * @param products productos a agregar en el detail
+	 * @param status estado de los productos
+	 * @returns detail para el traslado
+	 */
+	async getDetail(
+		products: {
+			product_id: number;
+			quantity: number;
+		}[],
+		status = 'open',
+	) {
+		const productsIds = products.map((product) => product.product_id);
+		const productsResponse: Product[] =
+			await this.productsService.getProductsIdSql(productsIds);
+
+		return productsResponse.map((product) => {
+			const prod = products.find((item) => product.id === item.product_id);
+			if (prod) {
+				return {
+					product,
+					quantity: prod.quantity,
+					status,
+					createdAt: new Date(),
+					updateAt: new Date(),
+				};
+			}
+			return {
+				product,
+				quantity: 0,
+				status,
+				createdAt: new Date(),
+				updateAt: new Date(),
+			};
+		});
 	}
 }
