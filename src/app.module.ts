@@ -17,6 +17,7 @@ import { ConfigsModule } from './configs/configs.module';
 import { InventoriesModule } from './inventories/inventories.module';
 import { StockTransferModule } from './stock-transfer/stock-transfer.module';
 import { ImagesModule } from './images/images.module';
+import { StockRequestModule } from './stock-request/stock-request.module';
 import config from './config';
 @Module({
 	imports: [
@@ -52,6 +53,7 @@ import config from './config';
 		InventoriesModule,
 		StockTransferModule,
 		ImagesModule,
+		StockRequestModule,
 	],
 })
 export class AppModule {}

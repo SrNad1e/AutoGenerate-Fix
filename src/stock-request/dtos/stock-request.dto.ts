@@ -10,7 +10,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
 
-export class FiltersStockTransferDto {
+export class FiltersStockRequestDto {
 	@IsOptional()
 	limit?: number;
 
@@ -42,56 +42,7 @@ export class FiltersStockTransferDto {
 	sort?: Record<string, 1 | -1 | { $meta: 'textScore' }>;
 }
 
-export class CreateStockTransferParamsDto {
-	@IsArray()
-	products: {
-		product_id: number;
-		quantity: number;
-	}[];
-
-	@IsOptional()
-	observationOrigin?: string;
-
-	@IsNumber()
-	warehouseOriginId: number;
-
-	@IsNumber()
-	warehouseDestinationId: number;
-
-	@IsString()
-	@IsOptional()
-	status?: string;
-	//TODO: Temporal mientras se traslada la autenticación
-	@IsObject()
-	user: User;
-}
-
-export class UpdateStockTransferParamsDto {
-	@IsString()
-	status: string;
-
-	@IsString()
-	@IsOptional()
-	observationDestination?: string;
-
-	@IsString()
-	@IsOptional()
-	observationOrigin?: string;
-
-	@IsString()
-	@IsOptional()
-	observation;
-
-	@IsArray()
-	products: {
-		product_id: number;
-		quantity: number;
-	}[];
-	@IsObject()
-	user: User;
-}
-
-export class CreateStockTransferDto {
+export class CreateStockRequestDto {
 	@IsObject()
 	detail: {
 		product: Product;
@@ -110,9 +61,6 @@ export class CreateStockTransferDto {
 	status?: string;
 
 	@IsOptional()
-	observationOrigin?: string;
-
-	@IsOptional()
 	observationDestination?: string;
 
 	@IsOptional()
@@ -125,7 +73,46 @@ export class CreateStockTransferDto {
 	warehouseDestination: Warehouse;
 
 	@IsNumber()
-	userIdOrigin: number;
+	@IsOptional()
+	userIdDestination: number;
+
+	@IsOptional()
+	code?: string;
+
+	@IsOptional()
+	createdAt?: Date;
+}
+
+export class UpdateStockRequestDto {
+	@IsObject()
+	@IsOptional()
+	detail?: {
+		product: Product;
+		quantity: number;
+		quantityConfirmed?: number;
+		status: string;
+		observation?: string;
+		createdAt: Date;
+		updateAt: Date;
+	}[];
+
+	@IsOptional()
+	number?: number;
+
+	@IsOptional()
+	status?: string;
+
+	@IsOptional()
+	observationDestination?: string;
+
+	@IsOptional()
+	observation?: string;
+
+	@IsNumber()
+	warehouseOrigin?: Warehouse;
+
+	@IsNumber()
+	warehouseDestination?: Warehouse;
 
 	@IsNumber()
 	@IsOptional()
@@ -138,11 +125,48 @@ export class CreateStockTransferDto {
 	createdAt?: Date;
 }
 
-export class ConfirmDetailTransferDto {
+export class CreateStockRequestParamsDto {
+	@IsArray()
+	products: {
+		product_id: number;
+		quantity: number;
+	}[];
+
+	@IsOptional()
+	observationDestination?: string;
+
 	@IsNumber()
-	quantityConfirmed: number;
+	warehouseOriginId: number;
+
+	@IsNumber()
+	warehouseDestinationId: number;
+
+	@IsString()
+	@IsOptional()
+	status?: string;
+	//TODO: Temporal mientras se traslada la autenticación
+	@IsObject()
+	user: User;
+}
+
+export class UpdateStockRequestParamsDto {
+	@IsString()
+	status: string;
+
+	@IsString()
+	@IsOptional()
+	observationDestination?: string;
 
 	@IsString()
 	@IsOptional()
 	observation?: string;
+
+	@IsArray()
+	products: {
+		product_id: number;
+		quantity: number;
+	}[];
+
+	@IsObject()
+	user: User;
 }

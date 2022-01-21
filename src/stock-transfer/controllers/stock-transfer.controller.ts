@@ -3,6 +3,7 @@ import {
 	Controller,
 	Get,
 	Param,
+	ParseIntPipe,
 	Patch,
 	Post,
 	Query,
@@ -49,6 +50,15 @@ export class StockTransferController {
 	@UsePipes(new ValidationPipe({ transform: true }))
 	getById(@Param('id') id: string) {
 		return this.stockTransferService.getById(id);
+	}
+
+	@Post(':id')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async createByRequest(
+		@Param('id') idRequest: string,
+		@Body('userId') userId: number,
+	) {
+		return this.stockTransferService.createByRequest(idRequest, userId);
 	}
 
 	@Post()

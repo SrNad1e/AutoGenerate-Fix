@@ -8,6 +8,7 @@ import { InventoriesService } from 'src/inventories/services/inventories/invento
 import { Product, ProductTransfer } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehouseService } from 'src/shops/services/warehouses.service';
+import { StockRequestService } from 'src/stock-request/services/stock-request.service';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import {
@@ -34,6 +35,7 @@ export class StockTransferService {
 		private warehousesService: WarehouseService,
 		private inventoryService: InventoriesService,
 		private userService: UsersService,
+		private stockRequestService: StockRequestService,
 	) {}
 
 	async getAll(params: FiltersStockTransferDto) {
@@ -153,7 +155,9 @@ export class StockTransferService {
 
 	async getById(id: string) {
 		try {
+			console.log(id);
 			const stockTransfer = await this.stockTransferModel.findById(id);
+
 			const userOrigin = await this.userService.getUserId(
 				stockTransfer.userIdOrigin,
 			);
@@ -193,7 +197,6 @@ export class StockTransferService {
 			products,
 			warehouseDestinationId,
 			warehouseOriginId,
-			observationDestination,
 			observationOrigin,
 			status = 'open',
 			user,
@@ -226,7 +229,6 @@ export class StockTransferService {
 			userIdOrigin: user.id,
 			detail,
 			status,
-			observationDestination,
 			observationOrigin,
 		});
 		if (typeof transferOk === 'object') {
@@ -309,6 +311,30 @@ export class StockTransferService {
 		}
 	}
 
+	async createByRequest(idRequest: string, userId: number) {
+		try {
+			const stockRequest = await this.stockRequestService.getById(idRequest);
+
+			const params: CreateStockTransferDto = {
+				detail: stockRequest.detail,
+				observationDestination: stockRequest.observationDestination,
+				warehouseDestination: stockRequest.warehouseDestination,
+				warehouseOrigin: stockRequest.warehouseOrigin,
+				userIdOrigin: userId,
+			};
+			const stockTransfer = await this.createStockTransfer(params);
+			await this.stockRequestService.updateStockRequest(idRequest, {
+				...stockRequest,
+				status: 'used',
+				documentId: stockTransfer._id,
+			});
+			return stockTransfer;
+		} catch (e) {
+			console.log(e);
+			return new NotFoundException(`Error al crear el traslado ${e}`);
+		}
+	}
+
 	async update(id: string, params: UpdateStockTransferParamsDto) {
 		const { products, status, user, observation, ...props } = params;
 		try {
@@ -335,7 +361,7 @@ export class StockTransferService {
 				(stockTransfer.status !== 'open' || productsError)
 			) {
 				return new NotFoundException(
-					`El traslado ${stockTransfer.number} no puede ser cancelado`,
+					`El traslado ${stockTransfer.number} no puede ser enviado`,
 				);
 			}
 
@@ -682,6 +708,7 @@ export class StockTransferService {
 				p.cost AS "product.cost",
 				p.state AS "product.state",
 				p.images AS "product.images",
+				p.id AS "product.id",
 				u.id AS "product.user.id",
 				u.name AS "product.user.name",
 				u.shop_id AS "product.user.shop_id",
@@ -741,6 +768,7 @@ export class StockTransferService {
 						cost: parseInt(productData['product.cost']),
 						state: productData['product.state'],
 						images: JSON.parse(productData['product.images']) || [],
+						id: productData['id'],
 					};
 					return {
 						product,

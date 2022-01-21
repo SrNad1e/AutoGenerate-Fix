@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectId } from 'bson';
 import { Document } from 'mongoose';
 import { Product } from 'src/products/entities/product.entity';
-
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 
-@Schema({ timestamps: true, collection: 'stocktransfer' })
-export class StockTransfer extends Document {
+@Schema({ timestamps: true, collection: 'stockrequest' })
+export class StockRequest extends Document {
 	@Prop({ type: Number, default: 0, unique: true })
 	number: number;
 
@@ -15,10 +15,6 @@ export class StockTransfer extends Document {
 
 	@Prop({ type: Object, required: true })
 	warehouseOrigin: Warehouse;
-
-	//TODO: pendiente pasar a mongo los usuarios
-	@Prop({ type: Number, required: true })
-	userIdOrigin: number;
 
 	@Prop({ type: Array, required: true })
 	detail: {
@@ -30,14 +26,14 @@ export class StockTransfer extends Document {
 		updateAt: Date;
 	}[];
 
-	@Prop({ type: String })
-	observationOrigin?: string;
-
-	@Prop({ type: Object, required: true  })
+	@Prop({ type: Object, required: true })
 	warehouseDestination: Warehouse;
 
+	@Prop({ type: ObjectId })
+	transferId?: ObjectId;
+
 	//TODO: pendiente pasar a mongo los usuarios
-	@Prop({ type: Number })
+	@Prop({ type: Number, required: true })
 	userIdDestination?: number;
 
 	@Prop({ type: String })
@@ -46,8 +42,9 @@ export class StockTransfer extends Document {
 	@Prop({ type: String })
 	observation?: string;
 
+	//TODO: Eliminar con el tiempo campo de mysql
 	@Prop({ type: String })
 	code?: string;
 }
 
-export const StockTransferSchema = SchemaFactory.createForClass(StockTransfer);
+export const StockRequestSchema = SchemaFactory.createForClass(StockRequest);

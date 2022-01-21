@@ -16,6 +16,7 @@ import { InventoriesModule } from 'src/inventories/inventories.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockTransferMysql } from './entities/stock-transfer.migrate.entity';
 import { StockTransferDetailMysql } from './entities/stock-transfer-detail.migrate.entity';
+import { StockRequestModule } from 'src/stock-request/stock-request.module';
 
 @Module({
 	imports: [
@@ -23,6 +24,7 @@ import { StockTransferDetailMysql } from './entities/stock-transfer-detail.migra
 		ProductsModule,
 		ShopsModule,
 		InventoriesModule,
+		StockRequestModule,
 		TypeOrmModule.forFeature([StockTransferMysql, StockTransferDetailMysql]),
 		MongooseModule.forFeatureAsync([
 			{
