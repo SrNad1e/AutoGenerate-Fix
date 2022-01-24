@@ -11,6 +11,7 @@ import {
 	ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { ObjectId } from 'mongoose';
 import { ParseSortPipePipe } from 'src/common/parse-sort-pipe.pipe';
 import { UsersService } from 'src/users/services/users.service';
 import {
@@ -40,6 +41,13 @@ export class StockTransferController {
 			sort,
 		});
 	}
+
+	@Get('verify/:id')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async getVerify(@Param('id') id: string) {
+		return this.stockTransferService.getVerify(id);
+	}
+
 	@Get('migrate')
 	@UsePipes(new ValidationPipe({ transform: true }))
 	showMigrate() {
@@ -79,6 +87,12 @@ export class StockTransferController {
 			productId,
 			params,
 		);
+	}
+
+	@Patch('verify/:id')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	async verify(@Param('id') id: ObjectId) {
+		return; //this.stockTransferService.verify(id);
 	}
 
 	@Patch(':id')

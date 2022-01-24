@@ -91,6 +91,7 @@ export class StockRequestService {
 				userIdOrigin: { $first: '$userIdOrigin' },
 				warehouseOrigin: { $first: '$warehouseOrigin' },
 				warehouseDestination: { $first: '$warehouseDestination' },
+				detail: { $first: '$detail' },
 				status: { $first: '$status' },
 				number: { $first: '$number' },
 				createdAt: { $first: '$createdAt' },

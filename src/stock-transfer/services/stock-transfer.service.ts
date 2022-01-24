@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { FilterQuery, Model } from 'mongoose';
+import mongoose, { FilterQuery, Model, mongo, ObjectId } from 'mongoose';
 
 import { InventoriesService } from 'src/inventories/services/inventories/inventories.service';
 import { Product, ProductTransfer } from 'src/products/entities/product.entity';
@@ -155,7 +155,6 @@ export class StockTransferService {
 
 	async getById(id: string) {
 		try {
-			console.log(id);
 			const stockTransfer = await this.stockTransferModel.findById(id);
 
 			const userOrigin = await this.userService.getUserId(
@@ -200,6 +199,7 @@ export class StockTransferService {
 			observationOrigin,
 			status = 'open',
 			user,
+			requests,
 		} = params;
 
 		const productsError = products.find((product) => product.quantity <= 0);
@@ -225,6 +225,7 @@ export class StockTransferService {
 		//crear la transferencia
 		const transferOk = await this.createStockTransfer({
 			warehouseOrigin,
+			requests,
 			warehouseDestination,
 			userIdOrigin: user.id,
 			detail,
@@ -235,20 +236,61 @@ export class StockTransferService {
 			let updateInventories;
 			//modificación en inventario
 			if (status === 'sent') {
-				for (let i = 0; i < detail.length; i++) {
-					const item = detail[i];
-					const product = item?.product['_doc'];
-					updateInventories = await this.inventoryService.reserveStock(
+				for (let i = 0; i < transferOk.requests.length; i++) {
+					const requestData = transferOk.requests[i];
+					updateInventories = await this.stockRequestService.updateStockRequest(
+						requestData._id,
 						{
-							...product,
-							quantity: item.quantity,
+							status: 'used',
 						},
-						warehouseOrigin,
-						warehouseDestination,
-						'transfer',
-						transferOk._id,
 					);
-					if (updateInventories !== true) break;
+				}
+				if (updateInventories !== true) {
+					for (let i = 0; i < detail.length; i++) {
+						const item = detail[i];
+						const product = item?.product['_doc'];
+						updateInventories = await this.inventoryService.reserveStock(
+							{
+								...product,
+								quantity: item.quantity,
+							},
+							warehouseOrigin,
+							warehouseDestination,
+							'transfer',
+							transferOk._id,
+						);
+						if (updateInventories !== true) break;
+					}
+				} else {
+					const detail = transferOk.detail.map((item) => ({
+						...item,
+						status: 'open',
+					}));
+					await this.stockTransferModel.findByIdAndUpdate(transferOk._id, {
+						$set: { status: 'open' },
+					});
+
+					//eliminar unidades
+					const indexDelete = detail.findIndex(
+						(item) => item.product._id === updateInventories.product._id,
+					);
+
+					for (let i = 0; i < indexDelete; i++) {
+						const item = detail[i];
+
+						const product = {
+							...detail[i]['product']['_doc'],
+							quantity: item.quantity,
+						} as ProductTransfer;
+						await this.inventoryService.reverseStock(
+							product,
+							warehouseOrigin,
+							warehouseDestination,
+							transferOk._id,
+						);
+					}
+
+					return new NotFoundException(updateInventories);
 				}
 			}
 			if (
@@ -317,6 +359,7 @@ export class StockTransferService {
 
 			const params: CreateStockTransferDto = {
 				detail: stockRequest.detail,
+				requests: [stockRequest],
 				observationDestination: stockRequest.observationDestination,
 				warehouseDestination: stockRequest.warehouseDestination,
 				warehouseOrigin: stockRequest.warehouseOrigin,
@@ -393,21 +436,42 @@ export class StockTransferService {
 				let updateInventories;
 
 				if (status === 'sent') {
-					for (let i = 0; i < detail.length; i++) {
-						const item = detail[i];
-						const product: any = item?.product;
+					for (let i = 0; i < stockTransfer.requests.length; i++) {
+						const requestData = stockTransfer.requests[i];
 
-						updateInventories = await this.inventoryService.reserveStock(
-							{
-								...product['_doc'],
-								quantity: item.quantity,
-							},
-							stockTransfer.warehouseOrigin,
-							stockTransfer.warehouseDestination,
-							'transfer',
-							stockTransfer._id,
-						);
-						if (updateInventories !== true) break;
+						updateInventories =
+							await this.stockRequestService.updateStockRequest(
+								requestData._id,
+								{
+									status: 'used',
+								},
+							);
+						if (typeof updateInventories === 'object') updateInventories = true;
+					}
+
+					if (updateInventories === true) {
+						for (let i = 0; i < detail.length; i++) {
+							const item = detail[i];
+							const product: any = item?.product;
+
+							updateInventories = await this.inventoryService.reserveStock(
+								{
+									...product['_doc'],
+									quantity: item.quantity,
+								},
+								stockTransfer.warehouseOrigin,
+								stockTransfer.warehouseDestination,
+								'transfer',
+								stockTransfer._id,
+							);
+							if (updateInventories !== true) break;
+						}
+					} else {
+						await this.stockTransferModel.findByIdAndUpdate(stockTransfer._id, {
+							$set: { status: 'open' },
+						});
+
+						return new NotFoundException(updateInventories);
 					}
 				}
 
@@ -459,6 +523,13 @@ export class StockTransferService {
 			}
 
 			if (status === 'canceled') {
+				for (let i = 0; i < stockTransfer.requests.length; i++) {
+					const requestData = stockTransfer.requests[i];
+
+					await this.stockRequestService.updateStockRequest(requestData._id, {
+						status: 'pending',
+					});
+				}
 				if (stockTransfer.status === 'sent') {
 					//actualizar las reservas a canceled
 					const updateStockInProcess =
@@ -607,6 +678,17 @@ export class StockTransferService {
 			console.log(e);
 			return new NotFoundException(e);
 		}
+	}
+
+	async getVerify(id: string) {
+		const stockInProcess = await this.inventoryService.getReserveStock({
+			documentId: new mongo.ObjectId(id) as unknown as ObjectId,
+			status: 'active',
+		});
+
+		return {
+			data: stockInProcess,
+		};
 	}
 
 	async confirmItems(
@@ -783,6 +865,7 @@ export class StockTransferService {
 				ok = await this.createStockTransfer({
 					number: item.id,
 					detail: detailFormat,
+					requests: [],
 					warehouseOrigin,
 					warehouseDestination,
 					userIdOrigin: item.origin_user_id,

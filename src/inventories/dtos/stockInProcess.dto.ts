@@ -16,3 +16,12 @@ export class updateStockInProcess {
 	warehouseId: number;
 	documentId: ObjectId;
 }
+
+export class FiltersStockInProcess {
+	productId?: ObjectId;
+	documentId?: ObjectId;
+	cost?: number;
+	documentType?: string;
+	quantity?: number;
+	status?: string;
+}

@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 import { Product } from 'src/products/entities/product.entity';
 
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { StockRequest } from 'src/stock-request/entities/stock-request.entity';
 
 @Schema({ timestamps: true, collection: 'stocktransfer' })
 export class StockTransfer extends Document {
@@ -33,7 +34,7 @@ export class StockTransfer extends Document {
 	@Prop({ type: String })
 	observationOrigin?: string;
 
-	@Prop({ type: Object, required: true  })
+	@Prop({ type: Object, required: true })
 	warehouseDestination: Warehouse;
 
 	//TODO: pendiente pasar a mongo los usuarios
@@ -45,6 +46,9 @@ export class StockTransfer extends Document {
 
 	@Prop({ type: String })
 	observation?: string;
+
+	@Prop({ type: Array, default: [] })
+	requests: StockRequest[];
 
 	@Prop({ type: String })
 	code?: string;

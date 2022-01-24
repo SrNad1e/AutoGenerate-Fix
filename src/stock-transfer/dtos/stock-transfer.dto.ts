@@ -6,6 +6,7 @@ import {
 	IsOptional,
 	IsString,
 } from 'class-validator';
+import { ObjectId } from 'mongoose';
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -49,6 +50,9 @@ export class CreateStockTransferParamsDto {
 		quantity: number;
 	}[];
 
+	@IsArray()
+	requests?: ObjectId[];
+
 	@IsOptional()
 	observationOrigin?: string;
 
@@ -77,6 +81,9 @@ export class UpdateStockTransferParamsDto {
 	@IsString()
 	@IsOptional()
 	observationOrigin?: string;
+
+	@IsArray()
+	requests: ObjectId[];
 
 	@IsString()
 	@IsOptional()
@@ -108,6 +115,9 @@ export class CreateStockTransferDto {
 
 	@IsOptional()
 	status?: string;
+
+	@IsArray()
+	requests: ObjectId[];
 
 	@IsOptional()
 	observationOrigin?: string;

@@ -11,6 +11,7 @@ import { Model, ObjectId } from 'mongoose';
 import {
 	createStockInProcess,
 	deleteStockInProcess,
+	FiltersStockInProcess,
 	updateStockInProcess,
 } from 'src/inventories/dtos/stockInProcess.dto';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -162,6 +163,10 @@ export class InventoriesService {
 			product_id: product.id,
 			warehouse_id: warehouseId,
 		});
+	}
+
+	async getReserveStock(params: FiltersStockInProcess) {
+		return this.stockInProcessModel.find(params);
 	}
 
 	/**
