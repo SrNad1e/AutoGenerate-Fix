@@ -26,7 +26,7 @@ export class CustomersService {
 		});
 	}
 
-	@Cron('59 * * * * *')
+	@Cron('* * 21 * * *')
 	async checkWholesales() {
 		//consultar clientes que sean mayoristas
 
