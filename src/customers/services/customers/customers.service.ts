@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
@@ -25,7 +26,7 @@ export class CustomersService {
 		});
 	}
 
-	@Cron('10 * * * * *')
+	@Cron('59 * * * * *')
 	async checkWholesales() {
 		//consultar clientes que sean mayoristas
 
@@ -35,22 +36,30 @@ export class CustomersService {
 
 		//seleccionamos los que tengan fecha vencida
 		const customersCheck = customers.filter((customer) =>
-			dayjs(customer.wholesale.activatedAt).add(30, 'd').isAfter(dayjs()),
+			dayjs(customer.wholesale.activatedAt).add(30, 'd').isBefore(dayjs()),
 		);
-
-		console.log(customersCheck.length);
 
 		//validamos las ventas por cliente por el tiempo
 		for (let i = 0; i < customersCheck.length; i++) {
 			const customer = customersCheck[i];
+
 			const total = await this.invoiceService.totalInvoicesCustomer(
 				customer.identification,
+				new Date(dayjs().subtract(30, 'd').format('YYYY/MM/DD')),
+				new Date(dayjs().add(1, 'd').format('YYYY/MM/DD')),
 			);
+
 			if (total < 200000) {
+				//inactivar al cliente
 				await this.inactiveWholesale(customer._id);
 				console.log(
 					`Cliente ${customer.identification} ha sido deshabilitado ventas ${total}`,
 				);
+			} else {
+				//actualizar la fecha de activación
+				await this.customerModel.findByIdAndUpdate(customer._id, {
+					$set: { wholesale: { active: true, activatedAt: new Date() } },
+				});
 			}
 		}
 	}

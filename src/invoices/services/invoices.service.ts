@@ -19,11 +19,19 @@ export class InvoicesService {
 	 * @param identification documento del cliente para consultar las ventas
 	 * @returns total de ventas de cliente tipo number
 	 */
-	async totalInvoicesCustomer(identification: string) {
+	async totalInvoicesCustomer(
+		identification: string,
+		dateInitial: Date,
+		dateFinish: Date,
+	) {
 		const total = await this.invoiceModel.aggregate([
 			{
 				$match: {
 					'customer.identification': identification,
+					createdAt: {
+						$gte: dateInitial,
+						$lt: dateFinish,
+					},
 				},
 			},
 			{
