@@ -22,7 +22,7 @@ export class CustomersService {
 	 */
 	async inactiveWholesale(customerId: string) {
 		return this.customerModel.findByIdAndUpdate(customerId, {
-			$set: { wholesale: { active: false } },
+			$set: { wholesale: { active: false, activatedAt: new Date() } },
 		});
 	}
 
