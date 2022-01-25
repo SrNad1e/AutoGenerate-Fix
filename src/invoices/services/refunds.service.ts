@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
@@ -80,35 +81,55 @@ export class RefundsService {
 				let refund;
 				try {
 					//Agregamos las unidades al inventario
-					await products.forEach(async (product) => {
-						await this.inventoriesService.addProductInventory(
+
+					let addInventory;
+					for (let i = 0; i < products.length; i++) {
+						const product = products[i];
+						addInventory = await this.inventoriesService.addProductInventory(
 							product,
 							orderFind['_doc'].warehouse.warehouseId,
 						);
-					});
-					//Creamos devolución
-					refund = await this.createRefund({
-						...params,
-						amount,
-						invoice: orderFind.invoice,
-						order: orderFind,
-						shop: orderFind.shop,
-					});
-					//creamos cupón
-					const resultCoupon = await this.couponsService.create({
-						...params,
-						amount,
-						order: orderFind,
-						refund: refund['_doc'],
-						invoice: orderFind.invoice,
-						shop: orderFind.shop,
-						customer: orderFind['_doc'].customer,
-					});
+						if (addInventory !== true) {
+							for (let j = 0; j < i; j++) {
+								const productDelete = products[j];
+								await this.inventoriesService.deleteProductInventory(
+									productDelete,
+									orderFind['_doc'].warehouse.warehouseId,
+								);
+							}
 
-					return {
-						...refund['_doc'],
-						coupon: resultCoupon['_doc'],
-					};
+							break;
+						}
+					}
+					if (addInventory === true) {
+						//Creamos devolución
+						refund = await this.createRefund({
+							...params,
+							amount,
+							invoice: orderFind.invoice,
+							order: orderFind,
+							shop: orderFind.shop,
+						});
+						//creamos cupón
+						const resultCoupon = await this.couponsService.create({
+							...params,
+							amount,
+							order: orderFind,
+							refund: refund['_doc'],
+							invoice: orderFind.invoice,
+							shop: orderFind.shop,
+							customer: orderFind['_doc'].customer,
+						});
+
+						return {
+							...refund['_doc'],
+							coupon: resultCoupon['_doc'],
+						};
+					} else {
+						return new NotFoundException(
+							`Error al crear agregar inventario, ${addInventory} `,
+						);
+					}
 				} catch (e) {
 					return new NotFoundException(`Error al crear la devolución, ${e} `);
 				}
