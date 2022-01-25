@@ -45,23 +45,30 @@ export class CustomersService {
 		for (let i = 0; i < customersCheck.length; i++) {
 			const customer = customersCheck[i];
 
-			const total = await this.invoiceService.totalInvoicesCustomer(
-				customer.identification,
-				new Date(dayjs().subtract(30, 'd').format('YYYY/MM/DD')),
-				new Date(dayjs().add(1, 'd').format('YYYY/MM/DD')),
-			);
-
-			if (total < 200000) {
-				//inactivar al cliente
-				await this.inactiveWholesale(customer._id);
-				console.log(
-					`Cliente ${customer.identification} ha sido deshabilitado ventas ${total}`,
-				);
-			} else {
-				//actualizar la fecha de activación
+			//Validar si es primera compra
+			if (customer.wholesale?.lastOrder?.totalPaid >= 300000) {
 				await this.customerModel.findByIdAndUpdate(customer._id, {
 					$set: { wholesale: { active: true, activatedAt: new Date() } },
 				});
+			} else {
+				const total = await this.invoiceService.totalInvoicesCustomer(
+					customer.identification,
+					new Date(dayjs().subtract(30, 'd').format('YYYY/MM/DD')),
+					new Date(dayjs().add(1, 'd').format('YYYY/MM/DD')),
+				);
+
+				if (total < 200000) {
+					//inactivar al cliente
+					await this.inactiveWholesale(customer._id);
+					console.log(
+						`Cliente ${customer.identification} ha sido deshabilitado ventas ${total}`,
+					);
+				} else {
+					//actualizar la fecha de activación
+					await this.customerModel.findByIdAndUpdate(customer._id, {
+						$set: { wholesale: { active: true, activatedAt: new Date() } },
+					});
+				}
 			}
 		}
 	}

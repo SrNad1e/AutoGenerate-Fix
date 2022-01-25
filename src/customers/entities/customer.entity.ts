@@ -8,6 +8,9 @@ export class Customer extends Document {
 	wholesale: {
 		active: boolean;
 		activatedAt: Date;
+		lastOrder: {
+			totalPaid: number;
+		};
 	};
 
 	@Prop({ type: String, default: 'cc' })
