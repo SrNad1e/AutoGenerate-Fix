@@ -1,13 +1,12 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model } from 'mongoose';
-import { InventoriesService } from 'src/inventories/services/inventories/inventories.service';
+import { InventoriesService } from 'src/inventories/services/inventories.service';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehouseService } from 'src/shops/services/warehouses.service';
-import { StockTransferDetailMysql } from 'src/stock-transfer/entities/stock-transfer-detail.migrate.entity';
-import { StockTransferMysql } from 'src/stock-transfer/entities/stock-transfer.migrate.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import {
@@ -18,6 +17,8 @@ import {
 	UpdateStockRequestParamsDto,
 } from '../dtos/stock-request.dto';
 import { StockRequest } from '../entities/stock-request.entity';
+import { StockTransferDetailMysql } from '../entities/stock-transfer-detail.migrate.entity';
+import { StockTransferMysql } from '../entities/stock-transfer.migrate.entity';
 
 @Injectable()
 export class StockRequestService {

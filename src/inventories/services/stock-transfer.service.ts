@@ -1,14 +1,15 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import mongoose, { FilterQuery, Model, mongo, ObjectId } from 'mongoose';
 
-import { InventoriesService } from 'src/inventories/services/inventories/inventories.service';
+import { InventoriesService } from 'src/inventories/services/inventories.service';
+import { StockRequestService } from 'src/inventories/services/stock-request.service';
 import { Product, ProductTransfer } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehouseService } from 'src/shops/services/warehouses.service';
-import { StockRequestService } from 'src/stock-request/services/stock-request.service';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import {

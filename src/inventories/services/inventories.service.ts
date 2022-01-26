@@ -85,6 +85,32 @@ export class InventoriesService {
 	}
 
 	/**
+	 * @description asigna unidades al inventario de un producto en específico
+	 * @param product producto a asigna uniades
+	 * @param warehouseId bodega para asigna unidades
+	 * @returns string si existe algun error o true si el proceso finaliza correctamente
+	 */
+	async assignProductInventory(product: ProductTransfer, warehouseId: number) {
+		const product_id = product.product_id || product.id;
+
+		try {
+			await this.inventoriesRepo.update(
+				{
+					warehouse_id: warehouseId,
+					product_id,
+				},
+				{
+					available: product.quantity,
+				},
+			);
+
+			return true;
+		} catch (e: any) {
+			return { message: `Error al asignar productos del inventario ${e}` };
+		}
+	}
+
+	/**
 	 * @description agrega productos al stock en proceso
 	 * @param props datos para crear el stock en proceso
 	 * @returns string si existe algun error o true si el proceso finaliza correctamente

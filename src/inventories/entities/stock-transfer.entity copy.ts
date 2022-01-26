@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
+import { StockRequest } from 'src/inventories/entities/stock-request.entity';
 import { Product } from 'src/products/entities/product.entity';
 
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { StockRequest } from 'src/stock-request/entities/stock-request.entity';
 
 @Schema({ timestamps: true, collection: 'stocktransfer' })
 export class StockTransfer extends Document {

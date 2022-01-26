@@ -39,6 +39,9 @@ export class FiltersStockRequestDto {
 	createdAtMax?: Date;
 
 	@IsOptional()
+	productId: string;
+
+	@IsOptional()
 	sort?: Record<string, 1 | -1 | { $meta: 'textScore' }>;
 }
 

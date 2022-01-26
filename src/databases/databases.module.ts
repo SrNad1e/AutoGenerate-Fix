@@ -6,9 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { Inventories } from 'src/inventories/entities/inventories.entity';
+import { StockTransferDetailMysql } from 'src/inventories/entities/stock-transfer-detail.migrate.entity';
+import { StockTransferMysql } from 'src/inventories/entities/stock-transfer.migrate.entity';
 import { ProductMysql } from 'src/products/entities/product.migration.entity';
-import { StockTransferDetailMysql } from 'src/stock-transfer/entities/stock-transfer-detail.migrate.entity';
-import { StockTransferMysql } from 'src/stock-transfer/entities/stock-transfer.migrate.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @Global()
