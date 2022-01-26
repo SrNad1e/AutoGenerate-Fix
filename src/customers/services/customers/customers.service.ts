@@ -39,8 +39,6 @@ export class CustomersService {
 			dayjs(customer.wholesale.activatedAt).add(30, 'd').isBefore(dayjs()),
 		);
 
-		console.log('Ejecutando Cantidad: >>', customersCheck.length);
-
 		//validamos las ventas por cliente por el tiempo
 		for (let i = 0; i < customersCheck.length; i++) {
 			const customer = customersCheck[i];
