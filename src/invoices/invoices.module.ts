@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import * as AutoIncrementFactory from 'mongoose-sequence';
@@ -56,5 +57,6 @@ import { InventoriesModule } from 'src/inventories/inventories.module';
 	],
 	controllers: [RefundsController, InvoicesController],
 	providers: [RefundsService, InvoicesService, OrdersService],
+	exports: [InvoicesService],
 })
 export class InvoicesModule {}

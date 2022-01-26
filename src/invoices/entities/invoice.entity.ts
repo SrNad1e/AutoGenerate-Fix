@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Prop, Schema } from '@nestjs/mongoose';
 import { Status } from 'src/configs/entities/status.entity';
 import { StatusHistory } from 'src/configs/entities/statusHistory.entity';
