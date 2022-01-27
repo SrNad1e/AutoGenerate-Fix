@@ -14,6 +14,8 @@ import { ShippingsModule } from './shippings/shippings.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { ConfigsModule } from './configs/configs.module';
 import { InventoriesModule } from './inventories/inventories.module';
+import { ConfigurationsModule } from './configurations/configurations.module';
+import { ReportsModule } from './reports/reports.module';
 import config from './config';
 @Module({
 	imports: [
@@ -42,6 +44,8 @@ import config from './config';
 		TreasuryModule,
 		ConfigsModule,
 		InventoriesModule,
+		ConfigurationsModule,
+		ReportsModule,
 	],
 })
 export class AppModule {}
