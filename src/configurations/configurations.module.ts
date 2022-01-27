@@ -15,5 +15,6 @@ import { ConfigurationsController } from './controllers/configurations.controlle
 	],
 	providers: [ConfigurationsService],
 	controllers: [ConfigurationsController],
+	exports: [ConfigurationsService],
 })
 export class ConfigurationsModule {}

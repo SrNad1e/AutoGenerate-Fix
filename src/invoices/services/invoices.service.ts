@@ -17,6 +17,8 @@ export class InvoicesService {
 	/**
 	 * @description se encarga de consultar total de ventas por cliente
 	 * @param identification documento del cliente para consultar las ventas
+	 * @param dateInitial fecha incial del rango para la consulta
+	 * @param dateFinish fecha final del rango para la consulta
 	 * @returns total de ventas de cliente tipo number
 	 */
 	async totalInvoicesCustomer(
@@ -28,6 +30,37 @@ export class InvoicesService {
 			{
 				$match: {
 					'customer.identification': identification,
+					createdAt: {
+						$gte: dateInitial,
+						$lt: dateFinish,
+					},
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					total: {
+						$sum: '$summary.total',
+					},
+				},
+			},
+		]);
+
+		return total[0]?.total || 0;
+	}
+
+	/**
+	 * @description se encarga de consultar total de ventas por tienda
+	 * @param shopId id de tienda para consultar las ventas
+	 * @param dateInitial fecha incial del rango para la consulta
+	 * @param dateFinish fecha final del rango para la consulta
+	 * @returns total de ventas de cliente tipo number
+	 */
+	async totalInvoicesShop(shopId: number, dateInitial: Date, dateFinish: Date) {
+		const total = await this.invoiceModel.aggregate([
+			{
+				$match: {
+					'shop.shopId': shopId,
 					createdAt: {
 						$gte: dateInitial,
 						$lt: dateFinish,
