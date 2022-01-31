@@ -11,11 +11,20 @@ export class ConfigurationsService {
 		private configurationModule: Model<Configuration>,
 	) {}
 
+	async getAll() {
+		return this.configurationModule.find({ __v: { $ne: 0 } });
+	}
+
 	async getForName(module: string, name: string) {
 		const config = await this.configurationModule.findOne({ module });
+
 		const configSelected = config.configs.find((item) => item.name === name);
 
 		return configSelected;
+	}
+
+	async getModule(module: string) {
+		return this.configurationModule.findOne({ module });
 	}
 
 	async addConfig(module: string, config: AddConfigurationsParamsDto) {

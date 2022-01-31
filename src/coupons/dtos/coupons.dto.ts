@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { IsOptional, IsPositive, IsString, Min } from 'class-validator';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
@@ -64,5 +65,5 @@ export class FilterCouponsDto {
 	couponCode?: string;
 
 	@IsOptional()
-	sort?: CouponsSortDto;
+	sort?: Record<string, 1 | -1 | { $meta: 'textScore' }>;
 }

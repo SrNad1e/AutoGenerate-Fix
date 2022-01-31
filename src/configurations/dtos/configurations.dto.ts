@@ -5,6 +5,12 @@ export class AddConfigurationsParamsDto {
 	@IsString()
 	name: string;
 
+	@IsString()
+	title: string;
+
+	@IsString()
+	description: string;
+
 	@IsArray()
 	data: any[];
 }
@@ -16,6 +22,8 @@ export class AddConfigurationsDto {
 	@IsObject()
 	config: {
 		name: string;
+		title: string;
+		description: string;
 		data: any[];
 		createdAt: Date;
 		updatedAt: Date;

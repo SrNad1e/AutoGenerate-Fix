@@ -1,13 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { ConfigurationsService } from 'src/configurations/services/configurations.service';
 import { InvoicesService } from 'src/invoices/services/invoices.service';
+import { ShopsService } from 'src/shops/services/shops.service';
 
 @Injectable()
 export class ReportsSalesService {
 	constructor(
 		private invoicesService: InvoicesService,
 		private configurationsService: ConfigurationsService,
+		private shopsService: ShopsService,
 	) {}
 
 	async bonusForGoal(shopId: number) {
@@ -24,40 +26,33 @@ export class ReportsSalesService {
 			);
 
 			//seleccionamos la meta de la tienda
-			const goal = await this.configurationsService.getForName(
-				'facturacion',
-				'meta',
+			const shopGoal = await this.shopsService.getByIdMysql(shopId);
+
+			//calculamos el porcentaje de la meta
+			const bonus = await this.configurationsService.getForName(
+				'invoicing',
+				'bonus',
 			);
 
-			const shopGoal = goal.data.find((item) => item.shopId === shopId);
+			//calculamos el total ganado
+			const superplusGoal = sales - shopGoal['_doc'].goal || 0;
 
-			if (shopGoal) {
-				//calculamos el porcentaje de la meta
-				const bonus = await this.configurationsService.getForName(
-					'facturacion',
-					'bonificacion',
-				);
+			const bonusValue =
+				superplusGoal > 0 ? (superplusGoal * bonus.data[0].value) / 100 : 0;
 
-				//calculamos el total ganado
-				const superplusGoal = shopGoal.value - sales;
-
-				const bonusValue =
-					superplusGoal > 0 ? (superplusGoal * bonus.data[0]) / 100 : 0;
-
-				return {
-					sales,
-					shopGoal,
-					bonus,
-					superplusGoal,
-					bonusValue,
-				};
-			} else {
-				return new NotFoundException(
-					'No existe meta para la tienda seleccionada',
-				);
-			}
+			return {
+				sales,
+				shopGoal: shopGoal['_doc'].goal,
+				bonus: bonus.data[0].value,
+				percentSales: sales / shopGoal['_doc'].goal,
+				superplusGoal,
+				bonusValue,
+			};
 		} catch (e) {
-			return new NotFoundException(`Error al calcular el informe ${e}`);
+			throw new HttpException(
+				`Error al crear consultar el informe ${e}`,
+				HttpStatus.BAD_REQUEST,
+			);
 		}
 	}
 }

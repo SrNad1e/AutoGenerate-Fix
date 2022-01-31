@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Global, Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -5,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { Inventories } from 'src/inventories/entities/inventories.entity';
-
+import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 @Global()
 @Module({
 	imports: [
@@ -33,7 +34,7 @@ import { Inventories } from 'src/inventories/entities/inventories.entity';
 					username: user,
 					password,
 					database: dbName,
-					entities:[Inventories]
+					entities: [Inventories, ShopMysql],
 				};
 			},
 		}),

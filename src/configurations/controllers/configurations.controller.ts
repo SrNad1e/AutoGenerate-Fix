@@ -19,8 +19,20 @@ export class ConfigurationsController {
 
 	@Get()
 	@UsePipes(new ValidationPipe({ transform: true }))
+	getAll() {
+		return this.configurationsService.getAll();
+	}
+
+	@Get('name')
+	@UsePipes(new ValidationPipe({ transform: true }))
 	getName(@Query('name') name: string, @Query('module') module: string) {
 		return this.configurationsService.getForName(module, name);
+	}
+
+	@Get(':module')
+	@UsePipes(new ValidationPipe({ transform: true }))
+	getModule(@Param('module') module: string) {
+		return this.configurationsService.getModule(module);
 	}
 
 	@Post(':module')

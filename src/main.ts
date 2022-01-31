@@ -1,8 +1,8 @@
+/* eslint-disable prettier/prettier */
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { enviroments } from './enviroments';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -14,10 +14,12 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup('docs', app, document);
 
+	app.enableCors();
+
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
-			forbidNonWhitelisted: true,
+			//forbidNonWhitelisted: true,
 			/*	transformOptions: {
 				enableImplicitConversion: true,
 			},*/

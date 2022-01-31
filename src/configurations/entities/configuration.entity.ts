@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
@@ -10,6 +9,8 @@ export class Configuration {
 	@Prop({ type: Array, required: true })
 	configs: {
 		name: string;
+		title: string;
+		description: string;
 		data: any[];
 		createdAt: Date;
 		updatedAt: Date;

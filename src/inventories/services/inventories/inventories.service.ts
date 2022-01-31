@@ -20,7 +20,6 @@ export class InventoriesService {
 	 */
 	async addProductInventory(product: Product, warehouseId: number) {
 		try {
-			console.log('id warew', warehouseId);
 			const inventories = await this.inventoriesRepo.findOne({
 				warehouse_id: warehouseId,
 				product_id: product.product_id,
