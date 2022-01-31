@@ -1,7 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema } from '@nestjs/mongoose';
-import { Status } from 'src/configs/entities/status.entity';
-import { StatusHistory } from 'src/configs/entities/statusHistory.entity';
+
+import { Status } from 'src/configurations/entities/status.entity';
+import { StatusHistory } from 'src/configurations/entities/statusHistory.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { DeliveryAddress } from 'src/customers/entities/deliveryaddress.entity';
 import { Product } from 'src/products/entities/product.entity';

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { ConfigurationsService } from 'src/configurations/services/configurations.service';

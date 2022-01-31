@@ -2,8 +2,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
+
 import { CouponsService } from 'src/coupons/services/coupons.service';
-import { InventoriesService } from 'src/inventories/services/inventories/inventories.service';
+import { InventoriesService } from 'src/inventories/services/inventories.service';
 import { CreateRefundsDto, FiltersRefundsDto } from '../dtos/refunds.dto';
 import { ProductReturns } from '../entities/productreturns.entity';
 import { Refund } from '../entities/refund.entity';

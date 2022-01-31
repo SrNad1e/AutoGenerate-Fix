@@ -4,8 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import * as shortid from 'shortid';
 
-import { CreateCouponsDto, FilterCouponsDto } from '../dtos/coupons.dto';
 import { Coupon } from '../entities/coupon.entity';
+import { CreateCouponsDto, FilterCouponsDto } from '../dtos/coupons.dto';
 @Injectable()
 export class CouponsService {
 	constructor(@InjectModel(Coupon.name) private couponModel: Model<Coupon>) {}

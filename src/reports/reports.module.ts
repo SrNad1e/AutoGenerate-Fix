@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
 import { InvoicesModule } from 'src/invoices/invoices.module';
@@ -6,7 +7,7 @@ import { ReportSalesController } from './controllers/report-sales.controller';
 import { ShopsModule } from 'src/shops/shops.module';
 
 @Module({
-	imports: [InvoicesModule, ConfigurationsModule, ShopsModule],
+	imports: [ConfigurationsModule, InvoicesModule, ShopsModule],
 	providers: [ReportsSalesService],
 	controllers: [ReportSalesController],
 })

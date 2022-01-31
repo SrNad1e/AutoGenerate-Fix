@@ -2,6 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+
 import { AddConfigurationsParamsDto } from '../dtos/configurations.dto';
 import { Configuration } from '../entities/configuration.entity';
 

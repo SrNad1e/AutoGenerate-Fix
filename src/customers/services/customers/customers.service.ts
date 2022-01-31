@@ -3,8 +3,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
 import { Model } from 'mongoose';
-import { Customer } from 'src/customers/entities/customer.entity';
 import * as dayjs from 'dayjs';
+
+import { Customer } from 'src/customers/entities/customer.entity';
 import { InvoicesService } from 'src/invoices/services/invoices.service';
 
 @Injectable()

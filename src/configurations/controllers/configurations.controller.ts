@@ -10,6 +10,7 @@ import {
 	ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
 import { AddConfigurationsParamsDto } from '../dtos/configurations.dto';
 import { ConfigurationsService } from '../services/configurations.service';
 

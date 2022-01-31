@@ -1,12 +1,7 @@
-import {
-	IsArray,
-	IsObject,
-	IsOptional,
-	IsPositive,
-	IsString,
-	Min,
-} from 'class-validator';
-import { Product } from 'src/products/entities/product.entity';
+/* eslint-disable prettier/prettier */
+import { IsArray, IsObject, IsOptional, IsString } from 'class-validator';
+
+import { ProductOrder } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 
 export class CreateRefundsDto {
@@ -14,7 +9,7 @@ export class CreateRefundsDto {
 	orderId: string;
 
 	@IsArray()
-	products: Product[];
+	products: ProductOrder[];
 
 	@IsObject()
 	user: User;

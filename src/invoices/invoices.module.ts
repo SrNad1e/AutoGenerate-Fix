@@ -38,7 +38,10 @@ import { InventoriesModule } from 'src/inventories/inventories.module';
 				useFactory: async (connection: Connection) => {
 					const schema = ProductReturnsSchema;
 					const AutoIncrement = AutoIncrementFactory(connection);
-					//schema.plugin(AutoIncrement, { inc_field: 'number' });
+					schema.plugin(AutoIncrement, {
+						id: 'invoice_increment',
+						inc_field: 'number',
+					});
 					return schema;
 				},
 				inject: [getConnectionToken('')],
@@ -48,15 +51,18 @@ import { InventoriesModule } from 'src/inventories/inventories.module';
 				useFactory: async (connection: Connection) => {
 					const schema = ProductReturnsSchema;
 					const AutoIncrement = AutoIncrementFactory(connection);
-					//schema.plugin(AutoIncrement, { inc_field: 'code' });
+					schema.plugin(AutoIncrement, {
+						id: 'order_increment',
+						inc_field: 'code',
+					});
 					return schema;
 				},
 				inject: [getConnectionToken('')],
 			},
 		]),
 	],
-	controllers: [RefundsController, InvoicesController],
-	providers: [RefundsService, InvoicesService, OrdersService],
+	controllers: [InvoicesController, RefundsController],
+	providers: [InvoicesService, OrdersService, RefundsService],
 	exports: [InvoicesService],
 })
 export class InvoicesModule {}

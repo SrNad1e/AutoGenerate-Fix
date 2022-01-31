@@ -1,5 +1,5 @@
+/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
-import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class ParseIntPipe implements PipeTransform {
