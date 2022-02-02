@@ -14,7 +14,8 @@ export class ConfigurationsService {
 	) {}
 
 	async getAll() {
-		return this.configurationModule.find({ __v: { $ne: 0 } });
+		const result = await this.configurationModule.find({ __v: { $ne: 0 } });
+		return result;
 	}
 
 	async getForName(module: string, name: string) {
