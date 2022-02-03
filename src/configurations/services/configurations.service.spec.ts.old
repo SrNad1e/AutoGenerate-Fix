@@ -1,19 +1,32 @@
 /* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigurationsController } from '../controllers/configurations.controller';
+import { Configuration } from '../entities/configuration.entity';
 import { ConfigurationsService } from './configurations.service';
 
 describe('ConfigurationsService', () => {
-  let service: ConfigurationsService;
+	let configurationsService: ConfigurationsService;
+	let configurationsController: ConfigurationsController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [ConfigurationsService],
-    }).compile();
+	beforeAll(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			controllers: [ConfigurationsController],
+			providers: [ConfigurationsService],
+		}).compile();
+		configurationsService = module.get<ConfigurationsService>(
+			ConfigurationsService,
+		);
+		configurationsController = module.get<ConfigurationsController>(
+			ConfigurationsController,
+		);
+	});
 
-    service = module.get<ConfigurationsService>(ConfigurationsService);
-  });
+	it('debe estar definido el servicio y el controlador', () => {
+		expect(configurationsService).toBeDefined();
+		expect(configurationsController).toBeDefined();
+	});
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+	it('debe consultar todas las configuraciones', () => {
+		expect(configurationsController.getAll()[0]).toBeInstanceOf(Configuration);
+	});
 });

@@ -11,7 +11,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { AddConfigurationsParamsDto } from '../dtos/configurations.dto';
+import { AddConfigurationsDto } from '../dtos/configurations.dto';
+import { Configs, Configuration } from '../entities/configuration.entity';
 import { ConfigurationsService } from '../services/configurations.service';
 
 @ApiTags('configurations')
@@ -21,18 +22,24 @@ export class ConfigurationsController {
 
 	@Get()
 	@UsePipes(new ValidationPipe({ transform: true }))
-	getAll() {
+	getAll(): Promise<Configuration[]> {
 		return this.configurationsService.getAll();
 	}
 
 	@Get('name')
-	@UsePipes(new ValidationPipe({ transform: true }))
-	getName(@Query('name') name: string, @Query('module') module: string) {
+	@UsePipes(
+		new ValidationPipe({
+			transformOptions: { enableImplicitConversion: true },
+		}),
+	)
+	getName(
+		@Query('name') name: string,
+		@Query('module') module: string,
+	): Promise<Configs> {
 		return this.configurationsService.getForName(module, name);
 	}
 
 	@Get(':module')
-	@UsePipes(new ValidationPipe({ transform: true }))
 	getModule(@Param('module') module: string) {
 		return this.configurationsService.getModule(module);
 	}
@@ -40,9 +47,9 @@ export class ConfigurationsController {
 	@Post(':module')
 	@UsePipes(new ValidationPipe({ transform: true }))
 	addConfig(
-		@Body() params: AddConfigurationsParamsDto,
+		@Body() params: AddConfigurationsDto,
 		@Param('module') module: string,
-	) {
+	): Promise<Configuration> {
 		return this.configurationsService.addConfig(module, params);
 	}
 }

@@ -1,31 +1,16 @@
 /* eslint-disable prettier/prettier */
-import { IsArray, IsObject, IsString } from 'class-validator';
-
-export class AddConfigurationsParamsDto {
-	@IsString()
-	name: string;
-
-	@IsString()
-	title: string;
-
-	@IsString()
-	description: string;
-
-	@IsArray()
-	data: any[];
-}
+import { IsArray, IsString } from 'class-validator';
 
 export class AddConfigurationsDto {
 	@IsString()
-	module: string;
+	readonly name: string;
 
-	@IsObject()
-	config: {
-		name: string;
-		title: string;
-		description: string;
-		data: any[];
-		createdAt: Date;
-		updatedAt: Date;
-	};
+	@IsString()
+	readonly title: string;
+
+	@IsString()
+	readonly description: string;
+
+	@IsArray()
+	readonly data: any[];
 }

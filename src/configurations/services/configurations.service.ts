@@ -1,61 +1,103 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { AddConfigurationsParamsDto } from '../dtos/configurations.dto';
-import { Configuration } from '../entities/configuration.entity';
+import { AddConfigurationsDto } from '../dtos/configurations.dto';
+import { Configs, Configuration } from '../entities/configuration.entity';
 
 @Injectable()
 export class ConfigurationsService {
 	constructor(
 		@InjectModel(Configuration.name)
-		private configurationModule: Model<Configuration>,
+		private readonly configurationModule: Model<Configuration>,
 	) {}
 
-	async getAll() {
-		const result = await this.configurationModule.find({ __v: { $ne: 0 } });
-		return result;
+	async getAll(): Promise<Configuration[]> {
+		const configurations = await this.configurationModule.find({
+			__v: { $ne: 0 },
+		});
+		if (configurations.length === 0) {
+			throw new NotFoundException(`No existen configuraciones`);
+		}
+		return configurations;
 	}
 
-	async getForName(module: string, name: string) {
+	async getForName(/*module: string,*/ name: string): Promise<Configs> {
+		const module = ''
+		if (!module || !name) {
+			throw new BadRequestException(
+				`Los parámetros module y name son obligatorios`,
+			);
+		}
+
 		const config = await this.configurationModule.findOne({ module });
-
+		if (!config) {
+			throw new NotFoundException(`El módulo ${module} no existe`);
+		}
 		const configSelected = config.configs.find((item) => item.name === name);
-
+		if (!configSelected) {
+			throw new NotFoundException(
+				`Configuración ${name} no encontrada en el módulo ${module}`,
+			);
+		}
 		return configSelected;
 	}
 
-	async getModule(module: string) {
-		return this.configurationModule.findOne({ module });
+	async getModule(module: string): Promise<Configuration> {
+		const configuration = await this.configurationModule.findOne({ module });
+
+		if (!configuration) {
+			throw new NotFoundException(`Configuración ${module} no encontrada`);
+		}
+		return configuration;
 	}
 
-	async addConfig(module: string, config: AddConfigurationsParamsDto) {
-		const configModule = await this.configurationModule.findOne({ module });
-		const { configs } = configModule;
-		try {
-			const configSelected = configs.findIndex(
-				(item) => item.name === config.name,
-			);
-			if (configSelected >= 0) {
-				configs[configSelected] = {
-					...configs[configSelected],
-					updatedAt: new Date(),
-					data: config.data,
-				};
-			} else {
-				return new NotFoundException(
-					`La configuración ${config.name} no existe en el módulo ${module}`,
-				);
-			}
+	async addConfig(
+		module: string,
+		config: AddConfigurationsDto,
+	): Promise<Configuration> {
 
-			return this.configurationModule.updateOne(
-				{ _id: configModule._id },
-				{ $set: { configs } },
-				{ new: true },
-			);
-		} catch (e) {
-			return new NotFoundException(`Error al agregar configuración, ${e}`);
+		const configModule = await this.configurationModule.findOne({ module });
+
+		if (!configModule) {
+			throw new NotFoundException(`Configuración no encontrada para ${module}`);
 		}
+
+		const { configs } = configModule;
+
+		if (configs.length === 0) {
+			throw new NotFoundException(
+				`No existen configuraciones para el módulo ${module}`,
+			);
+		}
+
+		const configSelected = configs.findIndex(
+			(item) => item.name === config.name,
+		);
+
+		if (configSelected >= 0) {
+			configs[configSelected] = {
+				...configs[configSelected],
+				updatedAt: new Date(),
+				data: config.data,
+			};
+		} else {
+			configs.push({
+				...config,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
+		}
+
+		return this.configurationModule.findByIdAndUpdate(
+			configModule._id,
+			{ $set: { configs } },
+			{ new: true },
+		);
 	}
 }

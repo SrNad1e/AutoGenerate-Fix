@@ -7,13 +7,16 @@ export class Configuration {
 	module: string;
 
 	@Prop({ type: Array, required: true })
-	configs: {
-		name: string;
-		title: string;
-		description: string;
-		data: any[];
-		createdAt: Date;
-		updatedAt: Date;
-	}[];
+	configs: Configs[];
 }
+
+export class Configs {
+	name: string;
+	title: string;
+	description: string;
+	data: any[];
+	createdAt: Date;
+	updatedAt: Date;
+}
+
 export const ConfigurationSchema = SchemaFactory.createForClass(Configuration);

@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Document, ObjectId } from 'mongoose';
-import { ConfigurationsModule } from '../configurations.module';
-import { Configuration } from '../entities/configuration.entity';
+import { configurationStub } from '../stubs/configuration.stub';
+import { Configuration, Configs } from '../entities/configuration.entity';
 import { ConfigurationsService } from '../services/configurations.service';
 import { ConfigurationsController } from './configurations.controller';
+import { AddConfigurationsDto } from '../dtos/configurations.dto';
+
+jest.mock('../services/configurations.service');
 
 describe('ConfigurationsController', () => {
 	let configurationsController: ConfigurationsController;
@@ -13,11 +14,10 @@ describe('ConfigurationsController', () => {
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			imports: [ConfigurationsModule],
-		})
-			.overrideProvider(getModelToken(Configuration.name))
-			.useValue(jest.fn())
-			.compile();
+			imports: [],
+			controllers: [ConfigurationsController],
+			providers: [ConfigurationsService],
+		}).compile();
 
 		configurationsController = module.get<ConfigurationsController>(
 			ConfigurationsController,
@@ -25,29 +25,103 @@ describe('ConfigurationsController', () => {
 		configurationsService = module.get<ConfigurationsService>(
 			ConfigurationsService,
 		);
+		jest.clearAllMocks();
 	});
 
 	describe('getAll', () => {
-		it('must return an Array of type ConfigurationSerializer', async () => {
-			jest
-				.spyOn(configurationsService, 'getAll')
-				.mockImplementation(() =>
-					Promise.resolve([
-						{ name: 'example', title: 'example' },
-					] as unknown as Promise<
-						(Document<any, any, Configuration> &
-							Configuration & { _id: ObjectId })[]
-					>),
-				);
-			const result = await configurationsController.getAll();
+		describe('cuando se llama a getAll', () => {
+			let configurations: Configuration[];
 
-			expect(result).toHaveLength(1);
-			expect(result instanceof ).toEqual(true);
-			expect(configurationsService.getAll).toHaveBeenCalledTimes(1);
+			beforeEach(async () => {
+				configurations = await configurationsController.getAll();
+			});
+
+			test('debería llamar el servicio', () => {
+				expect(configurationsService.getAll).toHaveBeenCalled();
+			});
+			test('deberia devolver un array de módulos de configuración', () => {
+				expect(configurations).toEqual([configurationStub()]);
+			});
 		});
 	});
 
-	it('should be defined', () => {
+	describe('getForName', () => {
+		describe('cuando se llama a getForName', () => {
+			let configs: Configs;
+
+			beforeEach(async () => {
+				configs = await configurationsController.getName(
+					configurationStub().configs[0].name,
+					configurationStub().module,
+				);
+			});
+
+			test('debería llamar el servicio', () => {
+				expect(configurationsService.getForName).toBeCalledWith(
+					configurationStub().module,
+					configurationStub().configs[0].name,
+				);
+			});
+			test('deberia devolver una configuración del módulo', () => {
+				expect(configs).toEqual(configurationStub().configs[0]);
+			});
+		});
+	});
+
+	describe('getModule', () => {
+		describe('cuando se llama a getModule', () => {
+			let configuration: Configuration;
+
+			beforeEach(async () => {
+				configuration = await configurationsController.getModule(
+					configurationStub().module,
+				);
+			});
+
+			test('debería llamar el servicio', () => {
+				expect(configurationsService.getModule).toBeCalledWith(
+					configurationStub().module,
+				);
+			});
+			test('deberia devolver un módulo de configuración', () => {
+				expect(configuration).toEqual(configurationStub());
+			});
+		});
+	});
+
+	describe('addConfig', () => {
+		describe('cuando se llama a addConfig', () => {
+			let configuration: Configuration;
+			let addConfigurationsDto: AddConfigurationsDto;
+
+			beforeEach(async () => {
+				addConfigurationsDto = {
+					name: configurationStub().configs[0].name,
+					title: configurationStub().configs[0].title,
+					description: configurationStub().configs[0].description,
+					data: configurationStub().configs[0].data,
+				};
+
+				configuration = await configurationsController.addConfig(
+					addConfigurationsDto,
+					configurationStub().module,
+				);
+			});
+
+			test('debería llamar el servicio', () => {
+				expect(configurationsService.addConfig).toHaveBeenCalledWith(
+					configurationStub().module,
+					addConfigurationsDto,
+				);
+			});
+			test('deberia devolver un módulo de configuración', () => {
+				expect(configuration).toEqual(configurationStub());
+			});
+		});
+	});
+
+	it('deberían estar definidos el controlador y el servicio', () => {
 		expect(configurationsController).toBeDefined();
+		expect(configurationsService).toBeDefined();
 	});
 });
