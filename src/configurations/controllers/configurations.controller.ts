@@ -36,12 +36,12 @@ export class ConfigurationsController {
 		@Query('name') name: string,
 		@Query('module') module: string,
 	): Promise<Configs> {
-		return this.configurationsService.getForName(module, name);
+		return this.configurationsService.getForName({ module, name });
 	}
 
 	@Get(':module')
 	getModule(@Param('module') module: string) {
-		return this.configurationsService.getModule(module);
+		return this.configurationsService.getModule({ module });
 	}
 
 	@Post(':module')
@@ -50,6 +50,6 @@ export class ConfigurationsController {
 		@Body() params: AddConfigurationsDto,
 		@Param('module') module: string,
 	): Promise<Configuration> {
-		return this.configurationsService.addConfig(module, params);
+		return this.configurationsService.addConfig({ module, ...params });
 	}
 }

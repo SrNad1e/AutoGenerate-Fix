@@ -1,0 +1,53 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Configuration {
+  _id: ID!
+  module: String!
+  configs: [Configs!]!
+}
+
+type Configs {
+  name: String!
+  title: String!
+  description: String!
+  data: [Data!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Data {
+  type: String!
+  name: String!
+  value: String!
+}
+
+type Query {
+  getAll: [Configuration!]!
+  getForName(name: String!, module: String!): Configuration!
+  configuration(module: String!): Configuration
+}
+
+type Mutation {
+  addConfi(addConfigData: AddConfigInput!): Configuration!
+}
+
+input AddConfigInput {
+  module: String!
+  name: String!
+  title: String!
+  description: String!
+  data: [DataInput!]!
+}
+
+input DataInput {
+  type: String!
+  name: String!
+  value: String!
+}

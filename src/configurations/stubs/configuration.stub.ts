@@ -3,6 +3,7 @@ import { Configuration } from 'src/configurations/entities/configuration.entity'
 
 export const configurationStub = (): Configuration => {
 	return {
+		_id: 'prueba',
 		module: 'invoicing',
 		configs: [
 			{

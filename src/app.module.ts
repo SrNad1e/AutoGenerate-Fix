@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
 import * as Joi from 'joi';
 
 import config from './config';
@@ -20,6 +21,9 @@ import { TreasuryModule } from './treasury/treasury.module';
 import { UsersModule } from './users/users.module';
 @Module({
 	imports: [
+		GraphQLModule.forRoot({
+			autoSchemaFile: 'src/schema.gql',
+		}),
 		ConfigModule.forRoot({
 			envFilePath: enviroments[process.env.NODE_ENV] || '.env',
 			load: [config],
@@ -38,9 +42,9 @@ import { UsersModule } from './users/users.module';
 			}),
 		}),
 		ConfigurationsModule,
+		DatabasesModule,
 		CouponsModule,
 		CustomersModule,
-		DatabasesModule,
 		ImagesModule,
 		InventoriesModule,
 		InvoicesModule,

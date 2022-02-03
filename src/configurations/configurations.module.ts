@@ -8,6 +8,7 @@ import {
 } from './entities/configuration.entity';
 import { ConfigurationsService } from './services/configurations.service';
 import { ConfigurationsController } from './controllers/configurations.controller';
+import { ConfigurationsResolver } from './resolvers/configurations.resolver';
 
 @Module({
 	imports: [
@@ -15,7 +16,7 @@ import { ConfigurationsController } from './controllers/configurations.controlle
 			{ name: Configuration.name, schema: ConfigurationSchema },
 		]),
 	],
-	providers: [ConfigurationsService],
+	providers: [ConfigurationsResolver, ConfigurationsService],
 	controllers: [ConfigurationsController],
 	exports: [ConfigurationsService],
 })

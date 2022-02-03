@@ -30,16 +30,18 @@ export class ReportsSalesService {
 			const shopGoal = await this.shopsService.getByIdMysql(shopId);
 
 			//calculamos el porcentaje de la meta
-			const bonus = await this.configurationsService.getForName(
-				'invoicing',
-				'bonus',
-			);
+			const bonus = await this.configurationsService.getForName({
+				module: 'invoicing',
+				name: 'bonus',
+			});
 
 			//calculamos el total ganado
 			const superplusGoal = sales - shopGoal['_doc'].goal || 0;
 
 			const bonusValue =
-				superplusGoal > 0 ? (superplusGoal * bonus.data[0].value) / 100 : 0;
+				superplusGoal > 0
+					? (superplusGoal * (bonus?.data[0]?.value as number)) / 100
+					: 0;
 
 			return {
 				sales,

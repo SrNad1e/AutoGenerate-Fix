@@ -6,36 +6,43 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { GetConfigsArgs } from '../dtos/args/get-configs.args';
+import { GetModuleConfigurationArgs } from '../dtos/args/get-module-configuration.args';
 
-import { AddConfigurationsDto } from '../dtos/configurations.dto';
-import { Configs, Configuration } from '../entities/configuration.entity';
+import { AddConfigInput } from '../dtos/inputs/add-config.input';
+import {
+	Configs,
+	Configuration,
+	ConfigurationDocument,
+} from '../entities/configuration.entity';
 
 @Injectable()
 export class ConfigurationsService {
 	constructor(
 		@InjectModel(Configuration.name)
-		private readonly configurationModule: Model<Configuration>,
+		private readonly configurationModule: Model<ConfigurationDocument>,
 	) {}
 
 	async getAll(): Promise<Configuration[]> {
-		const configurations = await this.configurationModule.find({
-			__v: { $ne: 0 },
-		});
+		const configurations = await this.configurationModule
+			.find({
+				__v: { $ne: 0 },
+			})
+			.lean();
 		if (configurations.length === 0) {
 			throw new NotFoundException(`No existen configuraciones`);
 		}
 		return configurations;
 	}
 
-	async getForName(/*module: string,*/ name: string): Promise<Configs> {
-		const module = ''
+	async getForName({ name, module }: GetConfigsArgs): Promise<Configs> {
 		if (!module || !name) {
 			throw new BadRequestException(
 				`Los parámetros module y name son obligatorios`,
 			);
 		}
 
-		const config = await this.configurationModule.findOne({ module });
+		const config = await this.configurationModule.findOne({ module }).lean();
 		if (!config) {
 			throw new NotFoundException(`El módulo ${module} no existe`);
 		}
@@ -48,8 +55,12 @@ export class ConfigurationsService {
 		return configSelected;
 	}
 
-	async getModule(module: string): Promise<Configuration> {
-		const configuration = await this.configurationModule.findOne({ module });
+	async getModule({
+		module,
+	}: GetModuleConfigurationArgs): Promise<Configuration> {
+		const configuration = await this.configurationModule
+			.findOne({ module })
+			.lean();
 
 		if (!configuration) {
 			throw new NotFoundException(`Configuración ${module} no encontrada`);
@@ -57,12 +68,13 @@ export class ConfigurationsService {
 		return configuration;
 	}
 
-	async addConfig(
-		module: string,
-		config: AddConfigurationsDto,
-	): Promise<Configuration> {
-
-		const configModule = await this.configurationModule.findOne({ module });
+	async addConfig({
+		module,
+		...config
+	}: AddConfigInput): Promise<Configuration> {
+		const configModule = await this.configurationModule
+			.findOne({ module })
+			.lean();
 
 		if (!configModule) {
 			throw new NotFoundException(`Configuración no encontrada para ${module}`);
