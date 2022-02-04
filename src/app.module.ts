@@ -19,6 +19,7 @@ import { ShippingsModule } from './shippings/shippings.module';
 import { ShopsModule } from './shops/shops.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { UsersModule } from './users/users.module';
+import { AppGateway } from './app.gateway';
 @Module({
 	imports: [
 		GraphQLModule.forRoot({
@@ -55,5 +56,6 @@ import { UsersModule } from './users/users.module';
 		TreasuryModule,
 		UsersModule,
 	],
+	providers: [AppGateway],
 })
 export class AppModule {}
