@@ -11,7 +11,7 @@ import { Shipping } from 'src/shippings/entities/shipping.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 import { Invoice } from './invoice.entity';
 import { Summary } from './summary.entity';
 
@@ -38,10 +38,10 @@ export class Order extends Document {
 	cartId: string;
 
 	@Prop({ type: Object, required: true })
-	seller: User;
+	seller: UserMysql;
 
 	@Prop({ type: Object, required: true })
-	user: User;
+	user: UserMysql;
 
 	@Prop({ type: Object, required: true })
 	shop: Shop;

@@ -28,14 +28,87 @@ type Data {
   value: String!
 }
 
+type Permission {
+  """Identificador de mongo"""
+  _id: String!
+
+  """módulo al que perteneces el permiso"""
+  module: String!
+
+  """Título de la acción"""
+  title: String!
+
+  """Nombre de la acción"""
+  name: String!
+
+  """Detalle de la acción"""
+  description: String!
+
+  """Tipo de acción crud que genera acceso"""
+  action: String!
+}
+
+type Role {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Nombre asiganado al rol"""
+  name: String!
+
+  """Permisos al los quie tiene el rol"""
+  permissions: [Permission!]!
+
+  """Usuario que creó o modificó el rol"""
+  user: User!
+
+  """Fecha de creación del rol"""
+  createdAt: DateTime!
+
+  """Fecha en la que se actualizó el rol"""
+  updatedAt: DateTime!
+}
+
+type User {
+  """id de mysql por migracion"""
+  id: Float!
+
+  """Identificador de mongo"""
+  _id: String!
+
+  """Nombre de la persona que usa el usuario"""
+  name: String!
+
+  """Nombre de usuario"""
+  userName: String!
+
+  """Contraseña de usuario"""
+  password: String!
+
+  """Usuario que creó el usuario"""
+  user: User!
+
+  """Rol que ocupa el usuario"""
+  role: Role!
+
+  """Nombre de usuario"""
+  createdAt: DateTime!
+
+  """Nombre de usuario"""
+  updateAt: DateTime!
+}
+
 type Query {
   getAll: [Configuration!]!
   getForName(name: String!, module: String!): Configuration!
   configuration(module: String!): Configuration
+  users: [User!]!
+  user(id: Int!): User!
 }
 
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 input AddConfigInput {
@@ -50,4 +123,21 @@ input DataInput {
   type: String!
   name: String!
   value: String!
+}
+
+input CreateUserInput {
+  """Usuario registrado"""
+  username: String!
+
+  """Contraseña de usuario"""
+  password: String!
+}
+
+input UpdateUserInput {
+  """Usuario registrado"""
+  username: String
+
+  """Contraseña de usuario"""
+  password: String
+  id: Int!
 }

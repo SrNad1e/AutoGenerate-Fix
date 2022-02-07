@@ -6,7 +6,7 @@ import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Refund } from 'src/invoices/entities/refund.entity';
 import { Order } from 'src/invoices/entities/order.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 export class CouponsSortDto {
 	@IsOptional()
@@ -25,7 +25,7 @@ export class CreateCouponsDto {
 	shop: Shop;
 
 	@IsOptional()
-	user: User;
+	user: UserMysql;
 
 	@IsOptional()
 	customer: Customer;

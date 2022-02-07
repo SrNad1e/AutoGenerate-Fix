@@ -6,7 +6,7 @@ import { Customer } from 'src/customers/entities/customer.entity';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Order } from 'src/invoices/entities/order.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
 export class Coupon extends Document {
@@ -26,7 +26,7 @@ export class Coupon extends Document {
 	shop: Shop;
 
 	@Prop({ type: Object, required: true })
-	user: User;
+	user: UserMysql;
 
 	@Prop({ type: Object, required: true })
 	customer: Customer;

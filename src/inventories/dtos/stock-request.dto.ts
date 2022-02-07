@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 export class FiltersStockRequestDto {
 	@IsOptional()
@@ -149,7 +149,7 @@ export class CreateStockRequestParamsDto {
 	status?: string;
 	//TODO: Temporal mientras se traslada la autenticación
 	@IsObject()
-	user: User;
+	user: UserMysql;
 }
 
 export class UpdateStockRequestParamsDto {
@@ -171,5 +171,5 @@ export class UpdateStockRequestParamsDto {
 	}[];
 
 	@IsObject()
-	user: User;
+	user: UserMysql;
 }

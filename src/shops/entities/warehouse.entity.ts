@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
 export class Warehouse extends Document {
@@ -9,7 +9,7 @@ export class Warehouse extends Document {
 	shopId: number;
 
 	@Prop({ type: Object, required: true })
-	user: User;
+	user: UserMysql;
 
 	@Prop({ type: String, required: true, unique: true })
 	name: string;

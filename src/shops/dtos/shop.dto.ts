@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IsObject, IsOptional, IsString } from 'class-validator';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 export class FilterShopsDto {
 	@IsOptional()
@@ -37,7 +37,7 @@ export class CreateShopParamsDto {
 
 	//TODO: eliminar al agregar validación
 	@IsObject()
-	user: User;
+	user: UserMysql;
 
 	@IsOptional()
 	goal?: number;
@@ -65,5 +65,5 @@ export class UpdateShopParamsDto {
 
 	//TODO: eliminar al agregar validación
 	@IsObject()
-	user: User;
+	user: UserMysql;
 }

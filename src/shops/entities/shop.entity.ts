@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
 export class Shop {
@@ -8,7 +8,7 @@ export class Shop {
 	name: string;
 
 	@Prop({ type: Object })
-	user: User;
+	user: UserMysql;
 
 	@Prop({ type: String, default: 'active' })
 	status: string;

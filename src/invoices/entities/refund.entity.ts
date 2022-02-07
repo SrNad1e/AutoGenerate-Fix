@@ -5,7 +5,7 @@ import { Document } from 'mongoose';
 import { Order } from 'src/invoices/entities/order.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 import { Invoice } from './invoice.entity';
 
 @Schema({ timestamps: true })
@@ -20,7 +20,7 @@ export class Refund extends Document {
 	products: Product[];
 
 	@Prop({ type: Object, required: true })
-	user: User;
+	user: UserMysql;
 
 	@Prop({ type: Object, required: true, index: true })
 	shop: Shop;

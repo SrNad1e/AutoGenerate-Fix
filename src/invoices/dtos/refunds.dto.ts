@@ -2,7 +2,7 @@
 import { IsArray, IsObject, IsOptional, IsString } from 'class-validator';
 
 import { ProductOrder } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 export class CreateRefundsDto {
 	@IsString()
@@ -12,7 +12,7 @@ export class CreateRefundsDto {
 	products: ProductOrder[];
 
 	@IsObject()
-	user: User;
+	user: UserMysql;
 }
 
 export class FiltersRefundsDto {

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 
 @Schema({ timestamps: true, collection: 'stockinput' })
@@ -35,6 +35,6 @@ export class StockInput extends Document {
 	observation: string;
 
 	@Prop({ type: Object, required: true })
-	user: User;
+	user: UserMysql;
 }
 export const StockInputSchema = SchemaFactory.createForClass(StockInput);

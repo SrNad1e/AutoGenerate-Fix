@@ -10,7 +10,7 @@ import { ProductMysql } from 'src/products/entities/product.migration.entity';
 import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { StockTransferDetailMysql } from 'src/inventories/entities/stock-transfer-detail.migrate.entity';
 import { StockTransferMysql } from 'src/inventories/entities/stock-transfer.migrate.entity';
-import { User } from 'src/users/entities/user.entity';
+import { UserMysql } from 'src/users/entities/user.entity';
 
 @Global()
 @Module({
@@ -42,7 +42,7 @@ import { User } from 'src/users/entities/user.entity';
 						StockTransferDetailMysql,
 						StockTransferMysql,
 						ShopMysql,
-						User,
+						UserMysql,
 					],
 				};
 			},
