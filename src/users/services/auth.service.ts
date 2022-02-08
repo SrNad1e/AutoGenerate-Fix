@@ -23,19 +23,12 @@ export class AuthService {
 		};
 	}
 
-	async signup(userCreate: Partial<User>): Promise<LoginResponse> {
+	async signup(userCreate: Partial<User>): Promise<User> {
 		const user = await this.usersService.findOne(userCreate?.username);
 		if (user) {
 			throw new Error(`El usuario ${userCreate.username} ya existe`);
 		}
-		const newUser = await this.usersService.create(userCreate);
-		return {
-			user: newUser,
-			access_token: this.jwtService.sign({
-				username: newUser.username,
-				sub: newUser._id,
-			}),
-		};
+		return this.usersService.create(userCreate);
 	}
 
 	/**

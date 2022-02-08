@@ -4,6 +4,7 @@ import { CreateUserInput } from '../dtos/create-user.input';
 
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
+import { User } from '../entities/user.entity';
 import { GqlAuthGuard } from '../guards/gql-auth.guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from '../services/auth.service';
@@ -21,12 +22,14 @@ export class AuthResolver {
 		return this.authService.login(context.user);
 	}
 
-	@Mutation(() => LoginResponse)
+	@Mutation(() => User)
 	@UseGuards(JwtAuthGuard)
 	async signup(
 		@Args('createUserInput') createUserInput: CreateUserInput,
 		@Context() context,
-	): Promise<LoginResponse> {
+	): Promise<User> {
+		console.log(context.req);
+
 		return this.authService.signup({
 			...context.req.body.variables.input,
 			user: context.req.user,
