@@ -2,19 +2,50 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Configuration {
-  _id: ID!
+input AddConfigInput {
+  data: [DataInput!]!
+  description: String!
   module: String!
-  configs: [Configs!]!
+  name: String!
+  title: String!
 }
 
 type Configs {
+  createdAt: DateTime!
+  data: [Data!]!
+  description: String!
   name: String!
   title: String!
-  description: String!
-  data: [Data!]!
-  createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type Configuration {
+  _id: ID!
+  configs: [Configs!]!
+  module: String!
+}
+
+input CreateUserInput {
+  """Nombre del usuario"""
+  name: String!
+
+  """Contraseña de usuario"""
+  password: String!
+
+  """Usuario registrado"""
+  username: String!
+}
+
+type Data {
+  name: String!
+  type: String!
+  value: String!
+}
+
+input DataInput {
+  name: String!
+  type: String!
+  value: String!
 }
 
 """
@@ -22,35 +53,60 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Data {
-  type: String!
-  name: String!
-  value: String!
+type LoginResponse {
+  access_token: String!
+  user: User!
+}
+
+input LoginUserInput {
+  """Contraseña de usuario"""
+  password: String!
+
+  """Usuario registrado"""
+  username: String!
+}
+
+type Mutation {
+  addConfi(addConfigData: AddConfigInput!): Configuration!
+  login(loginUserInput: LoginUserInput!): LoginResponse!
+  signup(createUserInput: CreateUserInput!): LoginResponse!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Permission {
   """Identificador de mongo"""
   _id: String!
 
-  """módulo al que perteneces el permiso"""
-  module: String!
-
-  """Título de la acción"""
-  title: String!
-
-  """Nombre de la acción"""
-  name: String!
+  """Tipo de acción crud que genera acceso"""
+  action: String!
 
   """Detalle de la acción"""
   description: String!
 
-  """Tipo de acción crud que genera acceso"""
-  action: String!
+  """módulo al que perteneces el permiso"""
+  module: String!
+
+  """Nombre de la acción"""
+  name: String!
+
+  """Título de la acción"""
+  title: String!
+}
+
+type Query {
+  configuration(module: String!): Configuration
+  getAll: [Configuration!]!
+  getForName(module: String!, name: String!): Configuration!
+  user(username: String!): User!
+  users: [User!]!
 }
 
 type Role {
   """Identificador de mongo"""
   _id: String!
+
+  """Fecha de creación del rol"""
+  createdAt: DateTime!
 
   """Nombre asiganado al rol"""
   name: String!
@@ -58,86 +114,51 @@ type Role {
   """Permisos al los quie tiene el rol"""
   permissions: [Permission!]!
 
-  """Usuario que creó o modificó el rol"""
-  user: User!
-
-  """Fecha de creación del rol"""
-  createdAt: DateTime!
-
   """Fecha en la que se actualizó el rol"""
   updatedAt: DateTime!
+
+  """Usuario que creó o modificó el rol"""
+  user: User!
+}
+
+input UpdateUserInput {
+  id: String!
+
+  """Nombre del usuario"""
+  name: String
+
+  """Contraseña de usuario"""
+  password: String
+
+  """Usuario registrado"""
+  username: String
 }
 
 type User {
-  """id de mysql por migracion"""
-  id: Float!
-
   """Identificador de mongo"""
   _id: String!
+
+  """Nombre de usuario"""
+  createdAt: DateTime!
+
+  """id de mysql por migracion"""
+  id: Float
 
   """Nombre de la persona que usa el usuario"""
   name: String!
 
-  """Nombre de usuario"""
-  userName: String!
-
   """Contraseña de usuario"""
-  password: String!
+  password: String
+
+  """Rol que ocupa el usuario"""
+  role: Role
+
+  """Nombre de usuario"""
+  updateAt: DateTime!
 
   """Usuario que creó el usuario"""
   user: User!
 
-  """Rol que ocupa el usuario"""
-  role: Role!
-
   """Nombre de usuario"""
-  createdAt: DateTime!
-
-  """Nombre de usuario"""
-  updateAt: DateTime!
-}
-
-type Query {
-  getAll: [Configuration!]!
-  getForName(name: String!, module: String!): Configuration!
-  configuration(module: String!): Configuration
-  users: [User!]!
-  user(id: Int!): User!
-}
-
-type Mutation {
-  addConfi(addConfigData: AddConfigInput!): Configuration!
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-}
-
-input AddConfigInput {
-  module: String!
-  name: String!
-  title: String!
-  description: String!
-  data: [DataInput!]!
-}
-
-input DataInput {
-  type: String!
-  name: String!
-  value: String!
-}
-
-input CreateUserInput {
-  """Usuario registrado"""
   username: String!
-
-  """Contraseña de usuario"""
-  password: String!
-}
-
-input UpdateUserInput {
-  """Usuario registrado"""
-  username: String
-
-  """Contraseña de usuario"""
-  password: String
-  id: Int!
 }

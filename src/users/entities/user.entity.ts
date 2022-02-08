@@ -1,12 +1,12 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from './role.entity';
-
 @Schema({ timestamps: true })
 @ObjectType()
 export class User {
-	@Field({ description: 'id de mysql por migracion' })
+	@Field({ description: 'id de mysql por migracion', nullable: true })
 	@Prop({ type: Number })
 	id: number;
 
@@ -19,18 +19,21 @@ export class User {
 
 	@Field({ description: 'Nombre de usuario' })
 	@Prop({ type: String, required: true })
-	userName: string;
+	username: string;
 
-	@Field({ description: 'Contraseña de usuario' })
-	@Prop({ type: String, select: false, required: true })
+	@Field({ description: 'Contraseña de usuario', nullable: true })
+	@Prop({ type: String, required: true })
 	password: string;
 
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })
 	user: Partial<User>;
 
-	@Field(() => Role, { description: 'Rol que ocupa el usuario' })
-	@Prop({ type: Object, required: true })
+	@Field(() => Role, {
+		description: 'Rol que ocupa el usuario',
+		nullable: true,
+	})
+	@Prop({ type: Object })
 	role: Role;
 
 	@Field({ description: 'Nombre de usuario' })

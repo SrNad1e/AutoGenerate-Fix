@@ -24,6 +24,7 @@ import { AppGateway } from './app.gateway';
 	imports: [
 		GraphQLModule.forRoot({
 			autoSchemaFile: 'src/schema.gql',
+			sortSchema: true,
 		}),
 		ConfigModule.forRoot({
 			envFilePath: enviroments[process.env.NODE_ENV] || '.env',
@@ -40,6 +41,7 @@ import { AppGateway } from './app.gateway';
 				MARIADB_PASSWORD: Joi.string().required(),
 				MARIADB_PORT: Joi.number().required(),
 				MARIADB_HOST: Joi.string().required(),
+				SECRET_TOKEN: Joi.string().required(),
 			}),
 		}),
 		ConfigurationsModule,

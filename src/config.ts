@@ -15,4 +15,8 @@ export default registerAs('config', () => ({
 		host: process.env.MARIADB_HOST,
 		port: parseInt(process.env.MARIADB_PORT, 10),
 	},
+	jwt: {
+		secret: process.env.SECRET_TOKEN,
+		expire: process.env.EXPIRE_TOKEN,
+	},
 }));
