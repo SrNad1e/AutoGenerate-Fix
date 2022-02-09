@@ -28,8 +28,6 @@ export class AuthResolver {
 		@Args('createUserInput') createUserInput: CreateUserInput,
 		@Context() context,
 	): Promise<User> {
-		console.log(context.req);
-
 		return this.authService.signup({
 			...context.req.body.variables.input,
 			user: context.req.user,

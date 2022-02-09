@@ -46,6 +46,7 @@ import { JwtStrategy } from './libs/jwt.strategy';
 				name: User.name,
 				useFactory: () => {
 					const schema = UserSchema;
+
 					schema.pre<User>('save', async function (next) {
 						const user = this || undefined;
 

@@ -10,4 +10,7 @@ export class CreateUserInput {
 
 	@Field({ description: 'Contraseña de usuario' })
 	password: string;
+
+	@Field({ description: 'Rol asignado al usuario' })
+	role: string;
 }

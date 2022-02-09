@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { Global, Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -21,6 +22,10 @@ import { UserMysql } from 'src/users/entities/user.entity';
 				return {
 					uri: `${connection}://${host}:${port}`,
 					dbName,
+					connectionFactory: (connection) => {
+						connection.plugin(require('mongoose-autopopulate'));
+						return connection;
+					},
 				};
 			},
 			inject: [config.KEY],

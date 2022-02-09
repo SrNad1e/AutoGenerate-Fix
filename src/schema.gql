@@ -32,6 +32,9 @@ input CreateUserInput {
   """Contraseña de usuario"""
   password: String!
 
+  """Rol asignado al usuario"""
+  role: String!
+
   """Usuario registrado"""
   username: String!
 }
@@ -130,6 +133,9 @@ input UpdateUserInput {
   """Contraseña de usuario"""
   password: String
 
+  """Rol asignado al usuario"""
+  role: String
+
   """Usuario registrado"""
   username: String
 }
@@ -151,7 +157,7 @@ type User {
   password: String
 
   """Rol que ocupa el usuario"""
-  role: Role
+  role: Role!
 
   """Nombre de usuario"""
   updateAt: DateTime!

@@ -1,6 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as bcrypt from 'bcrypt';
+import * as mongoose from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from './role.entity';
 @Schema({ timestamps: true })
@@ -18,23 +18,26 @@ export class User {
 	name: string;
 
 	@Field({ description: 'Nombre de usuario' })
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, required: true, trim: true })
 	username: string;
 
 	@Field({ description: 'Contraseña de usuario', nullable: true })
 	@Prop({ type: String, required: true })
 	password: string;
 
+	@Field(() => Role, {
+		description: 'Rol que ocupa el usuario',
+	})
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Role',
+		autopopulate: true,
+	})
+	role: mongoose.Schema.Types.ObjectId;
+
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })
 	user: Partial<User>;
-
-	@Field(() => Role, {
-		description: 'Rol que ocupa el usuario',
-		nullable: true,
-	})
-	@Prop({ type: Object })
-	role: Role;
 
 	@Field({ description: 'Nombre de usuario' })
 	createdAt: Date;

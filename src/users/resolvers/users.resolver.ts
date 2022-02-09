@@ -21,10 +21,13 @@ export class UsersResolver {
 	}
 
 	@Mutation(() => User)
+	@UseGuards(JwtAuthGuard)
 	updateUser(
 		@Args('updateUserInput') updateUserInput: UpdateUserInput,
 		@Context() context,
 	) {
+		console.log(context.req.body);
+
 		return this.usersService.update(
 			updateUserInput.id,
 			updateUserInput,
