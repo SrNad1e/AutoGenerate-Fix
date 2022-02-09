@@ -24,14 +24,9 @@ export class UsersResolver {
 	@UseGuards(JwtAuthGuard)
 	updateUser(
 		@Args('updateUserInput') updateUserInput: UpdateUserInput,
+		@Args('id') id: string,
 		@Context() context,
 	) {
-		console.log(context.req.body);
-
-		return this.usersService.update(
-			updateUserInput.id,
-			updateUserInput,
-			context.user,
-		);
+		return this.usersService.update(id, updateUserInput, context.user);
 	}
 }

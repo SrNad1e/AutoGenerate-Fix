@@ -73,7 +73,7 @@ type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
+  updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
 }
 
 type Permission {
@@ -125,8 +125,6 @@ type Role {
 }
 
 input UpdateUserInput {
-  id: String!
-
   """Nombre del usuario"""
   name: String
 

@@ -45,7 +45,7 @@ export class UsersService {
 		updateUserInput: UpdateUserInput,
 		userUpdate: User,
 	): Promise<User> {
-		const user = this.findById(id);
+		const user = await this.findById(id);
 		if (!user) {
 			throw new NotFoundException(`Usuario que intenta actualizar no existe`);
 		}
