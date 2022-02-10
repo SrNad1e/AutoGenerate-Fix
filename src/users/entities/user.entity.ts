@@ -6,7 +6,11 @@ import { Role } from './role.entity';
 @Schema({ timestamps: true })
 @ObjectType()
 export class User {
-	@Field({ description: 'id de mysql por migracion', nullable: true })
+	@Field({
+		description: 'id de mysql por migracion',
+		nullable: true,
+		deprecationReason: 'id usado en mysql',
+	})
 	@Prop({ type: Number })
 	id: number;
 

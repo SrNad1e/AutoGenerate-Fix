@@ -44,8 +44,6 @@ export class InventoriesService {
 			await this.inventoriesRepo.save(inventories);
 			return true;
 		} catch (e) {
-			console.log(e);
-
 			return `Error al agregar productos al inventario ${e}`;
 		}
 	}

@@ -124,7 +124,6 @@ export class StockOutputService {
 				};
 			}
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(e);
 		}
 	}
@@ -320,7 +319,6 @@ export class StockOutputService {
 				);
 			}
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(e);
 		}
 	}

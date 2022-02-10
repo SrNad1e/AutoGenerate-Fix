@@ -130,7 +130,6 @@ export class StockAdjustmentService {
 				};
 			}
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(e);
 		}
 	}
@@ -310,7 +309,6 @@ export class StockAdjustmentService {
 				);
 			}
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(e);
 		}
 	}

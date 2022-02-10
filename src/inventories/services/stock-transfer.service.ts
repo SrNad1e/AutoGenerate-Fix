@@ -148,7 +148,6 @@ export class StockTransferService {
 				};
 			}
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(e);
 		}
 	}
@@ -373,7 +372,6 @@ export class StockTransferService {
 			});
 			return stockTransfer;
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(`Error al crear el traslado ${e}`);
 		}
 	}
@@ -675,7 +673,6 @@ export class StockTransferService {
 				}
 			}
 		} catch (e) {
-			console.log(e);
 			return new NotFoundException(e);
 		}
 	}

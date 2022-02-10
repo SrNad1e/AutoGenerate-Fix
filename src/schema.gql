@@ -162,7 +162,7 @@ type User {
   createdAt: DateTime!
 
   """id de mysql por migracion"""
-  id: Float
+  id: Float @deprecated(reason: "id usado en mysql")
 
   """Nombre de la persona que usa el usuario"""
   name: String!
