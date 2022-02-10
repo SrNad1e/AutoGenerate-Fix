@@ -49,49 +49,65 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 @Entity({ name: 'users' })
+@ObjectType()
 export class UserMysql {
+	@Field()
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	@Field()
 	@Column({ type: 'int' })
 	role_id: number;
 
+	@Field()
 	@Column({ type: 'varchar' })
 	authentication_token: string;
 
+	@Field()
 	@Column({ type: 'int' })
 	shop_id: number;
 
+	@Field()
 	@Column({ type: 'int' })
 	customer_id: number;
 
+	@Field()
 	@Column({ type: 'int' })
 	owner_user_id: number;
 
+	@Field()
 	@Column({ type: 'varchar' })
 	user: string;
 
+	@Field()
 	@Column({ type: 'varchar' })
 	email: string;
 
+	@Field()
 	@Column({ type: 'varchar' })
 	password: string;
 
+	@Field()
 	@Column({ type: 'tinyint' })
 	active: boolean;
 
+	@Field()
 	@Column({ type: 'datetime' })
 	created_at: Date;
 
+	@Field()
 	@Column({ type: 'datetime' })
 	last_login_at: Date;
 
+	@Field()
 	@Column({ type: 'varchar' })
 	name: string;
 
+	@Field()
 	@Column({ type: 'varchar' })
 	identification: string;
 
+	@Field()
 	@Column({ type: 'tinyint' })
 	wholesale_member: boolean;
 }

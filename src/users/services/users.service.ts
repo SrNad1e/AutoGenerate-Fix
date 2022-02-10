@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
+
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { User } from '../entities/user.entity';
 
@@ -49,6 +51,14 @@ export class UsersService {
 		if (!user) {
 			throw new NotFoundException(`Usuario que intenta actualizar no existe`);
 		}
+
+		if (updateUserInput.password) {
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash(user.password, salt);
+
+			updateUserInput.password = hashedPassword;
+		}
+
 		return this.userModel.findByIdAndUpdate(
 			id,
 			{

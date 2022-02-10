@@ -2,8 +2,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
+import * as moment from 'moment';
 import { Model } from 'mongoose';
-import * as dayjs from 'dayjs';
 
 import { Customer } from 'src/customers/entities/customer.entity';
 import { InvoicesService } from 'src/invoices/services/invoices.service';
@@ -37,7 +37,7 @@ export class CustomersService {
 
 		//seleccionamos los que tengan fecha vencida
 		const customersCheck = customers.filter((customer) =>
-			dayjs(customer.wholesale.activatedAt).add(30, 'd').isBefore(dayjs()),
+			moment(customer.wholesale.activatedAt).add(30, 'd').isBefore(moment()),
 		);
 
 		//validamos las ventas por cliente por el tiempo
@@ -52,8 +52,8 @@ export class CustomersService {
 			} else {
 				const total = await this.invoiceService.totalInvoicesCustomer(
 					customer.identification,
-					new Date(dayjs().subtract(30, 'd').format('YYYY/MM/DD')),
-					new Date(dayjs().add(1, 'd').format('YYYY/MM/DD')),
+					new Date(moment().subtract(30, 'd').format('YYYY/MM/DD')),
+					new Date(moment().add(1, 'd').format('YYYY/MM/DD')),
 				);
 
 				if (total < 200000) {

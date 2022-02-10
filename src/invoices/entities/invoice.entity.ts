@@ -11,6 +11,7 @@ import { Shop } from 'src/shops/entities/shop.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Summary } from './summary.entity';
 
 @Schema({ timestamps: true })
@@ -68,4 +69,34 @@ export class Invoice {
 
 	@Prop({ type: Number, required: true })
 	code: number;
+}
+
+@Entity({ name: 'invoices' })
+export class InvoiceMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
+
+	@Column({ type: 'int' })
+	user_id: number;
+
+	@Column({ type: 'int' })
+	seller_id: number;
+
+	@Column({ type: 'int' })
+	shop_id: number;
+
+	@Column({ type: 'int' })
+	client_id: number;
+
+	@Column({ type: 'varchar' })
+	code: string;
+
+	@Column({ type: 'int' })
+	state: number;
+
+	@Column({ type: 'double' })
+	total: number;
+
+	@Column({ type: 'datetime' })
+	created_at: Date;
 }

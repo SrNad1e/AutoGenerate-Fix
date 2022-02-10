@@ -57,17 +57,6 @@ import { JwtStrategy } from './libs/jwt.strategy';
 
 						next();
 					});
-					schema.pre<User>('updateOne', async function (next) {
-						const user = this || undefined;
-
-						const salt = await bcrypt.genSalt(10);
-						const hashedPassword = await bcrypt.hash(user.password, salt);
-
-						user.password = hashedPassword;
-
-						next();
-					});
-
 					return schema;
 				},
 			},

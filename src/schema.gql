@@ -100,8 +100,14 @@ type Query {
   configuration(module: String!): Configuration
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
+  reportSales(year: Float!): [ReportSalesResponse!]!
   user(username: String!): User!
   users: [User!]!
+}
+
+type ReportSalesResponse {
+  shop: Shop!
+  weeks: [Float!]!
 }
 
 type Role {
@@ -122,6 +128,16 @@ type Role {
 
   """Usuario que creó o modificó el rol"""
   user: User!
+}
+
+type Shop {
+  address: String!
+  goal: Float!
+  name: String!
+  phone: String!
+  shopId: Float!
+  status: String!
+  user: UserMysql!
 }
 
 input UpdateUserInput {
@@ -165,4 +181,22 @@ type User {
 
   """Nombre de usuario"""
   username: String!
+}
+
+type UserMysql {
+  active: Boolean!
+  authentication_token: String!
+  created_at: DateTime!
+  customer_id: Float!
+  email: String!
+  id: Float!
+  identification: String!
+  last_login_at: DateTime!
+  name: String!
+  owner_user_id: Float!
+  password: String!
+  role_id: Float!
+  shop_id: Float!
+  user: String!
+  wholesale_member: Boolean!
 }

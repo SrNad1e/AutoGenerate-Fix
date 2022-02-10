@@ -12,6 +12,7 @@ import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { StockTransferDetailMysql } from 'src/inventories/entities/stock-transfer-detail.migrate.entity';
 import { StockTransferMysql } from 'src/inventories/entities/stock-transfer.migrate.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
+import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 
 @Global()
 @Module({
@@ -48,6 +49,7 @@ import { UserMysql } from 'src/users/entities/user.entity';
 						StockTransferMysql,
 						ShopMysql,
 						UserMysql,
+						InvoiceMysql,
 					],
 				};
 			},

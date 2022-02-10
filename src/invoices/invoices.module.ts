@@ -14,13 +14,17 @@ import {
 	ProductReturnsSchema,
 } from './entities/productreturns.entity';
 import { OrdersService } from './services/orders.service';
-import { Invoice } from './entities/invoice.entity';
+import { Invoice, InvoiceMysql } from './entities/invoice.entity';
 import { Order } from './entities/order.entity';
 import { InventoriesModule } from 'src/inventories/inventories.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ShopsModule } from 'src/shops/shops.module';
 @Module({
 	imports: [
 		CouponsModule,
 		InventoriesModule,
+		ShopsModule,
+		TypeOrmModule.forFeature([InvoiceMysql]),
 		MongooseModule.forFeatureAsync([
 			//TODO: modelo pendiente a cambiar por nombre más simple
 			{
