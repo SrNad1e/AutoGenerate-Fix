@@ -41,7 +41,7 @@ export class AuthService {
 	async validateUser(
 		username: string,
 		passwordOld: string,
-	): Promise<User> | undefined {
+	): Promise<Partial<User>> | undefined {
 		const user = await this.usersService.findOne(username);
 
 		if (user && bcrypt.compareSync(passwordOld, user.password)) {

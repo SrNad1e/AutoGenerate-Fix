@@ -98,6 +98,7 @@ type Permission {
 
 type Query {
   configuration(module: String!): Configuration
+  currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
   reportSales(year: Float!): [ReportSalesResponse!]!

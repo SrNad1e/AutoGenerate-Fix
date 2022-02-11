@@ -15,7 +15,14 @@ export class UsersResolver {
 		return this.usersService.findAll();
 	}
 
+	@Query(() => User, { name: 'currentUser' })
+	@UseGuards(JwtAuthGuard)
+	getCurrent(@Context() context) {
+		return context.req.user;
+	}
+
 	@Query(() => User, { name: 'user' })
+	@UseGuards(JwtAuthGuard)
 	findOne(@Args('username', { type: () => String }) username: string) {
 		return this.usersService.findOne(username);
 	}
@@ -27,6 +34,6 @@ export class UsersResolver {
 		@Args('id') id: string,
 		@Context() context,
 	) {
-		return this.usersService.update(id, updateUserInput, context.user);
+		return this.usersService.update(id, updateUserInput, context.req.user);
 	}
 }

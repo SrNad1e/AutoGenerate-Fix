@@ -15,7 +15,7 @@ export class UsersService {
 		return user;
 	}
 
-	async findOne(username: string): Promise<any> {
+	async findOne(username: string): Promise<User> {
 		return this.userModel.findOne({ username }).populate('role').lean();
 	}
 

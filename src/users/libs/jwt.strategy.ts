@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -17,9 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	}
 
 	async validate(payload: any): Promise<Partial<User>> {
-		const { password, _id, ...user } = await this.usersService.findById(
-			payload.sub,
-		);
+		const { password, ...user } = await this.usersService.findById(payload.sub);
 		return user;
 	}
 }
