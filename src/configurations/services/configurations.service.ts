@@ -13,14 +13,13 @@ import { AddConfigInput } from '../dtos/inputs/add-config.input';
 import {
 	Configs,
 	Configuration,
-	ConfigurationDocument,
 } from '../entities/configuration.entity';
 
 @Injectable()
 export class ConfigurationsService {
 	constructor(
 		@InjectModel(Configuration.name)
-		private readonly configurationModule: Model<ConfigurationDocument>,
+		private readonly configurationModule: Model<Configuration>,
 	) {}
 
 	async getAll(): Promise<Configuration[]> {

@@ -1,9 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import * as mongoose from 'mongoose';
 
-export type ConfigurationDocument = Configuration & mongoose.Document;
 @Schema({ timestamps: true, collection: 'config' })
 @ObjectType()
 export class Configuration {
