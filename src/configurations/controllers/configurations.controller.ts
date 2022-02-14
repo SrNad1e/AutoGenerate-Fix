@@ -50,6 +50,6 @@ export class ConfigurationsController {
 		@Body() params: AddConfigurationsDto,
 		@Param('module') module: string,
 	): Promise<Configuration> {
-		return this.configurationsService.addConfig({ module, ...params });
+		return this.configurationsService.addConfigModule({ module, ...params });
 	}
 }

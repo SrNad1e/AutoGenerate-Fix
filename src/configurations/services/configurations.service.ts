@@ -67,7 +67,7 @@ export class ConfigurationsService {
 		return configuration;
 	}
 
-	async addConfig({
+	async addConfigModule({
 		module,
 		...config
 	}: AddConfigInput): Promise<Configuration> {

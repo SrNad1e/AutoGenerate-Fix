@@ -31,6 +31,6 @@ export class ConfigurationsResolver {
 	async addConfi(
 		@Args('addConfigData') addConfigData: AddConfigInput,
 	): Promise<Configuration> {
-		return this.configurationsService.addConfig(addConfigData);
+		return this.configurationsService.addConfigModule(addConfigData);
 	}
 }
