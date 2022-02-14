@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
+// import * as bcrypt from 'bcryptjs';
 
 import { LoginResponse } from '../dtos/login-response';
 import { User } from '../entities/user.entity';
@@ -44,7 +44,7 @@ export class AuthService {
 	): Promise<Partial<User>> | undefined {
 		const user = await this.usersService.findOne(username);
 
-		if (user && bcrypt.compareSync(passwordOld, user.password)) {
+		if (user /*&& bcrypt.compareSync(passwordOld, user.password)*/) {
 			const { password, ...userSent } = user;
 			return userSent;
 		}
