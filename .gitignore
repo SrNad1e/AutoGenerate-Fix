@@ -2,6 +2,10 @@
 /dist
 /node_modules
 
+#Docker
+/mysql_data
+/mongo_data
+
 # Logs
 logs
 *.log

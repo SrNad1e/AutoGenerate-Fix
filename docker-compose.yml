@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+      - mongo
+    environment:
+      PORT: 8080
+      MONGO_DB: pos_qa
+      MONGO_PORT: 27017
+      MONGO_HOST: mongo
+      MONGO_CONNECTION: mongodb
+      MARIADB_DB: pos_qa
+      MARIADB_USER: root
+      MARIADB_PASSWORD: 1234
+      MARIADB_PORT: 3306
+      MARIADB_HOST: db
+      SECRET_TOKEN: prueba
+      EXPIRE_TOKEN: 24h
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    volumes:
+      - .:/app
+      #- /usr/src/node_modules
+    command: yarn run start:dev
+
+  db:
+    image: mysql:5
+    environment:
+      - MYSQL_DATABASE=pos_qa
+      - MYSQL_ROOT_PASSWORD=1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
+  mongo:
+    image: mongo:5.0
+    environment:
+     MONGO_INITDB_ROOT_USERNAME: admin
+     MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo_data:/data/db
