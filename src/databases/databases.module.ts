@@ -28,12 +28,6 @@ import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 					pass: password,
 					retryWrites: true,
 					w: 'majority',
-					connectionFactory: (connection) => {
-						connection.plugin(require('mongoose-autopopulate'));
-						console.log(connection);
-
-						return connection;
-					},
 				};
 			},
 			inject: [config.KEY],
