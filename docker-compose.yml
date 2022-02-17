@@ -4,19 +4,21 @@ services:
   app:
     build: .
     depends_on:
-      - db
+      - mysql
       - mongo
     environment:
       PORT: 8080
       MONGO_DB: pos_qa
+      MONGO_USER: cirotex
+      MONGO_PASSWORD: TsifwYyJENFn8qG5
       MONGO_PORT: 27017
-      MONGO_HOST: mongo
+      MONGO_HOST: cluster0.mjun9.mongodb.net
       MONGO_CONNECTION: mongodb
       MARIADB_DB: pos_qa
       MARIADB_USER: root
       MARIADB_PASSWORD: 1234
       MARIADB_PORT: 3306
-      MARIADB_HOST: db
+      MARIADB_HOST: mysql
       SECRET_TOKEN: prueba
       EXPIRE_TOKEN: 24h
     ports:
@@ -24,10 +26,9 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      #- /usr/src/node_modules
     command: yarn run start:dev
 
-  db:
+  mysql:
     image: mysql:5
     environment:
       - MYSQL_DATABASE=pos_qa
@@ -39,9 +40,10 @@ services:
 
   mongo:
     image: mongo:5.0
-    #environment:
-    # - MONGO_INITDB_ROOT_USERNAME=admin
-     #- MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: cirotex
+      MONGO_INITDB_ROOT_PASSWORD: prueba
     ports:
       - 27017:27017
     volumes:

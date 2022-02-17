@@ -19,12 +19,19 @@ import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 	imports: [
 		MongooseModule.forRootAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
-				const { connection, host, port, dbName } = configService.mongo;
+				const { connection, host, port, dbName, user, password } =
+					configService.mongo;
 				return {
 					uri: `${connection}://${host}:${port}`,
 					dbName,
+					user,
+					pass: password,
+					retryWrites: true,
+					w: 'majority',
 					connectionFactory: (connection) => {
 						connection.plugin(require('mongoose-autopopulate'));
+						console.log(connection);
+
 						return connection;
 					},
 				};

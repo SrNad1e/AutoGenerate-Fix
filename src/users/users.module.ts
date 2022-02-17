@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-// import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigType } from '@nestjs/config';
 
@@ -50,10 +50,10 @@ import { JwtStrategy } from './libs/jwt.strategy';
 					schema.pre<User>('save', async function (next) {
 						const user = this || undefined;
 
-						// const salt = await bcrypt.genSalt(10);
-						// const hashedPassword = await bcrypt.hash(user.password, salt);
+						const salt = await bcrypt.genSalt(10);
+						const hashedPassword = await bcrypt.hash(user.password, salt);
 
-						// user.password = hashedPassword;
+						user.password = hashedPassword;
 
 						next();
 					});
