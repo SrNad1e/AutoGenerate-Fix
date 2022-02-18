@@ -24,7 +24,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
+      - ./:/app
+      - /app/node_modules
     command: yarn run start:dev
 
   mysql:
@@ -47,3 +48,7 @@ services:
       - 27017:27017
     volumes:
       - ./mongo_data:/var/lib/mongodb
+
+networks:
+  default:
+    name:  cirotex_network

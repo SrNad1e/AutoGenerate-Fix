@@ -1,8 +1,8 @@
 FROM node:16.13.1
 
-COPY ["package.json","yarn.lock","/usr/src/app/"]
+COPY ["package.json","yarn.lock","/app/"]
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 RUN yarn
 
