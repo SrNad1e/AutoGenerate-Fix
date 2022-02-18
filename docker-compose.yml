@@ -39,7 +39,7 @@ services:
       - ./mysql_data:/var/lib/mysql
 
   mongodb:
-    image: mongo:5.0.6
+    image: mongo:5
     environment:
       - MONGO_INITDB_ROOT_USERNAME=cirotex
       - MONGO_INITDB_ROOT_PASSWORD=prueba
@@ -47,8 +47,11 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./mongo_data:/var/lib/mongodb
+      - mongo-data:/data/db
 
 networks:
   default:
     name:  cirotex_network
+
+volumes:
+  mongo-data:
