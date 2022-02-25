@@ -10,7 +10,7 @@ import { User } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true, collection: 'stocktransfer' })
 @ObjectType()
-export class StockTransfer extends Document {
+export class StockTransfer extends Document{
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: ObjectId;
 

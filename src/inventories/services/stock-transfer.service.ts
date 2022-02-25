@@ -2,7 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, mongo, ObjectId } from 'mongoose';
+import { FilterQuery, Model, mongo, ObjectId, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { InventoriesService } from 'src/inventories/services/inventories.service';
@@ -26,7 +26,8 @@ import { StockTransferMysql } from '../entities/stock-transfer.migrate.entity';
 export class StockTransferService {
 	constructor(
 		@InjectModel(StockTransfer.name)
-		private stockTransferModel: Model<StockTransfer> & any,
+		private stockTransferModel: Model<StockTransfer> &
+			PaginateModel<StockTransfer>,
 		@InjectRepository(StockTransferMysql)
 		private stockTransferRepo: Repository<StockTransferMysql>,
 		@InjectRepository(StockTransferDetailMysql)
