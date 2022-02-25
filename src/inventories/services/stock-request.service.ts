@@ -106,6 +106,7 @@ export class StockRequestService {
 		}
 
 		try {
+
 			const result = await this.stockRequestModel
 				.aggregate([
 					...aggregate,
@@ -204,7 +205,7 @@ export class StockRequestService {
 		}
 
 		//consultar productos
-		const detail = []//await this.getDetail(products, status);
+		const detail = []; //await this.getDetail(products, status);
 
 		//consultar bodegas
 		const warehouseOrigin = await this.warehousesService.getByIdMysql(
@@ -283,7 +284,7 @@ export class StockRequestService {
 				);
 			}
 			if (status === 'open' || status === 'pending') {
-				const detail =[]//await this.getDetail(products, status);
+				const detail = []; //await this.getDetail(products, status);
 
 				const detailNew = detail.map((item) => {
 					const detailOld = stockTransfer.detail.find(

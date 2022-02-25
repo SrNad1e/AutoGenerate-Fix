@@ -2,7 +2,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
-
+import mongoosePaginate from 'mongoose-paginate-v2';
 import { Product } from 'src/products/entities/product.entity';
 import { StockRequest } from './stock-request.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';

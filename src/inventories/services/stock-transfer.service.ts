@@ -26,7 +26,7 @@ import { StockTransferMysql } from '../entities/stock-transfer.migrate.entity';
 export class StockTransferService {
 	constructor(
 		@InjectModel(StockTransfer.name)
-		private stockTransferModel: Model<StockTransfer>,
+		private stockTransferModel: Model<StockTransfer> & any,
 		@InjectRepository(StockTransferMysql)
 		private stockTransferRepo: Repository<StockTransferMysql>,
 		@InjectRepository(StockTransferDetailMysql)
@@ -84,60 +84,16 @@ export class StockTransferService {
 			aggregate.push({ $match: filters });
 		}
 
-		//campos necesarios para traer
-		aggregate.push({
-			$group: {
-				_id: '$_id',
-				code: { $first: '$code' },
-				observation: { $first: '$observation' },
-				observationDestination: { $first: '$observationDestination' },
-				observationOrigin: { $first: '$observationOrigin' },
-				userIdDestination: { $first: '$userIdDestination' },
-				userIdOrigin: { $first: '$userIdOrigin' },
-				warehouseOrigin: { $first: '$warehouseOrigin' },
-				warehouseDestination: { $first: '$warehouseDestination' },
-				status: { $first: '$status' },
-				number: { $first: '$number' },
-				createdAt: { $first: '$createdAt' },
-				updatedAt: { $first: '$updatedAt' },
-			},
-		});
-
 		if (sort) {
 			aggregate.push({ $sort: sort });
 		}
 
 		try {
-			const result = await this.stockTransferModel
-				.aggregate([
-					...aggregate,
-					{
-						$group: {
-							_id: null,
-							total: { $sum: 1 },
-							data: { $push: '$$ROOT' },
-						},
-					},
-					{
-						$project: {
-							total: 1,
-							data: {
-								$slice: [
-									'$data',
-									parseInt(skip.toString()),
-									parseInt(limit.toString()),
-								],
-							},
-						},
-					},
-				])
-				.exec();
-
-			if (result[0]) {
-				return result;
-			} else {
-				return result;
-			}
+			const options = {
+				limit,
+				page: skip,
+			};
+			return this.stockTransferModel.paginate({}, options);
 		} catch (e) {
 			throw new NotFoundException(e);
 		}

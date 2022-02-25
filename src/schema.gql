@@ -229,7 +229,7 @@ type Query {
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
   reportSales(year: Float!): [ReportSalesResponse!]!
-  stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): [StockTransfer!]!
+  stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): StockTransferResponse!
   user(username: String!): User!
   users: [User!]!
   warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): [Warehouse!]!
@@ -333,6 +333,38 @@ type StockTransfer {
 
   """Bodega de origen del traslado"""
   warehouseOrigin: Warehouse!
+}
+
+type StockTransferResponse {
+  """Lista de traslados"""
+  docs: [StockTransfer!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
 }
 
 input UpdateUserInput {
