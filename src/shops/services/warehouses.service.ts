@@ -11,9 +11,9 @@ export class WarehouseService {
 	) {}
 
 	async findAll(props: FiltersWarehouseInput): Promise<Partial<Warehouse>> {
-		const { name = '' } = props;
+		const { name = '', ...params } = props;
 		return this.warehouseModel
-			.find({ name: { $regex: name, $options: 'i' } })
+			.find({ name: { $regex: name, $options: 'i' }, ...params })
 			.lean();
 	}
 
