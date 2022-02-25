@@ -27,8 +27,8 @@ export class UsersService {
 		return user;
 	}
 
-	async getUserId(id: number): Promise<Partial<User>> {
-		const user = await this.userModel.findOne({ id }).populate('role').lean();
+	async getUserId(id: string): Promise<Partial<User>> {
+		const user = await this.userModel.findById(id).populate('role').lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con idMysql ${id} no existe`);
 		}

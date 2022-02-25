@@ -2,22 +2,26 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Role } from './role.entity';
+
 @Schema({ timestamps: true })
 @ObjectType()
 export class User extends mongoose.Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: string;
 
-	@Field({ description: 'Nombre de la persona que usa el usuario' })
 	@Prop({ type: String, required: true })
+	@Field(() => String, {
+		description: 'Nombre de la persona que usa el usuario',
+	})
 	name: string;
 
-	@Field({ description: 'Nombre de usuario' })
 	@Prop({ type: String, required: true, trim: true })
+	@Field(() => String, { description: 'Nombre de usuario' })
 	username: string;
 
-	@Field({ description: 'Contraseña de usuario', nullable: true })
+	@Field(() => String, { description: 'Contraseña de usuario', nullable: true })
 	@Prop({ type: String, required: true })
 	password: string;
 
@@ -35,10 +39,10 @@ export class User extends mongoose.Document {
 	@Prop({ type: Object, required: true })
 	user: Partial<User>;
 
-	@Field({ description: 'Nombre de usuario' })
+	@Field(() => Date, { description: 'Nombre de usuario' })
 	createdAt: Date;
 
-	@Field({ description: 'Nombre de usuario' })
+	@Field(() => Date, { description: 'Nombre de usuario' })
 	updateAt: Date;
 }
 

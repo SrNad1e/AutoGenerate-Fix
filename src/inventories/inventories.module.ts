@@ -40,6 +40,7 @@ import { StockAdjustmentService } from './services/stock-adjustment.service';
 import { StockInputController } from './controllers/stock-input.controller';
 import { StockOutputController } from './controllers/stock-output.controller';
 import { StockAdjustmentController } from './controllers/stock-adjustment.controller';
+import { StockTransferResolver } from './resolvers/stock-transfer.resolver';
 
 @Module({
 	imports: [
@@ -132,6 +133,7 @@ import { StockAdjustmentController } from './controllers/stock-adjustment.contro
 		StockOutputService,
 		StockRequestService,
 		StockTransferService,
+		StockTransferResolver,
 	],
 	controllers: [
 		StockRequestController,

@@ -40,6 +40,7 @@ export class StockTransferService {
 
 	async getAll(params: FiltersStockTransferDto) {
 		const filters: FilterQuery<StockTransfer> = {};
+
 		const {
 			sort,
 			limit = 10,
@@ -133,22 +134,12 @@ export class StockTransferService {
 				.exec();
 
 			if (result[0]) {
-				return {
-					data: result[0].data,
-					total: result[0].total,
-					limit: parseInt(limit.toString()),
-					skip: parseInt(skip.toString()),
-				};
+				return result;
 			} else {
-				return {
-					data: [],
-					total: 0,
-					limit: parseInt(limit.toString()),
-					skip: parseInt(skip.toString()),
-				};
+				return result;
 			}
 		} catch (e) {
-			return new NotFoundException(e);
+			throw new NotFoundException(e);
 		}
 	}
 
@@ -157,10 +148,10 @@ export class StockTransferService {
 			const stockTransfer = await this.stockTransferModel.findById(id);
 
 			const userOrigin = await this.userService.getUserId(
-				stockTransfer.userIdOrigin,
+				stockTransfer.userOrigin._id,
 			);
 			const userDestination = await this.userService.getUserId(
-				stockTransfer.userIdDestination,
+				stockTransfer.userDestination._id,
 			);
 
 			//obtiene inventario de cada producto
@@ -210,7 +201,7 @@ export class StockTransferService {
 		}
 
 		//consultar productos
-		const detail = await this.getDetail(products, status);
+		const detail = []; //await this.getDetail(products, status);
 
 		//consultar bodegas
 		const warehouseOrigin = await this.warehousesService.getByIdMysql(
@@ -352,7 +343,7 @@ export class StockTransferService {
 		}
 	}
 
-	async createByRequest(idRequest: string, userId: number) {
+	async createByRequest(idRequest: ObjectId, userId: number) {
 		try {
 			const stockRequest = await this.stockRequestService.getById(idRequest);
 
@@ -430,7 +421,7 @@ export class StockTransferService {
 
 			if (status === 'open' || status === 'sent') {
 				//proceso dependiendo del estado
-				const detail = await this.getDetail(products, status);
+				const detail = []; //await this.getDetail(products, status);
 				let updateInventories;
 
 				if (status === 'sent') {
@@ -895,7 +886,7 @@ export class StockTransferService {
 	 */
 	async getDetail(
 		products: {
-			product_id: number;
+			product_id: ObjectId;
 			quantity: number;
 		}[],
 		status = 'open',
@@ -905,7 +896,7 @@ export class StockTransferService {
 			await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
-			const prod = products.find((item) => product.id === item.product_id);
+			const prod = products.find((item) => product._id === item.product_id);
 			if (prod) {
 				return {
 					product,

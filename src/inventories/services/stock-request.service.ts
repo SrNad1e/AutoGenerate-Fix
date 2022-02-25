@@ -2,7 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, ObjectId } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import {
@@ -151,12 +151,12 @@ export class StockRequestService {
 		}
 	}
 
-	async getById(id: string) {
+	async getById(id: ObjectId) {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id);
 
 			const userDestination = await this.userService.getUserId(
-				stockRequest.userIdDestination,
+				stockRequest.userIdDestination.toString(),
 			);
 
 			//obtiene inventario de cada producto
@@ -204,7 +204,7 @@ export class StockRequestService {
 		}
 
 		//consultar productos
-		const detail = await this.getDetail(products, status);
+		const detail = []//await this.getDetail(products, status);
 
 		//consultar bodegas
 		const warehouseOrigin = await this.warehousesService.getByIdMysql(
@@ -283,7 +283,7 @@ export class StockRequestService {
 				);
 			}
 			if (status === 'open' || status === 'pending') {
-				const detail = await this.getDetail(products, status);
+				const detail =[]//await this.getDetail(products, status);
 
 				const detailNew = detail.map((item) => {
 					const detailOld = stockTransfer.detail.find(
@@ -349,7 +349,7 @@ export class StockRequestService {
 	 * @description crea el traslado de mercancía
 	 * @param params datos para la creación del traslado
 	 */
-	async updateStockRequest(id: string, params: UpdateStockRequestDto) {
+	async updateStockRequest(id: ObjectId, params: UpdateStockRequestDto) {
 		try {
 			const response = await this.stockRequestModel.findByIdAndUpdate(id, {
 				$set: params,
@@ -505,7 +505,7 @@ export class StockRequestService {
 	 */
 	async getDetail(
 		products: {
-			product_id: number;
+			product_id: ObjectId;
 			quantity: number;
 		}[],
 		status = 'open',
@@ -515,7 +515,7 @@ export class StockRequestService {
 			await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
-			const prod = products.find((item) => product.id === item.product_id);
+			const prod = products.find((item) => product._id === item.product_id);
 			if (prod) {
 				return {
 					product,

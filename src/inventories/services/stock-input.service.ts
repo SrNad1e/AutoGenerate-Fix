@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, mongo } from 'mongoose';
+import { FilterQuery, Model, mongo, ObjectId } from 'mongoose';
 
 import {
 	CreateStockInputDto,
@@ -148,7 +148,7 @@ export class StockInputService {
 		}
 
 		//consultar productos
-		const detail = await this.getDetail(products);
+		const detail = []//await this.getDetail(products);
 		const quantity = detail.reduce((sum, item) => sum + item.quantity, 0);
 		const total = detail.reduce(
 			(sum, item) => sum + item.quantity * item.product.cost,
@@ -236,7 +236,7 @@ export class StockInputService {
 				);
 			}
 			if (status === 'open' || status === 'save') {
-				const detail = await this.getDetail(products);
+				const detail = []//await this.getDetail(products);
 
 				const detailNew = detail.map((item) => {
 					const detailOld = stockInput.detail.find(
@@ -331,7 +331,7 @@ export class StockInputService {
 	 */
 	async getDetail(
 		products: {
-			product_id: number;
+			product_id: ObjectId;
 			quantity: number;
 		}[],
 	) {

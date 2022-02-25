@@ -19,6 +19,7 @@ import {
 } from '../dtos/stock-request.dto';
 import { ParseSortPipePipe } from 'src/common/parse-sort-pipe.pipe';
 import { StockRequestService } from '../services/stock-request.service';
+import { ObjectId } from 'mongoose';
 
 @ApiTags('Solicitudes de Mercancía')
 @Controller('stock-request')
@@ -44,7 +45,7 @@ export class StockRequestController {
 
 	@Get(':id')
 	@UsePipes(new ValidationPipe({ transform: true }))
-	getById(@Param('id') id: string) {
+	getById(@Param('id') id: ObjectId) {
 		return this.stockRequestService.getById(id);
 	}
 

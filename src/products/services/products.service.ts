@@ -2,7 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { Product } from '../entities/product.entity';
@@ -20,7 +20,7 @@ export class ProductsService {
 	 * @description obtiene el producto con base al id de mysql
 	 * @param id identificador del producto en mysql
 	 */
-	async getProductsIdSql(ids: number[]) {
+	async getProductsIdSql(ids: ObjectId[]) {
 		return await this.productModel.find({ id: { $in: ids } });
 	}
 

@@ -60,7 +60,7 @@ export class StockTransferController {
 	@Post(':id')
 	@UsePipes(new ValidationPipe({ transform: true }))
 	async createByRequest(
-		@Param('id') idRequest: string,
+		@Param('id') idRequest: ObjectId,
 		@Body('userId') userId: number,
 	) {
 		return this.stockTransferService.createByRequest(idRequest, userId);

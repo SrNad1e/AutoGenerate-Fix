@@ -1,4 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { Document } from 'mongoose';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Document, ObjectId } from 'mongoose';
 
-export class Provider extends Document {}
+@ObjectType()
+export class Provider extends Document {
+    @Field(() => String, { description: 'Identificador de mongo' })
+	_id: ObjectId;
+}

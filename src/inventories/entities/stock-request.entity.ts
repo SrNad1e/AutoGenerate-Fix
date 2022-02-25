@@ -1,13 +1,17 @@
 /* eslint-disable prettier/prettier */
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ObjectId } from 'bson';
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 
 @Schema({ timestamps: true, collection: 'stockrequest' })
+@ObjectType()
 export class StockRequest extends Document {
+	@Field(() => String, { description: 'Identificador de mongo' })
+	_id: ObjectId;
+
 	@Prop({ type: Number, default: 0, unique: true })
 	number: number;
 
@@ -30,7 +34,7 @@ export class StockRequest extends Document {
 	@Prop({ type: Object, required: true })
 	warehouseDestination: Warehouse;
 
-	@Prop({ type: ObjectId })
+	@Prop({ type: String })
 	transferId?: ObjectId;
 
 	//TODO: pendiente pasar a mongo los usuarios

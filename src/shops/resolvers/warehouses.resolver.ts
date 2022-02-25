@@ -16,8 +16,6 @@ export class WarehousesResolver {
 		filtersWarehouseInput: FiltersWarehouseInput,
 		@Context() context,
 	) {
-		console.log();
-
 		return this.warehouseService.findAll(context.req.body.variables.input);
 	}
 }

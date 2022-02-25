@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectID, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 
@@ -162,7 +162,7 @@ export class InventoriesService {
 	 * @param params objeto de parametros usados para actualizar el documento
 	 * @returns string si se genera algun error o true si el proceso finaliza correctamente
 	 */
-	async updateProductsStockInProcess(documentId: ObjectID, status: string) {
+	async updateProductsStockInProcess(documentId: ObjectId, status: string) {
 		try {
 			const stockInProcess = this.stockInProcessModel
 				.updateMany({ documentId }, { $set: { status } })
