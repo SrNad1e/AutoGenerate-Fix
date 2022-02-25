@@ -10,6 +10,7 @@ import { ShopsController } from './controllers/shops.controller';
 import { Shop as ShopMysql } from './entities/shopMysql.entity';
 import { Shop, ShopSchema } from './entities/shop.entity';
 import { UsersModule } from 'src/users/users.module';
+import { WarehousesResolver } from './resolvers/warehouses.resolver';
 @Module({
 	imports: [
 		UsersModule,
@@ -23,7 +24,7 @@ import { UsersModule } from 'src/users/users.module';
 		TypeOrmModule.forFeature([ShopMysql]),
 	],
 	controllers: [ShopsController],
-	providers: [ShopsService, WarehouseService],
+	providers: [ShopsService, WarehouseService, WarehousesResolver],
 	exports: [ShopsService, WarehouseService],
 })
 export class ShopsModule {}

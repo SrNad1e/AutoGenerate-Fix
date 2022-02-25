@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 import { UserMysql } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
-export class Shop {
+export class Shop  extends Document{
 	@Field()
 	@Prop({ type: String, required: true, unique: true })
 	name: string;

@@ -56,6 +56,11 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input FiltersWarehouseInput {
+  """Comodín busqueda de la bodega"""
+  name: String
+}
+
 type LoginResponse {
   access_token: String!
   user: User!
@@ -104,6 +109,7 @@ type Query {
   reportSales(year: Float!): [ReportSalesResponse!]!
   user(username: String!): User!
   users: [User!]!
+  warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): [Warehouse!]!
 }
 
 type ReportSalesResponse {
@@ -162,9 +168,6 @@ type User {
   """Nombre de usuario"""
   createdAt: DateTime!
 
-  """id de mysql por migracion"""
-  id: Float @deprecated(reason: "id usado en mysql")
-
   """Nombre de la persona que usa el usuario"""
   name: String!
 
@@ -200,4 +203,21 @@ type UserMysql {
   shop_id: Float!
   user: String!
   wholesale_member: Boolean!
+}
+
+type Warehouse {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Estado de la bodega"""
+  active: Boolean!
+
+  """Nombre de la bodega"""
+  name: String!
+
+  """Tienda a la que pertenece"""
+  shop: Shop!
+
+  """Usuario que creó el usuario"""
+  user: User!
 }

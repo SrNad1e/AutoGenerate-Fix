@@ -11,16 +11,15 @@ import { User } from '../entities/user.entity';
 export class UsersService {
 	constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-	async findAll(): Promise<User[]> {
-		const user = await this.userModel.find().populate('role').lean();
-		return user;
+	async findAll(): Promise<Partial<User[]>> {
+		return await this.userModel.find().populate('role').lean();
 	}
 
 	async findOne(username: string): Promise<User> {
 		return this.userModel.findOne({ username }).populate('role').lean();
 	}
 
-	async findById(id: string): Promise<User> {
+	async findById(id: string): Promise<Partial<User>> {
 		const user = await this.userModel.findById(id).populate('role').lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con id ${id} no existe`);
@@ -28,7 +27,7 @@ export class UsersService {
 		return user;
 	}
 
-	async getUserId(id: number): Promise<User> {
+	async getUserId(id: number): Promise<Partial<User>> {
 		const user = await this.userModel.findOne({ id }).populate('role').lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con idMysql ${id} no existe`);

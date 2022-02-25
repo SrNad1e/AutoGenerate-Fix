@@ -229,7 +229,7 @@ export class StockInputService {
 			if (
 				status === 'canceled' &&
 				(stockInput.status === 'save' ||
-					user.shop_id !== stockInput.warehouse.shopId)
+					user.shop_id !== stockInput.warehouse.shop._id)
 			) {
 				return new NotFoundException(
 					`La entrada ${stockInput.number} no puede ser cancelada`,
