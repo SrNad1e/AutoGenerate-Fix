@@ -16,11 +16,11 @@ export class UsersService {
 	}
 
 	async findOne(username: string): Promise<User> {
-		return this.userModel.findOne({ username }).populate('role').lean();
+		return this.userModel.findOne({ username }).populate('role').populate('shop').lean();
 	}
 
 	async findById(id: string): Promise<Partial<User>> {
-		const user = await this.userModel.findById(id).populate('role').lean();
+		const user = await this.userModel.findById(id).populate('role').populate('shop').lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con id ${id} no existe`);
 		}
@@ -28,7 +28,7 @@ export class UsersService {
 	}
 
 	async getUserId(id: string): Promise<Partial<User>> {
-		const user = await this.userModel.findById(id).populate('role').lean();
+		const user = await this.userModel.findById(id).populate('role').populate('shop').lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con idMysql ${id} no existe`);
 		}

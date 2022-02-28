@@ -94,7 +94,7 @@ export class StockTransferService {
 				limit,
 				page: skip,
 			};
-			return this.stockTransferModel.paginate({}, options);
+			return this.stockTransferModel.paginate(filters, options);
 		} catch (e) {
 			throw new NotFoundException(e);
 		}
@@ -358,7 +358,7 @@ export class StockTransferService {
 				status === 'canceled' &&
 				(stockTransfer.status === 'confirmed' ||
 					productsConfirmed.length > 0 ||
-					user.shop_id !== stockTransfer.warehouseOrigin.shop._id)
+					user.shop !== stockTransfer.warehouseOrigin.shop._id)
 			) {
 				return new NotFoundException(
 					`El traslado ${stockTransfer.number} no puede ser cancelado`,
@@ -369,7 +369,7 @@ export class StockTransferService {
 				status === 'confirmed' &&
 				(stockTransfer.status !== 'sent' ||
 					productsConfirmed.length !== stockTransfer.detail.length ||
-					user.shop_id !== stockTransfer.warehouseDestination.shop._id)
+					user.shop !== stockTransfer.warehouseDestination.shop._id)
 			) {
 				return new NotFoundException(
 					`El traslado ${stockTransfer.number} no puede ser confirmado`,

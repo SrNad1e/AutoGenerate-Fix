@@ -12,7 +12,7 @@ export class Warehouse extends Document {
 	_id: ObjectId;
 
 	@Field(() => Shop, { description: 'Tienda a la que pertenece' })
-	@Prop({ type: Number, required: true })
+	@Prop({ type: Object, required: true })
 	shop: Shop;
 
 	@Field(() => String, { description: 'Nombre de la bodega' })

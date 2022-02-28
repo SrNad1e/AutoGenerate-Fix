@@ -278,7 +278,12 @@ type Shipping {
 }
 
 type Shop {
+  """Identificador de mongo"""
+  _id: String!
   address: String!
+
+  """Bodega predeterminada para la tienda"""
+  defaultWarehouse: Warehouse
   goal: Float!
   name: String!
   phone: String!
@@ -396,6 +401,9 @@ type User {
 
   """Rol que ocupa el usuario"""
   role: Role!
+
+  """Tienda a la que se encuentra asiganado el usuario"""
+  shop: Shop!
 
   """Nombre de usuario"""
   updateAt: DateTime!

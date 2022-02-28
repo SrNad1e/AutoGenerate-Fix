@@ -1,6 +1,7 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { Shop } from 'src/shops/entities/shop.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Role } from './role.entity';
@@ -34,6 +35,16 @@ export class User extends mongoose.Document {
 		autopopulate: true,
 	})
 	role: mongoose.Schema.Types.ObjectId;
+
+	@Field(() => Shop, {
+		description: 'Tienda a la que se encuentra asiganado el usuario',
+	})
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Shop',
+		autopopulate: true,
+	})
+	shop: mongoose.Schema.Types.ObjectId;
 
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })

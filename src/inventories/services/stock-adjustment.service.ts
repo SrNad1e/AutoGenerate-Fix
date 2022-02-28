@@ -230,7 +230,7 @@ export class StockAdjustmentService {
 			if (
 				status === 'canceled' &&
 				(stockInput.status === 'pending' ||
-					user.shop_id !== stockInput.warehouse.shop._id)
+					user.shop !== stockInput.warehouse.shop._id)
 			) {
 				return new NotFoundException(
 					`El ajuste ${stockInput.number} no puede ser cancelado`,

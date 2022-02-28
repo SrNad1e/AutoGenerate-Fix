@@ -277,7 +277,7 @@ export class StockRequestService {
 			if (
 				status === 'canceled' &&
 				(stockTransfer.status === 'pending' ||
-					user.shop_id !== stockTransfer.warehouseOrigin.shop._id)
+					user.shop !== stockTransfer.warehouseOrigin.shop._id)
 			) {
 				return new NotFoundException(
 					`El traslado ${stockTransfer.number} no puede ser cancelado`,

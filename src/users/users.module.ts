@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -57,6 +58,8 @@ import { JwtStrategy } from './libs/jwt.strategy';
 
 						next();
 					});
+
+					schema.plugin(require('mongoose-autopopulate'));
 					return schema;
 				},
 			},

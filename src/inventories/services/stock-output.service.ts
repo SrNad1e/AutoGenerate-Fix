@@ -230,7 +230,7 @@ export class StockOutputService {
 			if (
 				status === 'canceled' &&
 				(stockInput.status === 'pending' ||
-					user.shop_id !== stockInput.warehouse.shop._id)
+					user.shop !== stockInput.warehouse.shop._id)
 			) {
 				return new NotFoundException(
 					`La salida ${stockInput.number} no puede ser cancelada`,

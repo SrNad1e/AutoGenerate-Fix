@@ -1,12 +1,15 @@
-/* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import * as mongoose from 'mongoose';
 import { UserMysql } from 'src/users/entities/user.entity';
+import { Warehouse } from './warehouse.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
-export class Shop  extends Document{
+export class Shop extends mongoose.Document {
+	@Field(() => String, { description: 'Identificador de mongo' })
+	_id: mongoose.ObjectId;
+
 	@Field()
 	@Prop({ type: String, required: true, unique: true })
 	name: string;
@@ -30,6 +33,17 @@ export class Shop  extends Document{
 	@Field()
 	@Prop({ type: Number })
 	goal: number;
+
+	@Field(() => Warehouse, {
+		description: 'Bodega predeterminada para la tienda',
+		nullable: true,
+	})
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Warehouse',
+		autopopulate: true,
+	})
+	defaultWarehouse: mongoose.Schema.Types.ObjectId;
 
 	//TODO: se debe normalizar los ids de los modelos
 	@Field()

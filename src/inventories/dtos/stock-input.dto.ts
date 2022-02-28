@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { UserMysql } from 'src/users/entities/user.entity';
+import { User, UserMysql } from 'src/users/entities/user.entity';
 
 export class FiltersStockInputDto {
 	@IsOptional()
@@ -108,5 +108,5 @@ export class UpdateStockInputParamsDto {
 	observation?: string;
 
 	@IsObject()
-	user: UserMysql;
+	user: User;
 }

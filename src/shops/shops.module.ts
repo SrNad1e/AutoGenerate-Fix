@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,7 +20,16 @@ import { WarehousesResolver } from './resolvers/warehouses.resolver';
 				name: Warehouse.name,
 				schema: WarehouseSchema,
 			},
-			{ name: Shop.name, schema: ShopSchema },
+		]),
+		MongooseModule.forFeatureAsync([
+			{
+				name: Shop.name,
+				useFactory: () => {
+					const schema = ShopSchema;
+					schema.plugin(require('mongoose-autopopulate'));
+					return schema;
+				},
+			},
 		]),
 		TypeOrmModule.forFeature([ShopMysql]),
 	],
