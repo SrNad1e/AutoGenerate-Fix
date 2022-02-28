@@ -16,11 +16,31 @@ export class UsersService {
 	}
 
 	async findOne(username: string): Promise<User> {
-		return this.userModel.findOne({ username }).populate('role').populate('shop').lean();
+		return this.userModel
+			.findOne({ username })
+			.populate(['role', 'shop'])
+			.populate({
+				path: 'shop',
+				populate: {
+					path: 'defaultWarehouse',
+					model: 'Warehouse',
+				},
+			})
+			.lean();
 	}
 
 	async findById(id: string): Promise<Partial<User>> {
-		const user = await this.userModel.findById(id).populate('role').populate('shop').lean();
+		const user = await this.userModel
+			.findById(id)
+			.populate(['role', 'shop'])
+			.populate({
+				path: 'shop',
+				populate: {
+					path: 'defaultWarehouse',
+					model: 'Warehouse',
+				},
+			})
+			.lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con id ${id} no existe`);
 		}
@@ -28,7 +48,17 @@ export class UsersService {
 	}
 
 	async getUserId(id: string): Promise<Partial<User>> {
-		const user = await this.userModel.findById(id).populate('role').populate('shop').lean();
+		const user = await this.userModel
+			.findById(id, { strictQuery: false })
+			.populate(['role', 'shop'])
+			.populate({
+				path: 'shop',
+				populate: {
+					path: 'defaultWarehouse',
+					model: 'Warehouse',
+				},
+			})
+			.lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con idMysql ${id} no existe`);
 		}
@@ -39,7 +69,7 @@ export class UsersService {
 		const newUser = new this.userModel({
 			...user,
 		});
-		return (await newUser.save()).populate('role');
+		return (await newUser.save()).populate(['role', 'shop']);
 	}
 
 	async update(
@@ -59,15 +89,24 @@ export class UsersService {
 			updateUserInput.password = hashedPassword;
 		}
 
-		return this.userModel.findByIdAndUpdate(
-			id,
-			{
-				$set: {
-					...updateUserInput,
-					user: userUpdate,
+		return this.userModel
+			.findByIdAndUpdate(
+				id,
+				{
+					$set: {
+						...updateUserInput,
+						user: userUpdate,
+					},
 				},
-			},
-			{ new: true },
-		);
+				{ new: true },
+			)
+			.populate(['role', 'shop'])
+			.populate({
+				path: 'shop',
+				populate: {
+					path: 'defaultWarehouse',
+					model: 'Warehouse',
+				},
+			});
 	}
 }

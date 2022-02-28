@@ -29,7 +29,7 @@ import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 					retryWrites: true,
 					w: 'majority',
 					connectionFactory: (connection) => {
-						connection.plugin(require('mongoose-autopopulate'));
+						connection.plugin(require('mongoose-paginate-v2'));
 						return connection;
 					},
 				};

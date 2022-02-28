@@ -31,7 +31,7 @@ export class User extends mongoose.Document {
 	})
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Role',
+		ref: Role.name,
 		autopopulate: true,
 	})
 	role: mongoose.Schema.Types.ObjectId;

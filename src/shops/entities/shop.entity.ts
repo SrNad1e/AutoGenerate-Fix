@@ -40,7 +40,7 @@ export class Shop extends mongoose.Document {
 	})
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Warehouse',
+		ref: Warehouse.name,
 		autopopulate: true,
 	})
 	defaultWarehouse: mongoose.Schema.Types.ObjectId;

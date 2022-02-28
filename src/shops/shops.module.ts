@@ -26,7 +26,20 @@ import { WarehousesResolver } from './resolvers/warehouses.resolver';
 				name: Shop.name,
 				useFactory: () => {
 					const schema = ShopSchema;
-					schema.plugin(require('mongoose-autopopulate'));
+					schema.pre('find', (next) => {
+						if (typeof this === 'object') {
+						//	this?.populate('warehouse');
+						}
+						next();
+					});
+					schema.pre('findOne', () => {
+						const context = this || undefined;
+						context && context.populate('warehouse');
+					});
+					schema.pre('findOById', () => {
+						const context = this || undefined;
+						context && context.populate('warehouse');
+					});
 					return schema;
 				},
 			},

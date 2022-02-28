@@ -47,7 +47,7 @@ export class ShopsService {
 	}
 
 	async getByIdMysql(shopId: number) {
-		return this.shopModel.findOne({ shopId });
+		return (await this.shopModel.findOne({ shopId })).populated('warehouse');
 	}
 
 	async create(params: CreateShopParamsDto) {

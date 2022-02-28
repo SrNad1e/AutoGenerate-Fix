@@ -73,8 +73,6 @@ import { StockTransferResolver } from './resolvers/stock-transfer.resolver';
 				useFactory: async (connection: Connection) => {
 					const schema = StockTransferSchema;
 					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(require('mongoose-paginate-v2'));
-					schema.plugin(require('mongoose-autopopulate'));
 					schema.plugin(AutoIncrement, {
 						id: 'stock_transfer_increment',
 						inc_field: 'number',

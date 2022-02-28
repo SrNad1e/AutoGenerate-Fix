@@ -29,6 +29,6 @@ export class FiltersStockTransferInput {
 	@Field({ description: 'Número del traslado', nullable: true })
 	createdAtMax?: Date;
 
-	/*@Field(() => Object, { description: 'Número del traslado', nullable: true })
+	/*@Field(() => raw, { description: 'Número del traslado', nullable: true })
 	sort?: Record<string, 1 | -1 | { $meta: 'textScore' }>;*/
 }
