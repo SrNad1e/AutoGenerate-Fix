@@ -13,6 +13,8 @@ import { StockTransferDetailMysql } from 'src/inventories/entities/stock-transfe
 import { StockTransferMysql } from 'src/inventories/entities/stock-transfer.migrate.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
 import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
+import { ColorMysql } from 'src/products/entities/color.entity';
+import { SizeMysql } from 'src/products/entities/size.entity';
 
 @Global()
 @Module({
@@ -55,6 +57,8 @@ import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 						ShopMysql,
 						UserMysql,
 						InvoiceMysql,
+						ColorMysql,
+						SizeMysql
 					],
 				};
 			},

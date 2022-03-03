@@ -19,8 +19,17 @@ type Color {
   """Identificador de mongo"""
   _id: String!
 
-  """Url de la imagen del color"""
+  """Estado del color"""
+  active: Boolean!
+
+  """Color en formato html"""
   html: String!
+
+  """Identificador del color mysql"""
+  id: Float! @deprecated(reason: "Campo para migración de mysql")
+
+  """Url relativo de la imagen"""
+  image: String
 
   """Nombre del color"""
   name: String!
@@ -93,6 +102,22 @@ type DetailTransfer {
 
   """Fecha de actualizacion el producto"""
   updateAt: DateTime!
+}
+
+input FiltersColorInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Comodín busqueda del color"""
+  name: String
+}
+
+input FiltersSizeInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Comodín busqueda de la talla"""
+  name: String
 }
 
 input FiltersStockTransferInput {
@@ -230,11 +255,13 @@ type Provider {
 }
 
 type Query {
+  colors(filtersColorInput: FiltersColorInput = {}): [Color!]!
   configuration(module: String!): Configuration
   currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
   reportSales(year: Float!): [ReportSalesResponse!]!
+  sizes(filtersSizeInput: FiltersSizeInput = {}): [Size!]!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): StockTransferResponse!
   user(username: String!): User!
   users: [User!]!
@@ -301,6 +328,12 @@ type Shop {
 type Size {
   """Identificador de mongo"""
   _id: String!
+
+  """Estado de la talla"""
+  active: Boolean!
+
+  """Identificador mysql"""
+  id: Float @deprecated(reason: "Id de mysql")
 
   """Valor de la talla"""
   value: String!
