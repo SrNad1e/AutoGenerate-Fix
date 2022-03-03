@@ -15,7 +15,6 @@ import {
 	UpdateStockAdjustmentParamsDto,
 } from '../dtos/stock-adjustment.dto';
 import { InventoriesService } from './inventories.service';
-import { ProductTransfer } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 
@@ -155,7 +154,7 @@ export class StockAdjustmentService {
 		}
 
 		//consultar productos
-		const detail =[]// await this.getDetail(products);
+		const detail = []; // await this.getDetail(products);
 		const quantity = detail.reduce((sum, item) => sum + item.quantity, 0);
 		const total = detail.reduce(
 			(sum, item) => sum + item.quantity * item.product.cost,
@@ -171,7 +170,7 @@ export class StockAdjustmentService {
 					{
 						...item.product,
 						quantity: item.quantity,
-					} as ProductTransfer,
+					} as any,
 					warehouse.id,
 				);
 
@@ -237,7 +236,7 @@ export class StockAdjustmentService {
 				);
 			}
 			if (status === 'open' || status === 'save') {
-				const detail =[]// await this.getDetail(products);
+				const detail = []; // await this.getDetail(products);
 
 				const detailNew = detail.map((item) => {
 					const detailOld = stockInput.detail.find(
@@ -268,7 +267,7 @@ export class StockAdjustmentService {
 							{
 								...item.product,
 								quantity: item.quantity,
-							} as ProductTransfer,
+							} as any,
 							warehouse.id,
 						);
 						if (addProducts !== true) {
@@ -331,7 +330,7 @@ export class StockAdjustmentService {
 		);
 
 		return productsResponse.map((product) => {
-			const prod = products.find((item) => product.id === item.product_id);
+			const prod = products.find((item) => product._id === item.product_id);
 			if (prod) {
 				return {
 					product,

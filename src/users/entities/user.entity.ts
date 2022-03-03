@@ -1,9 +1,9 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Shop } from 'src/shops/entities/shop.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
 
 @Schema({ timestamps: true })
@@ -55,6 +55,15 @@ export class User extends mongoose.Document {
 
 	@Field(() => Date, { description: 'Nombre de usuario' })
 	updateAt: Date;
+
+	//TODO: id de mysql para migracion
+	@Field(() => User, {
+		description: 'Id de mysql',
+		deprecationReason: 'Id para migración',
+		nullable: true,
+	})
+	@Prop({ type: Number })
+	id: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

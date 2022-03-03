@@ -1,15 +1,27 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Model } from 'mongoose';
+import { Shop } from 'src/shops/entities/shop.entity';
+import { Repository } from 'typeorm';
 
 import { UpdateUserInput } from '../dtos/update-user.input';
-import { User } from '../entities/user.entity';
+import { User, UserMysql } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
-	constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+	constructor(
+		@InjectModel(User.name) private readonly userModel: Model<User>,
+		@InjectRepository(UserMysql)
+		private readonly userRepo: Repository<UserMysql>,
+		@InjectModel(Shop.name) private readonly shopModel: Model<Shop>,
+	) {}
+
+	async getByIdMysql(id: number) {
+		return this.userModel.findOne({ id });
+	}
 
 	async findAll(): Promise<Partial<User[]>> {
 		return await this.userModel.find().populate('role').lean();
@@ -107,6 +119,40 @@ export class UsersService {
 					path: 'defaultWarehouse',
 					model: 'Warehouse',
 				},
-			});
+			})
+			.lean();
+	}
+
+	async migration() {
+		try {
+			const usersMysql = await this.userRepo.find();
+
+			const usersMongo = [];
+
+			for (let i = 0; i < usersMysql.length; i++) {
+				const user = usersMysql[i];
+				const shop = await this.shopModel.findOne({ id: user.shop_id }).lean();
+				usersMongo.push({
+					name: user.name,
+					username: user.user,
+					password: user.password,
+					shop: shop._id,
+					user: {
+						name: 'migrate',
+						username: 'Usuario de migración',
+					},
+					id: user.id,
+				});
+			}
+			//console.log(usersMongo[0]);
+
+			await this.userModel.create(usersMongo);
+
+			return {
+				message: 'Migración Completa',
+			};
+		} catch (e) {
+			throw new NotFoundException(`Error al migrar los usuario ${e}`);
+		}
 	}
 }

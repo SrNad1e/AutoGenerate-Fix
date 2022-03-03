@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'mongoose';
-import { NotFoundError } from 'rxjs';
 import { Repository } from 'typeorm';
 import { FiltersSizeInput } from '../dtos/filters-size.input';
 
@@ -21,6 +20,10 @@ export class SizesService {
 		return this.sizeModel
 			.find({ value: { $regex: name, $options: 'i' }, ...params })
 			.lean();
+	}
+
+	async getByIdMysql(id: number) {
+		return this.sizeModel.findOne({ id });
 	}
 
 	async migration() {

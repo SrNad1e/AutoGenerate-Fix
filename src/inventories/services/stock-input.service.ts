@@ -10,7 +10,7 @@ import {
 	UpdateStockInputParamsDto,
 } from '../dtos/stock-input.dto';
 import { InventoriesService } from './inventories.service';
-import { Product, ProductTransfer } from 'src/products/entities/product.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { StockInput } from '../entities/stock-input.entity';
 
@@ -148,7 +148,7 @@ export class StockInputService {
 		}
 
 		//consultar productos
-		const detail = []//await this.getDetail(products);
+		const detail = []; //await this.getDetail(products);
 		const quantity = detail.reduce((sum, item) => sum + item.quantity, 0);
 		const total = detail.reduce(
 			(sum, item) => sum + item.quantity * item.product.cost,
@@ -164,7 +164,7 @@ export class StockInputService {
 					{
 						...item.product,
 						quantity: item.quantity,
-					} as ProductTransfer,
+					} as any,
 					warehouse.id,
 				);
 				if (addProducts !== true) {
@@ -175,7 +175,7 @@ export class StockInputService {
 							{
 								...itemDelete.product,
 								quantity: itemDelete.quantity,
-							} as ProductTransfer,
+							} as any,
 							warehouse.id,
 						);
 					}
@@ -236,7 +236,7 @@ export class StockInputService {
 				);
 			}
 			if (status === 'open' || status === 'save') {
-				const detail = []//await this.getDetail(products);
+				const detail = []; //await this.getDetail(products);
 
 				const detailNew = detail.map((item) => {
 					const detailOld = stockInput.detail.find(
@@ -266,7 +266,7 @@ export class StockInputService {
 							{
 								...item.product,
 								quantity: item.quantity,
-							} as ProductTransfer,
+							} as any,
 							warehouse.id,
 						);
 						if (addProducts !== true) {
@@ -278,7 +278,7 @@ export class StockInputService {
 										{
 											...itemDelete.product,
 											quantity: itemDelete.quantity,
-										} as ProductTransfer,
+										} as any,
 										warehouse.id,
 									);
 							}
@@ -340,7 +340,7 @@ export class StockInputService {
 			await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
-			const prod = products.find((item) => product.id === item.product_id);
+			const prod = products.find((item) => product._id === item.product_id);
 			if (prod) {
 				return {
 					product,

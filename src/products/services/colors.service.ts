@@ -27,6 +27,10 @@ export class ColorsService {
 			.lean();
 	}
 
+	async getByIdMysql(id: number) {
+		return this.colorModel.findOne({ id });
+	}
+
 	async migration() {
 		try {
 			//consultar mysql

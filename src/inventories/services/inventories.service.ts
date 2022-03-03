@@ -12,7 +12,6 @@ import {
 	updateStockInProcess,
 } from 'src/inventories/dtos/stockInProcess.dto';
 import { Inventories } from 'src/inventories/entities/inventories.entity';
-import { ProductTransfer } from 'src/products/entities/product.entity';
 import { StockInProcess } from 'src/inventories/entities/stockInProcess.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 
@@ -31,7 +30,7 @@ export class InventoriesService {
 	 * @param warehouseId bodega para agregar unidades
 	 * @returns string si existe algun error o true si el proceso finaliza correctamente
 	 */
-	async addProductInventory(product: ProductTransfer, warehouseId: number) {
+	async addProductInventory(product: any, warehouseId: number) {
 		try {
 			const inventories = await this.inventoriesRepo.findOne({
 				warehouse_id: warehouseId,
@@ -54,7 +53,7 @@ export class InventoriesService {
 	 * @param warehouseId bodega para eliminar unidades
 	 * @returns string si existe algun error o true si el proceso finaliza correctamente
 	 */
-	async deleteProductInventory(product: ProductTransfer, warehouseId: number) {
+	async deleteProductInventory(product: any, warehouseId: number) {
 		const product_id = product.product_id || product.id;
 
 		try {
@@ -88,7 +87,7 @@ export class InventoriesService {
 	 * @param warehouseId bodega para asigna unidades
 	 * @returns string si existe algun error o true si el proceso finaliza correctamente
 	 */
-	async assignProductInventory(product: ProductTransfer, warehouseId: number) {
+	async assignProductInventory(product: any, warehouseId: number) {
 		const product_id = product.product_id || product.id;
 
 		try {
@@ -182,7 +181,7 @@ export class InventoriesService {
 	 * @param warehouseId bodega a consultar inventario
 	 * @returns objeto type inventory
 	 */
-	async getOne(product: ProductTransfer, warehouseId: number) {
+	async getOne(product: any, warehouseId: number) {
 		return this.inventoriesRepo.findOne({
 			product_id: product.id,
 			warehouse_id: warehouseId,
@@ -203,7 +202,7 @@ export class InventoriesService {
 	 * @returns Error si algo pasa o true si solo sale bien
 	 */
 	async reserveStock(
-		product: ProductTransfer,
+		product: any,
 		warehouseOrigin: Warehouse,
 		warehouseDestination: Warehouse,
 		documentType: string,
@@ -234,7 +233,7 @@ export class InventoriesService {
 	 * @returns Error si algo pasa o true si solo sale bien
 	 */
 	async reverseStock(
-		product: ProductTransfer,
+		product: any,
 		warehouseOrigin: Warehouse,
 		warehouseDestination: Warehouse,
 		documentId: ObjectId,

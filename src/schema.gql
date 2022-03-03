@@ -10,11 +10,6 @@ input AddConfigInput {
   title: String!
 }
 
-type Category {
-  """Identificador de mongo"""
-  _id: String!
-}
-
 type Color {
   """Identificador de mongo"""
   _id: String!
@@ -157,11 +152,6 @@ input FiltersWarehouseInput {
   name: String
 }
 
-type Image {
-  """Identificador de mongo"""
-  _id: String!
-}
-
 type LoginResponse {
   access_token: String!
   user: User!
@@ -209,9 +199,6 @@ type Product {
   """Código de barras del producto"""
   barcode: String!
 
-  """Categorías del producto"""
-  categories: [Category!]!
-
   """Determina si el producto se puede cambiar"""
   changeable: Boolean!
 
@@ -224,8 +211,8 @@ type Product {
   """Descripción del producto"""
   description: String!
 
-  """Imagenes del producto"""
-  images: [Image!]!
+  """Identificador de mysql"""
+  id: Float @deprecated(reason: "Id de mysql")
 
   """Precio del producto"""
   price: Float!
@@ -236,8 +223,8 @@ type Product {
   """Referencia del producto"""
   reference: String!
 
-  """Características para el envío"""
-  shipping: [Shipping!]!
+  """Medidas del producto"""
+  shipping: Shipping!
 
   """Talla del producto"""
   size: Size!
@@ -246,12 +233,21 @@ type Product {
   state: String!
 
   """Usuario que crea el producto"""
-  userId: String!
+  user: User!
 }
 
 type Provider {
   """Identificador de mongo"""
   _id: String!
+
+  """Estado del proveedor"""
+  active: Boolean!
+
+  """Id de mysql"""
+  id: Boolean @deprecated(reason: "id de mysql")
+
+  """Nombre del proveedor"""
+  name: String!
 }
 
 type Query {
@@ -297,7 +293,7 @@ type Shipping {
   """Alto del producto"""
   height: Float!
 
-  """Profundidad del producto"""
+  """Largo del producto"""
   long: Float!
 
   """Volumen del producto"""
@@ -434,6 +430,9 @@ type User {
 
   """Nombre de usuario"""
   createdAt: DateTime!
+
+  """Id de mysql"""
+  id: User @deprecated(reason: "Id para migración")
 
   """Nombre de la persona que usa el usuario"""
   name: String!

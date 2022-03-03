@@ -1,14 +1,14 @@
-/* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Image } from 'src/images/entities/image.entity';
-import { Shipping } from 'src/shippings/entities/shipping.entity';
-import { Category } from './category.entity';
 import { Color } from './color.entity';
 import { Provider } from './provider.entity';
 import { Size } from './size.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Shipping } from './shipping.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
@@ -34,21 +34,41 @@ export class Product extends mongoose.Document {
 	})
 	changeable: boolean;
 
-	@Prop({ type: Object, required: true })
 	@Field(() => Color, { description: 'Color del producto' })
-	color: Color;
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: Color.name,
+		autopopulate: true,
+		required: true,
+	})
+	color: mongoose.Schema.Types.ObjectId;
 
-	@Prop({ type: Object, required: true })
 	@Field(() => Size, { description: 'Talla del producto' })
-	size: Size;
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: Size.name,
+		autopopulate: true,
+		required: true,
+	})
+	size: mongoose.Schema.Types.ObjectId;
 
-	@Prop({ type: Object, required: true })
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: Provider.name,
+		autopopulate: true,
+		required: true,
+	})
 	@Field(() => Provider, { description: 'Fabricante del producto' })
-	provider: Provider;
+	provider: mongoose.Schema.Types.ObjectId;
 
-	@Prop({ type: Array, required: true })
-	@Field(() => [Category], { description: 'Categorías del producto' })
-	categories: Category[];
+	/*@Field(() => [Category], { description: 'Categorías del producto' })
+	@Prop({
+		type: [mongoose.Schema.Types.ObjectId],
+		ref: Category.name,
+		autopopulate: true,
+		required: true,
+	})
+	categories: mongoose.Schema.Types.ObjectId[];*/
 
 	@Prop({ type: Number, required: true })
 	@Field(() => Number, { description: 'Precio del producto' })
@@ -62,43 +82,95 @@ export class Product extends mongoose.Document {
 	@Field(() => String, { description: 'Estado del producto' })
 	state: string;
 
-	@Prop({ type: Array, default: [] })
+	/*@Prop({ type: Array, default: [] })
 	@Field(() => [Image], { description: 'Imagenes del producto' })
-	images: Image[];
+	images: Image[];*/
 
-	@Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-	@Field(() => String, { description: 'Usuario que crea el producto' })
-	userId: mongoose.Schema.Types.ObjectId;
+	@Prop({ type: User, required: true })
+	@Field(() => User, { description: 'Usuario que crea el producto' })
+	user: User;
 
-	@Prop({ type: Object, required: true })
-	@Field(() => [Shipping], { description: 'Características para el envío' })
+	@Prop({
+		type: Object,
+		default: {
+			width: 0,
+			height: 0,
+			long: 0,
+			weight: 0,
+			volume: 0,
+		},
+	})
+	@Field(() => Shipping, { description: 'Medidas del producto' })
 	shipping: Shipping;
 
 	//TODO: campo a evaluar
-	@Prop({ type: String })
-	type: string;
+	/*@Prop({ type: String })
+	type: string;*/
+
+	//TODO: campo de mysql
+	@Prop({ type: Number, unique: true })
+	@Field(() => Number, {
+		description: 'Identificador de mysql',
+		nullable: true,
+		deprecationReason: 'Id de mysql',
+	})
+	id: number;
 }
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
+@Entity({ name: 'products' })
+export class ProductMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
 
-export class ProductOrder extends Product {
-	quantity: number;
-	@Prop({ type: Object, default: [] })
-	returns: {
-		createdAt: Date;
-		returnType: string;
-		quantityReturn: number;
-	}[];
+	@Column({ type: 'int' })
+	provider_id: number;
 
-	returnType?: string;
-	//TODO: eliminar campo al organizar
-	salePriceUnit?: number;
-	//TODO: campo generico pendiente eliminarlo
-	product_id?: number;
+	@Column({ type: 'int' })
+	size_id: number;
+
+	@Column({ type: 'int' })
+	color_id: number;
+
+	@Column({ type: 'int' })
+	owener_user_id: number;
+
+	@Column({ type: 'varchar' })
+	reference: string;
+
+	@Column({ type: 'varchar' })
+	barcode: string;
+
+	@Column({ type: 'double' })
+	price: number;
+
+	@Column({ type: 'double' })
+	cost: number;
+
+	@Column({ type: 'tinyint' })
+	state: boolean;
+
+	@Column({ type: 'varchar' })
+	description: string;
+
+	@Column({ type: 'tinyint' })
+	changeable: boolean;
+
+	@Column({ type: 'varchar' })
+	images: string;
+
+	@Column({ type: 'double' })
+	shipping_width: number;
+
+	@Column({ type: 'double' })
+	shipping_long: number;
+
+	@Column({ type: 'double' })
+	shipping_height: number;
+
+	@Column({ type: 'double' })
+	shipping_weigth: number;
+
+	@Column({ type: 'double' })
+	shipping_volume: number;
 }
-
-export class ProductTransfer extends ProductOrder {
-	quantity: number;
-}
-
-

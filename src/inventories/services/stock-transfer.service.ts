@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 
 import { InventoriesService } from 'src/inventories/services/inventories.service';
 import { StockRequestService } from 'src/inventories/services/stock-request.service';
-import { Product, ProductTransfer } from 'src/products/entities/product.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehouseService } from 'src/shops/services/warehouses.service';
 import { UsersService } from 'src/users/services/users.service';
@@ -228,7 +228,7 @@ export class StockTransferService {
 						const product = {
 							...detail[i]['product']['_doc'],
 							quantity: item.quantity,
-						} as ProductTransfer;
+						} as any;
 						await this.inventoryService.reverseStock(
 							product,
 							warehouseOrigin,
@@ -282,7 +282,7 @@ export class StockTransferService {
 					const product = {
 						...detail[i]['product']['_doc'],
 						quantity: item.quantity,
-					} as ProductTransfer;
+					} as any;
 					await this.inventoryService.reverseStock(
 						product,
 						warehouseOrigin,
@@ -492,7 +492,7 @@ export class StockTransferService {
 								{
 									...item.product,
 									quantity: item.quantity,
-								} as ProductTransfer,
+								} as any,
 								stockTransfer.warehouseOrigin.id,
 							);
 							if (addInventory !== true) {
@@ -502,7 +502,7 @@ export class StockTransferService {
 										{
 											...item.product,
 											quantity: item.quantity,
-										} as ProductTransfer,
+										} as any,
 										stockTransfer.warehouseOrigin.id,
 									);
 								}
@@ -565,7 +565,7 @@ export class StockTransferService {
 							{
 								...item.product,
 								quantity: item.quantityConfirmed,
-							} as ProductTransfer,
+							} as any,
 							stockTransfer.warehouseDestination.id,
 						);
 						if (addInventory !== true) {
@@ -576,7 +576,7 @@ export class StockTransferService {
 										{
 											...item.product,
 											quantity: item.quantityConfirmed,
-										} as ProductTransfer,
+										} as any,
 										stockTransfer.warehouseDestination.id,
 									);
 								}

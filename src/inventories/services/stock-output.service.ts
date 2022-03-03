@@ -10,7 +10,7 @@ import {
 	UpdateStockOutputParamsDto,
 } from '../dtos/stock-output.dto';
 import { InventoriesService } from './inventories.service';
-import { Product, ProductTransfer } from 'src/products/entities/product.entity';
+import { Product } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { StockOutput } from '../entities/stock-output.entity';
 
@@ -164,7 +164,7 @@ export class StockOutputService {
 					{
 						...item.product,
 						quantity: item.quantity,
-					} as ProductTransfer,
+					} as any,
 					warehouse.id,
 				);
 
@@ -176,7 +176,7 @@ export class StockOutputService {
 							{
 								...itemAdd.product,
 								quantity: itemAdd.quantity,
-							} as ProductTransfer,
+							} as any,
 							warehouse.id,
 						);
 					}
@@ -268,7 +268,7 @@ export class StockOutputService {
 							{
 								...item.product,
 								quantity: item.quantity,
-							} as ProductTransfer,
+							} as any,
 							warehouse.id,
 						);
 						if (addProducts !== true) {
@@ -279,7 +279,7 @@ export class StockOutputService {
 									{
 										...itemAdd.product,
 										quantity: itemAdd.quantity,
-									} as ProductTransfer,
+									} as any,
 									warehouse.id,
 								);
 							}

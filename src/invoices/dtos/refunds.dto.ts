@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { IsArray, IsObject, IsOptional, IsString } from 'class-validator';
 
-import { ProductOrder } from 'src/products/entities/product.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
 
 export class CreateRefundsDto {
@@ -9,7 +8,7 @@ export class CreateRefundsDto {
 	orderId: string;
 
 	@IsArray()
-	products: ProductOrder[];
+	products: any[];
 
 	@IsObject()
 	user: UserMysql;

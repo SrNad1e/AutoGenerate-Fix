@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { Inventories } from 'src/inventories/entities/inventories.entity';
-import { ProductMysql } from 'src/products/entities/product.migration.entity';
+import { ProductMysql } from 'src/products/entities/product.entity';
 import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { StockTransferDetailMysql } from 'src/inventories/entities/stock-transfer-detail.migrate.entity';
 import { StockTransferMysql } from 'src/inventories/entities/stock-transfer.migrate.entity';
@@ -15,6 +15,7 @@ import { UserMysql } from 'src/users/entities/user.entity';
 import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 import { ColorMysql } from 'src/products/entities/color.entity';
 import { SizeMysql } from 'src/products/entities/size.entity';
+import { ProviderMysql } from 'src/products/entities/provider.entity';
 
 @Global()
 @Module({
@@ -58,7 +59,8 @@ import { SizeMysql } from 'src/products/entities/size.entity';
 						UserMysql,
 						InvoiceMysql,
 						ColorMysql,
-						SizeMysql
+						SizeMysql,
+						ProviderMysql,
 					],
 				};
 			},
