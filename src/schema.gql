@@ -16,11 +16,17 @@ type Category {
 }
 
 type Color {
+  """Identificador de mongo"""
+  _id: String!
+
   """Url de la imagen del color"""
   html: String!
 
   """Nombre del color"""
   name: String!
+
+  """Nombre interno del color"""
+  name_internal: String!
 }
 
 type Configs {
@@ -293,6 +299,9 @@ type Shop {
 }
 
 type Size {
+  """Identificador de mongo"""
+  _id: String!
+
   """Valor de la talla"""
   value: String!
 }
