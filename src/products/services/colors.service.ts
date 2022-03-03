@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Model } from 'mongoose';
-import { NotFoundError } from 'rxjs';
 import { Repository } from 'typeorm';
 import { FiltersColorInput } from '../dtos/filters-color.input';
 import { Color, ColorMysql } from '../entities/color.entity';
@@ -18,7 +17,13 @@ export class ColorsService {
 	async findAll(props: FiltersColorInput): Promise<Partial<Color>> {
 		const { name = '', ...params } = props;
 		return this.colorModel
-			.find({ name: { $regex: name, $options: 'i' }, ...params })
+			.find({
+				$or: [
+					{ name: { $regex: name, $options: 'i' } },
+					{ name_internal: { $regex: name, $options: 'i' } },
+				],
+				...params,
+			})
 			.lean();
 	}
 
