@@ -36,17 +36,21 @@ export class ProductsService {
 		try {
 			const productsMysql = await this.productRepo.find();
 
-			const productsMongo = productsMysql.map(async (product) => {
+			const productsMongo = [];
+
+			for (let i = 0; i < productsMysql.length; i++) {
+				const product = productsMysql[i];
+
 				const color = await this.colorsService.getByIdMysql(product.color_id);
 				const size = await this.sizesService.getByIdMysql(product.size_id);
 				const provider = await this.providersService.getByIdMysql(
 					product.provider_id,
 				);
 				const user = await this.usersService.getByIdMysql(
-					product.owener_user_id,
+					product.owner_user_id,
 				);
 
-				return {
+				productsMongo.push({
 					reference: product.reference,
 					description: product.description,
 					barcode: product.barcode,
@@ -57,17 +61,17 @@ export class ProductsService {
 					price: product.price,
 					cost: product.cost,
 					state: product.state ? 'Active' : 'Inactive',
-					user: user._id,
+					user: user,
 					shipping: {
 						width: product.shipping_width,
-						height: product.shipping_weigth,
+						height: product.shipping_height,
 						long: product.shipping_long,
-						weight: product.shipping_weigth,
+						weight: product.shipping_weight,
 						volume: product.shipping_volume,
 					},
 					id: product.id,
-				};
-			});
+				});
+			}
 
 			await this.productModel.create(productsMongo);
 			return {

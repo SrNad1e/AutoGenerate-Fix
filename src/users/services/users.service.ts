@@ -138,13 +138,27 @@ export class UsersService {
 					password: user.password,
 					shop: shop._id,
 					user: {
-						name: 'migrate',
-						username: 'Usuario de migración',
+						id: 0,
+						name: 'Usuario de migración',
+						username: 'migrate',
 					},
 					id: user.id,
 				});
 			}
-			//console.log(usersMongo[0]);
+			const shop = await this.shopModel.findOne({ id: 1 }).lean();
+
+			usersMongo.push({
+				name: 'Usuario de migración',
+				username: 'migrate',
+				password: '1234',
+				shop: shop._id,
+				user: {
+					id: 0,
+					name: 'migrate',
+					username: 'Usuario de migración',
+				},
+				id: 0,
+			});
 
 			await this.userModel.create(usersMongo);
 

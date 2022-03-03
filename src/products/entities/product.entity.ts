@@ -133,7 +133,7 @@ export class ProductMysql {
 	color_id: number;
 
 	@Column({ type: 'int' })
-	owener_user_id: number;
+	owner_user_id: number;
 
 	@Column({ type: 'varchar' })
 	reference: string;
@@ -169,7 +169,7 @@ export class ProductMysql {
 	shipping_height: number;
 
 	@Column({ type: 'double' })
-	shipping_weigth: number;
+	shipping_weight: number;
 
 	@Column({ type: 'double' })
 	shipping_volume: number;
