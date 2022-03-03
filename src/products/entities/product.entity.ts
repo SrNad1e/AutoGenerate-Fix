@@ -3,7 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Image } from 'src/images/entities/image.entity';
 import { Color } from './color.entity';
 import { Provider } from './provider.entity';
 import { Size } from './size.entity';
@@ -61,15 +60,6 @@ export class Product extends mongoose.Document {
 	@Field(() => Provider, { description: 'Fabricante del producto' })
 	provider: mongoose.Schema.Types.ObjectId;
 
-	/*@Field(() => [Category], { description: 'Categorías del producto' })
-	@Prop({
-		type: [mongoose.Schema.Types.ObjectId],
-		ref: Category.name,
-		autopopulate: true,
-		required: true,
-	})
-	categories: mongoose.Schema.Types.ObjectId[];*/
-
 	@Prop({ type: Number, required: true })
 	@Field(() => Number, { description: 'Precio del producto' })
 	price: number;
@@ -80,11 +70,7 @@ export class Product extends mongoose.Document {
 
 	@Prop({ type: String, default: 'Active' })
 	@Field(() => String, { description: 'Estado del producto' })
-	state: string;
-
-	/*@Prop({ type: Array, default: [] })
-	@Field(() => [Image], { description: 'Imagenes del producto' })
-	images: Image[];*/
+	status: string;
 
 	@Prop({ type: User, required: true })
 	@Field(() => User, { description: 'Usuario que crea el producto' })
@@ -103,16 +89,12 @@ export class Product extends mongoose.Document {
 	@Field(() => Shipping, { description: 'Medidas del producto' })
 	shipping: Shipping;
 
-	//TODO: campo a evaluar
-	/*@Prop({ type: String })
-	type: string;*/
-
 	//TODO: campo de mysql
 	@Prop({ type: Number, unique: true })
 	@Field(() => Number, {
 		description: 'Identificador de mysql',
+		deprecationReason: 'Campo para migración de mysql',
 		nullable: true,
-		deprecationReason: 'Id de mysql',
 	})
 	id: number;
 }

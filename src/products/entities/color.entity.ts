@@ -7,7 +7,7 @@ import * as mongoose from 'mongoose';
 @ObjectType()
 export class Color {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: mongoose.ObjectId;
+	_id: mongoose.Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre del color' })
 	@Prop({ type: String, required: true })
@@ -36,6 +36,7 @@ export class Color {
 	@Field(() => Number, {
 		description: 'Identificador del color mysql',
 		deprecationReason: 'Campo para migración de mysql',
+		nullable: true,
 	})
 	@Prop({ type: Number, default: true })
 	id: number;

@@ -21,7 +21,7 @@ type Color {
   html: String!
 
   """Identificador del color mysql"""
-  id: Float! @deprecated(reason: "Campo para migración de mysql")
+  id: Float @deprecated(reason: "Campo para migración de mysql")
 
   """Url relativo de la imagen"""
   image: String
@@ -99,12 +99,24 @@ type DetailTransfer {
   updateAt: DateTime!
 }
 
-input FiltersColorInput {
-  """Estado de la bodega"""
-  active: Boolean
+input FiltersProductInput {
+  """Id de color"""
+  colorId: String
 
-  """Comodín busqueda del color"""
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para la busqueda del producto, barcode, referencem description"""
   name: String
+
+  """Id de talla"""
+  sizeId: String
+
+  """Desde donde arranca la página"""
+  skip: Float
+
+  """Estado del producto"""
+  status: String
 }
 
 input FiltersSizeInput {
@@ -212,7 +224,7 @@ type Product {
   description: String!
 
   """Identificador de mysql"""
-  id: Float @deprecated(reason: "Id de mysql")
+  id: Float @deprecated(reason: "Campo para migración de mysql")
 
   """Precio del producto"""
   price: Float!
@@ -230,7 +242,7 @@ type Product {
   size: Size!
 
   """Estado del producto"""
-  state: String!
+  status: String!
 
   """Usuario que crea el producto"""
   user: User!
@@ -244,14 +256,14 @@ type Provider {
   active: Boolean!
 
   """Id de mysql"""
-  id: Boolean @deprecated(reason: "id de mysql")
+  id: Boolean @deprecated(reason: "Campo para migración de mysql")
 
   """Nombre del proveedor"""
   name: String!
 }
 
 type Query {
-  colors(filtersColorInput: FiltersColorInput = {}): [Color!]!
+  colors(filtersProductInput: FiltersProductInput = {}): [Product!]!
   configuration(module: String!): Configuration
   currentUser: User!
   getAll: [Configuration!]!
@@ -329,7 +341,7 @@ type Size {
   active: Boolean!
 
   """Identificador mysql"""
-  id: Float @deprecated(reason: "Id de mysql")
+  id: Float @deprecated(reason: "Campo para migración de mysql")
 
   """Valor de la talla"""
   value: String!

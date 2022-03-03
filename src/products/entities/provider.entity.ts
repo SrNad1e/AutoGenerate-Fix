@@ -22,7 +22,7 @@ export class Provider extends Document {
 	@Field(() => Boolean, {
 		description: 'Id de mysql',
 		nullable: true,
-		deprecationReason: 'id de mysql',
+		deprecationReason: 'Campo para migración de mysql',
 	})
 	id: number;
 }

@@ -1,6 +1,6 @@
-/* eslint-disable prettier/prettier */
 import { Controller, Get } from '@nestjs/common';
-import { ProductsService } from 'src/products/services/products.service';
+
+import { ProductsService } from '../services/products.service';
 import { ColorsService } from '../services/colors.service';
 import { ProvidersService } from '../services/providers.service';
 import { SizesService } from '../services/sizes.service';

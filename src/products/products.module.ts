@@ -16,6 +16,7 @@ import { Size, SizeMysql, SizeSchema } from './entities/size.entity';
 import { Provider, ProviderMysql, ProviderSchema } from './entities/provider.entity';
 import { ProvidersService } from './services/providers.service';
 import { UsersModule } from 'src/users/users.module';
+import { ProductsResolver } from './resolvers/products.resolver';
 
 @Module({
 	imports: [
@@ -40,6 +41,7 @@ import { UsersModule } from 'src/users/users.module';
 		SizesService,
 		ColorsService,
 		ProvidersService,
+		ProductsResolver,
 	],
 	exports: [ProductsService],
 	controllers: [ProductsController],

@@ -1,10 +1,10 @@
-/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Model, ObjectId } from 'mongoose';
+import { FilterQuery, Model, ObjectId, PaginateModel } from 'mongoose';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
+import { FiltersProductInput } from '../dtos/filters-product.input';
 
 import { Product } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
@@ -15,7 +15,10 @@ import { SizesService } from './sizes.service';
 @Injectable()
 export class ProductsService {
 	constructor(
-		@InjectModel(Product.name) private readonly productModel: Model<Product>,
+		@InjectModel(Product.name)
+		private readonly productModel: Model<Product> &
+			PaginateModel<Product> &
+			any,
 		@InjectRepository(ProductMysql)
 		private readonly productRepo: Repository<ProductMysql>,
 		private readonly colorsService: ColorsService,
@@ -23,6 +26,40 @@ export class ProductsService {
 		private readonly providersService: ProvidersService,
 		private readonly usersService: UsersService,
 	) {}
+
+	async findAll(params: FiltersProductInput) {
+		const filters: FilterQuery<Product> = {};
+		const { colorId, limit = 10, skip = 0, name, sizeId, status } = params;
+
+		if (colorId) {
+			filters.color = colorId;
+		}
+
+		if (sizeId) {
+			filters.size = sizeId;
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+
+		const options = {
+			limit,
+			page: skip,
+		};
+
+		return this.productModel.paginate(
+			{
+				...filters,
+				$or: [
+					{ identification: name },
+					{ description: { $regex: name, $options: 'i' } },
+					{ reference: { $regex: name, $options: 'i' } },
+				],
+			},
+			options,
+		);
+	}
 
 	/**
 	 * @description obtiene el producto con base al id de mysql
@@ -60,7 +97,7 @@ export class ProductsService {
 					provider: provider._id,
 					price: product.price,
 					cost: product.cost,
-					state: product.state ? 'Active' : 'Inactive',
+					status: product.state ? 'Active' : 'Inactive',
 					user: user,
 					shipping: {
 						width: product.shipping_width,

@@ -20,7 +20,7 @@ export class Size {
 	//TODO: temporal id de mysql
 	@Field(() => Number, {
 		description: 'Identificador mysql',
-		deprecationReason: 'Id de mysql',
+		deprecationReason: 'Campo para migración de mysql',
 		nullable: true,
 	})
 	@Prop({ type: Number })
