@@ -117,6 +117,20 @@ input FiltersColorInput {
 }
 
 input FiltersProductInput {
+  """Identificador de mongo"""
+  _id: String
+
+  """Código de barras producto"""
+  barcode: String
+
+  """Descripción del producto"""
+  description: String
+
+  """Referencia del producto"""
+  reference: String
+}
+
+input FiltersProductsInput {
   """Id de color"""
   colorId: String
 
@@ -297,7 +311,8 @@ type Query {
   currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
-  products(filtersProductInput: FiltersProductInput = {}): ResponseProduct!
+  product(filtersProductInput: FiltersProductInput = {}): Product!
+  products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): StockTransferResponse!

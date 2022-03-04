@@ -4,13 +4,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model, PaginateModel } from 'mongoose';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
-import { FiltersProductInput } from '../dtos/filters-product.input';
+import {
+	FiltersProductInput,
+	FiltersProductsInput,
+} from '../dtos/filters-product.input';
 
 import { Product } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
 import { ProvidersService } from './providers.service';
 import { SizesService } from './sizes.service';
+
+const populate = ['color', 'size', 'provider'];
 
 @Injectable()
 export class ProductsService {
@@ -25,7 +30,7 @@ export class ProductsService {
 		private readonly usersService: UsersService,
 	) {}
 
-	async findAll(params: FiltersProductInput) {
+	async findAll(params: FiltersProductsInput) {
 		const filters: FilterQuery<Product> = {};
 		const {
 			colorId,
@@ -53,7 +58,7 @@ export class ProductsService {
 			limit,
 			page: skip,
 			sort,
-			populate: ['color', 'size', 'provider'],
+			populate,
 		};
 
 		console.log(name);
@@ -69,6 +74,10 @@ export class ProductsService {
 			},
 			options,
 		);
+	}
+
+	async findOne(params: FiltersProductInput): Promise<Product> {
+		return (await this.productModel.findOne(params)).populate(populate);
 	}
 
 	async migration() {
