@@ -10,7 +10,7 @@ import { ProductsService } from '../services/products.service';
 export class ProductsResolver {
 	constructor(private readonly productsService: ProductsService) {}
 
-	@Query(() => [Product], { name: 'colors' })
+	@Query(() => [Product], { name: 'products' })
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({ name: 'filtersProductInput', nullable: true, defaultValue: {} })

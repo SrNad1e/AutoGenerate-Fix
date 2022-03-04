@@ -7,4 +7,10 @@ export class FiltersColorInput {
 
 	@Field({ description: 'Estado de la bodega', nullable: true })
 	active?: boolean;
+
+	@Field({ description: 'Cantidad de registros', nullable: true })
+	limit?: number;
+
+	@Field({ description: 'Página', nullable: true })
+	skip?: number;
 }

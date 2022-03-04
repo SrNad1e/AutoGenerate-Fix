@@ -1,30 +1,47 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
+
+import { ColorResponse } from '../dtos/color-response';
 import { FiltersColorInput } from '../dtos/filters-color.input';
 import { Color, ColorMysql } from '../entities/color.entity';
 
 @Injectable()
 export class ColorsService {
 	constructor(
-		@InjectModel(Color.name) private readonly colorModel: Model<Color>,
+		@InjectModel(Color.name)
+		private readonly colorModel: Model<Color> & PaginateModel<Color>, // & any,
 		@InjectRepository(ColorMysql)
 		private readonly colorRepo: Repository<ColorMysql>,
 	) {}
 
-	async findAll(props: FiltersColorInput): Promise<Partial<Color>> {
-		const { name = '', ...params } = props;
-		return this.colorModel
-			.find({
+	async findAll(props: FiltersColorInput): Promise<Partial<ColorResponse>> {
+		const filters: FilterQuery<Color> = {};
+
+		const { name = '', limit = 10, skip = 0, active } = props;
+
+		if (active) {
+			filters.active = active;
+		}
+
+		const options = {
+			limit,
+			page: skip,
+			lean: true,
+		};
+
+		return this.colorModel.paginate(
+			{
+				...filters,
 				$or: [
 					{ name: { $regex: name, $options: 'i' } },
 					{ name_internal: { $regex: name, $options: 'i' } },
 				],
-				...params,
-			})
-			.lean();
+			},
+			options,
+		);
 	}
 
 	async getByIdMysql(id: number) {

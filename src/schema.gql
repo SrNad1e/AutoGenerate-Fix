@@ -33,6 +33,38 @@ type Color {
   name_internal: String!
 }
 
+type ColorResponse {
+  """Lista de colores"""
+  docs: [Color!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 type Configs {
   createdAt: DateTime!
   data: [Data!]!
@@ -97,6 +129,20 @@ type DetailTransfer {
 
   """Fecha de actualizacion el producto"""
   updateAt: DateTime!
+}
+
+input FiltersColorInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín busqueda del color"""
+  name: String
+
+  """Página"""
+  skip: Float
 }
 
 input FiltersProductInput {
@@ -263,11 +309,12 @@ type Provider {
 }
 
 type Query {
-  colors(filtersProductInput: FiltersProductInput = {}): [Product!]!
+  colors(filtersColorInput: FiltersColorInput = {}): ColorResponse!
   configuration(module: String!): Configuration
   currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
+  products(filtersProductInput: FiltersProductInput = {}): [Product!]!
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): [Size!]!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): StockTransferResponse!

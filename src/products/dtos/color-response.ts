@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { StockTransfer } from '../entities/stock-transfer.entity';
+import { Color } from '../entities/color.entity';
 
 @ObjectType()
-export class StockTransferResponse {
-	@Field(() => [StockTransfer], { description: 'Lista de traslados' })
-	docs: StockTransfer[];
+export class ColorResponse {
+	@Field(() => [Color], { description: 'Lista de colores' })
+	docs: Color[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;
@@ -33,4 +33,7 @@ export class StockTransferResponse {
 
 	@Field(() => Number || null, { description: 'Página siguente' })
 	nextPage: number | null;
+
+	/*@Field({ description: 'Número del traslado', nullable: true })
+	sort?: Record<string, 1 | -1 | { $meta: 'textScore' }>;*/
 }
