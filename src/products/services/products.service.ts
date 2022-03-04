@@ -31,7 +31,7 @@ export class ProductsService {
 			colorId,
 			limit = 10,
 			skip = 0,
-			name,
+			name = '',
 			sizeId,
 			status,
 			sort,
@@ -53,6 +53,7 @@ export class ProductsService {
 			limit,
 			page: skip,
 			sort,
+			populate: ['color', 'size', 'provider'],
 		};
 
 		return this.productModel.paginate(
