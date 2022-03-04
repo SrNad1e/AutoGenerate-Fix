@@ -56,11 +56,13 @@ export class ProductsService {
 			populate: ['color', 'size', 'provider'],
 		};
 
+		console.log(name);
+
 		return this.productModel.paginate(
 			{
 				...filters,
 				$or: [
-					{ identification: name },
+					{ barcode: name },
 					{ description: { $regex: name, $options: 'i' } },
 					{ reference: { $regex: name, $options: 'i' } },
 				],
