@@ -79,6 +79,20 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DetailRequest {
+  """Fecha de agregado del producto a la solicitud"""
+  createdAt: DateTime!
+
+  """Producto de la solicitud"""
+  product: Product!
+
+  """Cantidad de la solicitud"""
+  quantity: Float!
+
+  """Fecha de actualizado del producto a la solicitud"""
+  updateAt: DateTime!
+}
+
 type DetailTransfer {
   """Fecha de agregado el producto"""
   createdAt: DateTime!
@@ -516,6 +530,33 @@ input SortSize {
 type StockRequest {
   """Identificador de mongo"""
   _id: String!
+
+  """Usuario que crea la solicitud"""
+  code: String @deprecated(reason: "Migración mysql")
+
+  """Detalles de la solicitud"""
+  details: [DetailRequest!]!
+
+  """Número consecutivo de identificación"""
+  number: Float!
+
+  """Observación de la solicitud"""
+  observation: User!
+
+  """Estado de la solicitud"""
+  status: String!
+
+  """Transferencia usada"""
+  transfer: StockTransfer
+
+  """Usuario que crea la solicitud"""
+  userIdDestination: User!
+
+  """Bodega de destino de la solicitud"""
+  warehouseDestination: Warehouse!
+
+  """Bodega de origen de la solicitud"""
+  warehouseOrigin: Warehouse!
 }
 
 type StockTransfer {

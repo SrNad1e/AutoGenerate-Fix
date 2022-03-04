@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import { Types, Document, Schema as SchemaMongo } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Color } from './color.entity';
@@ -11,9 +11,9 @@ import { Shipping } from './shipping.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
-export class Product extends mongoose.Document {
+export class Product extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: mongoose.ObjectId;
+	_id: Types.ObjectId;
 
 	@Prop({ type: String, required: true })
 	@Field(() => String, { description: 'Referencia del producto' })
@@ -35,30 +35,30 @@ export class Product extends mongoose.Document {
 
 	@Field(() => Color, { description: 'Color del producto' })
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
+		type: SchemaMongo.Types.ObjectId,
 		ref: Color.name,
 		autopopulate: true,
 		required: true,
 	})
-	color: mongoose.Schema.Types.ObjectId;
+	color: Types.ObjectId;
 
 	@Field(() => Size, { description: 'Talla del producto' })
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
+		type: SchemaMongo.Types.ObjectId,
 		ref: Size.name,
 		autopopulate: true,
 		required: true,
 	})
-	size: mongoose.Schema.Types.ObjectId;
+	size: Types.ObjectId;
 
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
+		type: SchemaMongo.Types.ObjectId,
 		ref: Provider.name,
 		autopopulate: true,
 		required: true,
 	})
 	@Field(() => Provider, { description: 'Fabricante del producto' })
-	provider: mongoose.Schema.Types.ObjectId;
+	provider: Types.ObjectId;
 
 	@Prop({ type: Number, required: true })
 	@Field(() => Number, { description: 'Precio del producto' })

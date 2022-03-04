@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
-import mongoosePaginate from 'mongoose-paginate-v2';
 import { Product } from 'src/products/entities/product.entity';
 import { StockRequest } from './stock-request.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -10,9 +9,9 @@ import { User } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true, collection: 'stocktransfer' })
 @ObjectType()
-export class StockTransfer extends Document{
+export class StockTransfer extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: ObjectId;
+	_id: Types.ObjectId;
 
 	@Prop({ type: Number, default: 0, unique: true })
 	@Field(() => Number, { description: 'Consecutivo del traslado' })

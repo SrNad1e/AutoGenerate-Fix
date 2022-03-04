@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, mongo, ObjectId } from 'mongoose';
+import { FilterQuery, Model, mongo, Types } from 'mongoose';
 
 import {
 	CreateStockInputDto,
@@ -331,7 +331,7 @@ export class StockInputService {
 	 */
 	async getDetail(
 		products: {
-			product_id: ObjectId;
+			product_id: Types.ObjectId;
 			quantity: number;
 		}[],
 	) {

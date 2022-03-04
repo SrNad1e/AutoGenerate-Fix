@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
 import { Shop } from './shop.entity';
 
@@ -9,7 +9,7 @@ import { Shop } from './shop.entity';
 @ObjectType()
 export class Warehouse extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: ObjectId;
+	_id: Types.ObjectId;
 
 	@Field(() => Shop, { description: 'Tienda a la que pertenece' })
 	@Prop({ type: Object, required: true })

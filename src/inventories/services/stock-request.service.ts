@@ -1,8 +1,7 @@
-/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, ObjectId } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import {
@@ -15,8 +14,10 @@ import {
 import { InventoriesService } from 'src/inventories/services/inventories.service';
 import { Product } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
-import { StockRequest } from '../entities/stock-request.entity';
-import { StockTransferDetailMysql } from '../entities/stock-transfer-detail.migrate.entity';
+import {
+	StockRequest,
+	StockTransferDetailMysql,
+} from '../entities/stock-request.entity';
 import { StockTransferMysql } from '../entities/stock-transfer.migrate.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { WarehouseService } from 'src/shops/services/warehouses.service';
@@ -106,7 +107,6 @@ export class StockRequestService {
 		}
 
 		try {
-
 			const result = await this.stockRequestModel
 				.aggregate([
 					...aggregate,
@@ -152,7 +152,7 @@ export class StockRequestService {
 		}
 	}
 
-	async getById(id: ObjectId) {
+	async getById(id: Types.ObjectId) {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id);
 
@@ -287,7 +287,7 @@ export class StockRequestService {
 				const detail = []; //await this.getDetail(products, status);
 
 				const detailNew = detail.map((item) => {
-					const detailOld = stockTransfer.detail.find(
+					const detailOld = stockTransfer.details.find(
 						(itemOld) => item.product._id === itemOld.product._id,
 					);
 					if (detailOld) {
@@ -350,7 +350,7 @@ export class StockRequestService {
 	 * @description crea el traslado de mercancía
 	 * @param params datos para la creación del traslado
 	 */
-	async updateStockRequest(id: ObjectId, params: UpdateStockRequestDto) {
+	async updateStockRequest(id: Types.ObjectId, params: UpdateStockRequestDto) {
 		try {
 			const response = await this.stockRequestModel.findByIdAndUpdate(id, {
 				$set: params,
@@ -506,14 +506,14 @@ export class StockRequestService {
 	 */
 	async getDetail(
 		products: {
-			product_id: ObjectId;
+			product_id: Types.ObjectId;
 			quantity: number;
 		}[],
 		status = 'open',
 	) {
 		const productsIds = products.map((product) => product.product_id);
-		const productsResponse: Product[] = []
-			//await this.productsService.getProductsIdSql(productsIds);
+		const productsResponse: Product[] = [];
+		//await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
 			const prod = products.find((item) => product._id === item.product_id);

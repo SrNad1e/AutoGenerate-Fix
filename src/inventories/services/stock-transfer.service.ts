@@ -2,7 +2,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, mongo, ObjectId, PaginateModel } from 'mongoose';
+import {
+	FilterQuery,
+	Model,
+	mongo,
+	ObjectId,
+	PaginateModel,
+	Types,
+} from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { InventoriesService } from 'src/inventories/services/inventories.service';
@@ -18,9 +25,9 @@ import {
 	FiltersStockTransferDto,
 	UpdateStockTransferParamsDto,
 } from '../dtos/stock-transfer.dto';
-import { StockTransferDetailMysql } from '../entities/stock-transfer-detail.migrate.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { StockTransferMysql } from '../entities/stock-transfer.migrate.entity';
+import { StockTransferDetailMysql } from '../entities/stock-request.entity';
 
 @Injectable()
 export class StockTransferService {
@@ -300,7 +307,7 @@ export class StockTransferService {
 		}
 	}
 
-	async createByRequest(idRequest: ObjectId, userId: number) {
+	async createByRequest(idRequest: Types.ObjectId, userId: number) {
 		try {
 			const stockRequest = await this.stockRequestService.getById(idRequest);
 
@@ -627,7 +634,7 @@ export class StockTransferService {
 
 	async getVerify(id: string) {
 		const stockInProcess = await this.inventoryService.getReserveStock({
-			documentId: new mongo.ObjectId(id) as unknown as ObjectId,
+			documentId: new mongo.ObjectId(id) as unknown as Types.ObjectId,
 			status: 'active',
 		});
 
@@ -843,14 +850,14 @@ export class StockTransferService {
 	 */
 	async getDetail(
 		products: {
-			product_id: ObjectId;
+			product_id: Types.ObjectId;
 			quantity: number;
 		}[],
 		status = 'open',
 	) {
 		const productsIds = products.map((product) => product.product_id);
-		const productsResponse: Product[] =[]
-			//await this.productsService.getProductsIdSql(productsIds);
+		const productsResponse: Product[] = [];
+		//await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
 			const prod = products.find((item) => product._id === item.product_id);

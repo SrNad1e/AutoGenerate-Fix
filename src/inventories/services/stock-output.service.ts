@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, mongo, ObjectId } from 'mongoose';
+import { FilterQuery, Model, mongo, Types } from 'mongoose';
 
 import {
 	CreateStockOutputDto,
@@ -148,7 +148,7 @@ export class StockOutputService {
 		}
 
 		//consultar productos
-		const detail = []//await this.getDetail(products);
+		const detail = []; //await this.getDetail(products);
 		const quantity = detail.reduce((sum, item) => sum + item.quantity, 0);
 		const total = detail.reduce(
 			(sum, item) => sum + item.quantity * item.product.cost,
@@ -237,7 +237,7 @@ export class StockOutputService {
 				);
 			}
 			if (status === 'open' || status === 'save') {
-				const detail = []//await this.getDetail(products);
+				const detail = []; //await this.getDetail(products);
 
 				const detailNew = detail.map((item) => {
 					const detailOld = stockInput.detail.find(
@@ -331,13 +331,13 @@ export class StockOutputService {
 	 */
 	async getDetail(
 		products: {
-			product_id: ObjectId;
+			product_id: Types.ObjectId;
 			quantity: number;
 		}[],
 	) {
 		const productsIds = products.map((product) => product.product_id);
-		const productsResponse: Product[] =[]
-			//await this.productsService.getProductsIdSql(productsIds);
+		const productsResponse: Product[] = [];
+		//await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
 			const prod = products.find((item) => product._id === item.product_id);

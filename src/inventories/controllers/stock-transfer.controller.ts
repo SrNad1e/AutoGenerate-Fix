@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import {
 	Body,
@@ -11,7 +12,7 @@ import {
 	ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 import {
 	ConfirmDetailTransferDto,
@@ -60,7 +61,7 @@ export class StockTransferController {
 	@Post(':id')
 	@UsePipes(new ValidationPipe({ transform: true }))
 	async createByRequest(
-		@Param('id') idRequest: ObjectId,
+		@Param('id') idRequest: Types.ObjectId,
 		@Body('userId') userId: number,
 	) {
 		return this.stockTransferService.createByRequest(idRequest, userId);
@@ -88,7 +89,7 @@ export class StockTransferController {
 
 	@Patch('verify/:id')
 	@UsePipes(new ValidationPipe({ transform: true }))
-	async verify(@Param('id') id: ObjectId) {
+	async verify(@Param('id') id: Types.ObjectId) {
 		return; //this.stockTransferService.verify(id);
 	}
 

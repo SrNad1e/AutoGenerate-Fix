@@ -1,25 +1,25 @@
-/* eslint-disable prettier/prettier */
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
+
 export class deleteStockInProcess {
-	productId: ObjectId;
-	documentId: ObjectId;
+	productId: Types.ObjectId;
+	documentId: Types.ObjectId;
 	cost: number;
 	quantity: number;
-	warehouseId: ObjectId;
+	warehouseId: Types.ObjectId;
 }
 export class createStockInProcess extends deleteStockInProcess {
 	documentType: string;
 }
 
 export class updateStockInProcess {
-	productId: ObjectId;
+	productId: Types.ObjectId;
 	warehouseId: number;
-	documentId: ObjectId;
+	documentId: Types.ObjectId;
 }
 
 export class FiltersStockInProcess {
-	productId?: ObjectId;
-	documentId?: ObjectId;
+	productId?: Types.ObjectId;
+	documentId?: Types.ObjectId;
 	cost?: number;
 	documentType?: string;
 	quantity?: number;

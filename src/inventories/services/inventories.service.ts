@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import {
 	createStockInProcess,
@@ -161,7 +161,7 @@ export class InventoriesService {
 	 * @param params objeto de parametros usados para actualizar el documento
 	 * @returns string si se genera algun error o true si el proceso finaliza correctamente
 	 */
-	async updateProductsStockInProcess(documentId: ObjectId, status: string) {
+	async updateProductsStockInProcess(documentId: Types.ObjectId, status: string) {
 		try {
 			const stockInProcess = this.stockInProcessModel
 				.updateMany({ documentId }, { $set: { status } })
@@ -206,7 +206,7 @@ export class InventoriesService {
 		warehouseOrigin: Warehouse,
 		warehouseDestination: Warehouse,
 		documentType: string,
-		documentId: ObjectId,
+		documentId: Types.ObjectId,
 	) {
 		let result;
 		result = await this.deleteProductInventory(product, warehouseOrigin.id);
@@ -236,7 +236,7 @@ export class InventoriesService {
 		product: any,
 		warehouseOrigin: Warehouse,
 		warehouseDestination: Warehouse,
-		documentId: ObjectId,
+		documentId: Types.ObjectId,
 	) {
 		let result;
 
