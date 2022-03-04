@@ -33,38 +33,6 @@ type Color {
   name_internal: String!
 }
 
-type ColorResponse {
-  """Lista de colores"""
-  docs: [Color!]!
-
-  """¿Encuentra página siguiente?"""
-  hasNextPage: Boolean!
-
-  """¿Encuentra página anterior?"""
-  hasPrevPage: Boolean!
-
-  """Total de docuementos solicitados"""
-  limit: Float!
-
-  """Página siguente"""
-  nextPage: Float!
-
-  """Página actual"""
-  page: Float!
-
-  """"""
-  pagingCounter: Float!
-
-  """Página anterior"""
-  prevPage: Float!
-
-  """Total de documentos"""
-  totalDocs: Float!
-
-  """Total de páginas"""
-  totalPages: Float!
-}
-
 type Configs {
   createdAt: DateTime!
   data: [Data!]!
@@ -143,6 +111,9 @@ input FiltersColorInput {
 
   """Página"""
   skip: Float
+
+  """Ordenamiento"""
+  sort: SortColor
 }
 
 input FiltersProductInput {
@@ -161,6 +132,9 @@ input FiltersProductInput {
   """Desde donde arranca la página"""
   skip: Float
 
+  """Ordenamiento"""
+  sort: SortProduct
+
   """Estado del producto"""
   status: String
 }
@@ -169,8 +143,17 @@ input FiltersSizeInput {
   """Estado de la bodega"""
   active: Boolean
 
+  """Cantidad de registros"""
+  limit: Float
+
   """Comodín busqueda de la talla"""
   name: String
+
+  """Página"""
+  skip: Float
+
+  """Ordenamiento"""
+  sort: SortSize
 }
 
 input FiltersStockTransferInput {
@@ -309,14 +292,14 @@ type Provider {
 }
 
 type Query {
-  colors(filtersColorInput: FiltersColorInput = {}): ColorResponse!
+  colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
   configuration(module: String!): Configuration
   currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
-  products(filtersProductInput: FiltersProductInput = {}): [Product!]!
+  products(filtersProductInput: FiltersProductInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!
-  sizes(filtersSizeInput: FiltersSizeInput = {}): [Size!]!
+  sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): StockTransferResponse!
   user(username: String!): User!
   users: [User!]!
@@ -326,6 +309,102 @@ type Query {
 type ReportSalesResponse {
   shop: Shop!
   weeks: [Float!]!
+}
+
+type ResponseColor {
+  """Lista de colores"""
+  docs: [Color!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseProduct {
+  """Lista de productos"""
+  docs: [Product!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseSize {
+  """Lista de tallas"""
+  docs: [Size!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
 }
 
 type Role {
@@ -392,6 +471,31 @@ type Size {
 
   """Valor de la talla"""
   value: String!
+}
+
+input SortColor {
+  active: Float
+  createdAt: Float
+  name: Float
+  name_internal: Float
+  updatedAt: Float
+}
+
+input SortProduct {
+  barcode: Float
+  changeable: Float
+  cost: Float
+  description: Float
+  price: Float
+  reference: Float
+  status: Float
+}
+
+input SortSize {
+  active: Float
+  createdAt: Float
+  updatedAt: Float
+  value: Float
 }
 
 type StockRequest {

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, ObjectId, PaginateModel } from 'mongoose';
+import { FilterQuery, Model, PaginateModel } from 'mongoose';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import { FiltersProductInput } from '../dtos/filters-product.input';
@@ -16,9 +16,7 @@ import { SizesService } from './sizes.service';
 export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
-		private readonly productModel: Model<Product> &
-			PaginateModel<Product> &
-			any,
+		private readonly productModel: Model<Product> & PaginateModel<Product>,
 		@InjectRepository(ProductMysql)
 		private readonly productRepo: Repository<ProductMysql>,
 		private readonly colorsService: ColorsService,
@@ -29,7 +27,15 @@ export class ProductsService {
 
 	async findAll(params: FiltersProductInput) {
 		const filters: FilterQuery<Product> = {};
-		const { colorId, limit = 10, skip = 0, name, sizeId, status } = params;
+		const {
+			colorId,
+			limit = 10,
+			skip = 0,
+			name,
+			sizeId,
+			status,
+			sort,
+		} = params;
 
 		if (colorId) {
 			filters.color = colorId;
@@ -46,6 +52,7 @@ export class ProductsService {
 		const options = {
 			limit,
 			page: skip,
+			sort,
 		};
 
 		return this.productModel.paginate(
@@ -59,14 +66,6 @@ export class ProductsService {
 			},
 			options,
 		);
-	}
-
-	/**
-	 * @description obtiene el producto con base al id de mysql
-	 * @param id identificador del producto en mysql
-	 */
-	async getProductsIdSql(ids: ObjectId[]) {
-		return await this.productModel.find({ id: { $in: ids } });
 	}
 
 	async migration() {

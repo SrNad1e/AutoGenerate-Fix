@@ -325,9 +325,9 @@ export class StockAdjustmentService {
 		}[],
 	) {
 		const productsIds = products.map((product) => product.product_id);
-		const productsResponse = await this.productsService.getProductsIdSql(
+		const productsResponse =[]/* await this.productsService.getProductsIdSql(
 			productsIds,
-		);
+		);*/
 
 		return productsResponse.map((product) => {
 			const prod = products.find((item) => product._id === item.product_id);

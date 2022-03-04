@@ -849,8 +849,8 @@ export class StockTransferService {
 		status = 'open',
 	) {
 		const productsIds = products.map((product) => product.product_id);
-		const productsResponse: Product[] =
-			await this.productsService.getProductsIdSql(productsIds);
+		const productsResponse: Product[] =[]
+			//await this.productsService.getProductsIdSql(productsIds);
 
 		return productsResponse.map((product) => {
 			const prod = products.find((item) => product._id === item.product_id);

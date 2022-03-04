@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
-import { ColorResponse } from '../dtos/color-response';
+import { ResponseColor } from '../dtos/response-color';
 import { FiltersColorInput } from '../dtos/filters-color.input';
 import { Color, ColorMysql } from '../entities/color.entity';
 
@@ -12,15 +12,15 @@ import { Color, ColorMysql } from '../entities/color.entity';
 export class ColorsService {
 	constructor(
 		@InjectModel(Color.name)
-		private readonly colorModel: Model<Color> & PaginateModel<Color>, // & any,
+		private readonly colorModel: Model<Color> & PaginateModel<Color>,
 		@InjectRepository(ColorMysql)
 		private readonly colorRepo: Repository<ColorMysql>,
 	) {}
 
-	async findAll(props: FiltersColorInput): Promise<Partial<ColorResponse>> {
+	async findAll(props: FiltersColorInput): Promise<Partial<ResponseColor>> {
 		const filters: FilterQuery<Color> = {};
 
-		const { name = '', limit = 10, skip = 0, active } = props;
+		const { name = '', limit = 10, skip = 0, active, sort } = props;
 
 		if (active) {
 			filters.active = active;
@@ -30,6 +30,7 @@ export class ColorsService {
 			limit,
 			page: skip,
 			lean: true,
+			sort,
 		};
 
 		return this.colorModel.paginate(
@@ -45,7 +46,7 @@ export class ColorsService {
 	}
 
 	async getByIdMysql(id: number) {
-		return this.colorModel.findOne({ id });
+		return this.colorModel.findOne({ id }).lean();
 	}
 
 	async migration() {

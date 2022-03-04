@@ -1,6 +1,30 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
+export class SortProduct {
+	@Field(() => Number, { nullable: true })
+	reference?: number;
+
+	@Field(() => Number, { nullable: true })
+	description?: number;
+
+	@Field(() => Number, { nullable: true })
+	barcode?: number;
+
+	@Field(() => Number, { nullable: true })
+	changeable?: number;
+
+	@Field(() => Number, { nullable: true })
+	price?: number;
+
+	@Field(() => Number, { nullable: true })
+	cost?: number;
+
+	@Field(() => Number, { nullable: true })
+	status?: number;
+}
+
+@InputType()
 export class FiltersProductInput {
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
@@ -24,6 +48,6 @@ export class FiltersProductInput {
 	@Field({ description: 'Id de talla', nullable: true })
 	sizeId?: string;
 
-	/*@Field(() => raw, { description: 'Número del traslado', nullable: true })
-	sort?: Record<string, 1 | -1 | { $meta: 'textScore' }>;*/
+	@Field(() => SortProduct, { description: 'Ordenamiento', nullable: true })
+	sort?: SortProduct;
 }
