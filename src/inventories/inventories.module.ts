@@ -1,12 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as AutoIncrementFactory from 'mongoose-sequence';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
-import { InventoriesService } from './services/inventories.service';
 import { Inventories } from './entities/inventories.entity';
 import {
 	StockInProcess,
@@ -18,13 +15,9 @@ import {
 	StockRequestSchema,
 	StockTransferDetailMysql,
 } from './entities/stock-request.entity';
-import { StockRequestService } from './services/stock-request.service';
-import { StockRequestController } from './controllers/stock-request.controller';
 import { ProductsModule } from 'src/products/products.module';
 import { ShopsModule } from 'src/shops/shops.module';
 import { UsersModule } from 'src/users/users.module';
-import { StockTransferController } from './controllers/stock-transfer.controller';
-import { StockTransferService } from './services/stock-transfer.service';
 import {
 	StockTransfer,
 	StockTransferSchema,
@@ -35,14 +28,7 @@ import {
 	StockAdjustment,
 	StockAdjustmentSchema,
 } from './entities/stock-adjustment.entity';
-import { StockInputService } from './services/stock-input.service';
-import { StockOutputService } from './services/stock-output.service';
-import { StockAdjustmentService } from './services/stock-adjustment.service';
-import { StockInputController } from './controllers/stock-input.controller';
-import { StockOutputController } from './controllers/stock-output.controller';
-import { StockAdjustmentController } from './controllers/stock-adjustment.controller';
-import { StockTransferResolver } from './resolvers/stock-transfer.resolver';
-import { StockRequestResolver } from './resolvers/stock-request.resolver';
+import { InventoriesService } from './services/inventories.service';
 
 @Module({
 	imports: [
@@ -128,23 +114,8 @@ import { StockRequestResolver } from './resolvers/stock-request.resolver';
 			},
 		]),
 	],
-	providers: [
-		InventoriesService,
-		StockAdjustmentService,
-		StockInputService,
-		StockOutputService,
-		StockRequestService,
-		StockTransferService,
-		StockTransferResolver,
-		StockRequestResolver,
-	],
-	controllers: [
-		StockRequestController,
-		StockTransferController,
-		StockAdjustmentController,
-		StockInputController,
-		StockOutputController,
-	],
+	providers: [InventoriesService],
+	controllers: [],
 	exports: [InventoriesService],
 })
 export class InventoriesModule {}

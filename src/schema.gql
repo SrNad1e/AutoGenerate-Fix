@@ -184,35 +184,6 @@ input FiltersSizeInput {
   sort: SortSize
 }
 
-input FiltersStockTransferInput {
-  """Número del traslado"""
-  createdAtMax: DateTime
-
-  """Número del traslado"""
-  createdAtMin: DateTime
-
-  """Número del traslado"""
-  limit: Float
-
-  """Número del traslado"""
-  number: Float
-
-  """Número del traslado"""
-  shopId: Float
-
-  """Número del traslado"""
-  skip: Float
-
-  """Número del traslado"""
-  status: String
-
-  """Número del traslado"""
-  warehouseDestinationId: Float
-
-  """Número del traslado"""
-  warehouseOriginId: Float
-}
-
 input FiltersWarehouseInput {
   """Estado de la bodega"""
   active: Boolean
@@ -329,7 +300,6 @@ type Query {
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
-  stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): StockTransferResponse!
   user(username: String!): User!
   users: [User!]!
   warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): [Warehouse!]!
@@ -595,38 +565,6 @@ type StockTransfer {
 
   """Bodega de origen del traslado"""
   warehouseOrigin: Warehouse!
-}
-
-type StockTransferResponse {
-  """Lista de traslados"""
-  docs: [StockTransfer!]!
-
-  """¿Encuentra página siguiente?"""
-  hasNextPage: Boolean!
-
-  """¿Encuentra página anterior?"""
-  hasPrevPage: Boolean!
-
-  """Total de docuementos solicitados"""
-  limit: Float!
-
-  """Página siguente"""
-  nextPage: Float!
-
-  """Página actual"""
-  page: Float!
-
-  """"""
-  pagingCounter: Float!
-
-  """Página anterior"""
-  prevPage: Float!
-
-  """Total de documentos"""
-  totalDocs: Float!
-
-  """Total de páginas"""
-  totalPages: Float!
 }
 
 input UpdateUserInput {
