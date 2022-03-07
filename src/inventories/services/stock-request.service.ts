@@ -3,7 +3,6 @@ import {
 	HttpException,
 	HttpStatus,
 	Injectable,
-	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PaginateModel } from 'mongoose';
@@ -58,22 +57,14 @@ export class StockRequestService {
 			);
 
 			if (!warehouseOrigin.active) {
-				throw new HttpException(
-					{
-						status: HttpStatus.BAD_REQUEST,
-						error: 'La bodega de origen se encuentra inactiva',
-					},
-					HttpStatus.BAD_REQUEST,
+				throw new BadRequestException(
+					'La bodega de origen se encuentra inactiva',
 				);
 			}
 
 			if (!warehouseDestination.active) {
-				throw new HttpException(
-					{
-						status: HttpStatus.BAD_REQUEST,
-						error: 'La bodega de destino se encuentra inactiva',
-					},
-					HttpStatus.BAD_REQUEST,
+				throw new BadRequestException(
+					'La bodega de destino se encuentra inactiva',
 				);
 			}
 
@@ -96,8 +87,14 @@ export class StockRequestService {
 				...options,
 			});
 			return newStockRequest.save();
-		} catch (e) {
-			throw new NotFoundException(`Error al crear solicitud, ${e}`);
+		} catch (error) {
+			throw new HttpException(
+				{
+					status: HttpStatus.BAD_REQUEST,
+					error,
+				},
+				HttpStatus.BAD_REQUEST,
+			);
 		}
 	}
 
