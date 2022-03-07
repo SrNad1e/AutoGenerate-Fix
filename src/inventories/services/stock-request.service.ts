@@ -80,7 +80,13 @@ export class StockRequestService {
 			populate,
 		};
 
-		console.log(filters);
+		if (sort.warehouseDestination) {
+			options.sort['warehouseDestination.name'] = sort.warehouseDestination;
+		}
+
+		if (sort.warehouseOrigin) {
+			options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
+		}
 
 		return this.stockRequestModel.paginate(filters, options);
 	}
