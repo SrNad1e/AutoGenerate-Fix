@@ -29,6 +29,8 @@ import {
 	StockAdjustmentSchema,
 } from './entities/stock-adjustment.entity';
 import { InventoriesService } from './services/inventories.service';
+import { StockRequestService } from './services/stock-request.service';
+import { StockRequestResolver } from './resolvers/stock-request.resolver';
 
 @Module({
 	imports: [
@@ -114,7 +116,7 @@ import { InventoriesService } from './services/inventories.service';
 			},
 		]),
 	],
-	providers: [InventoriesService],
+	providers: [InventoriesService, StockRequestService, StockRequestResolver],
 	controllers: [],
 	exports: [InventoriesService],
 })

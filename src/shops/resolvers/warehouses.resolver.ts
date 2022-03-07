@@ -4,11 +4,11 @@ import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
 import { FiltersWarehouseInput } from '../dtos/filters-warehouse.input';
 import { Warehouse } from '../entities/warehouse.entity';
-import { WarehouseService } from '../services/warehouses.service';
+import { WarehousesService } from '../services/warehouses.service';
 
 @Resolver(() => Warehouse)
 export class WarehousesResolver {
-	constructor(private readonly warehouseService: WarehouseService) {}
+	constructor(private readonly warehousesService: WarehousesService) {}
 
 	@Query(() => [Warehouse], { name: 'warehouses' })
 	@UseGuards(JwtAuthGuard)
@@ -17,6 +17,6 @@ export class WarehousesResolver {
 		filtersWarehouseInput: FiltersWarehouseInput,
 		@Context() context,
 	) {
-		return this.warehouseService.findAll(context.req.body.variables.input);
+		return this.warehousesService.findAll(context.req.body.variables.input);
 	}
 }

@@ -3,6 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Shop } from './shop.entity';
 
 @Schema({ timestamps: true })
@@ -26,6 +27,26 @@ export class Warehouse extends Document {
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })
 	user: User;
+
+	@Field(() => Number, {
+		description: 'ID Mysql',
+		deprecationReason: 'Mysql migración',
+		nullable: true,
+	})
+	@Prop({ type: Number })
+	id: number;
 }
 
 export const WarehouseSchema = SchemaFactory.createForClass(Warehouse);
+
+@Entity({ name: 'warehouses' })
+export class WarehouseMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
+
+	@Column()
+	name: string;
+
+	@Column()
+	shop_id: number;
+}

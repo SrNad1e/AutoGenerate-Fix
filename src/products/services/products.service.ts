@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, PaginateModel } from 'mongoose';
+import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import {
@@ -78,6 +78,10 @@ export class ProductsService {
 
 	async findOne(params: FiltersProductInput): Promise<Product> {
 		return (await this.productModel.findOne(params)).populate(populate);
+	}
+
+	async findById(id: Types.ObjectId) {
+		return this.productModel.findById(id);
 	}
 
 	async migration() {

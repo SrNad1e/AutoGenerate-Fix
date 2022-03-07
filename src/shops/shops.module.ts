@@ -4,8 +4,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { WarehouseService } from './services/warehouses.service';
-import { Warehouse, WarehouseSchema } from './entities/warehouse.entity';
+import { WarehousesService } from './services/warehouses.service';
+import {
+	Warehouse,
+	WarehouseMysql,
+	WarehouseSchema,
+} from './entities/warehouse.entity';
 import { ShopsService } from './services/shops.service';
 import { ShopsController } from './controllers/shops.controller';
 import { Shop as ShopMysql } from './entities/shopMysql.entity';
@@ -28,7 +32,7 @@ import { WarehousesResolver } from './resolvers/warehouses.resolver';
 					const schema = ShopSchema;
 					schema.pre('find', (next) => {
 						if (typeof this === 'object') {
-						//	this?.populate('warehouse');
+							//	this?.populate('warehouse');
 						}
 						next();
 					});
@@ -44,10 +48,10 @@ import { WarehousesResolver } from './resolvers/warehouses.resolver';
 				},
 			},
 		]),
-		TypeOrmModule.forFeature([ShopMysql]),
+		TypeOrmModule.forFeature([ShopMysql, WarehouseMysql]),
 	],
 	controllers: [ShopsController],
-	providers: [ShopsService, WarehouseService, WarehousesResolver],
-	exports: [ShopsService, WarehouseService],
+	providers: [ShopsService, WarehousesService, WarehousesResolver],
+	exports: [ShopsService, WarehousesService],
 })
 export class ShopsModule {}

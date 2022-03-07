@@ -5,7 +5,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { StockTransfer } from './stock-transfer.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @ObjectType()
@@ -13,7 +12,7 @@ export class DetailRequest {
 	@Field(() => Product, { description: 'Producto de la solicitud' })
 	product: Product;
 
-	@Field(() => Number, { description: 'Cantidad de la solicitud' })
+	@Field(() => Number, { description: 'Cantidad de la solicfitud' })
 	quantity: number;
 
 	@Field(() => Date, {
@@ -37,7 +36,9 @@ export class StockRequest extends Document {
 	@Prop({ type: Number, default: 0, unique: true })
 	number: number;
 
-	@Field(() => String, { description: 'Estado de la solicitud' })
+	@Field(() => String, {
+		description: 'Estado de la solicitud (open, pending, used, canceled )',
+	})
 	@Prop({ type: String, default: 'open' })
 	status: string;
 
@@ -59,25 +60,15 @@ export class StockRequest extends Document {
 	@Prop({ type: Warehouse, required: true })
 	warehouseDestination: Warehouse;
 
-	@Field(() => StockTransfer, {
-		description: 'Transferencia usada',
-		nullable: true,
-	})
-	@Prop({
-		type: SchemaMongoose.Types.ObjectId,
-		ref: StockTransfer.name,
-		autopopulate: true,
-	})
-	transfer?: Types.ObjectId;
-
 	@Field(() => User, {
 		description: 'Usuario que crea la solicitud',
 	})
-	@Prop({ type: User, required: true })
-	userIdDestination?: User;
+	@Prop({ type: Object, required: true })
+	user?: Partial<User>;
 
-	@Field(() => User, {
+	@Field(() => String, {
 		description: 'Observación de la solicitud',
+		nullable: true,
 	})
 	@Prop({ type: String })
 	observation?: string;

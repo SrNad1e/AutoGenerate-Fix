@@ -16,6 +16,7 @@ import { ColorMysql } from 'src/products/entities/color.entity';
 import { SizeMysql } from 'src/products/entities/size.entity';
 import { ProviderMysql } from 'src/products/entities/provider.entity';
 import { StockTransferDetailMysql } from 'src/inventories/entities/stock-request.entity';
+import { WarehouseMysql } from 'src/shops/entities/warehouse.entity';
 
 @Global()
 @Module({
@@ -61,6 +62,7 @@ import { StockTransferDetailMysql } from 'src/inventories/entities/stock-request
 						ColorMysql,
 						SizeMysql,
 						ProviderMysql,
+						WarehouseMysql,
 					],
 				};
 			},

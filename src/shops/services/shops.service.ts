@@ -47,7 +47,7 @@ export class ShopsService {
 	}
 
 	async getByIdMysql(shopId: number) {
-		return (await this.shopModel.findOne({ shopId })).populated('warehouse');
+		return (await this.shopModel.findOne({ shopId }));
 	}
 
 	async create(params: CreateShopParamsDto) {
@@ -63,8 +63,8 @@ export class ShopsService {
 		try {
 			//consultamos las tiendas
 			const shopsMysql = await this.shopMysqlRepo.find();
-			//guardamos las tiendas
 
+			//guardamos las tiendas
 			for (let i = 0; i < shopsMysql.length; i++) {
 				const shopMysql = shopsMysql[i];
 				const newShop = new this.shopModel({
