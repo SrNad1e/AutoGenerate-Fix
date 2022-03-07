@@ -1,7 +1,10 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
+import { FiltersStockRequestInput } from '../dtos/filters-stockRequest.input';
+import { ResponseStockRequest } from '../dtos/response-stocRequest';
 import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
 import { StockRequest } from '../entities/stock-request.entity';
 import { StockRequestService } from '../services/stock-request.service';
@@ -10,11 +13,25 @@ import { StockRequestService } from '../services/stock-request.service';
 export class StockRequestResolver {
 	constructor(private readonly stockRequestService: StockRequestService) {}
 
+	@Query(() => ResponseStockRequest, { name: 'stockRequests' })
+	@UseGuards(JwtAuthGuard)
+	findAll(
+		@Args({
+			name: 'filtersStockRequestInput',
+			nullable: true,
+			defaultValue: {},
+		})
+		_: FiltersStockRequestInput,
+		@Context() context,
+	) {
+		return this.stockRequestService.findAll(context.req.body.variables.input);
+	}
+
 	@Mutation(() => StockRequest, { name: 'createStockRequest' })
 	@UseGuards(JwtAuthGuard)
 	create(
 		@Args('createStockRequestInput')
-		createStockRequestInput: CreateStockRequestInput,
+		_: CreateStockRequestInput,
 		@Context() context,
 	) {
 		return this.stockRequestService.create(
@@ -27,7 +44,7 @@ export class StockRequestResolver {
 	@UseGuards(JwtAuthGuard)
 	update(
 		@Args('updateStockRequestInput')
-		updateStockRequestInput: UpdateStockRequestInput,
+		_: UpdateStockRequestInput,
 		@Args('id') id: string,
 		@Context() context,
 	) {

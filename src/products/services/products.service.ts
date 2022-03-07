@@ -58,10 +58,9 @@ export class ProductsService {
 			limit,
 			page: skip,
 			sort,
+			lean: true,
 			populate,
 		};
-
-		console.log(name);
 
 		return this.productModel.paginate(
 			{

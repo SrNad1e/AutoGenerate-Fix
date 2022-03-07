@@ -5,14 +5,32 @@ import {
 	Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PaginateModel } from 'mongoose';
+import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
+import { FiltersStockRequestInput } from '../dtos/filters-stockRequest.input';
 import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
 import { StockRequest } from '../entities/stock-request.entity';
+
+const populate = {
+	path: 'details',
+	populate: {
+		path: 'product',
+		populate: [
+			{
+				path: 'size',
+				model: 'Size',
+			},
+			{
+				path: 'color',
+				model: 'Color',
+			},
+		],
+	},
+};
 
 //TODO: pendiente validacion  del inventario
 @Injectable()
@@ -24,6 +42,48 @@ export class StockRequestService {
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 	) {}
+
+	async findAll({
+		limit = 20,
+		skip = 0,
+		number,
+		sort,
+		status,
+		warehouseDestinationId,
+		warehouseOriginId,
+	}: FiltersStockRequestInput) {
+		const filters: FilterQuery<StockRequest> = {};
+
+		if (number) {
+			filters.number = number;
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+
+		if (warehouseDestinationId) {
+			filters['warehouseDestination._id'] = new Types.ObjectId(
+				warehouseDestinationId,
+			);
+		}
+
+		if (warehouseOriginId) {
+			filters['warehouseOrigin._id'] = new Types.ObjectId(warehouseOriginId);
+		}
+
+		const options = {
+			limit,
+			page: skip,
+			sort,
+			lean: true,
+			populate,
+		};
+
+		console.log(filters);
+
+		return this.stockRequestModel.paginate(filters, options);
+	}
 
 	async create(
 		{
@@ -86,7 +146,7 @@ export class StockRequestService {
 				user,
 				...options,
 			});
-			return newStockRequest.save();
+			return (await newStockRequest.save()).populate(populate);
 		} catch (error) {
 			throw new HttpException(
 				{
@@ -216,7 +276,11 @@ export class StockRequestService {
 				{
 					$set: { details: newDetails, ...options, user },
 				},
-				{ new: true, lean: true },
+				{
+					new: true,
+					lean: true,
+					populate,
+				},
 			);
 		} catch (error) {
 			throw new HttpException(

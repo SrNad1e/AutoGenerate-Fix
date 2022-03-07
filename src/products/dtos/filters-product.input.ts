@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import * as mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 @InputType()
 export class SortProduct {
@@ -59,7 +59,7 @@ export class FiltersProductInput {
 		description: 'Identificador de mongo',
 		nullable: true,
 	})
-	_id?: mongoose.ObjectId;
+	_id?: Types.ObjectId;
 
 	@Field({ description: 'Código de barras producto', nullable: true })
 	barcode?: string;

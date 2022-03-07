@@ -45,7 +45,7 @@ export class StockRequest extends Document {
 	@Field(() => Warehouse, {
 		description: 'Bodega de origen de la solicitud',
 	})
-	@Prop({ type: Warehouse, required: true })
+	@Prop({ type: Object, required: true })
 	warehouseOrigin: Warehouse;
 
 	@Field(() => [DetailRequest], {
@@ -57,7 +57,7 @@ export class StockRequest extends Document {
 	@Field(() => Warehouse, {
 		description: 'Bodega de destino de la solicitud',
 	})
-	@Prop({ type: Warehouse, required: true })
+	@Prop({ type: Object, required: true })
 	warehouseDestination: Warehouse;
 
 	@Field(() => User, {
@@ -72,6 +72,14 @@ export class StockRequest extends Document {
 	})
 	@Prop({ type: String })
 	observation?: string;
+
+	@Field(() => Date, { description: 'Fecha de creación de la solicitud' })
+	createdAt: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de la última actulización de la solicitud',
+	})
+	updatedAt: Date;
 
 	@Field(() => String, {
 		description: 'Usuario que crea la solicitud',
