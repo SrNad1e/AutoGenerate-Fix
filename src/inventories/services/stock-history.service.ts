@@ -168,7 +168,7 @@ export class StockHistoryService {
 			}
 			for (let i = 0; i < details.length; i++) {
 				const { productId, quantity } = details[i];
-				const product = await this.productsService.addStock(
+				const product = await this.productsService.deleteStock(
 					productId,
 					quantity,
 					warehouseId,
@@ -181,7 +181,7 @@ export class StockHistoryService {
 					const newHistory = new this.stockHistoryModel({
 						warehouse: warehouseId,
 						currentStock: stock.quantity,
-						quantity,
+						quantity: -quantity,
 						product: productId,
 						documentType,
 						documentNumber: document.number,

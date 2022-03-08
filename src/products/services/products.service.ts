@@ -157,7 +157,7 @@ export class ProductsService {
 	 * @description se encarga de agregar unidades al inventario
 	 * @param productId producto a agregar stock
 	 * @param quantity cantidad de stock
-	 * @param warehouseId bodega a agrear stock
+	 * @param warehouseId bodega a agregar stock
 	 * @returns si todo sale bien el producto actualizado
 	 */
 	async addStock(productId: string, quantity: number, warehouseId: string) {
@@ -173,6 +173,59 @@ export class ProductsService {
 					return {
 						warehouse: item.warehouse._id,
 						quantity: item.quantity + quantity,
+					};
+				}
+
+				return item;
+			});
+
+			return this.productModel.findByIdAndUpdate(
+				productId,
+				{
+					$set: {
+						stock,
+					},
+				},
+				{
+					lean: true,
+					new: true,
+					populate,
+				},
+			);
+		} catch (error) {
+			return error;
+		}
+	}
+
+	/**
+	 * @description se encarga de eliminar unidades al inventario
+	 * @param productId producto a eliminar stock
+	 * @param quantity cantidad de stock
+	 * @param warehouseId bodega a eliminar stock
+	 * @returns si todo sale bien el producto actualizado
+	 */
+	async deleteStock(productId: string, quantity: number, warehouseId: string) {
+		try {
+			const product = await this.productModel.findById(productId).lean();
+
+			if (!product) {
+				throw new BadRequestException('El producto no existe');
+			}
+
+			const stockSelected = product.stock.find(
+				(item) => item.warehouse._id.toString() === warehouseId,
+			);
+			if (stockSelected.quantity < quantity) {
+				throw new BadRequestException(
+					`Inventario insuficiente, stock ${stockSelected.quantity}`,
+				);
+			}
+
+			const stock = product.stock.map((item) => {
+				if (item.warehouse._id.toString() === warehouseId) {
+					return {
+						warehouse: item.warehouse._id,
+						quantity: item.quantity - quantity,
 					};
 				}
 
