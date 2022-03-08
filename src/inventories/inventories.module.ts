@@ -27,7 +27,6 @@ import {
 	StockAdjustment,
 	StockAdjustmentSchema,
 } from './entities/stock-adjustment.entity';
-import { InventoriesService } from './services/inventories.service';
 import { StockRequestService } from './services/stock-request.service';
 import { StockRequestResolver } from './resolvers/stock-request.resolver';
 import { StockTransferService } from './services/stock-transfer.service';
@@ -123,7 +122,6 @@ import { StockHistoryService } from './services/stock-history.service';
 		]),
 	],
 	providers: [
-		InventoriesService,
 		StockRequestService,
 		StockRequestResolver,
 		StockTransferService,
@@ -131,6 +129,6 @@ import { StockHistoryService } from './services/stock-history.service';
 		StockHistoryService,
 	],
 	controllers: [],
-	exports: [InventoriesService],
+	exports: [],
 })
 export class InventoriesModule {}

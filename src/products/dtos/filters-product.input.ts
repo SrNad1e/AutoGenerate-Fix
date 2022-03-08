@@ -27,6 +27,12 @@ export class SortProduct {
 
 @InputType()
 export class FiltersProductsInput {
+	@Field(() => [String], {
+		description: 'Identificadores de mongo',
+		nullable: true,
+	})
+	ids: string[];
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 

@@ -30,6 +30,12 @@ export class StockTransferResolver {
 		return this.stockTransferService.findAll(context.req.body.variables.input);
 	}
 
+	@Query(() => StockTransfer, { name: 'stockTransferId' })
+	@UseGuards(JwtAuthGuard)
+	findById(@Args('id') id: string) {
+		return this.stockTransferService.findById(id);
+	}
+
 	@Mutation(() => StockTransfer, { name: 'createStockTransfer' })
 	@UseGuards(JwtAuthGuard)
 	create(

@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, FilterQuery } from 'mongoose';
 
 import { CouponsService } from 'src/coupons/services/coupons.service';
-import { InventoriesService } from 'src/inventories/services/inventories.service';
 import { CreateRefundsDto, FiltersRefundsDto } from '../dtos/refunds.dto';
 import { ProductReturns } from '../entities/productreturns.entity';
 import { Refund } from '../entities/refund.entity';
@@ -18,7 +17,6 @@ export class RefundsService {
 		private productReturnsModel: Model<ProductReturns>,
 		private couponsService: CouponsService,
 		private orderService: OrdersService,
-		private inventoriesService: InventoriesService,
 	) {}
 
 	async getAll(params: FiltersRefundsDto) {
@@ -86,17 +84,17 @@ export class RefundsService {
 					let addInventory;
 					for (let i = 0; i < products.length; i++) {
 						const product = products[i];
-						addInventory = await this.inventoriesService.addProductInventory(
+						addInventory = true /*await this.inventoriesService.addProductInventory(
 							product,
 							orderFind['_doc'].warehouse.warehouseId,
-						);
+						);*/
 						if (addInventory !== true) {
 							for (let j = 0; j < i; j++) {
 								const productDelete = products[j];
-								await this.inventoriesService.deleteProductInventory(
+								/*await this.inventoriesService.deleteProductInventory(
 									productDelete,
 									orderFind['_doc'].warehouse.warehouseId,
-								);
+								);*/
 							}
 
 							break;

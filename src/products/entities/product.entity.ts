@@ -117,8 +117,8 @@ export class Product extends Document {
 	shipping: Shipping;
 
 	@Prop({ type: Array })
-	@Field(() => Stock, { description: 'Inventario del producto por bodegas' })
-	stock: Stock;
+	@Field(() => [Stock], { description: 'Inventario del producto por bodegas' })
+	stock: Stock[];
 
 	//TODO: campo de mysql
 	@Prop({ type: Number, unique: true })

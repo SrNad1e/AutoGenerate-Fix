@@ -17,11 +17,25 @@ export class StockHistory extends Document {
 
 	@Field(() => Number, { description: 'Stock del producto en la bodega' })
 	@Prop({ types: Number })
-	stock: number;
+	currentStock: number;
+
+	@Field(() => Number, { description: 'Cantidad en movimiento' })
+	@Prop({ types: Number })
+	quantity: number;
 
 	@Field(() => Product, { description: 'Producto' })
 	@Prop({ type: SchemaMongo.Types.ObjectId, ref: 'Product' })
 	product: Types.ObjectId;
+
+	@Field(() => String, {
+		description: 'Tipo de documento (transfer, input, adjustment, refund, output, invoice, order)',
+	})
+	@Prop({ type: String })
+	documentType: string;
+
+	@Field(() => Number, { description: 'Número consecutivo del documento' })
+	@Prop({ type: Number })
+	documentNumber: number;
 
 	@Field(() => Date, { description: 'Fecha de creación del traslado' })
 	createdAt: Date;

@@ -102,6 +102,10 @@ export class StockTransferService {
 		return this.stockTransferModel.paginate(filters, options);
 	}
 
+	async findById(id: string) {
+		return this.stockTransferModel.findById(id).populate(populate).lean();
+	}
+
 	async create(
 		{
 			warehouseDestinationId,
@@ -145,11 +149,11 @@ export class StockTransferService {
 			}
 
 			const warehouseOrigin = await this.warehousesService.findById(
-				warehouseOriginId,
+				warehouseOriginId.toString(),
 			);
 
 			const warehouseDestination = await this.warehousesService.findById(
-				warehouseDestinationId,
+				warehouseDestinationId.toString(),
 			);
 
 			if (!warehouseOrigin.active) {

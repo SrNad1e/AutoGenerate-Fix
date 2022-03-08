@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
@@ -42,7 +46,14 @@ export class ProductsService {
 			sizeId,
 			status,
 			sort,
+			ids,
 		} = params;
+
+		if (ids) {
+			filters._id = {
+				$in: ids,
+			};
+		}
 
 		if (colorId) {
 			filters.color = colorId;
@@ -119,7 +130,7 @@ export class ProductsService {
 					provider: provider._id,
 					price: product.price,
 					cost: product.cost,
-					status: product.state ? 'Active' : 'Inactive',
+					status: product.state ? 'active' : 'inactive',
 					user: user,
 					shipping: {
 						width: product.shipping_width,
@@ -139,6 +150,50 @@ export class ProductsService {
 			};
 		} catch (e) {
 			throw new NotFoundException(`Error al migrar productos ${e}`);
+		}
+	}
+
+	/**
+	 * @description se encarga de agregar unidades al inventario
+	 * @param productId producto a agregar stock
+	 * @param quantity cantidad de stock
+	 * @param warehouseId bodega a agrear stock
+	 * @returns si todo sale bien el producto actualizado
+	 */
+	async addStock(productId: string, quantity: number, warehouseId: string) {
+		try {
+			const product = await this.productModel.findById(productId).lean();
+
+			if (!product) {
+				throw new BadRequestException('El producto no existe');
+			}
+
+			const stock = product.stock.map((item) => {
+				if (item.warehouse._id.toString() === warehouseId) {
+					return {
+						warehouse: item.warehouse._id,
+						quantity: item.quantity + quantity,
+					};
+				}
+
+				return item;
+			});
+
+			return this.productModel.findByIdAndUpdate(
+				productId,
+				{
+					$set: {
+						stock,
+					},
+				},
+				{
+					lean: true,
+					new: true,
+					populate,
+				},
+			);
+		} catch (error) {
+			return error;
 		}
 	}
 }

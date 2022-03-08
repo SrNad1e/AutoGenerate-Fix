@@ -123,11 +123,11 @@ export class StockRequestService {
 			}
 
 			const warehouseOrigin = await this.warehousesService.findById(
-				warehouseOriginId,
+				warehouseOriginId.toString(),
 			);
 
 			const warehouseDestination = await this.warehousesService.findById(
-				warehouseDestinationId,
+				warehouseDestinationId.toString(),
 			);
 
 			if (!warehouseOrigin.active) {

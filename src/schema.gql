@@ -207,6 +207,9 @@ input FiltersProductsInput {
   """Id de color"""
   colorId: String
 
+  """Identificadores de mongo"""
+  ids: [String!]
+
   """Cantidad de registros"""
   limit: Float
 
@@ -383,7 +386,7 @@ type Product {
   status: String!
 
   """Inventario del producto por bodegas"""
-  stock: Stock!
+  stock: [Stock!]!
 
   """Usuario que crea el producto"""
   user: User!
@@ -415,6 +418,7 @@ type Query {
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockRequestId(id: String!): StockRequest!
   stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
+  stockTransferId(id: String!): StockTransfer!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
   user(username: String!): User!
   users: [User!]!

@@ -33,7 +33,7 @@ export class WarehousesService {
 		return this.warehouseModel.findOne({ id }).lean();
 	}
 
-	async findById(id: Types.ObjectId) {
+	async findById(id: string) {
 		return this.warehouseModel.findById(id);
 	}
 
