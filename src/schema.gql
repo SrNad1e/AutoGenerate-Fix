@@ -382,6 +382,9 @@ type Product {
   """Estado del producto"""
   status: String!
 
+  """Inventario del producto por bodegas"""
+  stock: Stock!
+
   """Usuario que crea el producto"""
   user: User!
 }
@@ -410,6 +413,7 @@ type Query {
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
+  stockRequestId(id: String!): StockRequest!
   stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
   user(username: String!): User!
@@ -711,6 +715,14 @@ input SortStockTransfer {
 
   """Ordenamiento por bodega de origen"""
   warehouseOrigin: Float
+}
+
+type Stock {
+  """Cantidad de productos en la bodega"""
+  quantity: Float!
+
+  """Identificador de la bodega"""
+  warehouse: Warehouse!
 }
 
 type StockRequest {

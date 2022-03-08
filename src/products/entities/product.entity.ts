@@ -7,7 +7,34 @@ import { Color } from './color.entity';
 import { Provider } from './provider.entity';
 import { Size } from './size.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Shipping } from './shipping.entity';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
+
+@ObjectType()
+export class Shipping {
+	@Field(() => Number, { description: 'Ancho del producto' })
+	width: number;
+
+	@Field(() => Number, { description: 'Alto del producto' })
+	height: number;
+
+	@Field(() => Number, { description: 'Largo del producto' })
+	long: number;
+
+	@Field(() => Number, { description: 'Peso del producto' })
+	weight: number;
+
+	@Field(() => Number, { description: 'Volumen del producto' })
+	volume: number;
+}
+
+@ObjectType()
+export class Stock {
+	@Field(() => Warehouse, { description: 'Identificador de la bodega' })
+	warehouse: Types.ObjectId;
+
+	@Field(() => Number, { description: 'Cantidad de productos en la bodega' })
+	quantity: number;
+}
 
 @Schema({ timestamps: true })
 @ObjectType()
@@ -88,6 +115,10 @@ export class Product extends Document {
 	})
 	@Field(() => Shipping, { description: 'Medidas del producto' })
 	shipping: Shipping;
+
+	@Prop({ type: Array })
+	@Field(() => Stock, { description: 'Inventario del producto por bodegas' })
+	stock: Stock;
 
 	//TODO: campo de mysql
 	@Prop({ type: Number, unique: true })

@@ -6,7 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
-import { Inventories } from 'src/inventories/entities/inventories.entity';
 import { ProductMysql } from 'src/products/entities/product.entity';
 import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
@@ -54,7 +53,6 @@ import {
 					password,
 					database: dbName,
 					entities: [
-						Inventories,
 						ProductMysql,
 						StockTransferDetailMysql,
 						StockTransferMysql,

@@ -4,7 +4,6 @@ import * as AutoIncrementFactory from 'mongoose-sequence';
 import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
-import { Inventories } from './entities/inventories.entity';
 import {
 	StockInProcess,
 	StockInProcessSchema,
@@ -33,17 +32,18 @@ import { StockRequestService } from './services/stock-request.service';
 import { StockRequestResolver } from './resolvers/stock-request.resolver';
 import { StockTransferService } from './services/stock-transfer.service';
 import { StockTransferResolver } from './resolvers/stock-transfer.resolver';
+import {
+	StockHistory,
+	StockHistorySchema,
+} from './entities/stock-history.entity';
+import { StockHistoryService } from './services/stock-history.service';
 
 @Module({
 	imports: [
 		ProductsModule,
 		ShopsModule,
 		UsersModule,
-		TypeOrmModule.forFeature([
-			Inventories,
-			StockTransferDetailMysql,
-			StockTransferMysql,
-		]),
+		TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
 		MongooseModule.forFeatureAsync([
 			{
 				name: StockRequest.name,
@@ -116,9 +116,20 @@ import { StockTransferResolver } from './resolvers/stock-transfer.resolver';
 				name: StockInProcess.name,
 				useFactory: () => StockInProcessSchema,
 			},
+			{
+				name: StockHistory.name,
+				useFactory: () => StockHistorySchema,
+			},
 		]),
 	],
-	providers: [InventoriesService, StockRequestService, StockRequestResolver, StockTransferService, StockTransferResolver],
+	providers: [
+		InventoriesService,
+		StockRequestService,
+		StockRequestResolver,
+		StockTransferService,
+		StockTransferResolver,
+		StockHistoryService,
+	],
 	controllers: [],
 	exports: [InventoriesService],
 })

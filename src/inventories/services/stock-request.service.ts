@@ -52,42 +52,49 @@ export class StockRequestService {
 		warehouseOriginId,
 	}: FiltersStockRequestInput) {
 		const filters: FilterQuery<StockRequest> = {};
+		try {
+			if (number) {
+				filters.number = number;
+			}
 
-		if (number) {
-			filters.number = number;
+			if (status) {
+				filters.status = status;
+			}
+
+			if (warehouseDestinationId) {
+				filters['warehouseDestination._id'] = new Types.ObjectId(
+					warehouseDestinationId,
+				);
+			}
+
+			if (warehouseOriginId) {
+				filters['warehouseOrigin._id'] = new Types.ObjectId(warehouseOriginId);
+			}
+
+			const options = {
+				limit,
+				page: skip,
+				sort,
+				lean: true,
+				populate,
+			};
+
+			if (sort?.warehouseDestination) {
+				options.sort['warehouseDestination.name'] = sort.warehouseDestination;
+			}
+
+			if (sort?.warehouseOrigin) {
+				options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
+			}
+
+			return this.stockRequestModel.paginate(filters, options);
+		} catch (error) {
+			throw new BadRequestException(`Se ha presentado un error  ${error}`);
 		}
+	}
 
-		if (status) {
-			filters.status = status;
-		}
-
-		if (warehouseDestinationId) {
-			filters['warehouseDestination._id'] = new Types.ObjectId(
-				warehouseDestinationId,
-			);
-		}
-
-		if (warehouseOriginId) {
-			filters['warehouseOrigin._id'] = new Types.ObjectId(warehouseOriginId);
-		}
-
-		const options = {
-			limit,
-			page: skip,
-			sort,
-			lean: true,
-			populate,
-		};
-
-		if (sort?.warehouseDestination) {
-			options.sort['warehouseDestination.name'] = sort.warehouseDestination;
-		}
-
-		if (sort?.warehouseOrigin) {
-			options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
-		}
-
-		return this.stockRequestModel.paginate(filters, options);
+	async findById(id: string) {
+		return this.stockRequestModel.findById(id).populate(populate).lean();
 	}
 
 	async create(
@@ -100,13 +107,14 @@ export class StockRequestService {
 		user: User,
 	): Promise<StockRequest> {
 		try {
-			if (!['open', 'cancelled', 'used', 'pending'].includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
 			if (options.status) {
+				if (
+					!['open', 'cancelled', 'used', 'pending'].includes(options.status)
+				) {
+					throw new BadRequestException(
+						`Es estado ${options.status} no es un estado válido`,
+					);
+				}
 				if (['cancelled', 'used'].includes(options.status)) {
 					throw new BadRequestException(
 						'La solicitud no puede ser creada, valide el estado de la solicitud',
@@ -158,13 +166,7 @@ export class StockRequestService {
 			});
 			return (await newStockRequest.save()).populate(populate);
 		} catch (error) {
-			throw new HttpException(
-				{
-					status: HttpStatus.BAD_REQUEST,
-					error,
-				},
-				HttpStatus.BAD_REQUEST,
-			);
+			return error;
 		}
 	}
 
@@ -295,13 +297,7 @@ export class StockRequestService {
 				},
 			);
 		} catch (error) {
-			throw new HttpException(
-				{
-					status: HttpStatus.BAD_REQUEST,
-					error,
-				},
-				HttpStatus.BAD_REQUEST,
-			);
+			return error;
 		}
 	}
 }

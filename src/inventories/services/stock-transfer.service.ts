@@ -199,13 +199,7 @@ export class StockTransferService {
 			}
 			return (await newStockTransfer.save()).populate(populate);
 		} catch (error) {
-			throw new HttpException(
-				{
-					status: HttpStatus.BAD_REQUEST,
-					error,
-				},
-				HttpStatus.BAD_REQUEST,
-			);
+			return error;
 		}
 	}
 

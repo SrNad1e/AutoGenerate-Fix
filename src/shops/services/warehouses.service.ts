@@ -17,7 +17,7 @@ export class WarehousesService {
 		private readonly shopsService: ShopsService,
 	) {}
 
-	async findAll(props: FiltersWarehouseInput): Promise<Partial<Warehouse>> {
+	async findAll(props: FiltersWarehouseInput): Promise<Partial<Warehouse[]>> {
 		const { name = '', ...params } = props;
 		return this.warehouseModel
 			.find({ name: { $regex: name, $options: 'i' }, ...params })

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
+import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { UsersService } from 'src/users/services/users.service';
 import { Repository } from 'typeorm';
 import {
@@ -28,6 +29,7 @@ export class ProductsService {
 		private readonly sizesService: SizesService,
 		private readonly providersService: ProvidersService,
 		private readonly usersService: UsersService,
+		private readonly warehousesService: WarehousesService,
 	) {}
 
 	async findAll(params: FiltersProductsInput) {
@@ -86,8 +88,14 @@ export class ProductsService {
 	async migration() {
 		try {
 			const productsMysql = await this.productRepo.find();
+			const warehouses = await this.warehousesService.findAll({});
 
 			const productsMongo = [];
+
+			const stock = warehouses?.map((warehouse) => ({
+				warehouse: warehouse._id,
+				quantity: 0,
+			}));
 
 			for (let i = 0; i < productsMysql.length; i++) {
 				const product = productsMysql[i];
@@ -120,6 +128,7 @@ export class ProductsService {
 						weight: product.shipping_weight,
 						volume: product.shipping_volume,
 					},
+					stock,
 					id: product.id,
 				});
 			}

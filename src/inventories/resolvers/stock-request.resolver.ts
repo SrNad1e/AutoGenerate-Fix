@@ -27,6 +27,12 @@ export class StockRequestResolver {
 		return this.stockRequestService.findAll(context.req.body.variables.input);
 	}
 
+	@Query(() => StockRequest, { name: 'stockRequestId' })
+	@UseGuards(JwtAuthGuard)
+	findById(@Args('id') id: string) {
+		return this.stockRequestService.findById(id);
+	}
+
 	@Mutation(() => StockRequest, { name: 'createStockRequest' })
 	@UseGuards(JwtAuthGuard)
 	create(

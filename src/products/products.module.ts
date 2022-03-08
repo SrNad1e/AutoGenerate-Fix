@@ -13,10 +13,15 @@ import { SizesService } from './services/sizes.service';
 import { ColorsService } from './services/colors.service';
 import { Color, ColorMysql, ColorSchema } from './entities/color.entity';
 import { Size, SizeMysql, SizeSchema } from './entities/size.entity';
-import { Provider, ProviderMysql, ProviderSchema } from './entities/provider.entity';
+import {
+	Provider,
+	ProviderMysql,
+	ProviderSchema,
+} from './entities/provider.entity';
 import { ProvidersService } from './services/providers.service';
 import { UsersModule } from 'src/users/users.module';
 import { ProductsResolver } from './resolvers/products.resolver';
+import { ShopsModule } from 'src/shops/shops.module';
 
 @Module({
 	imports: [
@@ -33,6 +38,7 @@ import { ProductsResolver } from './resolvers/products.resolver';
 			ProviderMysql,
 		]),
 		UsersModule,
+		ShopsModule,
 	],
 	providers: [
 		ProductsService,
