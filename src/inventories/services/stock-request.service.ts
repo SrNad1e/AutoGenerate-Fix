@@ -79,11 +79,11 @@ export class StockRequestService {
 			populate,
 		};
 
-		if (sort.warehouseDestination) {
+		if (sort?.warehouseDestination) {
 			options.sort['warehouseDestination.name'] = sort.warehouseDestination;
 		}
 
-		if (sort.warehouseOrigin) {
+		if (sort?.warehouseOrigin) {
 			options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
 		}
 

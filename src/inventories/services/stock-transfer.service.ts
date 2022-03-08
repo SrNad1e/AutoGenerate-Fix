@@ -91,15 +91,15 @@ export class StockTransferService {
 			populate,
 		};
 
-		if (sort.warehouseDestination) {
+		if (sort?.warehouseDestination) {
 			options.sort['warehouseDestination.name'] = sort.warehouseDestination;
 		}
 
-		if (sort.warehouseOrigin) {
+		if (sort?.warehouseOrigin) {
 			options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
 		}
 
-		return this.stockRequestModel.paginate(filters, options);
+		return this.stockTransferModel.paginate(filters, options);
 	}
 
 	async create(

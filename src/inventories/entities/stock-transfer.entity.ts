@@ -69,7 +69,11 @@ export class StockTransfer extends Document {
 	})
 	observation?: string;
 
-	@Prop([{ type: SchemaMongo.Types.ObjectId, ref: 'stockrequest' }])
+	@Prop({
+		type: [SchemaMongo.Types.ObjectId],
+		ref: 'StockRequest',
+		autopopulate: true,
+	})
 	@Field(() => [StockRequest], {
 		description: 'Solicitudes usadas',
 		nullable: true,
