@@ -1,7 +1,8 @@
-/* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as SchemaMongo } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Product } from 'src/products/entities/product.entity';
 import { StockRequest } from './stock-request.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -18,7 +19,10 @@ export class StockTransfer extends Document {
 	number: number;
 
 	@Prop({ type: String, default: 'open' })
-	@Field(() => String, { description: 'Estado del traslado' })
+	@Field(() => String, {
+		description:
+			'Estado del traslado (open, sent, confirmed, incomplete, cancelled, verified )',
+	})
 	status: string;
 
 	@Prop({ type: Object, required: true })
@@ -31,7 +35,7 @@ export class StockTransfer extends Document {
 
 	@Prop({ type: Array, required: true })
 	@Field(() => [DetailTransfer], { description: 'Detalle de los productos' })
-	detail: DetailTransfer[];
+	details: DetailTransfer[];
 
 	@Prop({ type: String })
 	@Field(() => String, {
@@ -65,9 +69,18 @@ export class StockTransfer extends Document {
 	})
 	observation?: string;
 
-	@Prop({ type: Array, default: [] })
-	@Field(() => [StockRequest], { description: 'Solicitudes usadas' })
-	requests: StockRequest[];
+	@Prop([{ type: SchemaMongo.Types.ObjectId, ref: 'stockrequest' }])
+	@Field(() => [StockRequest], {
+		description: 'Solicitudes usadas',
+		nullable: true,
+	})
+	requests: Types.ObjectId[];
+
+	@Field(() => Date, { description: 'Fecha de creación del traslado' })
+	createdAt: Date;
+
+	@Field(() => Date, { description: 'Fecha de actualización del traslado' })
+	updatedAt: Date;
 }
 
 export const StockTransferSchema = SchemaFactory.createForClass(StockTransfer);
@@ -86,11 +99,12 @@ class DetailTransfer {
 
 	@Field(() => Number, {
 		description: 'Cantidad del productos confirmados en el traslado',
+		nullable: true,
 	})
 	quantityConfirmed?: number;
 
 	@Field(() => String, {
-		description: 'Estado del producto',
+		description: 'Estado del producto (confirmed, new)',
 	})
 	status: string;
 
@@ -103,4 +117,67 @@ class DetailTransfer {
 		description: 'Fecha de actualizacion el producto',
 	})
 	updateAt: Date;
+}
+
+@Entity({ name: 'stock_transfer' })
+export class StockTransferMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
+
+	@Column({ type: 'varchar' })
+	code: string;
+
+	@Column({ type: 'varchar' })
+	status: string;
+
+	@Column({ type: 'int' })
+	warehouse_origin_id: number;
+
+	@Column({ type: 'int' })
+	warehouse_destination_id: number;
+
+	@Column({ type: 'int' })
+	origin_user_id: number;
+
+	@Column({ type: 'int' })
+	destination_user_id: number;
+
+	@Column({ type: 'varchar' })
+	observations_origin: string;
+
+	@Column({ type: 'varchar' })
+	observations_destination: string;
+
+	@Column({ type: 'varchar' })
+	observations: string;
+
+	@Column({ type: 'datetime' })
+	created_at: Date;
+
+	@Column({ type: 'varchar' })
+	type: string;
+}
+
+@Entity({ name: 'stock_transfer_detail' })
+export class StockTransferDetailMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
+
+	@Column({ type: 'int' })
+	product_id: number;
+
+	@Column({ type: 'int' })
+	transfer_id: number;
+
+	@Column({ type: 'int' })
+	quantity: number;
+
+	@Column({ type: 'int' })
+	quantity_confirmed: number;
+
+	@Column({ type: 'datetime' })
+	created_at: Date;
+
+	@Column({ type: 'datetime' })
+	updated_at: Date;
 }

@@ -4,7 +4,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
 import { FiltersStockRequestInput } from '../dtos/filters-stockRequest.input';
-import { ResponseStockRequest } from '../dtos/response-stocRequest';
+import { ResponseStockRequest } from '../dtos/response-stockRequest';
 import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
 import { StockRequest } from '../entities/stock-request.entity';
 import { StockRequestService } from '../services/stock-request.service';

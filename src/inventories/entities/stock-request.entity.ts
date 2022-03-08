@@ -1,7 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types, Document, Schema as SchemaMongoose } from 'mongoose';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Types, Document } from 'mongoose';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -37,7 +36,7 @@ export class StockRequest extends Document {
 	number: number;
 
 	@Field(() => String, {
-		description: 'Estado de la solicitud (open, pending, used, canceled )',
+		description: 'Estado de la solicitud (open, pending, used, cancelled )',
 	})
 	@Prop({ type: String, default: 'open' })
 	status: string;
@@ -91,27 +90,3 @@ export class StockRequest extends Document {
 }
 
 export const StockRequestSchema = SchemaFactory.createForClass(StockRequest);
-
-@Entity({ name: 'stock_transfer_detail' })
-export class StockTransferDetailMysql {
-	@PrimaryGeneratedColumn()
-	id: number;
-
-	@Column({ type: 'int' })
-	product_id: number;
-
-	@Column({ type: 'int' })
-	transfer_id: number;
-
-	@Column({ type: 'int' })
-	quantity: number;
-
-	@Column({ type: 'int' })
-	quantity_confirmed: number;
-
-	@Column({ type: 'datetime' })
-	created_at: Date;
-
-	@Column({ type: 'datetime' })
-	updated_at: Date;
-}

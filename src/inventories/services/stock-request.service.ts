@@ -32,7 +32,6 @@ const populate = {
 	},
 };
 
-//TODO: pendiente validacion  del inventario
 @Injectable()
 export class StockRequestService {
 	constructor(
@@ -101,15 +100,16 @@ export class StockRequestService {
 		user: User,
 	): Promise<StockRequest> {
 		try {
+			if (!['open', 'cancelled', 'used', 'pending'].includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+
 			if (options.status) {
-				if (['canceled', 'used'].includes(options.status)) {
-					throw new HttpException(
-						{
-							status: HttpStatus.BAD_REQUEST,
-							error:
-								'La solicitud no puede ser creada, valide el estado de la solicitud',
-						},
-						HttpStatus.BAD_REQUEST,
+				if (['cancelled', 'used'].includes(options.status)) {
+					throw new BadRequestException(
+						'La solicitud no puede ser creada, valide el estado de la solicitud',
 					);
 				}
 			}
@@ -134,6 +134,8 @@ export class StockRequestService {
 				);
 			}
 
+			//TODO: falta validar inventario
+
 			const detailsRequest = [];
 
 			for (let i = 0; i < details.length; i++) {
@@ -142,6 +144,8 @@ export class StockRequestService {
 				detailsRequest.push({
 					product,
 					quantity: detail.quantity,
+					createdAt: new Date(),
+					updateAt: new Date(),
 				});
 			}
 
@@ -167,7 +171,7 @@ export class StockRequestService {
 	async update(
 		id: string,
 		{ details, ...options }: UpdateStockRequestInput,
-		user,
+		user: Partial<User>,
 	): Promise<StockRequest> {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id).lean();
@@ -199,13 +203,13 @@ export class StockRequestService {
 								'La solicitud se encuentra usada y no se puede enviar',
 							);
 						}
-						if (options.status === 'canceled') {
+						if (options.status === 'cancelled') {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede cancelar',
 							);
 						}
 						break;
-					case 'canceled':
+					case 'cancelled':
 						throw new BadRequestException(
 							'La solicitud se encuentra cancelada',
 						);
@@ -232,6 +236,8 @@ export class StockRequestService {
 					{ new: true, lean: true },
 				);
 			}
+
+			//TODO: falta validar inventario
 			const productsDelete = details
 				.filter((detail) => detail.action === 'delete')
 				.map((detail) => detail.productId.toString());

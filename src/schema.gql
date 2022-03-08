@@ -55,13 +55,33 @@ input CreateStockRequestInput {
   """Observación de la solicitud"""
   observation: String
 
-  """Estado de la solicitud (open, pending, used, canceled )"""
+  """Estado de la solicitud (open, pending, used, cancelled )"""
   status: String
 
   """Identificador de la bodega de destino de la solicitud"""
   warehouseDestinationId: String!
 
   """Identificador de la bodega de origen de la solicitud"""
+  warehouseOriginId: String!
+}
+
+input CreateStockTransferInput {
+  """Productos del traslado"""
+  details: [DetailStockTransferInput!]!
+
+  """Observación del que realiza el traslado"""
+  observationOrigin: String
+
+  """Solicitudes usadas"""
+  requests: [String!]
+
+  """Estado del traslado (open, sent, confirmed, incomplete, cancelled)"""
+  status: String
+
+  """Identificador de la bodega de destino del traslado"""
+  warehouseDestinationId: String!
+
+  """Identificador de la bodega de origen del traslado"""
   warehouseOriginId: String!
 }
 
@@ -121,6 +141,17 @@ input DetailStockRequestInput {
   quantity: Float!
 }
 
+input DetailStockTransferInput {
+  """Acción a efectuar con el producto (delete, update, create)"""
+  action: String
+
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
 type DetailTransfer {
   """Fecha de agregado el producto"""
   createdAt: DateTime!
@@ -132,9 +163,9 @@ type DetailTransfer {
   quantity: Float!
 
   """Cantidad del productos confirmados en el traslado"""
-  quantityConfirmed: Float!
+  quantityConfirmed: Float
 
-  """Estado del producto"""
+  """Estado del producto (confirmed, new)"""
   status: String!
 
   """Fecha de actualizacion el producto"""
@@ -235,6 +266,29 @@ input FiltersStockRequestInput {
   warehouseOriginId: String
 }
 
+input FiltersStockTransferInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo asignado al traslado"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  skip: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortStockTransfer
+
+  """Estado del traslado (open, sent, confirmed, incomplete, cancelled)"""
+  status: String
+
+  """Id de la bodega de destino"""
+  warehouseDestinationId: String
+
+  """Id de la bodega de origen"""
+  warehouseOriginId: String
+}
+
 input FiltersWarehouseInput {
   """Estado de la bodega"""
   active: Boolean
@@ -258,10 +312,13 @@ input LoginUserInput {
 
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
+  confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
+  createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
+  updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
 }
 
@@ -354,6 +411,7 @@ type Query {
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
+  stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
   user(username: String!): User!
   users: [User!]!
   warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): [Warehouse!]!
@@ -463,6 +521,38 @@ type ResponseSize {
 type ResponseStockRequest {
   """Lista de solicitudes"""
   docs: [StockRequest!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseStockTransfer {
+  """Lista de traslados"""
+  docs: [StockTransfer!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -603,6 +693,26 @@ input SortStockRequest {
   warehouseOrigin: Float
 }
 
+input SortStockTransfer {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por número"""
+  number: Float
+
+  """Ordenamiento por estado"""
+  status: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updateAt: Float
+
+  """Ordenamiento por bodega de destino"""
+  warehouseDestination: Float
+
+  """Ordenamiento por bodega de origen"""
+  warehouseOrigin: Float
+}
+
 type StockRequest {
   """Identificador de mongo"""
   _id: String!
@@ -622,7 +732,7 @@ type StockRequest {
   """Observación de la solicitud"""
   observation: String
 
-  """Estado de la solicitud (open, pending, used, canceled )"""
+  """Estado de la solicitud (open, pending, used, cancelled )"""
   status: String!
 
   """Fecha de la última actulización de la solicitud"""
@@ -638,6 +748,52 @@ type StockRequest {
   warehouseOrigin: Warehouse!
 }
 
+type StockTransfer {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación del traslado"""
+  createdAt: DateTime!
+
+  """Detalle de los productos"""
+  details: [DetailTransfer!]!
+
+  """Consecutivo del traslado"""
+  number: Float!
+
+  """Observación general"""
+  observation: String
+
+  """Observación del que crea el traslado"""
+  observationDestination: String
+
+  """Observación del que crea el traslado"""
+  observationOrigin: String
+
+  """Solicitudes usadas"""
+  requests: [StockRequest!]
+
+  """
+  Estado del traslado (open, sent, confirmed, incomplete, cancelled, verified )
+  """
+  status: String!
+
+  """Fecha de actualización del traslado"""
+  updatedAt: DateTime!
+
+  """Usuario de destino del traslado"""
+  userDestination: User
+
+  """Usuario de origen del traslado"""
+  userOrigin: User!
+
+  """Bodega de origen del traslado"""
+  warehouseDestination: Warehouse!
+
+  """Bodega de origen del traslado"""
+  warehouseOrigin: Warehouse!
+}
+
 input UpdateStockRequestInput {
   """Productos de la solicitud"""
   details: [DetailStockRequestInput!]
@@ -645,7 +801,27 @@ input UpdateStockRequestInput {
   """Observación de la solicitud"""
   observation: String
 
-  """Estado de la solicitud (open, pending, used, canceled )"""
+  """Estado de la solicitud (open, pending, used, cancelled )"""
+  status: String
+}
+
+input UpdateStockTransferInput {
+  """Productos del traslado"""
+  details: [DetailStockTransferInput!]
+
+  """Observación general"""
+  observation: String
+
+  """Observación del que recibe el traslado"""
+  observationDestination: String
+
+  """Observación del que envía el traslado"""
+  observationOrigin: String
+
+  """Solicitudes usadas"""
+  requests: [String!]
+
+  """Estado del traslado (open, sent, confirmed, incomplete, cancelled)"""
   status: String
 }
 

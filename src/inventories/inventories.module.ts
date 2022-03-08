@@ -9,17 +9,17 @@ import {
 	StockInProcess,
 	StockInProcessSchema,
 } from './entities/stockInProcess.entity';
-import { StockTransferMysql } from './entities/stock-transfer.migrate.entity';
 import {
 	StockRequest,
 	StockRequestSchema,
-	StockTransferDetailMysql,
 } from './entities/stock-request.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { ShopsModule } from 'src/shops/shops.module';
 import { UsersModule } from 'src/users/users.module';
 import {
 	StockTransfer,
+	StockTransferDetailMysql,
+	StockTransferMysql,
 	StockTransferSchema,
 } from './entities/stock-transfer.entity';
 import { StockInput, StockInputSchema } from './entities/stock-input.entity';
@@ -31,6 +31,8 @@ import {
 import { InventoriesService } from './services/inventories.service';
 import { StockRequestService } from './services/stock-request.service';
 import { StockRequestResolver } from './resolvers/stock-request.resolver';
+import { StockTransferService } from './services/stock-transfer.service';
+import { StockTransferResolver } from './resolvers/stock-transfer.resolver';
 
 @Module({
 	imports: [
@@ -116,7 +118,7 @@ import { StockRequestResolver } from './resolvers/stock-request.resolver';
 			},
 		]),
 	],
-	providers: [InventoriesService, StockRequestService, StockRequestResolver],
+	providers: [InventoriesService, StockRequestService, StockRequestResolver, StockTransferService, StockTransferResolver],
 	controllers: [],
 	exports: [InventoriesService],
 })
