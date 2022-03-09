@@ -20,7 +20,20 @@ import { ColorsService } from './colors.service';
 import { ProvidersService } from './providers.service';
 import { SizesService } from './sizes.service';
 
-const populate = ['color', 'size', 'provider'];
+const populate = [
+	{
+		path: 'stock',
+		populate: [
+			{
+				path: 'warehouse',
+				model: 'Warehouse',
+			},
+		],
+	},
+	{ path: 'color', model: 'Color' },
+	{ path: 'size', model: 'Size' },
+	{ path: 'provider', model: 'Provider' },
+];
 
 @Injectable()
 export class ProductsService {
@@ -47,6 +60,7 @@ export class ProductsService {
 			status,
 			sort,
 			ids,
+			warehouseId,
 		} = params;
 
 		if (ids) {
@@ -74,6 +88,33 @@ export class ProductsService {
 			lean: true,
 			populate,
 		};
+
+		if (warehouseId) {
+			const response = await this.productModel.paginate(
+				{
+					...filters,
+					$or: [
+						{ barcode: name },
+						{ description: { $regex: name, $options: 'i' } },
+						{ reference: { $regex: name, $options: 'i' } },
+					],
+				},
+				options,
+			);
+			const docs = response.docs.map((doc) => {
+				const stock = doc.stock.filter(
+					(item) => item.warehouse._id.toString() === warehouseId,
+				);
+				return {
+					...doc,
+					stock,
+				};
+			});
+			return {
+				...response,
+				docs,
+			};
+		}
 
 		return this.productModel.paginate(
 			{

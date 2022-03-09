@@ -57,6 +57,9 @@ export class FiltersProductsInput {
 
 	@Field(() => SortProduct, { description: 'Ordenamiento', nullable: true })
 	sort?: SortProduct;
+
+	@Field(() => String, { description: 'Bodega de inventario', nullable: true })
+	warehouseId?: string;
 }
 
 @InputType()

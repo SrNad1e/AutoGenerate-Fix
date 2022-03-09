@@ -227,6 +227,9 @@ input FiltersProductsInput {
 
   """Estado del producto"""
   status: String
+
+  """Bodega de inventario"""
+  warehouseId: String
 }
 
 input FiltersSizeInput {
