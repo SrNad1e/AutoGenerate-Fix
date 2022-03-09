@@ -7,7 +7,7 @@ export class FilterShopsDto {
 	limit?: number;
 
 	@IsOptional()
-	skip?: number;
+	page?: number;
 
 	@IsOptional()
 	name?: string;

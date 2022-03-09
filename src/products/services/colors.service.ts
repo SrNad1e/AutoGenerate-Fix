@@ -20,7 +20,7 @@ export class ColorsService {
 	async findAll(props: FiltersColorInput): Promise<Partial<ResponseColor>> {
 		const filters: FilterQuery<Color> = {};
 
-		const { name = '', limit = 10, skip = 0, active, sort } = props;
+		const { name = '', limit = 10, page = 1, active, sort } = props;
 
 		if (active) {
 			filters.active = active;
@@ -28,7 +28,7 @@ export class ColorsService {
 
 		const options = {
 			limit,
-			page: skip,
+			page,
 			lean: true,
 			sort,
 		};

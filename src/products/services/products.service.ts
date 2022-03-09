@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
+import { FilterQuery, Model, PaginateModel } from 'mongoose';
+import { Repository } from 'typeorm';
+
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { UsersService } from 'src/users/services/users.service';
-import { Repository } from 'typeorm';
 import {
 	FiltersProductInput,
 	FiltersProductsInput,
 } from '../dtos/filters-product.input';
-
 import { Product } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
@@ -54,7 +54,7 @@ export class ProductsService {
 		const {
 			colorId,
 			limit = 10,
-			skip = 0,
+			page = 1,
 			name = '',
 			sizeId,
 			status,
@@ -83,40 +83,13 @@ export class ProductsService {
 
 		const options = {
 			limit,
-			page: skip,
+			page: page,
 			sort,
 			lean: true,
 			populate,
 		};
 
-		if (warehouseId) {
-			const response = await this.productModel.paginate(
-				{
-					...filters,
-					$or: [
-						{ barcode: name },
-						{ description: { $regex: name, $options: 'i' } },
-						{ reference: { $regex: name, $options: 'i' } },
-					],
-				},
-				options,
-			);
-			const docs = response.docs.map((doc) => {
-				const stock = doc.stock.filter(
-					(item) => item.warehouse._id.toString() === warehouseId,
-				);
-				return {
-					...doc,
-					stock,
-				};
-			});
-			return {
-				...response,
-				docs,
-			};
-		}
-
-		return this.productModel.paginate(
+		const response = await this.productModel.paginate(
 			{
 				...filters,
 				$or: [
@@ -127,14 +100,79 @@ export class ProductsService {
 			},
 			options,
 		);
+
+		const docs = response.docs.map((doc) => {
+			if (warehouseId) {
+				if (warehouseId === 'all') {
+					return doc;
+				}
+
+				const stock = doc.stock.filter(
+					(item) => item.warehouse._id.toString() === warehouseId,
+				);
+
+				return {
+					...doc,
+					stock,
+				};
+			}
+			return {
+				...doc,
+				stock: [],
+			};
+		});
+		return {
+			...response,
+			docs,
+		};
 	}
 
-	async findOne(params: FiltersProductInput): Promise<Product> {
-		return (await this.productModel.findOne(params)).populate(populate);
+	async findOne({ warehouseId, ...params }: FiltersProductInput) {
+		const product = await (
+			await this.productModel.findOne(params)
+		).populate(populate);
+
+		if (warehouseId) {
+			if (warehouseId === 'all') {
+				return product;
+			}
+
+			const stock = product.stock.filter(
+				(item) => item.warehouse._id.toString() === warehouseId,
+			);
+
+			return {
+				...product,
+				stock,
+			};
+		}
+
+		return {
+			...product,
+			stock: [],
+		};
 	}
 
-	async findById(id: Types.ObjectId) {
-		return this.productModel.findById(id);
+	async findById(id: string, warehouseId?: string) {
+		const { stock, ...product } = await this.productModel.findById(id).lean();
+		if (warehouseId) {
+			if (warehouseId === 'all') {
+				return {
+					...product,
+					stock,
+				};
+			}
+			const stockLocal = stock.filter(
+				(item) => item.warehouse._id.toString() === warehouseId,
+			);
+
+			return {
+				...product,
+				stock: stockLocal,
+			};
+		}
+
+		return { ...product, stock: [] };
 	}
 
 	async migration() {
@@ -220,7 +258,7 @@ export class ProductsService {
 				return item;
 			});
 
-			return this.productModel.findByIdAndUpdate(
+			const response = await this.productModel.findByIdAndUpdate(
 				productId,
 				{
 					$set: {
@@ -233,6 +271,15 @@ export class ProductsService {
 					populate,
 				},
 			);
+
+			const newStock = response.stock.filter(
+				(item) => item.warehouse._id.toString() === warehouseId,
+			);
+
+			return {
+				...response,
+				stock: newStock,
+			};
 		} catch (error) {
 			return error;
 		}
@@ -273,7 +320,7 @@ export class ProductsService {
 				return item;
 			});
 
-			return this.productModel.findByIdAndUpdate(
+			const response = await this.productModel.findByIdAndUpdate(
 				productId,
 				{
 					$set: {
@@ -286,6 +333,15 @@ export class ProductsService {
 					populate,
 				},
 			);
+
+			const newStock = response.stock.filter(
+				(item) => item.warehouse._id.toString() === warehouseId,
+			);
+
+			return {
+				...response,
+				stock: newStock,
+			};
 		} catch (error) {
 			return error;
 		}

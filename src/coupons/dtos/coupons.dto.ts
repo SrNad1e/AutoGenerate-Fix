@@ -47,7 +47,7 @@ export class FilterCouponsDto {
 
 	@IsOptional()
 	@Min(0)
-	skip?: number;
+	page?: number;
 
 	@IsOptional()
 	@Min(0)

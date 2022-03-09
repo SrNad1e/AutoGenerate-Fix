@@ -56,7 +56,7 @@ export class StockTransferService {
 
 	async findAll({
 		limit = 20,
-		skip = 0,
+		page = 1,
 		number,
 		sort,
 		status,
@@ -85,7 +85,7 @@ export class StockTransferService {
 
 		const options = {
 			limit,
-			page: skip,
+			page,
 			sort,
 			lean: true,
 			populate,
@@ -376,7 +376,7 @@ export class StockTransferService {
 
 			const detailsArray = stockTransfer.details
 				.filter((detail) => detail.status === 'confirmed')
-				.map((detail) => detail.product._id);
+				.map((detail) => detail.product._id.toString());
 
 			const detailsVerified = detailsConfirm.find((detail) =>
 				detailsArray.includes(detail.productId),

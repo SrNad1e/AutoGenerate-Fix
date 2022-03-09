@@ -1,9 +1,4 @@
-import {
-	BadRequestException,
-	HttpException,
-	HttpStatus,
-	Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
 
@@ -28,6 +23,15 @@ const populate = {
 				path: 'color',
 				model: 'Color',
 			},
+			{
+				path: 'stock',
+				populate: [
+					{
+						path: 'warehouse',
+						model: 'Warehouse',
+					},
+				],
+			},
 		],
 	},
 };
@@ -44,7 +48,7 @@ export class StockRequestService {
 
 	async findAll({
 		limit = 20,
-		skip = 0,
+		page = 1,
 		number,
 		sort,
 		status,
@@ -73,7 +77,7 @@ export class StockRequestService {
 
 			const options = {
 				limit,
-				page: skip,
+				page: page,
 				sort,
 				lean: true,
 				populate,
@@ -94,7 +98,29 @@ export class StockRequestService {
 	}
 
 	async findById(id: string) {
-		return this.stockRequestModel.findById(id).populate(populate).lean();
+		const response = await this.stockRequestModel
+			.findById(id)
+			.populate(populate)
+			.lean();
+
+		const details = response.details.map((detail) => {
+			const warehouseId = response.warehouseOrigin._id;
+			const stock = detail.product.stock.filter(
+				(item) => item.warehouse._id.toString() === warehouseId.toString(),
+			);
+			return {
+				...detail,
+				product: {
+					...detail.product,
+					stock,
+				},
+			};
+		});
+
+		return {
+			...response,
+			details,
+		};
 	}
 
 	async create(
@@ -142,13 +168,24 @@ export class StockRequestService {
 				);
 			}
 
-			//TODO: falta validar inventario
-
 			const detailsRequest = [];
 
 			for (let i = 0; i < details.length; i++) {
 				const detail = details[i];
-				const product = await this.productsService.findById(detail.productId);
+				const product = await this.productsService.findById(
+					detail.productId,
+					warehouseOriginId.toString(),
+				);
+				const stock = product.stock.filter(
+					(item) => item.warehouse._id === warehouseOrigin._id,
+				);
+				if (!stock || stock[0]?.quantity < detail.quantity) {
+					throw new BadRequestException(
+						`El producto ${product.reference}/ ${
+							product.barcode
+						} no tiene suficientes unidades stock ${stock[0].quantity || 0}`,
+					);
+				}
 				detailsRequest.push({
 					product,
 					quantity: detail.quantity,
@@ -174,7 +211,7 @@ export class StockRequestService {
 		id: string,
 		{ details, ...options }: UpdateStockRequestInput,
 		user: Partial<User>,
-	): Promise<StockRequest> {
+	) {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id).lean();
 
@@ -239,7 +276,6 @@ export class StockRequestService {
 				);
 			}
 
-			//TODO: falta validar inventario
 			const productsDelete = details
 				.filter((detail) => detail.action === 'delete')
 				.map((detail) => detail.productId.toString());
@@ -276,6 +312,16 @@ export class StockRequestService {
 						);
 					}
 					const product = await this.productsService.findById(productId);
+					const stock = product.stock.filter(
+						(item) => item.warehouse._id === stockRequest.warehouseOrigin._id,
+					);
+					if (!stock || stock[0]?.quantity < quantity) {
+						throw new BadRequestException(
+							`El producto ${product.reference}/ ${
+								product.barcode
+							} no tiene suficientes unidades stock ${stock[0].quantity || 0}`,
+						);
+					}
 					newDetails.push({
 						product,
 						quantity,
@@ -285,7 +331,7 @@ export class StockRequestService {
 				}
 			}
 
-			return this.stockRequestModel.findByIdAndUpdate(
+			const response = await this.stockRequestModel.findByIdAndUpdate(
 				id,
 				{
 					$set: { details: newDetails, ...options, user },
@@ -296,6 +342,25 @@ export class StockRequestService {
 					populate,
 				},
 			);
+
+			const detailsProducts = response.details.map((detail) => {
+				const warehouseId = response.warehouseOrigin._id;
+				const stock = detail.product.stock.filter(
+					(item) => item.warehouse._id.toString() === warehouseId.toString(),
+				);
+				return {
+					...detail,
+					product: {
+						...detail.product,
+						stock,
+					},
+				};
+			});
+
+			return {
+				...response,
+				details: detailsProducts,
+			};
 		} catch (error) {
 			return error;
 		}

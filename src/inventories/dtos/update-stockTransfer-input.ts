@@ -44,7 +44,7 @@ export class UpdateStockTransferInput {
 @InputType()
 export class DetailStockTransferInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
-	productId: Types.ObjectId;
+	productId: string;
 
 	@Field(() => String, {
 		description: 'Acción a efectuar con el producto (delete, update, create)',

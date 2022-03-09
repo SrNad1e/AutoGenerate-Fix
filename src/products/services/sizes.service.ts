@@ -20,7 +20,7 @@ export class SizesService {
 	async findAll(props: FiltersSizeInput): Promise<Partial<ResponseSize>> {
 		const filters: FilterQuery<Size> = {};
 
-		const { name = '', limit = 10, skip = 0, active, sort } = props;
+		const { name = '', limit = 10, page = 1, active, sort } = props;
 
 		if (active) {
 			filters.active = active;
@@ -28,7 +28,7 @@ export class SizesService {
 
 		const options = {
 			limit,
-			page: skip,
+			page,
 			lean: true,
 			sort,
 		};

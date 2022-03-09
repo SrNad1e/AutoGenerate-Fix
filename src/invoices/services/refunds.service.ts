@@ -23,7 +23,7 @@ export class RefundsService {
 		const filters: FilterQuery<Refund> = {};
 		const {
 			limit = 20,
-			skip = 0,
+			page = 1,
 			orderCode,
 			invoiceNumber,
 			shopId,
@@ -47,14 +47,14 @@ export class RefundsService {
 			.find(filters)
 			.sort(sort)
 			.limit(limit)
-			.skip(skip)
+			.skip(page)
 			.exec();
 
 		return {
 			data: result,
 			total: result?.length,
 			limit,
-			skip,
+			page,
 		};
 	}
 

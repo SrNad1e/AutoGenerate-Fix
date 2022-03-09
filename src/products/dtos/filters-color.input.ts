@@ -30,7 +30,7 @@ export class FiltersColorInput {
 	limit?: number;
 
 	@Field({ description: 'Página', nullable: true })
-	skip?: number;
+	page?: number;
 
 	@Field(() => SortColor, { description: 'Ordenamiento', nullable: true })
 	sort?: SortColor;

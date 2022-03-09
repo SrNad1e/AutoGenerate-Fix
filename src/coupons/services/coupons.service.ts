@@ -14,7 +14,7 @@ export class CouponsService {
 		const filters: FilterQuery<Coupon> = {};
 		const {
 			limit = 20,
-			skip = 0,
+			page = 0,
 			orderCode,
 			invoiceNumber,
 			shopId,
@@ -43,7 +43,7 @@ export class CouponsService {
 		const result = await this.couponModel
 			.find(filters)
 			.limit(limit)
-			.skip(skip)
+			.skip(page)
 			.sort(sort)
 			.exec();
 
@@ -51,7 +51,7 @@ export class CouponsService {
 			data: result,
 			total: result?.length,
 			limit,
-			skip,
+			page,
 		};
 	}
 

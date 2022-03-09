@@ -27,7 +27,7 @@ export class FiltersSizeInput {
 	limit?: number;
 
 	@Field({ description: 'Página', nullable: true })
-	skip?: number;
+	page?: number;
 
 	@Field(() => SortSize, { description: 'Ordenamiento', nullable: true })
 	sort?: SortSize;

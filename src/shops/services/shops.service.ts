@@ -21,7 +21,7 @@ export class ShopsService {
 
 	async getAll(params: FilterShopsDto) {
 		const filters: FilterQuery<Shop> = {};
-		const { limit = 20, skip = 0, name, status, sort } = params;
+		const { limit = 20, page = 1, name, status, sort } = params;
 
 		if (name) {
 			filters['name'] = { $regex: name, $options: 'i' };
@@ -34,7 +34,7 @@ export class ShopsService {
 		const result = await this.shopModel
 			.find(filters)
 			.limit(limit)
-			.skip(skip)
+			.skip(page)
 			.sort(sort)
 			.exec();
 
@@ -42,7 +42,7 @@ export class ShopsService {
 			data: result,
 			total: result?.length,
 			limit,
-			skip,
+			page,
 		};
 	}
 

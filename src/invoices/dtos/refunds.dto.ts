@@ -19,7 +19,7 @@ export class FiltersRefundsDto {
 	limit?: number;
 
 	@IsOptional()
-	skip?: number;
+	page?: number;
 
 	@IsOptional()
 	orderCode?: number;

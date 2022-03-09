@@ -183,7 +183,7 @@ input FiltersColorInput {
   name: String
 
   """Página"""
-  skip: Float
+  page: Float
 
   """Ordenamiento"""
   sort: SortColor
@@ -201,6 +201,9 @@ input FiltersProductInput {
 
   """Referencia del producto"""
   reference: String
+
+  """Bodega de inventario o "all" para traer todos los inventarios"""
+  warehouseId: String
 }
 
 input FiltersProductsInput {
@@ -216,11 +219,11 @@ input FiltersProductsInput {
   """Comodín para la busqueda del producto, barcode, referencem description"""
   name: String
 
+  """Página actual"""
+  page: Float
+
   """Id de talla"""
   sizeId: String
-
-  """Desde donde arranca la página"""
-  skip: Float
 
   """Ordenamiento"""
   sort: SortProduct
@@ -228,7 +231,7 @@ input FiltersProductsInput {
   """Estado del producto"""
   status: String
 
-  """Bodega de inventario"""
+  """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
 }
 
@@ -243,7 +246,7 @@ input FiltersSizeInput {
   name: String
 
   """Página"""
-  skip: Float
+  page: Float
 
   """Ordenamiento"""
   sort: SortSize
@@ -257,7 +260,7 @@ input FiltersStockRequestInput {
   number: Float
 
   """Desde donde arranca la página"""
-  skip: Float
+  page: Float
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockRequest
@@ -280,7 +283,7 @@ input FiltersStockTransferInput {
   number: Float
 
   """Desde donde arranca la página"""
-  skip: Float
+  page: Float
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockTransfer

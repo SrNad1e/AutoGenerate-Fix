@@ -77,5 +77,5 @@ export class FiltersStockTransferInput {
 	limit?: number;
 
 	@Field({ description: 'Desde donde arranca la página', nullable: true })
-	skip?: number;
+	page?: number;
 }

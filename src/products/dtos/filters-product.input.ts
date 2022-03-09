@@ -1,5 +1,4 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Types } from 'mongoose';
 
 @InputType()
 export class SortProduct {
@@ -36,8 +35,8 @@ export class FiltersProductsInput {
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 
-	@Field({ description: 'Desde donde arranca la página', nullable: true })
-	skip?: number;
+	@Field({ description: 'Página actual', nullable: true })
+	page?: number;
 
 	@Field({ description: 'Estado del producto', nullable: true })
 	status?: string;
@@ -58,7 +57,11 @@ export class FiltersProductsInput {
 	@Field(() => SortProduct, { description: 'Ordenamiento', nullable: true })
 	sort?: SortProduct;
 
-	@Field(() => String, { description: 'Bodega de inventario', nullable: true })
+	@Field(() => String, {
+		description:
+			'Bodega de inventario o "all" para traer todos los inventarios',
+		nullable: true,
+	})
 	warehouseId?: string;
 }
 
@@ -68,7 +71,7 @@ export class FiltersProductInput {
 		description: 'Identificador de mongo',
 		nullable: true,
 	})
-	_id?: Types.ObjectId;
+	_id?: string;
 
 	@Field({ description: 'Código de barras producto', nullable: true })
 	barcode?: string;
@@ -84,4 +87,11 @@ export class FiltersProductInput {
 		nullable: true,
 	})
 	description?: string;
+
+	@Field(() => String, {
+		description:
+			'Bodega de inventario o "all" para traer todos los inventarios',
+		nullable: true,
+	})
+	warehouseId?: string;
 }
