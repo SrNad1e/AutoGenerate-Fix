@@ -184,7 +184,7 @@ export class ProductsService {
 
 			const stock = warehouses?.map((warehouse) => ({
 				warehouse: warehouse._id,
-				quantity: 0,
+				quantity: 100,
 			}));
 
 			for (let i = 0; i < productsMysql.length; i++) {
@@ -344,6 +344,37 @@ export class ProductsService {
 			};
 		} catch (error) {
 			return error;
+		}
+	}
+
+	/**
+	 * @description valida el inventario de un producto en una bodega
+	 * @param productId producto a validart
+	 * @param quantity cantidad a validar
+	 * @param warehouseId bodega a validar
+	 * @returns devuelve un producto
+	 */
+	async validateStock(
+		productId: string,
+		quantity: number,
+		warehouseId: string,
+	) {
+		try {
+			const product = await this.findById(productId, warehouseId);
+
+			if (!product) {
+				throw new NotFoundException(`El producto no existe`);
+			}
+
+			if (product?.stock[0]?.quantity < quantity) {
+				throw new BadRequestException(
+					`El producto ${product?.reference}/${product?.barcode} no tiene suficientes unidades, stock: ${product?.stock[0].quantity}`,
+				);
+			}
+
+			return product;
+		} catch (error) {
+			throw error;
 		}
 	}
 }

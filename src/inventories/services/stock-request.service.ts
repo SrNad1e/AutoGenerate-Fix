@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
 
@@ -98,29 +102,19 @@ export class StockRequestService {
 	}
 
 	async findById(id: string) {
-		const response = await this.stockRequestModel
-			.findById(id)
-			.populate(populate)
-			.lean();
-
-		const details = response.details.map((detail) => {
-			const warehouseId = response.warehouseOrigin._id;
-			const stock = detail.product.stock.filter(
-				(item) => item.warehouse._id.toString() === warehouseId.toString(),
-			);
-			return {
-				...detail,
-				product: {
-					...detail.product,
-					stock,
-				},
-			};
-		});
-
-		return {
-			...response,
-			details,
-		};
+		try {
+			const response = await this.stockRequestModel
+				.findById(id)
+				.populate(populate)
+				.lean();
+			if (response) {
+				return response;
+			} else {
+				throw new NotFoundException('La solicitud no existe');
+			}
+		} catch (error) {
+			return error;
+		}
 	}
 
 	async create(
@@ -133,6 +127,10 @@ export class StockRequestService {
 		user: User,
 	): Promise<StockRequest> {
 		try {
+			if (!(details.length > 0)) {
+				throw new BadRequestException('La solicitud no puede estar vacía');
+			}
+
 			if (options.status) {
 				if (
 					!['open', 'cancelled', 'used', 'pending'].includes(options.status)
@@ -171,24 +169,16 @@ export class StockRequestService {
 			const detailsRequest = [];
 
 			for (let i = 0; i < details.length; i++) {
-				const detail = details[i];
-				const product = await this.productsService.findById(
-					detail.productId,
+				const { quantity, productId } = details[i];
+
+				const product = await this.productsService.validateStock(
+					productId,
+					quantity,
 					warehouseOriginId.toString(),
 				);
-				const stock = product.stock.filter(
-					(item) => item.warehouse._id === warehouseOrigin._id,
-				);
-				if (!stock || stock[0]?.quantity < detail.quantity) {
-					throw new BadRequestException(
-						`El producto ${product.reference}/ ${
-							product.barcode
-						} no tiene suficientes unidades stock ${stock[0].quantity || 0}`,
-					);
-				}
 				detailsRequest.push({
 					product,
-					quantity: detail.quantity,
+					quantity: quantity,
 					createdAt: new Date(),
 					updateAt: new Date(),
 				});
@@ -214,153 +204,141 @@ export class StockRequestService {
 	) {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id).lean();
-
-			if (options.status) {
-				switch (stockRequest.status) {
-					case 'open':
-						if (options.status === 'used') {
+			if (stockRequest) {
+				if (options.status) {
+					switch (stockRequest.status) {
+						case 'open':
+							if (options.status === 'used') {
+								throw new BadRequestException(
+									'La solicitud se encuentra abierta y no puede ser usada',
+								);
+							}
+							break;
+						case 'pending':
+							if (options.status === 'open') {
+								throw new BadRequestException(
+									'La solicitud se encuentra pendiente y no se puede abrir',
+								);
+							}
+							break;
+						case 'used':
+							if (options.status === 'open') {
+								throw new BadRequestException(
+									'La solicitud se encuentra usada y no se puede abrir',
+								);
+							}
+							if (options.status === 'pending') {
+								throw new BadRequestException(
+									'La solicitud se encuentra usada y no se puede enviar',
+								);
+							}
+							if (options.status === 'cancelled') {
+								throw new BadRequestException(
+									'La solicitud se encuentra usada y no se puede cancelar',
+								);
+							}
+							break;
+						case 'cancelled':
 							throw new BadRequestException(
-								'La solicitud se encuentra abierta y no puede ser usada',
+								'La solicitud se encuentra cancelada',
 							);
-						}
-						break;
-					case 'pending':
-						if (options.status === 'open') {
-							throw new BadRequestException(
-								'La solicitud se encuentra pendiente y no se puede abrir',
-							);
-						}
-						break;
-					case 'used':
-						if (options.status === 'open') {
-							throw new BadRequestException(
-								'La solicitud se encuentra usada y no se puede abrir',
-							);
-						}
-						if (options.status === 'pending') {
-							throw new BadRequestException(
-								'La solicitud se encuentra usada y no se puede enviar',
-							);
-						}
-						if (options.status === 'cancelled') {
-							throw new BadRequestException(
-								'La solicitud se encuentra usada y no se puede cancelar',
-							);
-						}
-						break;
-					case 'cancelled':
+							break;
+						default:
+							break;
+					}
+					if (options.status === stockRequest.status) {
 						throw new BadRequestException(
-							'La solicitud se encuentra cancelada',
+							'El estado de la solicitud debe cambiar o enviarse vacío',
 						);
-						break;
-					default:
-						break;
+					}
 				}
-				if (options.status === stockRequest.status) {
-					throw new BadRequestException(
-						'El estado de la solicitud debe cambiar o enviarse vacío',
+
+				if (stockRequest.status !== 'open') {
+					if (!options.status) {
+						throw new BadRequestException('Debe enviar un cambio de estado');
+					}
+					return this.stockRequestModel.findByIdAndUpdate(
+						id,
+						{
+							$set: { ...options, user },
+						},
+						{ new: true, lean: true },
 					);
 				}
-			}
 
-			if (stockRequest.status !== 'open') {
-				if (!options.status) {
-					throw new BadRequestException('Debe enviar un cambio de estado');
-				}
-				return this.stockRequestModel.findByIdAndUpdate(
-					id,
-					{
-						$set: { ...options, user },
-					},
-					{ new: true, lean: true },
-				);
-			}
+				const productsDelete = details
+					.filter((detail) => detail.action === 'delete')
+					.map((detail) => detail.productId.toString());
 
-			const productsDelete = details
-				.filter((detail) => detail.action === 'delete')
-				.map((detail) => detail.productId.toString());
-
-			const newDetails = stockRequest.details
-				.filter(
+				const newDetails = stockRequest.details.filter(
 					(detail) => !productsDelete.includes(detail.product._id.toString()),
-				)
-				.map((detail) => {
-					const productFind = details.find(
-						(item) =>
-							item.productId.toString() === detail.product._id.toString(),
-					);
-					if (productFind) {
-						return {
-							...detail,
-							quantity: productFind.quantity,
+				);
+
+				for (let i = 0; i < details.length; i++) {
+					const { action, productId, quantity } = details[i];
+
+					if (action === 'create') {
+						const productFind = stockRequest.details.find(
+							(item) => item.product._id.toString() === productId.toString(),
+						);
+						if (productFind) {
+							throw new BadRequestException(
+								`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
+							);
+						}
+						const product = await this.productsService.validateStock(
+							productId,
+							quantity,
+							stockRequest.warehouseOrigin._id.toString(),
+						);
+
+						newDetails.push({
+							product,
+							quantity,
+							createdAt: new Date(),
+							updateAt: new Date(),
+						});
+					} else if (action === 'update') {
+						const detailFindIndex = newDetails.findIndex(
+							(item) => item.product._id.toString() === productId.toString(),
+						);
+
+						const product = await this.productsService.validateStock(
+							productId,
+							quantity,
+							stockRequest.warehouseOrigin._id.toString(),
+						);
+
+						if (detailFindIndex === -1) {
+							throw new BadRequestException(
+								`El producto ${product.reference} / ${product.barcode}  no se encuentra registrado`,
+							);
+						}
+						const productFind = newDetails[detailFindIndex];
+
+						newDetails[detailFindIndex] = {
+							...productFind,
+							product,
+							quantity,
 							updateAt: new Date(),
 						};
 					}
-					return detail;
-				});
-
-			for (let i = 0; i < details.length; i++) {
-				const { action, productId, quantity } = details[i];
-
-				if (action === 'create') {
-					const productFind = stockRequest.details.find(
-						(item) => item.product._id.toString() === productId.toString(),
-					);
-					if (productFind) {
-						throw new BadRequestException(
-							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
-						);
-					}
-					const product = await this.productsService.findById(productId);
-					const stock = product.stock.filter(
-						(item) => item.warehouse._id === stockRequest.warehouseOrigin._id,
-					);
-					if (!stock || stock[0]?.quantity < quantity) {
-						throw new BadRequestException(
-							`El producto ${product.reference}/ ${
-								product.barcode
-							} no tiene suficientes unidades stock ${stock[0].quantity || 0}`,
-						);
-					}
-					newDetails.push({
-						product,
-						quantity,
-						createdAt: new Date(),
-						updateAt: new Date(),
-					});
 				}
-			}
 
-			const response = await this.stockRequestModel.findByIdAndUpdate(
-				id,
-				{
-					$set: { details: newDetails, ...options, user },
-				},
-				{
-					new: true,
-					lean: true,
-					populate,
-				},
-			);
-
-			const detailsProducts = response.details.map((detail) => {
-				const warehouseId = response.warehouseOrigin._id;
-				const stock = detail.product.stock.filter(
-					(item) => item.warehouse._id.toString() === warehouseId.toString(),
-				);
-				return {
-					...detail,
-					product: {
-						...detail.product,
-						stock,
+				return this.stockRequestModel.findByIdAndUpdate(
+					id,
+					{
+						$set: { details: newDetails, ...options, user },
 					},
-				};
-			});
-
-			return {
-				...response,
-				details: detailsProducts,
-			};
+					{
+						new: true,
+						lean: true,
+						populate,
+					},
+				);
+			} else {
+				throw new NotFoundException('La solicitud no existe');
+			}
 		} catch (error) {
 			return error;
 		}
