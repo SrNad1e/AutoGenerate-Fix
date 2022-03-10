@@ -288,6 +288,17 @@ export class StockTransferService {
 						'El estado del traslado debe cambiar o enviarse vacío',
 					);
 				}
+
+				if (options.status === 'confirmed') {
+					const confirmedProducts = stockTransfer.details.find(
+						(detail) => detail.status === 'new',
+					);
+					if (confirmedProducts) {
+						throw new BadRequestException(
+							'Debe confirmar todos los productos para confirmar el traslado',
+						);
+					}
+				}
 			}
 
 			if (stockTransfer.status !== 'open' && !options.status) {
@@ -385,8 +396,6 @@ export class StockTransferService {
 				}
 
 				if (options.status === 'confirmed') {
-					//TODO: validar el estado de los productos
-
 					const detailHistory = response.details.map((detail) => ({
 						productId: detail.product._id.toString(),
 						quantity: detail.quantity,
@@ -434,8 +443,6 @@ export class StockTransferService {
 				}
 
 				if (options.status === 'confirmed') {
-					//TODO: validar el estado de los productos
-
 					const detailHistory = response.details.map((detail) => ({
 						productId: detail.product._id.toString(),
 						quantity: detail.quantity,
