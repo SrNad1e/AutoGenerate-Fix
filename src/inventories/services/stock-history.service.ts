@@ -1,23 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PaginateModel } from 'mongoose';
+import { PaginateModel } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { StockHistory } from '../entities/stock-history.entity';
+import { StockInput } from '../entities/stock-input.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 
 @Injectable()
 export class StockHistoryService {
 	constructor(
 		@InjectModel(StockHistory.name)
-		private readonly stockHistoryModel: Model<StockHistory> &
-			PaginateModel<StockHistory>,
+		private readonly stockHistoryModel: PaginateModel<StockHistory>,
 		@InjectModel(StockTransfer.name)
-		private readonly stockTransferModel: Model<StockTransfer> &
-			PaginateModel<StockHistory>,
+		private readonly stockTransferModel: PaginateModel<StockTransfer>,
+		@InjectModel(StockInput.name)
+		private readonly stockInputModel: PaginateModel<StockInput>,
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 	) {}
@@ -42,7 +43,7 @@ export class StockHistoryService {
 					document = await this.stockTransferModel.findById(documentId).lean();
 					break;
 				case 'input':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockInputModel.findById(documentId).lean();
 					break;
 				case 'adjustment':
 					//	document = await this.stockTransferService.findById(documentId);
@@ -85,14 +86,11 @@ export class StockHistoryService {
 					quantity,
 					warehouseId,
 				);
-				if (product) {
-					const stock = product.stock.find(
-						(item) => item.warehouse._id === warehouseId,
-					);
 
+				if (product) {
 					const newHistory = new this.stockHistoryModel({
 						warehouse: warehouseId,
-						currentStock: stock.quantity,
+						currentStock: product?.stock[0]?.quantity,
 						quantity,
 						product: productId,
 						documentType,

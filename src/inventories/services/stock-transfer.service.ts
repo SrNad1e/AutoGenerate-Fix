@@ -54,6 +54,8 @@ const populate = [
 	{ path: 'requests', model: 'StockRequest' },
 ];
 
+const statusTypes = ['open', 'cancelled', 'sent', 'confirmed', 'incomplete'];
+
 @Injectable()
 export class StockTransferService {
 	constructor(
@@ -145,11 +147,7 @@ export class StockTransferService {
 			}
 
 			if (options.status) {
-				if (
-					!['open', 'cancelled', 'sent', 'confirmed', 'incomplete'].includes(
-						options.status,
-					)
-				) {
+				if (!statusTypes.includes(options.status)) {
 					throw new BadRequestException(
 						`Es estado ${options.status} no es un estado válido`,
 					);
@@ -157,7 +155,7 @@ export class StockTransferService {
 
 				if (['cancelled', 'confirmed', 'incomplete'].includes(options.status)) {
 					throw new BadRequestException(
-						'Es traslado no puede ser creado, valide el estado del traslado',
+						'El traslado no puede ser creado, valide el estado del traslado',
 					);
 				}
 			}
@@ -176,11 +174,11 @@ export class StockTransferService {
 			}
 
 			const warehouseOrigin = await this.warehousesService.findById(
-				warehouseOriginId.toString(),
+				warehouseOriginId,
 			);
 
 			const warehouseDestination = await this.warehousesService.findById(
-				warehouseDestinationId.toString(),
+				warehouseDestinationId,
 			);
 
 			if (!warehouseOrigin?.active) {
@@ -226,8 +224,8 @@ export class StockTransferService {
 
 			if (options.status === 'sent') {
 				await this.stockRequestService.updateMany({ requests, status: 'used' });
-				const detailHistory = details.map((detail) => ({
-					productId: detail.productId,
+				const detailHistory = response.details.map((detail) => ({
+					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
 				}));
 
@@ -372,8 +370,8 @@ export class StockTransferService {
 						requests,
 						status: 'used',
 					});
-					const detailHistory = details.map((detail) => ({
-						productId: detail.productId,
+					const detailHistory = response.details.map((detail) => ({
+						productId: detail.product._id.toString(),
 						quantity: detail.quantity,
 					}));
 
@@ -387,11 +385,10 @@ export class StockTransferService {
 				}
 
 				if (options.status === 'confirmed') {
-
 					//TODO: validar el estado de los productos
 
-					const detailHistory = details.map((detail) => ({
-						productId: detail.productId,
+					const detailHistory = response.details.map((detail) => ({
+						productId: detail.product._id.toString(),
 						quantity: detail.quantity,
 					}));
 
@@ -406,7 +403,7 @@ export class StockTransferService {
 
 				return response;
 			} else {
-				return this.stockTransferModel.findByIdAndUpdate(
+				const response = await this.stockTransferModel.findByIdAndUpdate(
 					id,
 					{
 						$set: { ...options, user },
@@ -417,6 +414,43 @@ export class StockTransferService {
 						populate,
 					},
 				);
+				if (options.status === 'sent') {
+					await this.stockRequestService.updateMany({
+						requests,
+						status: 'used',
+					});
+					const detailHistory = response.details.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.quantity,
+					}));
+
+					const deleteStockHistoryInput: DeleteStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
+						documentId: response._id.toString(),
+						documentType: 'transfer',
+					};
+					await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				}
+
+				if (options.status === 'confirmed') {
+					//TODO: validar el estado de los productos
+
+					const detailHistory = response.details.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.quantity,
+					}));
+
+					const deleteStockHistoryInput: AddStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseDestination._id.toString(),
+						documentId: response._id.toString(),
+						documentType: 'transfer',
+					};
+					await this.stockHistoryService.addStock(deleteStockHistoryInput);
+				}
+
+				return response;
 			}
 		} catch (error) {
 			throw new HttpException(

@@ -1,5 +1,4 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Types } from 'mongoose';
 
 @InputType()
 export class UpdateStockTransferInput {
@@ -48,7 +47,6 @@ export class DetailStockTransferInput {
 
 	@Field(() => String, {
 		description: 'Acción a efectuar con el producto (delete, update, create)',
-		nullable: true,
 	})
 	action: string;
 

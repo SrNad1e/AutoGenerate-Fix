@@ -48,6 +48,20 @@ type Configuration {
   module: String!
 }
 
+input CreateStockInputInput {
+  """Productos de la solicitud"""
+  details: [DetailStockInputCreateInput!]!
+
+  """Observación del que realiza la entrada"""
+  observation: String
+
+  """Estado de la entrada (open, confirmed, cancelled)"""
+  status: String
+
+  """Identificador de la bodega para la entrada"""
+  warehouseId: String!
+}
+
 input CreateStockRequestInput {
   """Productos de la solicitud"""
   details: [DetailStockRequestCreateInput!]!
@@ -116,6 +130,20 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DetailInput {
+  """Fecha de agregado del deltalle a la entrada"""
+  createdAt: DateTime!
+
+  """Producto de la entrada"""
+  product: Product!
+
+  """Cantidad de producto"""
+  quantity: Float!
+
+  """Fecha de actualización del detalle a la entrada"""
+  updateAt: DateTime!
+}
+
 type DetailRequest {
   """Fecha de agregado del producto a la solicitud"""
   createdAt: DateTime!
@@ -128,6 +156,25 @@ type DetailRequest {
 
   """Fecha de actualizado del producto a la solicitud"""
   updateAt: DateTime!
+}
+
+input DetailStockInputCreateInput {
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
+input DetailStockInputInput {
+  """Acción a efectuar con el producto (delete, update, create)"""
+  action: String!
+
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
 }
 
 input DetailStockRequestCreateInput {
@@ -159,7 +206,7 @@ input DetailStockTransferCreateInput {
 
 input DetailStockTransferInput {
   """Acción a efectuar con el producto (delete, update, create)"""
-  action: String
+  action: String!
 
   """Identificador de mongo del producto"""
   productId: String!
@@ -268,6 +315,26 @@ input FiltersSizeInput {
   sort: SortSize
 }
 
+input FiltersStockInputInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo asignado a la entrada"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortStockInput
+
+  """Estado de la entrada (open, confirmed, cancelled)"""
+  status: String
+
+  """Id de la bodega"""
+  warehouseId: String
+}
+
 input FiltersStockRequestInput {
   """Cantidad de registros"""
   limit: Float
@@ -338,10 +405,12 @@ input LoginUserInput {
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
+  createStockInput(createStockRequestInput: CreateStockInputInput!): StockInput!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
   createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
+  updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
   updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
@@ -438,6 +507,8 @@ type Query {
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
+  stockInputId(id: String!): StockInput!
+  stockInputs(filtersStockInputInput: FiltersStockInputInput = {}): ResponseStockInput!
   stockRequestId(id: String!): StockRequest!
   stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
   stockTransferId(id: String!): StockTransfer!
@@ -519,6 +590,38 @@ type ResponseProduct {
 type ResponseSize {
   """Lista de tallas"""
   docs: [Size!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseStockInput {
+  """Lista de solicitudes"""
+  docs: [StockInput!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -703,6 +806,23 @@ input SortSize {
   value: Float
 }
 
+input SortStockInput {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por número"""
+  number: Float
+
+  """Ordenamiento por estado"""
+  status: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updateAt: Float
+
+  """Ordenamiento por bodega"""
+  warehouse: Float
+}
+
 input SortStockRequest {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -748,6 +868,38 @@ type Stock {
   quantity: Float!
 
   """Identificador de la bodega"""
+  warehouse: Warehouse!
+}
+
+type StockInput {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación de la entrada"""
+  createdAt: DateTime!
+
+  """Detalles de la entrada"""
+  details: [DetailInput!]!
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Observación de la entrada"""
+  observation: String
+
+  """Estado de la entrada (open, confirmed, cancelled)"""
+  status: String!
+
+  """Costo total de la entrada"""
+  total: Float!
+
+  """Fecha de la última actulización de la entrada"""
+  updatedAt: DateTime!
+
+  """Usuario que creó la entrada"""
+  user: User!
+
+  """Bodega de la entrada"""
   warehouse: Warehouse!
 }
 
@@ -830,6 +982,17 @@ type StockTransfer {
 
   """Bodega de origen del traslado"""
   warehouseOrigin: Warehouse!
+}
+
+input UpdateStockInputInput {
+  """Productos de la entrada"""
+  details: [DetailStockInputInput!]
+
+  """Observación de la entrada"""
+  observation: String
+
+  """Estado de la entrada (open, confirmed, cancelled)"""
+  status: String
 }
 
 input UpdateStockRequestInput {

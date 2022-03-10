@@ -5,10 +5,6 @@ import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 import {
-	StockInProcess,
-	StockInProcessSchema,
-} from './entities/stockInProcess.entity';
-import {
 	StockRequest,
 	StockRequestSchema,
 } from './entities/stock-request.entity';
@@ -36,6 +32,8 @@ import {
 	StockHistorySchema,
 } from './entities/stock-history.entity';
 import { StockHistoryService } from './services/stock-history.service';
+import { StockInputService } from './services/stock-input.service';
+import { StockInputResolver } from './resolvers/stock-input.resolver';
 
 @Module({
 	imports: [
@@ -112,10 +110,6 @@ import { StockHistoryService } from './services/stock-history.service';
 				inject: [getConnectionToken('')],
 			},
 			{
-				name: StockInProcess.name,
-				useFactory: () => StockInProcessSchema,
-			},
-			{
 				name: StockHistory.name,
 				useFactory: () => StockHistorySchema,
 			},
@@ -127,6 +121,8 @@ import { StockHistoryService } from './services/stock-history.service';
 		StockTransferService,
 		StockTransferResolver,
 		StockHistoryService,
+		StockInputService,
+		StockInputResolver,
 	],
 	controllers: [],
 	exports: [],
