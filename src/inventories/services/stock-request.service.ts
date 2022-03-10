@@ -81,7 +81,7 @@ export class StockRequestService {
 
 			const options = {
 				limit,
-				page: page,
+				page,
 				sort,
 				lean: true,
 				populate,
@@ -101,6 +101,19 @@ export class StockRequestService {
 		}
 	}
 
+	async findAllMany({
+		requests,
+		status,
+	}: {
+		requests: string[];
+		status: string[];
+	}) {
+		return this.stockRequestModel.find({
+			_id: { $in: requests },
+			status: { $in: status },
+		});
+	}
+
 	async findById(id: string) {
 		try {
 			const response = await this.stockRequestModel
@@ -109,9 +122,8 @@ export class StockRequestService {
 				.lean();
 			if (response) {
 				return response;
-			} else {
-				throw new NotFoundException('La solicitud no existe');
 			}
+			throw new NotFoundException('La solicitud no existe');
 		} catch (error) {
 			return error;
 		}
@@ -127,7 +139,7 @@ export class StockRequestService {
 		user: User,
 	): Promise<StockRequest> {
 		try {
-			if (!(details.length > 0)) {
+			if (!(details?.length > 0)) {
 				throw new BadRequestException('La solicitud no puede estar vacía');
 			}
 
@@ -154,15 +166,15 @@ export class StockRequestService {
 				warehouseDestinationId.toString(),
 			);
 
-			if (!warehouseOrigin.active) {
+			if (!warehouseOrigin?.active) {
 				throw new BadRequestException(
-					'La bodega de origen se encuentra inactiva',
+					'La bodega de origen no existe o se encuentra inactiva',
 				);
 			}
 
-			if (!warehouseDestination.active) {
+			if (!warehouseDestination?.active) {
 				throw new BadRequestException(
-					'La bodega de destino se encuentra inactiva',
+					'La bodega de destino no existe o se encuentra inactiva',
 				);
 			}
 
@@ -204,68 +216,72 @@ export class StockRequestService {
 	) {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id).lean();
-			if (stockRequest) {
-				if (options.status) {
-					switch (stockRequest.status) {
-						case 'open':
-							if (options.status === 'used') {
-								throw new BadRequestException(
-									'La solicitud se encuentra abierta y no puede ser usada',
-								);
-							}
-							break;
-						case 'pending':
-							if (options.status === 'open') {
-								throw new BadRequestException(
-									'La solicitud se encuentra pendiente y no se puede abrir',
-								);
-							}
-							break;
-						case 'used':
-							if (options.status === 'open') {
-								throw new BadRequestException(
-									'La solicitud se encuentra usada y no se puede abrir',
-								);
-							}
-							if (options.status === 'pending') {
-								throw new BadRequestException(
-									'La solicitud se encuentra usada y no se puede enviar',
-								);
-							}
-							if (options.status === 'cancelled') {
-								throw new BadRequestException(
-									'La solicitud se encuentra usada y no se puede cancelar',
-								);
-							}
-							break;
-						case 'cancelled':
-							throw new BadRequestException(
-								'La solicitud se encuentra cancelada',
-							);
-							break;
-						default:
-							break;
-					}
-					if (options.status === stockRequest.status) {
-						throw new BadRequestException(
-							'El estado de la solicitud debe cambiar o enviarse vacío',
-						);
-					}
-				}
 
-				if (stockRequest.status !== 'open') {
-					if (!options.status) {
-						throw new BadRequestException('Debe enviar un cambio de estado');
-					}
-					return this.stockRequestModel.findByIdAndUpdate(
-						id,
-						{
-							$set: { ...options, user },
-						},
-						{ new: true, lean: true },
+			if (!stockRequest) {
+				throw new NotFoundException('La solicitud no existe');
+			}
+
+			if (options.status) {
+				switch (stockRequest.status) {
+					case 'open':
+						if (options.status === 'used') {
+							throw new BadRequestException(
+								'La solicitud se encuentra abierta y no puede ser usada',
+							);
+						}
+						break;
+					case 'pending':
+						if (options.status === 'open') {
+							throw new BadRequestException(
+								'La solicitud se encuentra pendiente y no se puede abrir',
+							);
+						}
+						break;
+					case 'used':
+						if (options.status === 'open') {
+							throw new BadRequestException(
+								'La solicitud se encuentra usada y no se puede abrir',
+							);
+						}
+						if (options.status === 'pending') {
+							throw new BadRequestException(
+								'La solicitud se encuentra usada y no se puede enviar',
+							);
+						}
+						if (options.status === 'cancelled') {
+							throw new BadRequestException(
+								'La solicitud se encuentra usada y no se puede cancelar',
+							);
+						}
+						break;
+					case 'cancelled':
+						throw new BadRequestException(
+							'La solicitud se encuentra cancelada',
+						);
+						break;
+					default:
+						break;
+				}
+				if (options.status === stockRequest.status) {
+					throw new BadRequestException(
+						'El estado de la solicitud debe cambiar o enviarse vacío',
 					);
 				}
+			}
 
+			if (stockRequest.status !== 'open') {
+				if (!options.status) {
+					throw new BadRequestException('Debe enviar un cambio de estado');
+				}
+				return this.stockRequestModel.findByIdAndUpdate(
+					id,
+					{
+						$set: { ...options, user },
+					},
+					{ new: true, lean: true },
+				);
+			}
+			if (details && details.length > 0) {
 				const productsDelete = details
 					.filter((detail) => detail.action === 'delete')
 					.map((detail) => detail.productId.toString());
@@ -337,10 +353,37 @@ export class StockRequestService {
 					},
 				);
 			} else {
-				throw new NotFoundException('La solicitud no existe');
+				return this.stockRequestModel.findByIdAndUpdate(
+					id,
+					{
+						$set: { ...options, user },
+					},
+					{
+						new: true,
+						lean: true,
+						populate,
+					},
+				);
 			}
 		} catch (error) {
 			return error;
 		}
+	}
+
+	async updateMany({
+		requests,
+		status,
+	}: {
+		requests: string[];
+		status: string;
+	}) {
+		//validar antes de actualizar
+
+		return this.stockRequestModel.updateMany(
+			{ _id: { $in: requests } },
+			{
+				$set: { status },
+			},
+		);
 	}
 }

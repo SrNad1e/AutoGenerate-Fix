@@ -28,7 +28,6 @@ export class DetailStockRequestInput {
 
 	@Field(() => String, {
 		description: 'Acción a efectuar con el producto (delete, update, create)',
-		nullable: true,
 	})
 	action: string;
 

@@ -50,7 +50,7 @@ type Configuration {
 
 input CreateStockRequestInput {
   """Productos de la solicitud"""
-  details: [DetailStockRequestInput!]!
+  details: [DetailStockRequestCreateInput!]!
 
   """Observación de la solicitud"""
   observation: String
@@ -67,7 +67,7 @@ input CreateStockRequestInput {
 
 input CreateStockTransferInput {
   """Productos del traslado"""
-  details: [DetailStockTransferInput!]!
+  details: [DetailStockTransferCreateInput!]!
 
   """Observación del que realiza el traslado"""
   observationOrigin: String
@@ -130,10 +130,26 @@ type DetailRequest {
   updateAt: DateTime!
 }
 
+input DetailStockRequestCreateInput {
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
 input DetailStockRequestInput {
   """Acción a efectuar con el producto (delete, update, create)"""
-  action: String
+  action: String!
 
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
+input DetailStockTransferCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
 

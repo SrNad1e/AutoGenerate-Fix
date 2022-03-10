@@ -7,7 +7,7 @@ import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { StockHistory } from '../entities/stock-history.entity';
-import { StockTransfer } from '../entities/stock-transfer.entity';
+import { StockTransferService } from './stock-transfer.service';
 
 @Injectable()
 export class StockHistoryService {
@@ -15,9 +15,7 @@ export class StockHistoryService {
 		@InjectModel(StockHistory.name)
 		private readonly stockHistoryModel: Model<StockHistory> &
 			PaginateModel<StockHistory>,
-		@InjectModel(StockTransfer.name)
-		private readonly stockTransferModel: Model<StockTransfer> &
-			PaginateModel<StockHistory>,
+		private readonly stockTransferService: StockTransferService,
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 	) {}
@@ -39,16 +37,16 @@ export class StockHistoryService {
 			let document;
 			switch (documentType) {
 				case 'transfer':
-					document = await this.stockTransferModel.findById(documentId).lean();
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'input':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'adjustment':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'refund':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				default:
 					throw new BadRequestException(
@@ -127,19 +125,19 @@ export class StockHistoryService {
 			let document;
 			switch (documentType) {
 				case 'transfer':
-					document = await this.stockTransferModel.findById(documentId).lean();
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'output':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'adjustment':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'invoice':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				case 'order':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockTransferService.findById(documentId);
 					break;
 				default:
 					throw new BadRequestException(
@@ -175,18 +173,20 @@ export class StockHistoryService {
 					quantity,
 					warehouseId,
 				);
-
 				if (product) {
+					const stock = product.stock.find(
+						(item) => item.warehouse._id === warehouseId,
+					);
+
 					const newHistory = new this.stockHistoryModel({
 						warehouse: warehouseId,
-						currentStock: product?.stock[0]?.quantity,
+						currentStock: stock.quantity,
 						quantity: -quantity,
 						product: productId,
 						documentType,
 						documentNumber: document.number,
 					});
 					await newHistory.save();
-
 					item = i;
 				}
 			}

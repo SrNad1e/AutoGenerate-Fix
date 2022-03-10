@@ -154,25 +154,30 @@ export class ProductsService {
 	}
 
 	async findById(id: string, warehouseId?: string) {
-		const { stock, ...product } = await this.productModel.findById(id).lean();
-		if (warehouseId) {
-			if (warehouseId === 'all') {
+		const productQuery = await this.productModel.findById(id).lean();
+		if (productQuery) {
+			const { stock, ...product } = productQuery;
+			if (warehouseId) {
+				if (warehouseId === 'all') {
+					return {
+						...product,
+						stock,
+					};
+				}
+				const stockLocal = stock.filter(
+					(item) => item.warehouse._id.toString() === warehouseId,
+				);
+
 				return {
 					...product,
-					stock,
+					stock: stockLocal,
 				};
 			}
-			const stockLocal = stock.filter(
-				(item) => item.warehouse._id.toString() === warehouseId,
-			);
 
-			return {
-				...product,
-				stock: stockLocal,
-			};
+			return { ...product, stock: [] };
+		} else {
+			throw new NotFoundException('El producto no existe');
 		}
-
-		return { ...product, stock: [] };
 	}
 
 	async migration() {

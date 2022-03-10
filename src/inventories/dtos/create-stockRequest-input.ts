@@ -1,8 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 
-import { DetailStockRequestInput } from './update-stockRequest-input';
-
 @InputType()
 export class CreateStockRequestInput {
 	@Field(() => String, {
@@ -21,14 +19,23 @@ export class CreateStockRequestInput {
 	})
 	status: string;
 
-	@Field(() => [DetailStockRequestInput], {
+	@Field(() => [DetailStockRequestCreateInput], {
 		description: 'Productos de la solicitud',
 	})
-	details: DetailStockRequestInput[];
+	details: DetailStockRequestCreateInput[];
 
 	@Field(() => String, {
 		description: 'Observación de la solicitud',
 		nullable: true,
 	})
 	observation: string;
+}
+
+@InputType()
+export class DetailStockRequestCreateInput {
+	@Field(() => String, { description: 'Identificador de mongo del producto' })
+	productId: string;
+
+	@Field(() => Number, { description: 'Cantidad de productos' })
+	quantity: number;
 }

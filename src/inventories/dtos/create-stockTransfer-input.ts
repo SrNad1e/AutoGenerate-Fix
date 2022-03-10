@@ -1,19 +1,16 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Types } from 'mongoose';
-
-import { DetailStockTransferInput } from './update-stockTransfer-input';
 
 @InputType()
 export class CreateStockTransferInput {
 	@Field(() => String, {
 		description: 'Identificador de la bodega de origen del traslado',
 	})
-	warehouseOriginId: Types.ObjectId;
+	warehouseOriginId: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la bodega de destino del traslado',
 	})
-	warehouseDestinationId: Types.ObjectId;
+	warehouseDestinationId: string;
 
 	@Field(() => String, {
 		description:
@@ -22,10 +19,10 @@ export class CreateStockTransferInput {
 	})
 	status: string;
 
-	@Field(() => [DetailStockTransferInput], {
+	@Field(() => [DetailStockTransferCreateInput], {
 		description: 'Productos del traslado',
 	})
-	details: DetailStockTransferInput[];
+	details: DetailStockTransferCreateInput[];
 
 	@Field(() => String, {
 		description: 'Observación del que realiza el traslado',
@@ -38,4 +35,13 @@ export class CreateStockTransferInput {
 		nullable: true,
 	})
 	requests: string[];
+}
+
+@InputType()
+export class DetailStockTransferCreateInput {
+	@Field(() => String, { description: 'Identificador de mongo del producto' })
+	productId: string;
+
+	@Field(() => Number, { description: 'Cantidad de productos' })
+	quantity: number;
 }

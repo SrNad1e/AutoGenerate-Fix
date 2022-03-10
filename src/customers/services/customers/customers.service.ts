@@ -59,9 +59,6 @@ export class CustomersService {
 				if (total < 200000) {
 					//inactivar al cliente
 					await this.inactiveWholesale(customer._id);
-					console.log(
-						`Cliente ${customer.identification} ha sido deshabilitado ventas ${total}`,
-					);
 				} else {
 					//actualizar la fecha de activación
 					await this.customerModel.findByIdAndUpdate(customer._id, {
