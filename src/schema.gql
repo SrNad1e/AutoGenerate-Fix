@@ -377,6 +377,12 @@ input FiltersSizeInput {
 }
 
 input FiltersStockInputInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -397,6 +403,12 @@ input FiltersStockInputInput {
 }
 
 input FiltersStockOutputInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -417,6 +429,12 @@ input FiltersStockOutputInput {
 }
 
 input FiltersStockRequestInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -440,6 +458,12 @@ input FiltersStockRequestInput {
 }
 
 input FiltersStockTransferInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
   """Cantidad de registros"""
   limit: Float
 

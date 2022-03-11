@@ -118,6 +118,7 @@ export class StockHistoryService {
 		warehouseId,
 	}: DeleteStockHistoryInput) {
 		let item;
+
 		try {
 			const validateQuantity = details.find((item) => !(item.quantity > 0));
 			if (validateQuantity) {
@@ -147,7 +148,6 @@ export class StockHistoryService {
 						`El tipo de documento ${documentType} es invalido`,
 					);
 			}
-
 			if (!document) {
 				throw new BadRequestException(`La documento no existe`);
 			}
@@ -164,11 +164,13 @@ export class StockHistoryService {
 				status: 'active',
 				limit: -1,
 			});
+
 			if (totalDocs !== products.length) {
 				throw new BadRequestException(
 					`Un producto no existe o se encuentra inactivo, revise la lista de productos`,
 				);
 			}
+
 			for (let i = 0; i < details.length; i++) {
 				const { productId, quantity } = details[i];
 				const product = await this.productsService.deleteStock(
@@ -176,7 +178,6 @@ export class StockHistoryService {
 					quantity,
 					warehouseId,
 				);
-
 				if (product) {
 					const newHistory = new this.stockHistoryModel({
 						warehouse: warehouseId,
@@ -195,7 +196,7 @@ export class StockHistoryService {
 			if (item) {
 				//TODO: pendiente planear el reversar
 			}
-			return error;
+			throw error;
 		}
 	}
 }

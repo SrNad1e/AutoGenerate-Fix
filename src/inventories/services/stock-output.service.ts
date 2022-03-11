@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
+import * as dayjs from 'dayjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
@@ -64,6 +65,8 @@ export class StockOutputService {
 		warehouseId,
 		limit = 20,
 		page = 1,
+		dateFinal,
+		dateInitial,
 	}: FiltersStockOutputInput) {
 		const filters: FilterQuery<StockOutput> = {};
 		try {
@@ -88,6 +91,24 @@ export class StockOutputService {
 			};
 			if (sort?.warehouse) {
 				options.sort['warehouse.name'] = sort.warehouse;
+			}
+			if (dateInitial) {
+				if (!dateFinal) {
+					throw new BadRequestException('Debe enviarse una fecha final');
+				}
+
+				filters['createdAt'] = {
+					$gte: new Date(dateInitial),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+				};
+			} else if (dateFinal) {
+				if (!dateInitial) {
+					throw new BadRequestException('Debe enviarse una fecha inicial');
+				}
+				filters['createdAt'] = {
+					$gte: new Date(dateInitial),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+				};
 			}
 			return this.stockOutputModel.paginate(filters, options);
 		} catch (error) {
@@ -299,7 +320,7 @@ export class StockOutputService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'input',
+					documentType: 'output',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
 			}
@@ -328,7 +349,7 @@ export class StockOutputService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'input',
+					documentType: 'output',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
 			}

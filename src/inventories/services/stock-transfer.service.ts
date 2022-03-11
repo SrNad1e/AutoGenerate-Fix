@@ -6,6 +6,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as dayjs from 'dayjs';
 import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
@@ -76,6 +77,8 @@ export class StockTransferService {
 		status,
 		warehouseDestinationId,
 		warehouseOriginId,
+		dateInitial,
+		dateFinal,
 	}: FiltersStockTransferInput) {
 		const filters: FilterQuery<StockTransfer> = {};
 
@@ -111,6 +114,24 @@ export class StockTransferService {
 
 		if (sort?.warehouseOrigin) {
 			options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
+		}
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+			};
 		}
 
 		return this.stockTransferModel.paginate(filters, options);

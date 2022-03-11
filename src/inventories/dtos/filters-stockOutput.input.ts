@@ -59,6 +59,18 @@ export class FiltersStockOutputInput {
 	})
 	sort: SortStockOutput;
 
+	@Field(() => String, {
+		description: 'Fecha inicial para la busqueda',
+		nullable: true,
+	})
+	dateInitial: string;
+
+	@Field(() => String, {
+		description: 'Fecha final para la busqueda',
+		nullable: true,
+	})
+	dateFinal: string;
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 

@@ -4,6 +4,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
@@ -64,6 +65,8 @@ export class StockAdjustmentService {
 		warehouseId,
 		limit = 20,
 		page = 1,
+		dateFinal,
+		dateInitial,
 	}: FiltersStockAdjustmentInput) {
 		const filters: FilterQuery<StockAdjustment> = {};
 		try {
@@ -86,9 +89,30 @@ export class StockAdjustmentService {
 				lean: true,
 				populate,
 			};
+
 			if (sort?.warehouse) {
 				options.sort['warehouse.name'] = sort.warehouse;
 			}
+
+			if (dateInitial) {
+				if (!dateFinal) {
+					throw new BadRequestException('Debe enviarse una fecha final');
+				}
+
+				filters['createdAt'] = {
+					$gte: new Date(dateInitial),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+				};
+			} else if (dateFinal) {
+				if (!dateInitial) {
+					throw new BadRequestException('Debe enviarse una fecha inicial');
+				}
+				filters['createdAt'] = {
+					$gte: new Date(dateInitial),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+				};
+			}
+
 			return this.stockAdjustmetnModel.paginate(filters, options);
 		} catch (error) {
 			return error;
