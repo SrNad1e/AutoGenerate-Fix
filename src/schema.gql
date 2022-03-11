@@ -49,7 +49,7 @@ type Configuration {
 }
 
 input CreateStockInputInput {
-  """Productos de la solicitud"""
+  """Productos de la entrada"""
   details: [DetailStockInputCreateInput!]!
 
   """Observación del que realiza la entrada"""
@@ -130,6 +130,20 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DetailAdjustment {
+  """Fecha de agregado del deltalle al ajuste"""
+  createdAt: DateTime!
+
+  """Producto de la ajuste"""
+  product: Product!
+
+  """Cantidad de producto"""
+  quantity: Float!
+
+  """Fecha de actualización del detalle al ajuste"""
+  updateAt: DateTime!
+}
+
 type DetailInput {
   """Fecha de agregado del deltalle a la entrada"""
   createdAt: DateTime!
@@ -141,6 +155,20 @@ type DetailInput {
   quantity: Float!
 
   """Fecha de actualización del detalle a la entrada"""
+  updateAt: DateTime!
+}
+
+type DetailOutput {
+  """Fecha de agregado del deltalle a la salida"""
+  createdAt: DateTime!
+
+  """Producto de la salida"""
+  product: Product!
+
+  """Cantidad de producto"""
+  quantity: Float!
+
+  """Fecha de actualización del detalle a la salida"""
   updateAt: DateTime!
 }
 
@@ -620,7 +648,7 @@ type ResponseSize {
 }
 
 type ResponseStockInput {
-  """Lista de solicitudes"""
+  """Lista de entradas"""
   docs: [StockInput!]!
 
   """¿Encuentra página siguiente?"""

@@ -8,6 +8,7 @@ import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { StockHistory } from '../entities/stock-history.entity';
 import { StockInput } from '../entities/stock-input.entity';
+import { StockOutput } from '../entities/stock-output.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 
 @Injectable()
@@ -19,6 +20,8 @@ export class StockHistoryService {
 		private readonly stockTransferModel: PaginateModel<StockTransfer>,
 		@InjectModel(StockInput.name)
 		private readonly stockInputModel: PaginateModel<StockInput>,
+		@InjectModel(StockOutput.name)
+		private readonly stockOutputModel: PaginateModel<StockOutput>,
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 	) {}
@@ -128,7 +131,7 @@ export class StockHistoryService {
 					document = await this.stockTransferModel.findById(documentId).lean();
 					break;
 				case 'output':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockOutputModel.findById(documentId).lean();
 					break;
 				case 'adjustment':
 					//	document = await this.stockTransferService.findById(documentId);

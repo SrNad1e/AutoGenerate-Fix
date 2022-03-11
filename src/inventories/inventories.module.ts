@@ -34,6 +34,8 @@ import {
 import { StockHistoryService } from './services/stock-history.service';
 import { StockInputService } from './services/stock-input.service';
 import { StockInputResolver } from './resolvers/stock-input.resolver';
+import { StockOutputService } from './services/stock-output.service';
+import { StockAdjustmentService } from './services/stock-adjustment.service';
 
 @Module({
 	imports: [
@@ -123,6 +125,8 @@ import { StockInputResolver } from './resolvers/stock-input.resolver';
 		StockHistoryService,
 		StockInputService,
 		StockInputResolver,
+		StockOutputService,
+		StockAdjustmentService,
 	],
 	controllers: [],
 	exports: [],

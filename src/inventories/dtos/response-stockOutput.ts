@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { StockInput } from '../entities/stock-input.entity';
+import { StockOutput } from '../entities/stock-output.entity';
 
 @ObjectType()
-export class ResponseStockInput {
-	@Field(() => [StockInput], { description: 'Lista de entradas' })
-	docs: StockInput[];
+export class ResponseStockOutput {
+	@Field(() => [StockOutput], { description: 'Lista de salidas' })
+	docs: StockOutput[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;
