@@ -36,6 +36,8 @@ import { StockInputService } from './services/stock-input.service';
 import { StockInputResolver } from './resolvers/stock-input.resolver';
 import { StockOutputService } from './services/stock-output.service';
 import { StockAdjustmentService } from './services/stock-adjustment.service';
+import { StockOutputResolver } from './resolvers/stock-output.resolver';
+import { StockAdjustmentResolver } from './resolvers/stock-adjustment.resolver';
 
 @Module({
 	imports: [
@@ -127,6 +129,8 @@ import { StockAdjustmentService } from './services/stock-adjustment.service';
 		StockInputResolver,
 		StockOutputService,
 		StockAdjustmentService,
+		StockOutputResolver,
+		StockAdjustmentResolver,
 	],
 	controllers: [],
 	exports: [],

@@ -36,7 +36,7 @@ export class StockInputResolver {
 	@Mutation(() => StockInput, { name: 'createStockInput' })
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createStockRequestInput')
+		@Args('createStockInputInput')
 		_: CreateStockInputInput,
 		@Context() context,
 	) {

@@ -13,10 +13,10 @@ export class CreateStockOutputInput {
 	})
 	status: string;
 
-	@Field(() => [DetailStockInputCreateInput], {
+	@Field(() => [DetailStockOutputCreateInput], {
 		description: 'Productos de la salida',
 	})
-	details: DetailStockInputCreateInput[];
+	details: DetailStockOutputCreateInput[];
 
 	@Field(() => String, {
 		description: 'Observación del que realiza la salida',
@@ -26,7 +26,7 @@ export class CreateStockOutputInput {
 }
 
 @InputType()
-export class DetailStockInputCreateInput {
+export class DetailStockOutputCreateInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
 	productId: string;
 
