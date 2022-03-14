@@ -507,6 +507,17 @@ input LoginUserInput {
   username: String!
 }
 
+type MaxMin {
+  """Cantidad máxima de productose en la bodega"""
+  max: Float!
+
+  """Cantidad mínima de productos en la bodega"""
+  min: Float!
+
+  """Identificador de la bodega"""
+  warehouse: Warehouse!
+}
+
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
@@ -564,6 +575,9 @@ type Product {
 
   """Identificador de mysql"""
   id: Float @deprecated(reason: "Campo para migración de mysql")
+
+  """Máximos y mínimos del producto en la bodega"""
+  maxMin: [MaxMin!]!
 
   """Precio del producto"""
   price: Float!

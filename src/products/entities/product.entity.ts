@@ -36,6 +36,22 @@ export class Stock {
 	quantity: number;
 }
 
+@ObjectType()
+export class MaxMin {
+	@Field(() => Warehouse, { description: 'Identificador de la bodega' })
+	warehouse: Types.ObjectId;
+
+	@Field(() => Number, {
+		description: 'Cantidad máxima de productose en la bodega',
+	})
+	max: number;
+
+	@Field(() => Number, {
+		description: 'Cantidad mínima de productos en la bodega',
+	})
+	min: number;
+}
+
 @Schema({ timestamps: true })
 @ObjectType()
 export class Product extends Document {
@@ -119,6 +135,12 @@ export class Product extends Document {
 	@Prop({ type: Array })
 	@Field(() => [Stock], { description: 'Inventario del producto por bodegas' })
 	stock: Stock[];
+
+	@Prop({ type: Array })
+	@Field(() => [MaxMin], {
+		description: 'Máximos y mínimos del producto en la bodega',
+	})
+	maxMin: MaxMin[];
 
 	//TODO: campo de mysql
 	@Prop({ type: Number, unique: true })
