@@ -1,23 +1,22 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Types } from 'mongoose';
 
 @InputType()
 export class CreateStockRequestInput {
 	@Field(() => String, {
 		description: 'Identificador de la bodega de origen de la solicitud',
 	})
-	warehouseOriginId: Types.ObjectId;
+	warehouseOriginId: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la bodega de destino de la solicitud',
 	})
-	warehouseDestinationId: Types.ObjectId;
+	warehouseDestinationId: string;
 
 	@Field(() => String, {
 		description: 'Estado de la solicitud (open, pending, used, cancelled )',
 		nullable: true,
 	})
-	status: string;
+	status?: string;
 
 	@Field(() => [DetailStockRequestCreateInput], {
 		description: 'Productos de la solicitud',
@@ -28,7 +27,7 @@ export class CreateStockRequestInput {
 		description: 'Observación de la solicitud',
 		nullable: true,
 	})
-	observation: string;
+	observation?: string;
 }
 
 @InputType()

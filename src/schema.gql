@@ -490,8 +490,20 @@ input FiltersWarehouseInput {
   """Estado de la bodega"""
   active: Boolean
 
+  """Si se requiere traer la bodega principal"""
+  isMain: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
   """Comodín busqueda de la bodega"""
   name: String
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortWarehouse
 }
 
 type LoginResponse {
@@ -525,6 +537,7 @@ type Mutation {
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
   createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
+  generateStockRequest(warehouseId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
@@ -638,7 +651,7 @@ type Query {
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
   user(username: String!): User!
   users: [User!]!
-  warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): [Warehouse!]!
+  warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): ResponseWarehouses!
 }
 
 type ReportSalesResponse {
@@ -870,6 +883,38 @@ type ResponseStockTransfer {
   totalPages: Float!
 }
 
+type ResponseWarehouses {
+  """Lista de salidas"""
+  docs: [Warehouse!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 type Role {
   """Identificador de mongo"""
   _id: String!
@@ -1033,6 +1078,12 @@ input SortStockTransfer {
 
   """Ordenamiento por bodega de origen"""
   warehouseOrigin: Float
+}
+
+input SortWarehouse {
+  active: Float
+  isMain: Float
+  name: Float
 }
 
 type Stock {

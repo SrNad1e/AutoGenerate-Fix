@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Model } from 'mongoose';
+import { FilterQuery, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
+
 import { FiltersWarehouseInput } from '../dtos/filters-warehouse.input';
 import { Warehouse, WarehouseMysql } from '../entities/warehouse.entity';
 import { ShopsService } from './shops.service';
@@ -11,17 +12,32 @@ import { ShopsService } from './shops.service';
 export class WarehousesService {
 	constructor(
 		@InjectModel(Warehouse.name)
-		private readonly warehouseModel: Model<Warehouse>,
+		private readonly warehouseModel: PaginateModel<Warehouse>,
 		@InjectRepository(WarehouseMysql)
 		private readonly warehouseRepo: Repository<WarehouseMysql>,
 		private readonly shopsService: ShopsService,
 	) {}
 
-	async findAll(props: FiltersWarehouseInput): Promise<Partial<Warehouse[]>> {
-		const { name = '', ...params } = props;
-		return this.warehouseModel
-			.find({ name: { $regex: name, $options: 'i' }, ...params })
-			.lean();
+	async findAll({
+		name = '',
+		limit = 10,
+		page = 1,
+		sort,
+		...params
+	}: FiltersWarehouseInput) {
+		const filters: FilterQuery<Warehouse> = {
+			name: { $regex: name, $options: 'i' },
+			...params,
+		};
+
+		const options = {
+			limit,
+			page: page,
+			sort,
+			lean: true,
+		};
+
+		return this.warehouseModel.paginate(filters, options);
 	}
 
 	/**

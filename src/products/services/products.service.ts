@@ -39,7 +39,7 @@ const populate = [
 export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
-		private readonly productModel: Model<Product> & PaginateModel<Product>,
+		private readonly productModel: PaginateModel<Product>,
 		@InjectRepository(ProductMysql)
 		private readonly productRepo: Repository<ProductMysql>,
 		private readonly colorsService: ColorsService,
@@ -187,7 +187,7 @@ export class ProductsService {
 
 			const productsMongo = [];
 
-			const stock = warehouses?.map((warehouse) => ({
+			const stock = warehouses?.docs.map((warehouse) => ({
 				warehouse: warehouse._id,
 				quantity: 100,
 			}));

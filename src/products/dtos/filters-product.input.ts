@@ -30,7 +30,7 @@ export class FiltersProductsInput {
 		description: 'Identificadores de mongo',
 		nullable: true,
 	})
-	ids: string[];
+	ids?: string[];
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;

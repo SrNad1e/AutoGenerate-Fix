@@ -408,4 +408,32 @@ export class StockRequestService {
 			},
 		);
 	}
+
+	async autogenerate(warehouseId: string, user: User) {
+		const products = await this.productsService.findAll({
+			warehouseId,
+			status: 'active',
+		});
+
+		const productsRequest = products.docs.filter(
+			(product) => product.stock[0].quantity < product.maxMin[0].min,
+		);
+
+		const details = productsRequest.map((product) => ({
+			productId: product._id.toString(),
+			quantity: product.maxMin[0].min - product.stock[0].quantity,
+		}));
+		const warehouseOrigin = await this.warehousesService.findAll({
+			isMain: true,
+		});
+
+		return this.create(
+			{
+				warehouseDestinationId: warehouseId,
+				warehouseOriginId: warehouseOrigin.docs[0]._id.toString(),
+				details,
+			},
+			user,
+		);
+	}
 }

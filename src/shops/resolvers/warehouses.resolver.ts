@@ -3,6 +3,7 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
 import { FiltersWarehouseInput } from '../dtos/filters-warehouse.input';
+import { ResponseWarehouses } from '../dtos/response-warehouse';
 import { Warehouse } from '../entities/warehouse.entity';
 import { WarehousesService } from '../services/warehouses.service';
 
@@ -10,7 +11,7 @@ import { WarehousesService } from '../services/warehouses.service';
 export class WarehousesResolver {
 	constructor(private readonly warehousesService: WarehousesService) {}
 
-	@Query(() => [Warehouse], { name: 'warehouses' })
+	@Query(() => ResponseWarehouses, { name: 'warehouses' })
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({ name: 'filtersWarehouseInput', nullable: true, defaultValue: {} })
