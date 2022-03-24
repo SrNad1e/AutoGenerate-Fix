@@ -27,7 +27,7 @@ import {
 				const { connection, host, port, dbName, user, password } =
 					configService.mongo;
 				return {
-					uri: `${connection}://${host}:${port}`,
+					uri: `${connection}://${host}`,
 					dbName,
 					user,
 					pass: password,

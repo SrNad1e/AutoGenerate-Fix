@@ -136,12 +136,6 @@ export class Product extends Document {
 	@Field(() => [Stock], { description: 'Inventario del producto por bodegas' })
 	stock: Stock[];
 
-	@Prop({ type: Array })
-	@Field(() => [MaxMin], {
-		description: 'Máximos y mínimos del producto en la bodega',
-	})
-	maxMin: MaxMin[];
-
 	//TODO: campo de mysql
 	@Prop({ type: Number, unique: true })
 	@Field(() => Number, {

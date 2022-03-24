@@ -63,7 +63,7 @@ export class StockRequestResolver {
 
 	@Mutation(() => StockRequest, { name: 'generateStockRequest' })
 	@UseGuards(JwtAuthGuard)
-	autogenerate(@Args('warehouseId') warehouseId: string, @Context() context) {
-		return this.stockRequestService.autogenerate(warehouseId, context.req.user);
+	autogenerate(@Args('shopId') shopId: string, @Context() context) {
+		return this.stockRequestService.autogenerate(shopId, context.req.user);
 	}
 }

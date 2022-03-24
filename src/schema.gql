@@ -447,7 +447,7 @@ input FiltersStockRequestInput {
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockRequest
 
-  """Estado de la solicitud (open, pending, cancel, used)"""
+  """Estado de la solicitud (open, pending, cancelled, used)"""
   status: String
 
   """Id de la bodega de destino"""
@@ -519,17 +519,6 @@ input LoginUserInput {
   username: String!
 }
 
-type MaxMin {
-  """Cantidad máxima de productose en la bodega"""
-  max: Float!
-
-  """Cantidad mínima de productos en la bodega"""
-  min: Float!
-
-  """Identificador de la bodega"""
-  warehouse: Warehouse!
-}
-
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
@@ -537,7 +526,7 @@ type Mutation {
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
   createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
-  generateStockRequest(warehouseId: String!): StockRequest!
+  generateStockRequest(shopId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
@@ -588,9 +577,6 @@ type Product {
 
   """Identificador de mysql"""
   id: Float @deprecated(reason: "Campo para migración de mysql")
-
-  """Máximos y mínimos del producto en la bodega"""
-  maxMin: [MaxMin!]!
 
   """Precio del producto"""
   price: Float!
@@ -960,11 +946,17 @@ type Shop {
   """Bodega predeterminada para la tienda"""
   defaultWarehouse: Warehouse
   goal: Float!
+
+  """Es centro de distribución"""
+  isMain: Boolean!
   name: String!
   phone: String!
   shopId: Float!
   status: String!
   user: UserMysql!
+
+  """Bodega de centro de distribución asignado"""
+  warehouseMain: Warehouse
 }
 
 type Size {
@@ -1365,6 +1357,12 @@ type Warehouse {
 
   """ID Mysql"""
   id: Float @deprecated(reason: "Mysql migración")
+
+  """Máxima cantidad de productos en la bodega"""
+  max: Float!
+
+  """Mínima cantidad de productos en la bodega"""
+  min: Float!
 
   """Nombre de la bodega"""
   name: String!

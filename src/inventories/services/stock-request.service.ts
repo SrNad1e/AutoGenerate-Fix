@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
+import { ShopsService } from 'src/shops/services/shops.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
@@ -45,9 +46,9 @@ const populate = {
 export class StockRequestService {
 	constructor(
 		@InjectModel(StockRequest.name)
-		private readonly stockRequestModel: Model<StockRequest> &
-			PaginateModel<StockRequest>,
+		private readonly stockRequestModel: PaginateModel<StockRequest>,
 		private readonly warehousesService: WarehousesService,
+		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
 	) {}
 
@@ -409,28 +410,60 @@ export class StockRequestService {
 		);
 	}
 
-	async autogenerate(warehouseId: string, user: User) {
-		const products = await this.productsService.findAll({
-			warehouseId,
+	async autogenerate(shopId: string, user: User) {
+		const shop = await this.shopsService.findById(shopId);
+		const warehouse = await this.warehousesService.findById(
+			shop.defaultWarehouse.toString(),
+		);
+		const products = await this.productsService.getProducts({
 			status: 'active',
 		});
 
-		const productsRequest = products.docs.filter(
-			(product) => product.stock[0].quantity < product.maxMin[0].min,
-		);
+		const productsRequest = products
+			.map((product) => {
+				const stock = product.stock.find(
+					(item) => item.warehouse.toString() === warehouse._id.toString(),
+				);
 
-		const details = productsRequest.map((product) => ({
-			productId: product._id.toString(),
-			quantity: product.maxMin[0].min - product.stock[0].quantity,
-		}));
-		const warehouseOrigin = await this.warehousesService.findAll({
-			isMain: true,
-		});
+				return { ...product, stock };
+			})
+			.filter((product) => product.stock.quantity < warehouse.min);
+
+		const details = [];
+
+		for (let i = 0; i < productsRequest.length; i++) {
+			const detail = productsRequest[i];
+
+			const product = await this.productsService.findById(
+				detail._id.toString(),
+				shop.warehouseMain.toString(),
+			);
+
+			const total = warehouse.min - detail.stock.quantity;
+
+			if (product.stock[0].quantity < total) {
+				details.push({
+					productId: detail._id.toString(),
+					quantity: product.stock[0].quantity,
+				});
+			} else {
+				details.push({
+					productId: detail._id.toString(),
+					quantity: total,
+				});
+			}
+		}
+
+		if (details.length === 0) {
+			throw new BadRequestException(
+				'No se encontraron productos para realizar la solicitud',
+			);
+		}
 
 		return this.create(
 			{
-				warehouseDestinationId: warehouseId,
-				warehouseOriginId: warehouseOrigin.docs[0]._id.toString(),
+				warehouseDestinationId: shop.warehouseMain.toString(),
+				warehouseOriginId: shop.defaultWarehouse.toString(),
 				details,
 			},
 			user,

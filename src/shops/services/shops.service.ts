@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model } from 'mongoose';
 import { Repository } from 'typeorm';
+
 import {
 	CreateShopParamsDto,
 	FilterShopsDto,
@@ -11,6 +12,17 @@ import {
 } from '../dtos/shop.dto';
 import { Shop } from '../entities/shop.entity';
 import { Shop as ShopMysql } from '../entities/shopMysql.entity';
+
+const populate = [
+	{
+		path: 'defaultWarehouse',
+		model: 'Warehouse'
+	},
+	{
+		path: 'warehouseMain',
+		model: 'Warehouse'	
+	}
+];
 
 @Injectable()
 export class ShopsService {
@@ -47,7 +59,11 @@ export class ShopsService {
 	}
 
 	async getByIdMysql(shopId: number) {
-		return (await this.shopModel.findOne({ shopId }));
+		return await this.shopModel.findOne({ shopId });
+	}
+
+	async findById(shopId: string) {
+		return this.shopModel.findById(shopId);
 	}
 
 	async create(params: CreateShopParamsDto) {

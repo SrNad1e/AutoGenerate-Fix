@@ -382,4 +382,42 @@ export class ProductsService {
 			throw error;
 		}
 	}
+
+	/**
+	 * @description se encarga de obtener los productos sin paginación, sin populate
+	 * @param params datos pára filtrar la información
+	 * @returns array de productos o vacío
+	 */
+	async getProducts(params: FiltersProductsInput) {
+		const filters: FilterQuery<Product> = {};
+		const { colorId, name = '', sizeId, status, ids } = params;
+
+		if (ids) {
+			filters._id = {
+				$in: ids,
+			};
+		}
+
+		if (colorId) {
+			filters.color = colorId;
+		}
+
+		if (sizeId) {
+			filters.size = sizeId;
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+		return this.productModel
+			.find({
+				...filters,
+				$or: [
+					{ barcode: name },
+					{ description: { $regex: name, $options: 'i' } },
+					{ reference: { $regex: name, $options: 'i' } },
+				],
+			})
+			.lean();
+	}
 }

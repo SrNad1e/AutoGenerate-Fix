@@ -45,6 +45,21 @@ export class Shop extends mongoose.Document {
 	})
 	defaultWarehouse: mongoose.Schema.Types.ObjectId;
 
+	@Field(() => Boolean, { description: 'Es centro de distribución' })
+	@Prop({ type: Boolean, default: false })
+	isMain: boolean;
+
+	@Field(() => Warehouse, {
+		description: 'Bodega de centro de distribución asignado',
+		nullable: true,
+	})
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: Warehouse.name,
+		autopopulate: true,
+	})
+	warehouseMain: mongoose.Schema.Types.ObjectId;
+
 	//TODO: se debe normalizar los ids de los modelos
 	@Field()
 	@Prop({ type: Number, unique: true })

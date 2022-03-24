@@ -49,7 +49,7 @@ export class FiltersStockRequestInput {
 	number: number;
 
 	@Field(() => String, {
-		description: 'Estado de la solicitud (open, pending, cancel, used)',
+		description: 'Estado de la solicitud (open, pending, cancelled, used)',
 		nullable: true,
 	})
 	status: string;

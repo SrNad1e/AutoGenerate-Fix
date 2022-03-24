@@ -2,8 +2,9 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+import { User } from 'src/users/entities/user.entity';
 import { Shop } from './shop.entity';
 
 @Schema({ timestamps: true })
@@ -27,6 +28,18 @@ export class Warehouse extends Document {
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })
 	user: User;
+
+	@Field(() => Number, {
+		description: 'Máxima cantidad de productos en la bodega',
+	})
+	@Prop({ type: Number, required: true })
+	max: number;
+
+	@Field(() => Number, {
+		description: 'Mínima cantidad de productos en la bodega',
+	})
+	@Prop({ type: Number, required: true })
+	min: number;
 
 	@Field(() => Number, {
 		description: 'ID Mysql',

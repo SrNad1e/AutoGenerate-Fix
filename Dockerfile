@@ -11,6 +11,9 @@ COPY [".","."]
 
 EXPOSE 8080
 
-CMD ["node","src/main.ts"]
+RUN yarn build
+
+CMD ["node","dist/main.js"]
+
 
 
