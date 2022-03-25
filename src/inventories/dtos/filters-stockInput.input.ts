@@ -21,6 +21,12 @@ export class SortStockInput {
 	warehouse: number;
 
 	@Field(() => Number, {
+		description: 'Ordenamiento por total',
+		nullable: true,
+	})
+	total: number;
+
+	@Field(() => Number, {
 		description: 'Ordenamiento por fecha de creación',
 		nullable: true,
 	})
@@ -30,7 +36,7 @@ export class SortStockInput {
 		description: 'Ordenamiento por fecha de actualización',
 		nullable: true,
 	})
-	updateAt: number;
+	updatedAt: number;
 }
 
 @InputType()
@@ -58,6 +64,12 @@ export class FiltersStockInputInput {
 		nullable: true,
 	})
 	sort: SortStockInput;
+
+	@Field(() => Number, {
+		description: 'Valor total de la entrada',
+		nullable: true,
+	})
+	total: number;
 
 	@Field(() => String, {
 		description: 'Fecha inicial para la busqueda',

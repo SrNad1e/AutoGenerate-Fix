@@ -102,7 +102,7 @@ export class StockInputService {
 
 				filters['createdAt'] = {
 					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 				};
 			} else if (dateFinal) {
 				if (!dateInitial) {
@@ -110,7 +110,7 @@ export class StockInputService {
 				}
 				filters['createdAt'] = {
 					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 				};
 			}
 			return this.stockInputModel.paginate(filters, options);

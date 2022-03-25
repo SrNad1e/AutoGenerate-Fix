@@ -398,6 +398,9 @@ input FiltersStockInputInput {
   """Estado de la entrada (open, confirmed, cancelled)"""
   status: String
 
+  """Valor total de la entrada"""
+  total: Float
+
   """Id de la bodega"""
   warehouseId: String
 }
@@ -423,6 +426,9 @@ input FiltersStockOutputInput {
 
   """Estado de la salida (open, confirmed, cancelled)"""
   status: String
+
+  """Valor total de la entrada"""
+  total: Float
 
   """Id de la bodega"""
   warehouseId: String
@@ -1008,8 +1014,11 @@ input SortStockInput {
   """Ordenamiento por estado"""
   status: Float
 
+  """Ordenamiento por total"""
+  total: Float
+
   """Ordenamiento por fecha de actualización"""
-  updateAt: Float
+  updatedAt: Float
 
   """Ordenamiento por bodega"""
   warehouse: Float
@@ -1025,8 +1034,11 @@ input SortStockOutput {
   """Ordenamiento por estado"""
   status: Float
 
+  """Ordenamiento por total"""
+  total: Float
+
   """Ordenamiento por fecha de actualización"""
-  updateAt: Float
+  updatedAt: Float
 
   """Ordenamiento por bodega"""
   warehouse: Float

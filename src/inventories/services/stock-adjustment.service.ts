@@ -101,7 +101,7 @@ export class StockAdjustmentService {
 
 				filters['createdAt'] = {
 					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 				};
 			} else if (dateFinal) {
 				if (!dateInitial) {
@@ -109,7 +109,7 @@ export class StockAdjustmentService {
 				}
 				filters['createdAt'] = {
 					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 				};
 			}
 
