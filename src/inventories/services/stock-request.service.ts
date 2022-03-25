@@ -90,7 +90,7 @@ export class StockRequestService {
 
 				filters['createdAt'] = {
 					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 				};
 			} else if (dateFinal) {
 				if (!dateInitial) {
@@ -98,7 +98,7 @@ export class StockRequestService {
 				}
 				filters['createdAt'] = {
 					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('DD/MM/YYYY')),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 				};
 			}
 
@@ -109,6 +109,8 @@ export class StockRequestService {
 				lean: true,
 				populate,
 			};
+
+			console.log(filters);
 
 			if (sort?.warehouseDestination) {
 				options.sort['warehouseDestination.name'] = sort.warehouseDestination;

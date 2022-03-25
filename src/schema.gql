@@ -1043,7 +1043,7 @@ input SortStockRequest {
   status: Float
 
   """Ordenamiento por fecha de actualización"""
-  updateAt: Float
+  updatedAt: Float
 
   """Ordenamiento por bodega de destino"""
   warehouseDestination: Float
