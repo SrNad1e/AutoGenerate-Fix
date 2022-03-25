@@ -110,8 +110,6 @@ export class StockRequestService {
 				populate,
 			};
 
-			console.log(filters);
-
 			if (sort?.warehouseDestination) {
 				options.sort['warehouseDestination.name'] = sort.warehouseDestination;
 			}
