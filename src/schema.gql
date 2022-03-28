@@ -172,6 +172,23 @@ type DetailInput {
   updateAt: DateTime!
 }
 
+type DetailOrder {
+  """Fecha de agregado del producto al pedido"""
+  createdAt: DateTime!
+
+  """Producto agregado al pedido"""
+  product: Product!
+
+  """Cantidad de productos en el pedido"""
+  quantity: Float!
+
+  """Estado del producto (new, confirmed)"""
+  status: String!
+
+  """Fecha de actualizado del producto al pedido"""
+  updateAt: DateTime!
+}
+
 type DetailOutput {
   """Fecha de agregado del deltalle a la salida"""
   createdAt: DateTime!
@@ -540,6 +557,25 @@ type Mutation {
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
   updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
+}
+
+type Payment {
+  """Identificador de mongo"""
+  _id: String!
+}
+
+type PaymentOrder {
+  """Fecha de agregado del pago al pedido"""
+  createdAt: DateTime!
+
+  """Método de pago usado"""
+  payments: Payment!
+
+  """Total pagado"""
+  total: Float!
+
+  """Fecha de actualizado del pago al pedido"""
+  updateAt: DateTime!
 }
 
 type Permission {

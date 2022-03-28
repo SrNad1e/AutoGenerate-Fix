@@ -2,14 +2,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import { ConfigurationsService } from 'src/configurations/services/configurations.service';
-import { InvoicesService } from 'src/invoices/services/invoices.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { ReportSalesResponse } from '../dtos/report-sales-response';
 
 @Injectable()
 export class ReportsSalesService {
 	constructor(
-		private invoicesService: InvoicesService,
 		private configurationsService: ConfigurationsService,
 		private shopsService: ShopsService,
 	) {}
@@ -21,11 +19,11 @@ export class ReportsSalesService {
 			const dateFinish = new Date(moment().endOf('M').format('YYYY/MM/DD'));
 
 			//seleccionar valor de las ventas
-			const sales = await this.invoicesService.totalInvoicesShop(
+			const sales = 0/* await this.invoicesService.totalInvoicesShop(
 				shopId,
 				dateInitial,
 				dateFinish,
-			);
+			);*/
 
 			//seleccionamos la meta de la tienda
 			const shopGoal = await this.shopsService.getByIdMysql(shopId);
@@ -93,10 +91,10 @@ export class ReportsSalesService {
 			}
 
 			//consultar las ventas nuevas
-			const data = await this.invoicesService.salesForShop(
+			const data = []/* await this.invoicesService.salesForShop(
 				dateInitial.toDate(),
 				dateFinish.toDate(),
-			);
+			);*/
 			salesReport = salesReport.map((item) => {
 				const total =
 					data.find((dato) => dato.shopId === item.shop.shopId)?.total || 0;

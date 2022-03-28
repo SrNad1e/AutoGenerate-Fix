@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -33,6 +34,7 @@ export class Customer extends Document {
 
 	@Prop({ type: String, required: true })
 	identification: string;
+	
 	@Prop({ type: String })
 	phone: string;
 

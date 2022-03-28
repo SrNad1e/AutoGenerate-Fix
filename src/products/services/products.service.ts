@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { WarehousesService } from 'src/shops/services/warehouses.service';

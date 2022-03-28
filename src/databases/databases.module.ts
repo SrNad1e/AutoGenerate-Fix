@@ -9,7 +9,6 @@ import config from 'src/config';
 import { ProductMysql } from 'src/products/entities/product.entity';
 import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
-import { InvoiceMysql } from 'src/invoices/entities/invoice.entity';
 import { ColorMysql } from 'src/products/entities/color.entity';
 import { SizeMysql } from 'src/products/entities/size.entity';
 import { ProviderMysql } from 'src/products/entities/provider.entity';
@@ -58,7 +57,6 @@ import {
 						StockTransferMysql,
 						ShopMysql,
 						UserMysql,
-						InvoiceMysql,
 						ColorMysql,
 						SizeMysql,
 						ProviderMysql,

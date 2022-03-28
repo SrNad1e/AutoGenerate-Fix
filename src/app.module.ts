@@ -6,13 +6,10 @@ import * as Joi from 'joi';
 
 import config from './config';
 import { ConfigurationsModule } from './configurations/configurations.module';
-import { CouponsModule } from './coupons/coupons.module';
-import { CustomersModule } from './customers/customers.module';
 import { DatabasesModule } from './databases/databases.module';
 import { enviroments } from './enviroments';
 import { ImagesModule } from './images/images.module';
 import { InventoriesModule } from './inventories/inventories.module';
-import { InvoicesModule } from './invoices/invoices.module';
 import { ProductsModule } from './products/products.module';
 import { ReportsModule } from './reports/reports.module';
 import { ShippingsModule } from './shippings/shippings.module';
@@ -20,6 +17,8 @@ import { ShopsModule } from './shops/shops.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
+import { SalesModule } from './sales/sales.module';
+import { CrmModule } from './crm/crm.module';
 @Module({
 	imports: [
 		GraphQLModule.forRoot({
@@ -48,17 +47,16 @@ import { AppGateway } from './app.gateway';
 		}),
 		ConfigurationsModule,
 		DatabasesModule,
-		CouponsModule,
-		CustomersModule,
 		ImagesModule,
 		InventoriesModule,
-		InvoicesModule,
 		ProductsModule,
 		ReportsModule,
 		ShippingsModule,
 		ShopsModule,
 		TreasuryModule,
 		UsersModule,
+		SalesModule,
+		CrmModule,
 	],
 	providers: [AppGateway],
 })
