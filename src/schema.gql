@@ -91,6 +91,11 @@ type Configuration {
   module: String!
 }
 
+input CreateOrderInput {
+  """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
+  status: String!
+}
+
 input CreateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputCreateInput!]!
@@ -176,6 +181,9 @@ type Customer {
 
   """Direcciones del cliente"""
   address: [Address!]
+
+  """Usuario asigando al cliente"""
+  assigningUser: User
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -401,7 +409,7 @@ type DetailTransfer {
 }
 
 type DocumentType {
-  """Abreviación"""
+  """Abreviación (CC, NIT, TI, CE, PASS)"""
   abbreviation: String!
 
   """Fecha de creación"""
@@ -649,6 +657,7 @@ input LoginUserInput {
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
+  createOrder(createOrderInput: CreateOrderInput!): Order!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
@@ -661,6 +670,38 @@ type Mutation {
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
   updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
+}
+
+type Order {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Cliente que solicita el pedido"""
+  customer: Customer!
+
+  """Productos que tiene el pedido"""
+  details: [DetailOrder!]
+
+  """Número de pedido"""
+  number: Float!
+
+  """Métodos de pago usados en el pedido"""
+  payments: [PaymentOrder!]
+
+  """Tienda donde se solicita el pedido"""
+  shop: Shop!
+
+  """Estado del pedido (open, pending, cancelled, closed, sent, invoiced)"""
+  status: String!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el pedido"""
+  user: User!
 }
 
 type Payment {
@@ -1095,6 +1136,9 @@ type Shop {
 
   """Es centro de distribución"""
   isMain: Boolean!
+
+  """Valida si la tienda es mayorista"""
+  isWholesale: Boolean!
   name: String!
   phone: String!
   shopId: Float!

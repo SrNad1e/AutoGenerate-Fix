@@ -61,21 +61,17 @@ export class Order extends Document {
 
 	@Field(() => Customer, { description: 'Cliente que solicita el pedido' })
 	@Prop({
-		type: Types.ObjectId,
-		ref: Customer.name,
-		autopopulate: true,
+		type: Object,
 		required: true,
 	})
-	customer: Types.ObjectId;
+	customer: Customer;
 
 	@Field(() => Shop, { description: 'Tienda donde se solicita el pedido' })
 	@Prop({
-		type: Types.ObjectId,
-		ref: Shop.name,
-		autopopulate: true,
+		type: Object,
 		required: true,
 	})
-	shop: Types.ObjectId;
+	shop: Shop;
 
 	@Field(() => [PaymentOrder], {
 		description: 'Métodos de pago usados en el pedido',
@@ -106,7 +102,7 @@ export class Order extends Document {
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el pedido',
 	})
-	@Prop({ type: Object })
+	@Prop({ type: Object, required: true })
 	user: User;
 
 	@Field(() => Date, { description: 'Fecha de creación' })

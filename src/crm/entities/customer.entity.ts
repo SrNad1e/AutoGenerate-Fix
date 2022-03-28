@@ -2,6 +2,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+
 import { User } from 'src/users/entities/user.entity';
 import { City } from './city.entity';
 import { DocumentType } from './documentType.entity';
@@ -109,12 +110,18 @@ export class Customer extends Document {
 	@Prop({ type: Boolean, default: false })
 	isDefault: boolean;
 
-	@Field(() => String, { description: 'Tipo de documento (CC, )' })
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cliente',
 	})
 	@Prop({ type: Object })
 	user: User;
+
+	@Field(() => User, {
+		description: 'Usuario asigando al cliente',
+		nullable: true,
+	})
+	@Prop({ type: Types.ObjectId, ref: User.name, autopopulate: true })
+	assigningUser: Types.ObjectId;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

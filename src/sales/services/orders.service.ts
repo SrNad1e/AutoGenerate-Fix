@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
-import { CustomersService } from 'src/crm/services/customers.service';
 
+import { CustomersService } from 'src/crm/services/customers.service';
+import { ShopsService } from 'src/shops/services/shops.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { Order } from '../entities/order.entity';
@@ -21,6 +22,7 @@ export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
 		private readonly customersService: CustomersService,
+		private readonly shopsService: ShopsService,
 	) {}
 
 	async create({ status }: CreateOrderInput, user: User) {
@@ -30,12 +32,18 @@ export class OrdersService {
 			}
 
 			if (user.type === 'employee') {
-				const customerDefault =
-					await this.customersService.getCustomerDefault();
-					
+				const customer = await this.customersService.getCustomerDefault();
+				const shop = await this.shopsService.findById(user.shop._id.toString());
+
+				return this.orderModel.create({ customer, shop, user });
 			}
 
-			//se crea el pedido a la tienda mayorista
+			const customer = await this.customersService.getCustomerAssigning(
+				user._id.toString(),
+			);
+			const shop = await this.shopsService.getShopWholesale();
+
+			return this.orderModel.create({ customer, shop, user });
 		} catch (error) {
 			return error;
 		}

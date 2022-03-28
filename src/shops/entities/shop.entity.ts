@@ -60,6 +60,13 @@ export class Shop extends mongoose.Document {
 	})
 	warehouseMain: mongoose.Schema.Types.ObjectId;
 
+	@Field(() => Boolean, { description: 'Valida si la tienda es mayorista' })
+	@Prop({
+		type: Boolean,
+		default: false,
+	})
+	isWholesale: boolean;
+
 	//TODO: se debe normalizar los ids de los modelos
 	@Field()
 	@Prop({ type: Number, unique: true })

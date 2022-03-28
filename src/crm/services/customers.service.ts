@@ -20,4 +20,16 @@ export class CustomersService {
 			return error;
 		}
 	}
+
+	/**
+	 * @description se encargar de seleccionar el cliente asignado a un usuario
+	 * @param userId id del usuario
+	 */
+	async getCustomerAssigning(userId: string) {
+		try {
+			return this.customerModel.findOne({ assigningUser: userId }).lean();
+		} catch (error) {
+			return error;
+		}
+	}
 }

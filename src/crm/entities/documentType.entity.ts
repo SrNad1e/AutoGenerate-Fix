@@ -8,7 +8,7 @@ export class DocumentType {
 	@Field(() => String, { description: 'Nombre del tipo de documento' })
 	name: string;
 
-	@Field(() => String, { description: 'Abreviación' })
+	@Field(() => String, { description: 'Abreviación (CC, NIT, TI, CE, PASS)' })
 	abbreviation: string;
 
 	@Field(() => User, {

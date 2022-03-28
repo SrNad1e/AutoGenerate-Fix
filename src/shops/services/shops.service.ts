@@ -16,12 +16,12 @@ import { Shop as ShopMysql } from '../entities/shopMysql.entity';
 const populate = [
 	{
 		path: 'defaultWarehouse',
-		model: 'Warehouse'
+		model: 'Warehouse',
 	},
 	{
 		path: 'warehouseMain',
-		model: 'Warehouse'	
-	}
+		model: 'Warehouse',
+	},
 ];
 
 @Injectable()
@@ -63,7 +63,7 @@ export class ShopsService {
 	}
 
 	async findById(shopId: string) {
-		return this.shopModel.findById(shopId);
+		return (await this.shopModel.findById(shopId)).populate(populate);
 	}
 
 	async create(params: CreateShopParamsDto) {
@@ -73,6 +73,18 @@ export class ShopsService {
 
 	async update(id: string, params: UpdateShopParamsDto) {
 		return this.shopModel.findByIdAndUpdate(id, params, { new: true });
+	}
+
+	/**
+	 * @description se encarga de consultar la tienda mayorista
+	 * @returns tienda mayorista
+	 */
+	async getShopWholesale() {
+		try {
+			return this.shopModel.findOne({ isWholesale: true }).lean();
+		} catch (error) {
+			return error;
+		}
 	}
 
 	async migrate() {
