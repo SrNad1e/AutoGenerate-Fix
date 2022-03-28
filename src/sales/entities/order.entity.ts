@@ -5,6 +5,7 @@ import { Document, Types } from 'mongoose';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
+import { User } from 'src/users/entities/user.entity';
 import { Customer } from '../../crm/entities/customer.entity';
 
 @ObjectType()
@@ -86,7 +87,8 @@ export class Order extends Document {
 	payments: PaymentOrder[];
 
 	@Field(() => String, {
-		description: 'Estado del pedido (open, cancelled, closed, sent, invoiced)',
+		description:
+			'Estado del pedido (open, pending, cancelled, closed, sent, invoiced)',
 	})
 	@Prop({
 		type: String,
@@ -95,11 +97,17 @@ export class Order extends Document {
 	status: string;
 
 	@Field(() => [DetailOrder], {
-		description: 'Productos que tiene la orden',
+		description: 'Productos que tiene el pedido',
 		nullable: true,
 	})
-	@Prop({ type: Object })
+	@Prop({ type: Array })
 	details: DetailOrder[];
+
+	@Field(() => User, {
+		description: 'Usuario que creó o editó el pedido',
+	})
+	@Prop({ type: Object })
+	user: User;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

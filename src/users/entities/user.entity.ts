@@ -26,6 +26,12 @@ export class User extends mongoose.Document {
 	@Prop({ type: String, required: true })
 	password: string;
 
+	@Field(() => String, {
+		description: 'Tipo de usuario (detail, wholesale, employee, dealer)',
+	})
+	@Prop({ type: String, default: 'detail' })
+	type: string;
+
 	@Field(() => Role, {
 		description: 'Rol que ocupa el usuario',
 	})

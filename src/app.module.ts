@@ -12,7 +12,6 @@ import { ImagesModule } from './images/images.module';
 import { InventoriesModule } from './inventories/inventories.module';
 import { ProductsModule } from './products/products.module';
 import { ReportsModule } from './reports/reports.module';
-import { ShippingsModule } from './shippings/shippings.module';
 import { ShopsModule } from './shops/shops.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { UsersModule } from './users/users.module';
@@ -51,7 +50,6 @@ import { CrmModule } from './crm/crm.module';
 		InventoriesModule,
 		ProductsModule,
 		ReportsModule,
-		ShippingsModule,
 		ShopsModule,
 		TreasuryModule,
 		UsersModule,

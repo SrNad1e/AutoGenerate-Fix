@@ -10,6 +10,49 @@ input AddConfigInput {
   title: String!
 }
 
+type Address {
+  """Ciudad a la que pertenece"""
+  city: City!
+
+  """Datos extra de la dirección"""
+  extra: String
+
+  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
+  field1: String!
+
+  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
+  field2: String!
+
+  """Define si la dirección es la principal"""
+  isMain: Boolean!
+
+  """Número de la casa"""
+  loteNumber: Float!
+
+  """Número del field1"""
+  number1: Float!
+
+  """Número del field2"""
+  number2: Float!
+}
+
+type City {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó la ciudad"""
+  user: User!
+}
+
 type Color {
   """Identificador de mongo"""
   _id: String!
@@ -125,6 +168,50 @@ input CreateUserInput {
 
   """Usuario registrado"""
   username: String!
+}
+
+type Customer {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Direcciones del cliente"""
+  address: [Address!]
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Número de documento"""
+  document: String!
+
+  """Tipo de documento"""
+  documentType: DocumentType!
+
+  """Número telefonico tiene whatsapp"""
+  email: String
+
+  """Nombres del cliente"""
+  firstName: String!
+
+  """Cliente por defecto"""
+  isDefault: Boolean!
+
+  """Número telefonico tiene whatsapp"""
+  isWhatsapp: Boolean!
+
+  """Apellidos del cliente"""
+  lastName: String!
+
+  """Número telefonico del cliente"""
+  phone: Float
+
+  """Tipo de cliente (detail, wholesale, empleoyee, dealer)"""
+  type: String!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el cliente"""
+  user: User!
 }
 
 type Data {
@@ -311,6 +398,23 @@ type DetailTransfer {
 
   """Fecha de actualizacion el producto"""
   updateAt: DateTime!
+}
+
+type DocumentType {
+  """Abreviación"""
+  abbreviation: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Nombre del tipo de documento"""
+  name: String!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el pedido"""
+  user: User!
 }
 
 input FiltersColorInput {
@@ -1367,6 +1471,9 @@ type User {
 
   """Tienda a la que se encuentra asiganado el usuario"""
   shop: Shop!
+
+  """Tipo de usuario (detail, wholesale, employee, dealer)"""
+  type: String!
 
   """Nombre de usuario"""
   updateAt: DateTime!
