@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 
@@ -9,6 +9,14 @@ export class CustomersService {
 	constructor(
 		@InjectModel(Customer.name) private customerModel: PaginateModel<Customer>,
 	) {}
+
+	async findById(id: string) {
+		try {
+			return this.customerModel.findById(id).lean();
+		} catch (error) {
+			throw new NotFoundException(`Error al consultar el usuario, ${error}`);
+		}
+	}
 
 	/**
 	 * @description se encargar de seleccionar el cliente por defecto

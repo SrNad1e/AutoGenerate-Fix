@@ -1,10 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 
 import { CustomersService } from 'src/crm/services/customers.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { User } from 'src/users/entities/user.entity';
+import { AddPaymentsOrderInput } from '../dtos/addPayments-order-input';
+import { AddProductsOrderInput } from '../dtos/addProducts-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
@@ -50,5 +56,117 @@ export class OrdersService {
 		}
 	}
 
-	async update({}: UpdateOrderInput, user: User) {}
+	async update(
+		orderId: string,
+		{ status, customerId }: UpdateOrderInput,
+		user: User,
+	) {
+		try {
+			const order = await this.orderModel.findById(orderId).lean();
+
+			if (!order) {
+				throw new BadRequestException(
+					'El pedido que intenta actualizar no existe',
+				);
+			}
+			const dataUpdate = {};
+
+			if (customerId) {
+				const customer = await this.customersService.findById(customerId);
+				if (!customer?._id) {
+					throw new NotFoundException('El cliente seleccionado no existe');
+				}
+
+				dataUpdate['customer'] = customer;
+			}
+
+			if (status) {
+				if (!statuTypes.includes(status)) {
+					throw new BadRequestException(
+						`El estado ${status} no es un estado válido`,
+					);
+				}
+
+				switch (order?.status) {
+					case 'open':
+						if (!['cancelled', 'invoiced'].includes(status)) {
+							throw new BadRequestException('El pedido se encuentra abierto');
+						}
+						break;
+					case 'pending':
+						if (!['open'].includes(status)) {
+							throw new BadRequestException('El pedido se encuentra pendiente');
+						}
+						break;
+					case 'invoiced':
+						if (!['sent', 'closed'].includes(status)) {
+							throw new BadRequestException('El pedido se encuentra facturado');
+						}
+						break;
+					case 'sent':
+						if (!['closed'].includes(status)) {
+							throw new BadRequestException('El pedido se encuentra enviado');
+						}
+						break;
+					case 'calcelled' || 'closed':
+						throw new BadRequestException('El pedido se encuentra finalizado');
+					default:
+						break;
+				}
+
+				if (status === 'invoiced') {
+					//TODO: generar el proceso de facturación
+				}
+				dataUpdate['status'] = status;
+			}
+
+			return this.orderModel.findByIdAndUpdate(orderId, {
+				$set: { ...dataUpdate, user },
+			});
+		} catch (error) {
+			return error;
+		}
+	}
+
+	async addProducts({ orderId, details }: AddProductsOrderInput) {
+		try {
+			const order = await this.orderModel.findById(orderId).lean();
+
+			if (!order) {
+				throw new BadRequestException(
+					'El pedido que intenta actualizar no existe',
+				);
+			}
+
+			if (order?.status !== 'open') {
+				throw new BadRequestException(
+					`El pedido ${order.number} no se encuentra abierto`,
+				);
+			}
+
+			//validar productos a eliminar
+
+			//validar productos a actualizar
+
+			//validar productos a crear
+
+			//guardar el pedido
+		} catch (error) {
+			return error;
+		}
+	}
+
+	async addPayments({ orderId, payments }: AddPaymentsOrderInput) {
+		try {
+			const order = await this.orderModel.findById(orderId).lean();
+
+			if (!order) {
+				throw new BadRequestException(
+					'El pedido que intenta actualizar no existe',
+				);
+			}
+		} catch (error) {
+			return error;
+		}
+	}
 }
