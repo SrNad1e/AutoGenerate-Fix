@@ -147,8 +147,9 @@ export class ProductsService {
 			};
 		}
 
+
 		return {
-			...product,
+			...product['_doc'],
 			stock: [],
 		};
 	}

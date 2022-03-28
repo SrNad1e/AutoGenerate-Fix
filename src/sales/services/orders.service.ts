@@ -6,6 +6,7 @@ import { CustomersService } from 'src/crm/services/customers.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateOrderInput } from '../dtos/create-order-input';
+import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
 
 const statuTypes = [
@@ -31,7 +32,7 @@ export class OrdersService {
 				throw new BadRequestException('El estado del pedido no es correcto');
 			}
 
-			if (user.type === 'employee') {
+			if (user.type === 'employee' && status === 'open') {
 				const customer = await this.customersService.getCustomerDefault();
 				const shop = await this.shopsService.findById(user.shop._id.toString());
 
@@ -48,4 +49,6 @@ export class OrdersService {
 			return error;
 		}
 	}
+
+	async update({}: UpdateOrderInput, user: User) {}
 }

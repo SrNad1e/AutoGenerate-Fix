@@ -18,7 +18,7 @@ export class ProductsResolver {
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({ name: 'filtersProductsInput', nullable: true, defaultValue: {} })
-		filtersProductsInput: FiltersProductsInput,
+		_: FiltersProductsInput,
 		@Context() context,
 	) {
 		return this.productsService.findAll(context.req.body.variables.input);
@@ -28,7 +28,7 @@ export class ProductsResolver {
 	@UseGuards(JwtAuthGuard)
 	findOne(
 		@Args({ name: 'filtersProductInput', nullable: true, defaultValue: {} })
-		filtersProductInput: FiltersProductInput,
+		_: FiltersProductInput,
 		@Context() context,
 	) {
 		return this.productsService.findOne(context.req.body.variables.input);
