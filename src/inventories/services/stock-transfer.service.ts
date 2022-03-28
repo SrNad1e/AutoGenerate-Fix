@@ -82,59 +82,63 @@ export class StockTransferService {
 	}: FiltersStockTransferInput) {
 		const filters: FilterQuery<StockTransfer> = {};
 
-		if (number) {
-			filters.number = number;
-		}
-
-		if (status) {
-			filters.status = status;
-		}
-
-		if (warehouseDestinationId) {
-			filters['warehouseDestination._id'] = new Types.ObjectId(
-				warehouseDestinationId,
-			);
-		}
-
-		if (warehouseOriginId) {
-			filters['warehouseOrigin._id'] = new Types.ObjectId(warehouseOriginId);
-		}
-
-		const options = {
-			limit,
-			page,
-			sort,
-			lean: true,
-			populate,
-		};
-
-		if (sort?.warehouseDestination) {
-			options.sort['warehouseDestination.name'] = sort.warehouseDestination;
-		}
-
-		if (sort?.warehouseOrigin) {
-			options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
-		}
-		if (dateInitial) {
-			if (!dateFinal) {
-				throw new BadRequestException('Debe enviarse una fecha final');
+		try {
+			if (number) {
+				filters.number = number;
 			}
 
-			filters['createdAt'] = {
-				$gte: new Date(dateInitial),
-				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
-			};
-		} else if (dateFinal) {
-			if (!dateInitial) {
-				throw new BadRequestException('Debe enviarse una fecha inicial');
+			if (status) {
+				filters.status = status;
 			}
-			filters['createdAt'] = {
-				$gte: new Date(dateInitial),
-				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
-			};
-		}
 
-		return this.stockTransferModel.paginate(filters, options);
+			if (warehouseDestinationId) {
+				filters['warehouseDestination._id'] = new Types.ObjectId(
+					warehouseDestinationId,
+				);
+			}
+
+			if (warehouseOriginId) {
+				filters['warehouseOrigin._id'] = new Types.ObjectId(warehouseOriginId);
+			}
+
+			const options = {
+				limit,
+				page,
+				sort,
+				lean: true,
+				populate,
+			};
+
+			if (sort?.warehouseDestination) {
+				options.sort['warehouseDestination.name'] = sort.warehouseDestination;
+			}
+
+			if (sort?.warehouseOrigin) {
+				options.sort['warehouseOrigin.name'] = sort.warehouseOrigin;
+			}
+			if (dateInitial) {
+				if (!dateFinal) {
+					throw new BadRequestException('Debe enviarse una fecha final');
+				}
+
+				filters['createdAt'] = {
+					$gte: new Date(dateInitial),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+				};
+			} else if (dateFinal) {
+				if (!dateInitial) {
+					throw new BadRequestException('Debe enviarse una fecha inicial');
+				}
+				filters['createdAt'] = {
+					$gte: new Date(dateInitial),
+					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+				};
+			}
+
+			return this.stockTransferModel.paginate(filters, options);
+		} catch (error) {
+			throw new BadRequestException(`Se ha presentado un error  ${error}`);
+		}
 	}
 
 	async findById(id: string) {
@@ -163,10 +167,6 @@ export class StockTransferService {
 		userOrigin: Partial<User>,
 	) {
 		try {
-			if (!(details?.length > 0)) {
-				throw new BadRequestException('La solicitud no puede estar vacía');
-			}
-
 			if (options.status) {
 				if (!statusTypes.includes(options.status)) {
 					throw new BadRequestException(
@@ -181,6 +181,9 @@ export class StockTransferService {
 				}
 			}
 
+			if (!(details?.length > 0)) {
+				throw new BadRequestException('El traslado no puede estar vacío');
+			}
 			if (requests) {
 				const requestOpenOrCancel = await this.stockRequestService.findAllMany({
 					requests,
@@ -309,17 +312,6 @@ export class StockTransferService {
 						'El estado del traslado debe cambiar o enviarse vacío',
 					);
 				}
-
-				if (options.status === 'confirmed') {
-					const confirmedProducts = stockTransfer.details.find(
-						(detail) => detail.status === 'new',
-					);
-					if (confirmedProducts) {
-						throw new BadRequestException(
-							'Debe confirmar todos los productos para confirmar el traslado',
-						);
-					}
-				}
 			}
 
 			if (stockTransfer.status !== 'open' && !options.status) {
@@ -417,6 +409,15 @@ export class StockTransferService {
 				}
 
 				if (options.status === 'confirmed') {
+					const confirmedProducts = stockTransfer.details.find(
+						(detail) => detail.status === 'new',
+					);
+					if (confirmedProducts) {
+						throw new BadRequestException(
+							'Debe confirmar todos los productos para confirmar el traslado',
+						);
+					}
+
 					const detailHistory = response.details.map((detail) => ({
 						productId: detail.product._id.toString(),
 						quantity: detail.quantity,
