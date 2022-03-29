@@ -221,33 +221,31 @@ export class StockInputService {
 		user: User,
 	) {
 		const stockInput = await this.stockInputModel.findById(id).lean();
-
-		if (!statusTypes.includes(options.status)) {
-			throw new BadRequestException(
-				`Es estado ${options.status} no es un estado válido`,
-			);
-		}
-
-		if (!stockInput) {
-			throw new BadRequestException('La entrada no existe');
-		}
-
-		if (stockInput.status === 'cancelled') {
-			throw new BadRequestException('La entrada se encuenta cancelada');
-		}
-
-		if (stockInput.status === 'confirmed') {
-			throw new BadRequestException('La entrada se encuentra confirmada');
-		}
-
 		if (options.status) {
+			if (!statusTypes.includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+
+			if (!stockInput) {
+				throw new BadRequestException('La entrada no existe');
+			}
+
+			if (stockInput.status === 'cancelled') {
+				throw new BadRequestException('La entrada se encuenta cancelada');
+			}
+
+			if (stockInput.status === 'confirmed') {
+				throw new BadRequestException('La entrada se encuentra confirmada');
+			}
+
 			if (options.status === stockInput.status) {
 				throw new BadRequestException(
 					'El estado de la entrada debe cambiar o enviarse vacío',
 				);
 			}
 		}
-
 		if (details && details.length > 0) {
 			const productsDelete = details
 				.filter((detail) => detail.action === 'delete')

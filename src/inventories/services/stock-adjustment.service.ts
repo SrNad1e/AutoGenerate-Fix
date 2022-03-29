@@ -222,26 +222,25 @@ export class StockAdjustmentService {
 		user: User,
 	) {
 		const stockInput = await this.stockAdjustmetnModel.findById(id).lean();
-
-		if (!statusTypes.includes(options.status)) {
-			throw new BadRequestException(
-				`Es estado ${options.status} no es un estado válido`,
-			);
-		}
-
-		if (!stockInput) {
-			throw new BadRequestException('El ajuste no existe');
-		}
-
-		if (stockInput.status === 'cancelled') {
-			throw new BadRequestException('El ajuste se encuenta cancelado');
-		}
-
-		if (stockInput.status === 'confirmed') {
-			throw new BadRequestException('El ajuste se encuentra confirmado');
-		}
-
 		if (options.status) {
+			if (!statusTypes.includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+
+			if (!stockInput) {
+				throw new BadRequestException('El ajuste no existe');
+			}
+
+			if (stockInput.status === 'cancelled') {
+				throw new BadRequestException('El ajuste se encuenta cancelado');
+			}
+
+			if (stockInput.status === 'confirmed') {
+				throw new BadRequestException('El ajuste se encuentra confirmado');
+			}
+
 			if (options.status === stockInput.status) {
 				throw new BadRequestException(
 					'El estado del ajuste debe cambiar o enviarse vacío',

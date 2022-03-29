@@ -218,26 +218,25 @@ export class StockOutputService {
 		user: User,
 	) {
 		const stockInput = await this.stockOutputModel.findById(id).lean();
-
-		if (!statusTypes.includes(options.status)) {
-			throw new BadRequestException(
-				`Es estado ${options.status} no es un estado válido`,
-			);
-		}
-
-		if (!stockInput) {
-			throw new BadRequestException('La salida no existe');
-		}
-
-		if (stockInput.status === 'cancelled') {
-			throw new BadRequestException('La salida se encuenta cancelada');
-		}
-
-		if (stockInput.status === 'confirmed') {
-			throw new BadRequestException('La salida se encuentra confirmada');
-		}
-
 		if (options.status) {
+			if (!statusTypes.includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+
+			if (!stockInput) {
+				throw new BadRequestException('La salida no existe');
+			}
+
+			if (stockInput.status === 'cancelled') {
+				throw new BadRequestException('La salida se encuenta cancelada');
+			}
+
+			if (stockInput.status === 'confirmed') {
+				throw new BadRequestException('La salida se encuentra confirmada');
+			}
+
 			if (options.status === stockInput.status) {
 				throw new BadRequestException(
 					'El estado de la salida debe cambiar o enviarse vacío',
