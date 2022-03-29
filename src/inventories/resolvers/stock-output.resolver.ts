@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
 import { FiltersStockOutputInput } from '../dtos/filters-stockOutput.input';
 import { ResponseStockOutput } from '../dtos/response-stockOutput';
-import { UpdateStockOutputnput } from '../dtos/update-stockOutput-input';
+import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockOutputService } from '../services/stock-output.service';
 
@@ -50,7 +50,7 @@ export class StockOutputResolver {
 	@UseGuards(JwtAuthGuard)
 	update(
 		@Args('updateStockOutputInput')
-		_: UpdateStockOutputnput,
+		_: UpdateStockOutputInput,
 		@Args('id') id: string,
 		@Context() context,
 	) {

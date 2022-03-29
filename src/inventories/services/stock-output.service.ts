@@ -13,7 +13,7 @@ import { User } from 'src/users/entities/user.entity';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { FiltersStockOutputInput } from '../dtos/filters-stockOutput.input';
-import { UpdateStockOutputnput } from '../dtos/update-stockOutput-input';
+import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockHistoryService } from './stock-history.service';
 
@@ -214,7 +214,7 @@ export class StockOutputService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockOutputnput,
+		{ details, ...options }: UpdateStockOutputInput,
 		user: User,
 	) {
 		const stockInput = await this.stockOutputModel.findById(id).lean();

@@ -5,7 +5,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
-import {} from 'joi';
+import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
@@ -52,6 +52,17 @@ export class User extends Document {
 		autopopulate: true,
 	})
 	shop: Types.ObjectId;
+
+	@Prop({
+		type: Types.ObjectId,
+		ref: 'PointOfSale',
+		autopopulate: true,
+	})
+	@Field(() => PointOfSale, {
+		description: 'Punto de venta asignado al usuario',
+		nullable: true,
+	})
+	pointOfSale: Types.ObjectId;
 
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })

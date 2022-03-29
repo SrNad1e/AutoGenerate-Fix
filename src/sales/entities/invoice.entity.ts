@@ -2,62 +2,33 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+import { Customer } from 'src/crm/entities/customer.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Customer } from '../../crm/entities/customer.entity';
-import { Invoice } from './invoice.entity';
+import { AuthorizationDian } from './authorization.entity';
 
 @ObjectType()
-export class DetailOrder {
+export class DetailInvoice {
 	@Field(() => Product, { description: 'Producto agregado al pedido' })
 	product: Product;
 
-	@Field(() => String, { description: 'Estado del producto (new, confirmed)' })
-	status: string;
-
 	@Field(() => Number, { description: 'Cantidad de productos en el pedido' })
 	quantity: number;
-
-	@Field(() => Number, { description: 'Descuento del producto en el pedido' })
-	discount: number;
-
-	@Field(() => Number, { description: 'Precio del producto en el pedido' })
-	price: number;
-
-	@Field(() => Date, {
-		description: 'Fecha de agregado del producto al pedido',
-	})
-	createdAt: Date;
-
-	@Field(() => Date, {
-		description: 'Fecha de actualizado del producto al pedido',
-	})
-	updateAt: Date;
 }
 
 @ObjectType()
-export class PaymentOrder {
+export class PaymentInvoice {
 	@Field(() => Payment, { description: 'Método de pago usado' })
 	payment: Payment;
 
 	@Field(() => Number, { description: 'Total pagado' })
 	total: number;
-
-	@Field(() => Date, {
-		description: 'Fecha de agregado del pago al pedido',
-	})
-	createdAt: Date;
-
-	@Field(() => Date, {
-		description: 'Fecha de actualizado del pago al pedido',
-	})
-	updateAt: Date;
 }
 
 @ObjectType()
-export class SummaryOrder {
+export class SummaryInvoice {
 	@Field(() => Number, { description: 'Total del pedido' })
 	total: number;
 
@@ -79,68 +50,62 @@ export class SummaryOrder {
 
 @Schema({ timestamps: true })
 @ObjectType()
-export class Order extends Document {
+export class Invoice extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
-	@Field(() => Number, { description: 'Número de pedido' })
+	@Field(() => AuthorizationDian, {
+		description: 'Autorización de facturación',
+	})
+	@Prop({ type: Number, required: true })
+	autorization: AuthorizationDian;
+
+	@Field(() => Number, { description: 'Número de factura' })
 	@Prop({ type: Number, default: 0 })
 	number: number;
 
-	@Field(() => Customer, { description: 'Cliente que solicita el pedido' })
+	@Field(() => Customer, { description: 'Cliente para la factura' })
 	@Prop({
 		type: Object,
 		required: true,
 	})
 	customer: Customer;
 
-	@Field(() => Shop, { description: 'Tienda donde se solicita el pedido' })
+	@Field(() => Shop, { description: 'Tienda donde se realiza la factura' })
 	@Prop({
 		type: Object,
 		required: true,
 	})
 	shop: Shop;
 
-	@Field(() => [PaymentOrder], {
-		description: 'Métodos de pago usados en el pedido',
+	@Field(() => [PaymentInvoice], {
+		description: 'Métodos de pago usados en la factura',
 		nullable: true,
 	})
 	@Prop({
 		type: Object,
 	})
-	payments: PaymentOrder[];
+	payments: PaymentInvoice[];
 
-	@Field(() => String, {
-		description:
-			'Estado del pedido (open, pending, cancelled, closed, sent, invoiced)',
+	@Field(() => Boolean, {
+		description: 'La factura se encuentra activa o no',
 	})
 	@Prop({
-		type: String,
-		default: 'open',
+		type: Boolean,
+		default: true,
 	})
-	status: string;
+	active: boolean;
 
-	@Field(() => Invoice, {
-		description: 'Factura generada al facturar',
-		nullable: true,
-	})
-	@Prop({
-		type: Types.ObjectId,
-		ref: 'Invoice',
-		autopopulate: true,
-	})
-	invoice?: Types.ObjectId;
-
-	@Field(() => SummaryOrder, { description: 'Resumen de los pagosy totales' })
+	@Field(() => SummaryInvoice, { description: 'Resumen de los pagosy totales' })
 	@Prop({ type: Object })
-	summary: SummaryOrder;
+	summary: SummaryInvoice;
 
-	@Field(() => [DetailOrder], {
+	@Field(() => [DetailInvoice], {
 		description: 'Productos que tiene el pedido',
 		nullable: true,
 	})
 	@Prop({ type: Array })
-	details: DetailOrder[];
+	details: DetailInvoice[];
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el pedido',
@@ -155,4 +120,4 @@ export class Order extends Document {
 	updateAt: Date;
 }
 
-export const OrderSchema = SchemaFactory.createForClass(Order);
+export const InvoiceSchema = SchemaFactory.createForClass(Invoice);

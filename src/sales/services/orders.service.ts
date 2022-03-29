@@ -12,11 +12,12 @@ import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { User } from 'src/users/entities/user.entity';
-import { AddPaymentsOrderInput } from '../dtos/addPayments-order-input';
-import { AddProductsOrderInput } from '../dtos/addProducts-order-input';
+import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
+import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
+import { InvoicesService } from './invoices.service';
 
 const statuTypes = [
 	'open',
@@ -36,6 +37,7 @@ export class OrdersService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
+		private readonly invoicesService: InvoicesService,
 	) {}
 
 	async create({ status }: CreateOrderInput, user: User) {
@@ -85,6 +87,7 @@ export class OrdersService {
 
 				dataUpdate['customer'] = customer;
 			}
+			let invoice;
 
 			if (status) {
 				if (!statuTypes.includes(status)) {
@@ -95,7 +98,7 @@ export class OrdersService {
 
 				switch (order?.status) {
 					case 'open':
-						if (!['cancelled', 'invoiced'].includes(status)) {
+						if (!['cancelled', 'invoiced', 'closed'].includes(status)) {
 							throw new BadRequestException('El pedido se encuentra abierto');
 						}
 						break;
@@ -120,14 +123,34 @@ export class OrdersService {
 						break;
 				}
 
-				if (status === 'invoiced') {
-					//TODO: generar el proceso de facturación
+				if (
+					(order.status === 'open' && status === 'closed') ||
+					status === 'invoiced'
+				) {
+					const result = await this.invoicesService.create(
+						{
+							customerId,
+							details: order.details.map((item) => ({
+								productId: item.product._id.toString(),
+								quantity: item.quantity,
+								price: item.price,
+								discount: item.discount,
+							})),
+							payments: order.payments.map((item) => ({
+								paymentId: item.payment._id.toString(),
+								total: item.total,
+							})),
+						},
+						user,
+					);
+					invoice = result._id;
 				}
+
 				dataUpdate['status'] = status;
 			}
 
 			return this.orderModel.findByIdAndUpdate(orderId, {
-				$set: { ...dataUpdate, user },
+				$set: { ...dataUpdate, user, invoice },
 			});
 		} catch (error) {
 			return error;
@@ -268,10 +291,13 @@ export class OrdersService {
 							);
 						}
 
+						//calcular los descuentos
 						newDetails.push({
 							product,
 							status: 'new',
 							quantity: detail.quantity,
+							price: product.price,
+							discount: 0,
 							createdAt: new Date(),
 							updateAt: new Date(),
 						});

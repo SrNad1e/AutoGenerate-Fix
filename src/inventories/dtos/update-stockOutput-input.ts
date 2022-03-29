@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
-export class UpdateStockOutputnput {
+export class UpdateStockOutputInput {
 	@Field(() => [DetailStockOutputInput], {
 		description: 'Productos de la salida',
 		nullable: true,

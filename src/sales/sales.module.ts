@@ -11,6 +11,14 @@ import { OrdersResolver } from './resolvers/orders.resolver';
 import { ProductsModule } from 'src/products/products.module';
 import { InventoriesModule } from 'src/inventories/inventories.module';
 import { TreasuryModule } from 'src/treasury/treasury.module';
+import { InvoicesService } from './services/invoices.service';
+import { Invoice, InvoiceSchema } from './entities/invoice.entity';
+import { PointOfSale, PointOfSaleSchema } from './entities/pointOfSale.entity';
+import {
+	AuthorizationDian,
+	AuthorizationDianSchema,
+} from './entities/authorization.entity';
+import { PointOfSalesService } from './services/point-of-sales.service';
 
 @Module({
 	imports: [
@@ -34,9 +42,33 @@ import { TreasuryModule } from 'src/treasury/treasury.module';
 				},
 				inject: [getConnectionToken('')],
 			},
+			{
+				name: Invoice.name,
+				useFactory: async (connection: Connection) => {
+					const schema = PointOfSaleSchema;
+					const AutoIncrement = AutoIncrementFactory(connection);
+					schema.plugin(AutoIncrement, {
+						id: 'invoice_increment',
+						inc_field: 'number',
+						//	start_seq: 1888,
+					});
+					return schema;
+				},
+				inject: [getConnectionToken('')],
+			},
+		]),
+		MongooseModule.forFeature([
+			{
+				name: PointOfSale.name,
+				schema: PointOfSaleSchema,
+			},
+			{
+				name: AuthorizationDian.name,
+				schema: AuthorizationDianSchema,
+			},
 		]),
 	],
-	providers: [OrdersService, OrdersResolver],
+	providers: [OrdersService, OrdersResolver, InvoicesService, PointOfSalesService],
 	exports: [OrdersService],
 })
 export class SalesModule {}

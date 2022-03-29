@@ -1,6 +1,4 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Product } from 'src/products/entities/product.entity';
-import { Payment } from 'src/treasury/entities/payment.entity';
 
 @InputType()
 export class UpdateOrderInput {

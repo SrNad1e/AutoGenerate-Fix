@@ -36,6 +36,14 @@ type Address {
   number2: Float!
 }
 
+type AuthorizationDian {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Prefijo de autorización"""
+  prefix: String!
+}
+
 type City {
   """Identificador de mongo"""
   _id: String!
@@ -267,9 +275,23 @@ type DetailInput {
   updateAt: DateTime!
 }
 
+type DetailInvoice {
+  """Producto agregado al pedido"""
+  product: Product!
+
+  """Cantidad de productos en el pedido"""
+  quantity: Float!
+}
+
 type DetailOrder {
   """Fecha de agregado del producto al pedido"""
   createdAt: DateTime!
+
+  """Descuento del producto en el pedido"""
+  discount: Float!
+
+  """Precio del producto en el pedido"""
+  price: Float!
 
   """Producto agregado al pedido"""
   product: Product!
@@ -641,6 +663,44 @@ input FiltersWarehouseInput {
   sort: SortWarehouse
 }
 
+type Invoice {
+  """Identificador de mongo"""
+  _id: String!
+
+  """La factura se encuentra activa o no"""
+  active: Boolean!
+
+  """Autorización de facturación"""
+  autorization: AuthorizationDian!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Cliente para la factura"""
+  customer: Customer!
+
+  """Productos que tiene el pedido"""
+  details: [DetailInvoice!]
+
+  """Número de factura"""
+  number: Float!
+
+  """Métodos de pago usados en la factura"""
+  payments: [PaymentInvoice!]
+
+  """Tienda donde se realiza la factura"""
+  shop: Shop!
+
+  """Resumen de los pagosy totales"""
+  summary: SummaryInvoice!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el pedido"""
+  user: User!
+}
+
 type LoginResponse {
   access_token: String!
   user: User!
@@ -666,7 +726,7 @@ type Mutation {
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
-  updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputnput!): StockOutput!
+  updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
   updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
@@ -685,6 +745,9 @@ type Order {
   """Productos que tiene el pedido"""
   details: [DetailOrder!]
 
+  """Factura generada al facturar"""
+  invoice: Invoice
+
   """Número de pedido"""
   number: Float!
 
@@ -696,6 +759,9 @@ type Order {
 
   """Estado del pedido (open, pending, cancelled, closed, sent, invoiced)"""
   status: String!
+
+  """Resumen de los pagosy totales"""
+  summary: SummaryOrder!
 
   """Fecha de actualización"""
   updateAt: DateTime!
@@ -722,6 +788,14 @@ type Payment {
 
   """Usuario que creó o editó el medio de pago"""
   user: User!
+}
+
+type PaymentInvoice {
+  """Método de pago usado"""
+  payment: Payment!
+
+  """Total pagado"""
+  total: Float!
 }
 
 type PaymentOrder {
@@ -756,6 +830,29 @@ type Permission {
 
   """Título de la acción"""
   title: String!
+}
+
+type PointOfSale {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Tienda a la que pertenece el punto de venta"""
+  authorization: AuthorizationDian!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Nombre del punto de venta"""
+  name: String!
+
+  """Tienda a la que pertenece el punto de venta"""
+  shop: Shop!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el punto de venta"""
+  user: User!
 }
 
 type Product {
@@ -1442,6 +1539,46 @@ type StockTransfer {
   warehouseOrigin: Warehouse!
 }
 
+type SummaryInvoice {
+  """Cambio del pedido"""
+  change: Float!
+
+  """Descuento del pedido"""
+  discount: Float!
+
+  """Subtotal del pedido"""
+  subtotal: Float!
+
+  """Impuestos del pedido"""
+  tax: Float!
+
+  """Total del pedido"""
+  total: Float!
+
+  """Total pago del pedido"""
+  totalPaid: Float!
+}
+
+type SummaryOrder {
+  """Cambio del pedido"""
+  change: Float!
+
+  """Descuento del pedido"""
+  discount: Float!
+
+  """Subtotal del pedido"""
+  subtotal: Float!
+
+  """Impuestos del pedido"""
+  tax: Float!
+
+  """Total del pedido"""
+  total: Float!
+
+  """Total pago del pedido"""
+  totalPaid: Float!
+}
+
 input UpdateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputInput!]
@@ -1453,7 +1590,7 @@ input UpdateStockInputInput {
   status: String
 }
 
-input UpdateStockOutputnput {
+input UpdateStockOutputInput {
   """Productos de la salida"""
   details: [DetailStockOutputInput!]
 
@@ -1524,6 +1661,9 @@ type User {
 
   """Contraseña de usuario"""
   password: String
+
+  """Punto de venta asignado al usuario"""
+  pointOfSale: PointOfSale
 
   """Rol que ocupa el usuario"""
   role: Role!
