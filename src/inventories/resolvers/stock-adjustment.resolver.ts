@@ -19,7 +19,7 @@ export class StockAdjustmentResolver {
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersStockInputInput',
+			name: 'filtersStockAdjustmentInput',
 			nullable: true,
 			defaultValue: {},
 		})
@@ -40,7 +40,7 @@ export class StockAdjustmentResolver {
 	@Mutation(() => StockAdjustment, { name: 'createStockAdjustment' })
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createStockInputInput')
+		@Args('createStockAdjustmentInput')
 		_: CreateStockAdjustmentInput,
 		@Context() context,
 	) {
@@ -53,7 +53,7 @@ export class StockAdjustmentResolver {
 	@Mutation(() => StockAdjustment, { name: 'updateStockAdjustment' })
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateStockInputInput')
+		@Args('updateStockAdjustmentInput')
 		_: UpdateStockAdjustmentInput,
 		@Args('id') id: string,
 		@Context() context,
