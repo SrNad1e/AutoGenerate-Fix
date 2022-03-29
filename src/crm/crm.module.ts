@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Customer, CustomerSchema } from './entities/customer.entity';
+import {
+	CustomerType,
+	CustomerTypeSchema,
+} from './entities/customerType.entity';
 import { CustomersService } from './services/customers.service';
 
 @Module({
@@ -9,6 +13,10 @@ import { CustomersService } from './services/customers.service';
 			{
 				name: Customer.name,
 				schema: CustomerSchema,
+			},
+			{
+				name: CustomerType.name,
+				schema: CustomerTypeSchema,
 			},
 		]),
 	],

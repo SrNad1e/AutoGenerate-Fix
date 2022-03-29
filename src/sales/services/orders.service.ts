@@ -302,13 +302,15 @@ export class OrdersService {
 							);
 						}
 
+						//descuentos
+						const discount = 0;
 						//calcular los descuentos
 						newDetails.push({
 							product,
 							status: 'new',
 							quantity: detail.quantity,
 							price: product.price,
-							discount: 0,
+							discount,
 							createdAt: new Date(),
 							updateAt: new Date(),
 						});
