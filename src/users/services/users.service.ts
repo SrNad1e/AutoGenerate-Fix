@@ -10,6 +10,26 @@ import { Repository } from 'typeorm';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { User, UserMysql } from '../entities/user.entity';
 
+const populate = [
+	'role',
+	'shop',
+	'pointOfSale',
+	{
+		path: 'shop',
+		populate: {
+			path: 'defaultWarehouse',
+			model: 'Warehouse',
+		},
+	},
+	{
+		path:'pointOfSale',
+		populate:{
+			path:'authorization',
+			model:'AuthorizationDian'
+		}
+	}
+];
+
 @Injectable()
 export class UsersService {
 	constructor(
@@ -20,39 +40,19 @@ export class UsersService {
 	) {}
 
 	async getByIdMysql(id: number) {
-		return this.userModel.findOne({ id });
+		return this.userModel.findOne({ id }).populate(populate).lean();
 	}
 
 	async findAll(): Promise<Partial<User[]>> {
-		return await this.userModel.find().populate('role').lean();
+		return await this.userModel.find().populate(populate).lean();
 	}
 
 	async findOne(username: string): Promise<User> {
-		return this.userModel
-			.findOne({ username })
-			.populate(['role', 'shop'])
-			.populate({
-				path: 'shop',
-				populate: {
-					path: 'defaultWarehouse',
-					model: 'Warehouse',
-				},
-			})
-			.lean();
+		return this.userModel.findOne({ username }).populate(populate).lean();
 	}
 
 	async findById(id: string): Promise<Partial<User>> {
-		const user = await this.userModel
-			.findById(id)
-			.populate(['role', 'shop'])
-			.populate({
-				path: 'shop',
-				populate: {
-					path: 'defaultWarehouse',
-					model: 'Warehouse',
-				},
-			})
-			.lean();
+		const user = await this.userModel.findById(id).populate(populate).lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con id ${id} no existe`);
 		}
@@ -60,17 +60,7 @@ export class UsersService {
 	}
 
 	async getUserId(id: string): Promise<Partial<User>> {
-		const user = await this.userModel
-			.findById(id, { strictQuery: false })
-			.populate(['role', 'shop'])
-			.populate({
-				path: 'shop',
-				populate: {
-					path: 'defaultWarehouse',
-					model: 'Warehouse',
-				},
-			})
-			.lean();
+		const user = await this.userModel.findById(id).populate(populate).lean();
 		if (!user) {
 			throw new NotFoundException(`Usuario con idMysql ${id} no existe`);
 		}
@@ -81,7 +71,7 @@ export class UsersService {
 		const newUser = new this.userModel({
 			...user,
 		});
-		return (await newUser.save()).populate(['role', 'shop']);
+		return (await newUser.save()).populate(populate);
 	}
 
 	async update(
@@ -112,14 +102,7 @@ export class UsersService {
 				},
 				{ new: true },
 			)
-			.populate(['role', 'shop'])
-			.populate({
-				path: 'shop',
-				populate: {
-					path: 'defaultWarehouse',
-					model: 'Warehouse',
-				},
-			})
+			.populate(populate)
 			.lean();
 	}
 

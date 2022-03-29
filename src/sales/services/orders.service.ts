@@ -18,6 +18,7 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
 import { InvoicesService } from './invoices.service';
+import { PointOfSalesService } from './point-of-sales.service';
 
 const statuTypes = [
 	'open',
@@ -37,6 +38,7 @@ export class OrdersService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
+		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly invoicesService: InvoicesService,
 	) {}
 
@@ -155,6 +157,15 @@ export class OrdersService {
 		} catch (error) {
 			return error;
 		}
+	}
+
+	/**
+	 * @description obtiene los pedidos del punto de venta
+	 * @param idPointOfSale punto de venta
+	 * @returns pedidos del punto de venta
+	 */
+	async getByPointOfSales(idPointOfSale: string) {
+		return this.orderModel.find({ pointOfSale: idPointOfSale }).lean();
 	}
 
 	async addProducts({ orderId, details }: AddProductsOrderInput, user: User) {

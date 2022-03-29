@@ -10,6 +10,22 @@ input AddConfigInput {
   title: String!
 }
 
+input AddPaymentsOrderInput {
+  """Id del pedido que se requiere agreagar o editar productos"""
+  orderId: String!
+
+  """Medios de pago"""
+  payments: [PaymentsOrderInput!]!
+}
+
+input AddProductsOrderInput {
+  """Productos a crear o actualizar"""
+  details: [DetailAddProductsOrderInput!]!
+
+  """Id del pedido que se requiere agreagr o editar productos"""
+  orderId: String!
+}
+
 type Address {
   """Ciudad a la que pertenece"""
   city: City!
@@ -246,6 +262,17 @@ input DataInput {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+input DetailAddProductsOrderInput {
+  """Acción a realizar con el producto (create, update, delete)"""
+  action: String!
+
+  """Identificador Producto agregado al pedido"""
+  productId: String!
+
+  """Cantidad de producto agregado"""
+  quantity: Float!
+}
 
 type DetailAdjustment {
   """Fecha de agregado del deltalle al ajuste"""
@@ -716,6 +743,8 @@ input LoginUserInput {
 
 type Mutation {
   addConfi(addConfigData: AddConfigInput!): Configuration!
+  addPaymentsOrder(addPaymentsOrderInput: AddPaymentsOrderInput!): Order!
+  addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createOrder(createOrderInput: CreateOrderInput!): Order!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
@@ -753,6 +782,9 @@ type Order {
 
   """Métodos de pago usados en el pedido"""
   payments: [PaymentOrder!]
+
+  """Punto de venta asigando"""
+  pointOfSale: PointOfSale!
 
   """Tienda donde se solicita el pedido"""
   shop: Shop!
@@ -810,6 +842,17 @@ type PaymentOrder {
 
   """Fecha de actualizado del pago al pedido"""
   updateAt: DateTime!
+}
+
+input PaymentsOrderInput {
+  """Acción a realizar con el medio de pago (create, update, delete)"""
+  action: String!
+
+  """Identificador medio de pago agregado al pedido"""
+  paymentId: String!
+
+  """Valor total agregado"""
+  total: Float!
 }
 
 type Permission {
@@ -922,6 +965,7 @@ type Query {
   currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
+  ordersByPointOfSale(idPointOfSale: String!): [Order!]!
   product(filtersProductInput: FiltersProductInput = {}): Product!
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!

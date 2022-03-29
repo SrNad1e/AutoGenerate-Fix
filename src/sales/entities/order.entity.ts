@@ -8,6 +8,7 @@ import { Payment } from 'src/treasury/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
+import { PointOfSale } from './pointOfSale.entity';
 
 @ObjectType()
 export class DetailOrder {
@@ -141,6 +142,14 @@ export class Order extends Document {
 	})
 	@Prop({ type: Array })
 	details: DetailOrder[];
+
+	@Field(() => PointOfSale, { description: 'Punto de venta asigando' })
+	@Prop({
+		type: Types.ObjectId,
+		ref: 'PointOfSale',
+		autopopulate: true,
+	})
+	pointOfSale: Types.ObjectId;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el pedido',
