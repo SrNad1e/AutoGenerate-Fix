@@ -4,6 +4,13 @@ import { PaginateModel } from 'mongoose';
 
 import { Customer } from '../entities/customer.entity';
 
+const populate = [
+	{
+		path: 'type',
+		model: 'CustomerType',
+	},
+];
+
 @Injectable()
 export class CustomersService {
 	constructor(
@@ -12,7 +19,7 @@ export class CustomersService {
 
 	async findById(id: string) {
 		try {
-			return this.customerModel.findById(id).lean();
+			return this.customerModel.findById(id).populate(populate).lean();
 		} catch (error) {
 			throw new NotFoundException(`Error al consultar el usuario, ${error}`);
 		}
@@ -23,7 +30,10 @@ export class CustomersService {
 	 */
 	async getCustomerDefault() {
 		try {
-			return this.customerModel.findOne({ isDefault: true }).lean();
+			return this.customerModel
+				.findOne({ isDefault: true })
+				.populate(populate)
+				.lean();
 		} catch (error) {
 			return error;
 		}
@@ -35,7 +45,10 @@ export class CustomersService {
 	 */
 	async getCustomerAssigning(userId: string) {
 		try {
-			return this.customerModel.findOne({ assigningUser: userId }).lean();
+			return this.customerModel
+				.findOne({ assigningUser: userId })
+				.populate(populate)
+				.lean();
 		} catch (error) {
 			return error;
 		}

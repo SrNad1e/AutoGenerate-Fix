@@ -120,6 +120,20 @@ input CreateOrderInput {
   status: String!
 }
 
+input CreateStockAdjustmentInput {
+  """Productos del ajuste"""
+  details: [DetailStockAdjustmentCreateInput!]!
+
+  """Observación del que realiza el ajuste"""
+  observation: String
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String
+
+  """Identificador de la bodega para el ajuste"""
+  warehouseId: String!
+}
+
 input CreateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputCreateInput!]!
@@ -236,13 +250,33 @@ type Customer {
   """Número telefonico del cliente"""
   phone: Float
 
-  """Tipo de cliente (detail, wholesale, empleoyee, dealer)"""
-  type: String!
+  """Tipo de cliente"""
+  type: CustomerType!
 
   """Fecha de actualización"""
   updateAt: DateTime!
 
   """Usuario que creó o editó el cliente"""
+  user: User!
+}
+
+type CustomerType {
+  """Identificación de mongo"""
+  _id: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Descuento al tipo de cliente"""
+  discount: Float!
+
+  """Nombre del tipo de cliente"""
+  name: String!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el tipo de cliente"""
   user: User!
 }
 
@@ -359,6 +393,25 @@ type DetailRequest {
 
   """Fecha de actualizado del producto a la solicitud"""
   updateAt: DateTime!
+}
+
+input DetailStockAdjustmentCreateInput {
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
+input DetailStockAdjustmentInput {
+  """Acción a efectuar con el producto (delete, update, create)"""
+  action: String!
+
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
 }
 
 input DetailStockInputCreateInput {
@@ -554,6 +607,35 @@ input FiltersSizeInput {
   sort: SortSize
 }
 
+input FiltersStockAdjustmentInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo asignado al ajuste"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortStockAdjustment
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String
+
+  """Valor total de la entrada"""
+  total: Float
+
+  """Id de la bodega"""
+  warehouseId: String
+}
+
 input FiltersStockInputInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -747,6 +829,7 @@ type Mutation {
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createOrder(createOrderInput: CreateOrderInput!): Order!
+  createStockAdjustment(createStockInputInput: CreateStockAdjustmentInput!): StockAdjustment!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
@@ -754,6 +837,7 @@ type Mutation {
   generateStockRequest(shopId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
+  updateStockAdjustment(id: String!, updateStockInputInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
@@ -970,6 +1054,8 @@ type Query {
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
+  stockAdjustmentId(id: String!): StockAdjustment!
+  stockAdjustments(filtersStockInputInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
   stockInputId(id: String!): StockInput!
   stockInputs(filtersStockInputInput: FiltersStockInputInput = {}): ResponseStockInput!
   stockOutputId(id: String!): StockOutput!
@@ -1055,6 +1141,38 @@ type ResponseProduct {
 type ResponseSize {
   """Lista de tallas"""
   docs: [Size!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseStockAdjustment {
+  """Lista de ajustes"""
+  docs: [StockAdjustment!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -1344,6 +1462,26 @@ input SortSize {
   value: Float
 }
 
+input SortStockAdjustment {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por número"""
+  number: Float
+
+  """Ordenamiento por estado"""
+  status: Float
+
+  """Ordenamiento por total"""
+  total: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+
+  """Ordenamiento por bodega"""
+  warehouse: Float
+}
+
 input SortStockInput {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -1435,6 +1573,29 @@ type Stock {
   quantity: Float!
 
   """Identificador de la bodega"""
+  warehouse: Warehouse!
+}
+
+type StockAdjustment {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Detalles del ajuste"""
+  details: [DetailAdjustment!]!
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Observación de la entrada"""
+  observation: String
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String!
+
+  """Costo total del ajuste"""
+  total: Float!
+
+  """Bodega del ajuste"""
   warehouse: Warehouse!
 }
 
@@ -1621,6 +1782,17 @@ type SummaryOrder {
 
   """Total pago del pedido"""
   totalPaid: Float!
+}
+
+input UpdateStockAdjustmentInput {
+  """Productos del ajuste"""
+  details: [DetailStockAdjustmentInput!]
+
+  """Observación del ajuste"""
+  observation: String
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String
 }
 
 input UpdateStockInputInput {

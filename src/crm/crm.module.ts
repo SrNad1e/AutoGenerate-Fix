@@ -6,6 +6,7 @@ import {
 	CustomerTypeSchema,
 } from './entities/customerType.entity';
 import { CustomersService } from './services/customers.service';
+import { CustomerTypeService } from './services/customer-type.service';
 
 @Module({
 	imports: [
@@ -20,7 +21,7 @@ import { CustomersService } from './services/customers.service';
 			},
 		]),
 	],
-	providers: [CustomersService],
+	providers: [CustomersService, CustomerTypeService],
 	exports: [CustomersService],
 })
 export class CrmModule {}

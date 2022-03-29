@@ -29,6 +29,13 @@ const statuTypes = [
 	'invoiced',
 ];
 
+const populate = [
+	{
+		path: 'type',
+		model: 'CustomerType',
+	},
+];
+
 @Injectable()
 export class OrdersService {
 	constructor(
@@ -303,8 +310,8 @@ export class OrdersService {
 						}
 
 						//descuentos
-						const discount = 0;
-						//calcular los descuentos
+						const discount =0// order?.customer.type.discount;
+
 						newDetails.push({
 							product,
 							status: 'new',
@@ -322,7 +329,6 @@ export class OrdersService {
 				}
 			}
 
-			//construir actualización
 			for (let i = 0; i < productsUpdate.length; i++) {
 				const product = productsUpdate[i];
 
@@ -339,7 +345,6 @@ export class OrdersService {
 				}
 			}
 
-			//generar movimientos de inventario
 			await this.stockHistoryService.addStock({
 				details: productsDelete,
 				documentId: orderId,

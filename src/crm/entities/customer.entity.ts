@@ -5,6 +5,7 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { City } from './city.entity';
+import { CustomerType } from './customerType.entity';
 import { DocumentType } from './documentType.entity';
 
 @ObjectType()
@@ -71,11 +72,11 @@ export class Customer extends Document {
 	@Prop({ type: String, required: true })
 	lastName: string;
 
-	@Field(() => String, {
-		description: 'Tipo de cliente (detail, wholesale, empleoyee, dealer)',
+	@Field(() => CustomerType, {
+		description: 'Tipo de cliente',
 	})
-	@Prop({ type: String, default: 'detail' })
-	type: string;
+	@Prop({ type: Types.ObjectId, ref: 'CustomerType' })
+	type: Types.ObjectId;
 
 	@Field(() => [Address], {
 		description: 'Direcciones del cliente',
