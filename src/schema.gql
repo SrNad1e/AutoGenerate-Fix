@@ -829,7 +829,7 @@ type Mutation {
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createOrder(createOrderInput: CreateOrderInput!): Order!
-  createStockAdjustment(createStockInputInput: CreateStockAdjustmentInput!): StockAdjustment!
+  createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
@@ -837,7 +837,7 @@ type Mutation {
   generateStockRequest(shopId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
-  updateStockAdjustment(id: String!, updateStockInputInput: UpdateStockAdjustmentInput!): StockAdjustment!
+  updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
@@ -1055,7 +1055,7 @@ type Query {
   reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockAdjustmentId(id: String!): StockAdjustment!
-  stockAdjustments(filtersStockInputInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
+  stockAdjustments(filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
   stockInputId(id: String!): StockInput!
   stockInputs(filtersStockInputInput: FiltersStockInputInput = {}): ResponseStockInput!
   stockOutputId(id: String!): StockOutput!
