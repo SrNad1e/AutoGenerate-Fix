@@ -3,9 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
+import { Order } from 'src/sales/entities/order.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
+import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistory } from '../entities/stock-history.entity';
 import { StockInput } from '../entities/stock-input.entity';
 import { StockOutput } from '../entities/stock-output.entity';
@@ -22,6 +24,10 @@ export class StockHistoryService {
 		private readonly stockInputModel: PaginateModel<StockInput>,
 		@InjectModel(StockOutput.name)
 		private readonly stockOutputModel: PaginateModel<StockOutput>,
+		@InjectModel(StockAdjustment.name)
+		private readonly stockAdjustmentModel: PaginateModel<StockAdjustment>,
+		@InjectModel(Order.name)
+		private readonly orderModel: PaginateModel<Order>,
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 	) {}
@@ -48,11 +54,11 @@ export class StockHistoryService {
 				case 'input':
 					document = await this.stockInputModel.findById(documentId).lean();
 					break;
-				case 'adjustment':
-					//	document = await this.stockTransferService.findById(documentId);
+				case 'order':
+					document = await this.orderModel.findById(documentId).lean();
 					break;
-				case 'refund':
-					//	document = await this.stockTransferService.findById(documentId);
+				case 'adjustment':
+					document = await this.stockAdjustmentModel.findById(documentId);
 					break;
 				default:
 					throw new BadRequestException(
@@ -135,13 +141,10 @@ export class StockHistoryService {
 					document = await this.stockOutputModel.findById(documentId).lean();
 					break;
 				case 'adjustment':
-					//	document = await this.stockTransferService.findById(documentId);
-					break;
-				case 'invoice':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.stockAdjustmentModel.findById(documentId);
 					break;
 				case 'order':
-					//	document = await this.stockTransferService.findById(documentId);
+					document = await this.orderModel.findById(documentId).lean();
 					break;
 				default:
 					throw new BadRequestException(

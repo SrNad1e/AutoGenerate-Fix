@@ -8,11 +8,17 @@ import { Order, OrderSchema } from './entities/order.entity';
 import { OrdersService } from './services/orders.service';
 import { ShopsModule } from 'src/shops/shops.module';
 import { OrdersResolver } from './resolvers/orders.resolver';
+import { ProductsModule } from 'src/products/products.module';
+import { InventoriesModule } from 'src/inventories/inventories.module';
+import { TreasuryModule } from 'src/treasury/treasury.module';
 
 @Module({
 	imports: [
+		InventoriesModule,
 		CrmModule,
 		ShopsModule,
+		ProductsModule,
+		TreasuryModule,
 		MongooseModule.forFeatureAsync([
 			{
 				name: Order.name,
@@ -31,5 +37,6 @@ import { OrdersResolver } from './resolvers/orders.resolver';
 		]),
 	],
 	providers: [OrdersService, OrdersResolver],
+	exports: [OrdersService],
 })
 export class SalesModule {}

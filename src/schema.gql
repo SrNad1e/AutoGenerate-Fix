@@ -707,6 +707,21 @@ type Order {
 type Payment {
   """Identificador de mongo"""
   _id: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Nombre del medio de pago"""
+  name: String!
+
+  """Tipo de medio de pago (cash, bank, credit)"""
+  type: String!
+
+  """Fecha de actualización"""
+  updateAt: DateTime!
+
+  """Usuario que creó o editó el medio de pago"""
+  user: User!
 }
 
 type PaymentOrder {
@@ -714,7 +729,7 @@ type PaymentOrder {
   createdAt: DateTime!
 
   """Método de pago usado"""
-  payments: Payment!
+  payment: Payment!
 
   """Total pagado"""
   total: Float!

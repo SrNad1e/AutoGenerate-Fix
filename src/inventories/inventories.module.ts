@@ -38,6 +38,7 @@ import { StockOutputService } from './services/stock-output.service';
 import { StockAdjustmentService } from './services/stock-adjustment.service';
 import { StockOutputResolver } from './resolvers/stock-output.resolver';
 import { StockAdjustmentResolver } from './resolvers/stock-adjustment.resolver';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 
 @Module({
 	imports: [
@@ -117,6 +118,10 @@ import { StockAdjustmentResolver } from './resolvers/stock-adjustment.resolver';
 				name: StockHistory.name,
 				useFactory: () => StockHistorySchema,
 			},
+			{
+				name: Order.name,
+				useFactory: () => OrderSchema,
+			},
 		]),
 	],
 	providers: [
@@ -133,6 +138,6 @@ import { StockAdjustmentResolver } from './resolvers/stock-adjustment.resolver';
 		StockAdjustmentResolver,
 	],
 	controllers: [],
-	exports: [],
+	exports: [StockHistoryService],
 })
 export class InventoriesModule {}

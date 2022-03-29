@@ -33,7 +33,7 @@ export class DetailOrder {
 @ObjectType()
 export class PaymentOrder {
 	@Field(() => Payment, { description: 'Método de pago usado' })
-	payments: Payment;
+	payment: Payment;
 
 	@Field(() => Number, { description: 'Total pagado' })
 	total: number;
