@@ -28,7 +28,7 @@ export class CustomerType extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 export const CustomerTypeSchema = SchemaFactory.createForClass(CustomerType);

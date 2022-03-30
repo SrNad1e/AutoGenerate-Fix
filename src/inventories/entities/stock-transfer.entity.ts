@@ -120,7 +120,7 @@ class DetailTransfer {
 	@Field(() => Date, {
 		description: 'Fecha de actualizacion el producto',
 	})
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 @Entity({ name: 'stock_transfer' })

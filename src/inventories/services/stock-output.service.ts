@@ -175,7 +175,7 @@ export class StockOutputService {
 					product,
 					quantity,
 					createdAt: new Date(),
-					updateAt: new Date(),
+					updatedAt: new Date(),
 				});
 			}
 			const total = detailsInput.reduce(
@@ -262,7 +262,7 @@ export class StockOutputService {
 						return {
 							...detail,
 							quantity: productFind.quantity,
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						};
 					}
 					return detail;
@@ -287,7 +287,7 @@ export class StockOutputService {
 						product,
 						quantity,
 						createdAt: new Date(),
-						updateAt: new Date(),
+						updatedAt: new Date(),
 					});
 				}
 			}

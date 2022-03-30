@@ -265,7 +265,7 @@ export class OrdersService {
 						return {
 							...detail,
 							quantity: productFind.quantity,
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						};
 					}
 
@@ -316,7 +316,7 @@ export class OrdersService {
 							price: product.price,
 							discount: (customerType.discount / 100) * product.price,
 							createdAt: new Date(),
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						});
 					} else {
 						throw new NotFoundException(
@@ -459,7 +459,7 @@ export class OrdersService {
 						return {
 							...item,
 							total: paymentFind.total,
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						};
 					}
 					return item;
@@ -494,7 +494,7 @@ export class OrdersService {
 						payment,
 						total: detailPayment.total,
 						createdAt: new Date(),
-						updateAt: new Date(),
+						updatedAt: new Date(),
 					});
 				}
 			}

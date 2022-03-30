@@ -23,7 +23,7 @@ export class DetailAdjustment {
 	@Field(() => Date, {
 		description: 'Fecha de actualización del detalle al ajuste',
 	})
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 @Schema({ timestamps: true, collection: 'stockadjustment' })

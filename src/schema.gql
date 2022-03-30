@@ -71,7 +71,7 @@ type City {
   name: String!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó la ciudad"""
   user: User!
@@ -217,6 +217,9 @@ type Customer {
   """Identificador de mongo"""
   _id: String!
 
+  """Se encuentra activo el usuario"""
+  active: Boolean!
+
   """Direcciones del cliente"""
   address: [Address!]
 
@@ -254,7 +257,7 @@ type Customer {
   type: CustomerType!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el cliente"""
   user: User!
@@ -274,7 +277,7 @@ type CustomerType {
   name: String!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el tipo de cliente"""
   user: User!
@@ -319,7 +322,7 @@ type DetailAdjustment {
   quantity: Float!
 
   """Fecha de actualización del detalle al ajuste"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type DetailInput {
@@ -333,7 +336,7 @@ type DetailInput {
   quantity: Float!
 
   """Fecha de actualización del detalle a la entrada"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type DetailInvoice {
@@ -364,7 +367,7 @@ type DetailOrder {
   status: String!
 
   """Fecha de actualizado del producto al pedido"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type DetailOutput {
@@ -378,7 +381,7 @@ type DetailOutput {
   quantity: Float!
 
   """Fecha de actualización del detalle a la salida"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type DetailRequest {
@@ -392,7 +395,7 @@ type DetailRequest {
   quantity: Float!
 
   """Fecha de actualizado del producto a la solicitud"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 input DetailStockAdjustmentCreateInput {
@@ -507,7 +510,7 @@ type DetailTransfer {
   status: String!
 
   """Fecha de actualizacion el producto"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type DocumentType {
@@ -521,7 +524,7 @@ type DocumentType {
   name: String!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el pedido"""
   user: User!
@@ -542,6 +545,23 @@ input FiltersColorInput {
 
   """Ordenamiento"""
   sort: SortColor
+}
+
+input FiltersCustomerInput {
+  """Si el cliente se encuentra activo"""
+  active: Boolean
+
+  """comodin para la busque de documento, nombre y apellido"""
+  dato: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCustomer
 }
 
 input FiltersProductInput {
@@ -780,7 +800,7 @@ type Invoice {
   active: Boolean!
 
   """Autorización de facturación"""
-  autorization: AuthorizationDian!
+  authorization: AuthorizationDian!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -804,7 +824,7 @@ type Invoice {
   summary: SummaryInvoice!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el pedido"""
   user: User!
@@ -880,7 +900,7 @@ type Order {
   summary: SummaryOrder!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el pedido"""
   user: User!
@@ -900,7 +920,7 @@ type Payment {
   type: String!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el medio de pago"""
   user: User!
@@ -925,7 +945,7 @@ type PaymentOrder {
   total: Float!
 
   """Fecha de actualizado del pago al pedido"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 }
 
 input PaymentsOrderInput {
@@ -976,7 +996,7 @@ type PointOfSale {
   shop: Shop!
 
   """Fecha de actualización"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó o editó el punto de venta"""
   user: User!
@@ -1047,6 +1067,7 @@ type Query {
   colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
   configuration(module: String!): Configuration
   currentUser: User!
+  customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
   orderId(id: String!): [Order!]!
@@ -1078,6 +1099,38 @@ type ReportSalesResponse {
 type ResponseColor {
   """Lista de colores"""
   docs: [Color!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseCustomer {
+  """Lista de clientes"""
+  docs: [Customer!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -1446,6 +1499,32 @@ input SortColor {
   updatedAt: Float
 }
 
+input SortCustomer {
+  """ordernamiento por docuemnto"""
+  active: Float!
+
+  """ordernamiento por documento"""
+  document: Float!
+
+  """ordernamiento por docuemnto"""
+  email: Float!
+
+  """ordernamiento por nombre"""
+  firstName: Float!
+
+  """ordernamiento por docuemnto"""
+  isDefault: Float!
+
+  """ordernamiento por docuemnto"""
+  isWhatsapp: Float!
+
+  """ordernamiento por apellido"""
+  lastName: Float!
+
+  """ordernamiento por docuemnto"""
+  phone: Float!
+}
+
 input SortProduct {
   barcode: Float
   changeable: Float
@@ -1554,7 +1633,7 @@ input SortStockTransfer {
   status: Float
 
   """Ordenamiento por fecha de actualización"""
-  updateAt: Float
+  updatedAt: Float
 
   """Ordenamiento por bodega de destino"""
   warehouseDestination: Float
@@ -1901,7 +1980,7 @@ type User {
   type: CustomerType!
 
   """Nombre de usuario"""
-  updateAt: DateTime!
+  updatedAt: DateTime!
 
   """Usuario que creó el usuario"""
   user: User!

@@ -22,7 +22,7 @@ export class DetailRequest {
 	@Field(() => Date, {
 		description: 'Fecha de actualizado del producto a la solicitud',
 	})
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 @Schema({ timestamps: true, collection: 'stockrequest' })

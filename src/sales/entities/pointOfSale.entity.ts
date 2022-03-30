@@ -37,7 +37,7 @@ export class PointOfSale extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 export const PointOfSaleSchema = SchemaFactory.createForClass(PointOfSale);

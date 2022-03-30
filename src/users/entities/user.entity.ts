@@ -73,7 +73,7 @@ export class User extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Nombre de usuario' })
-	updateAt: Date;
+	updatedAt: Date;
 
 	//TODO: id de mysql para migracion
 	@Field(() => User, {

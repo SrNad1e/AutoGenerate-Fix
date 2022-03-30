@@ -35,7 +35,7 @@ export class DetailOrder {
 	@Field(() => Date, {
 		description: 'Fecha de actualizado del producto al pedido',
 	})
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 @ObjectType()
@@ -54,7 +54,7 @@ export class PaymentOrder {
 	@Field(() => Date, {
 		description: 'Fecha de actualizado del pago al pedido',
 	})
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 @ObjectType()
@@ -171,7 +171,7 @@ export class Order extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel } from 'mongoose';
+import { FiltersCustomerInput } from '../dtos/filters-customer-input';
 
 import { Customer } from '../entities/customer.entity';
 
@@ -16,6 +17,62 @@ export class CustomersService {
 	constructor(
 		@InjectModel(Customer.name) private customerModel: PaginateModel<Customer>,
 	) {}
+
+	async findAll({
+		dato,
+		sort,
+		active,
+		limit = 20,
+		page = 1,
+	}: FiltersCustomerInput) {
+		const filters: FilterQuery<Customer> = {};
+
+		try {
+			if (dato) {
+				filters.$or = [
+					{
+						identification: {
+							$regex: dato,
+							$options: 'i',
+						},
+						firstName: {
+							$regex: dato,
+							$options: 'i',
+						},
+						lastName: {
+							$regex: dato,
+							$options: 'i',
+						},
+						email: {
+							$regex: dato,
+							$options: 'i',
+						},
+						phone: {
+							$regex: dato,
+							$options: 'i',
+						},
+					},
+				];
+			}
+
+			if (active) {
+				filters.active = active;
+			}
+
+			const options = {
+				limit,
+				page,
+				sort,
+				lean: true,
+				populate,
+			};
+
+			return this.customerModel.paginate(filters, options);
+		} catch (error) {
+			return error;
+		}
+		return;
+	}
 
 	async findById(id: string) {
 		try {

@@ -105,7 +105,7 @@ export class InvoicesService {
 		};
 
 		return this.invoiceModel.create({
-			autorization: pointOfSale.authorization,
+			authorization: pointOfSale.authorization,
 			customer,
 			shop: user.shop,
 			payments: newPayments,

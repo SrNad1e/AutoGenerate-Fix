@@ -29,7 +29,7 @@ export class Payment extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);

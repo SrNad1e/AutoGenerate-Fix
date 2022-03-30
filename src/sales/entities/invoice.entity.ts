@@ -58,7 +58,7 @@ export class Invoice extends Document {
 		description: 'Autorización de facturación',
 	})
 	@Prop({ type: Number, required: true })
-	autorization: AuthorizationDian;
+	authorization: AuthorizationDian;
 
 	@Field(() => Number, { description: 'Número de factura' })
 	@Prop({ type: Number, default: 0 })
@@ -117,7 +117,7 @@ export class Invoice extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 export const InvoiceSchema = SchemaFactory.createForClass(Invoice);

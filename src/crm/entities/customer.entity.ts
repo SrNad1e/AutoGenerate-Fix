@@ -111,6 +111,12 @@ export class Customer extends Document {
 	@Prop({ type: Boolean, default: false })
 	isDefault: boolean;
 
+	@Field(() => Boolean, {
+		description: 'Se encuentra activo el usuario',
+	})
+	@Prop({ type: Boolean, default: true })
+	active: boolean;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cliente',
 	})
@@ -128,7 +134,7 @@ export class Customer extends Document {
 	createdAt: Date;
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
-	updateAt: Date;
+	updatedAt: Date;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

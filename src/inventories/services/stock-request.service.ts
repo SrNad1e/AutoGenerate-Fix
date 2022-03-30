@@ -215,7 +215,7 @@ export class StockRequestService {
 					product,
 					quantity: quantity,
 					createdAt: new Date(),
-					updateAt: new Date(),
+					updatedAt: new Date(),
 				});
 			}
 
@@ -335,7 +335,7 @@ export class StockRequestService {
 							product,
 							quantity,
 							createdAt: new Date(),
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						});
 					} else if (action === 'update') {
 						const detailFindIndex = newDetails.findIndex(
@@ -359,7 +359,7 @@ export class StockRequestService {
 							...productFind,
 							product,
 							quantity,
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						};
 					}
 				}

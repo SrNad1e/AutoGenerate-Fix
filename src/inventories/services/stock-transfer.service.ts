@@ -231,7 +231,7 @@ export class StockTransferService {
 					quantity,
 					status: 'new',
 					createdAt: new Date(),
-					updateAt: new Date(),
+					updatedAt: new Date(),
 				});
 			}
 
@@ -349,7 +349,7 @@ export class StockTransferService {
 							return {
 								...detail,
 								quantity: productFind.quantity,
-								updateAt: new Date(),
+								updatedAt: new Date(),
 							};
 						}
 						return detail;
@@ -372,7 +372,7 @@ export class StockTransferService {
 							quantity,
 							status: 'new',
 							createdAt: new Date(),
-							updateAt: new Date(),
+							updatedAt: new Date(),
 						});
 					}
 				}

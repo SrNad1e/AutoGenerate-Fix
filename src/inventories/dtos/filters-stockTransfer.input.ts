@@ -37,7 +37,7 @@ export class SortStockTransfer {
 		description: 'Ordenamiento por fecha de actualización',
 		nullable: true,
 	})
-	updateAt: number;
+	updatedAt: number;
 }
 
 @InputType()
