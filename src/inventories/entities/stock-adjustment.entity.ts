@@ -5,6 +5,7 @@ import { Document, Types } from 'mongoose';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @ObjectType()
 export class DetailAdjustment {
@@ -59,6 +60,18 @@ export class StockAdjustment extends Document {
 	})
 	@Prop({ type: String })
 	observation: string;
+
+	@Field(() => User, { description: 'Usuario que creó el ajuste' })
+	@Prop({ type: Object, required: true })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación de la entrada' })
+	createdAt: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de la última actulización de la entrada',
+	})
+	updatedAt: Date;
 }
 export const StockAdjustmentSchema =
 	SchemaFactory.createForClass(StockAdjustment);
