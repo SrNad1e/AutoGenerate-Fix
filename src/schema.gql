@@ -1049,6 +1049,7 @@ type Query {
   currentUser: User!
   getAll: [Configuration!]!
   getForName(module: String!, name: String!): Configuration!
+  orderId(id: String!): [Order!]!
   ordersByPointOfSale(idPointOfSale: String!): [Order!]!
   product(filtersProductInput: FiltersProductInput = {}): Product!
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!

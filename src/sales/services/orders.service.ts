@@ -42,6 +42,10 @@ export class OrdersService {
 		private readonly customerTypesService: CustomerTypeService,
 	) {}
 
+	async findById(id: string) {
+		return this.orderModel.findById(id).lean();
+	}
+
 	async create({ status }: CreateOrderInput, user: User) {
 		try {
 			if (!['open', 'pending'].includes(status)) {

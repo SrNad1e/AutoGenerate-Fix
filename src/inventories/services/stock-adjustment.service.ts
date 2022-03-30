@@ -206,7 +206,7 @@ export class StockAdjustmentService {
 					details: detailHistory,
 					warehouseId,
 					documentId: response._id.toString(),
-					documentType: 'output',
+					documentType: 'adjustment',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
 			}
@@ -324,7 +324,7 @@ export class StockAdjustmentService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'input',
+					documentType: 'adjustment',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
 			}
@@ -354,7 +354,7 @@ export class StockAdjustmentService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'input',
+					documentType: 'adjustment',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
 			}

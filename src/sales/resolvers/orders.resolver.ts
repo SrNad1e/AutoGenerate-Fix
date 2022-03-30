@@ -18,6 +18,12 @@ export class OrdersResolver {
 		return this.ordersService.getByPointOfSales(idPointOfSale);
 	}
 
+	@Query(() => [Order], { name: 'orderId' })
+	@UseGuards(JwtAuthGuard)
+	findById(@Args('id') id: string) {
+		return this.ordersService.findById(id);
+	}
+
 	@Mutation(() => Order, { name: 'createOrder' })
 	@UseGuards(JwtAuthGuard)
 	create(@Args('createOrderInput') _: CreateOrderInput, @Context() context) {
