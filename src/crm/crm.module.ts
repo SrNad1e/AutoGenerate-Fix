@@ -22,6 +22,6 @@ import { CustomerTypeService } from './services/customer-type.service';
 		]),
 	],
 	providers: [CustomersService, CustomerTypeService],
-	exports: [CustomersService],
+	exports: [CustomersService, CustomerTypeService],
 })
 export class CrmModule {}

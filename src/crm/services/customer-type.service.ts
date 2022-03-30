@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { CustomerType } from '../entities/customerType.entity';
@@ -10,5 +10,13 @@ export class CustomerTypeService {
 		private readonly customerTypeModel: PaginateModel<CustomerType>,
 	) {}
 
-    
+	async findById(id: string) {
+		try {
+			return this.customerTypeModel.findById(id);
+		} catch (error) {
+			throw new NotFoundException(
+				`Error al consultar tipo de cliente, ${error}`,
+			);
+		}
+	}
 }

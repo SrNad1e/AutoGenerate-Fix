@@ -6,6 +6,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
+import { CustomerType } from 'src/crm/entities/customerType.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
@@ -27,11 +28,11 @@ export class User extends Document {
 	@Prop({ type: String, required: true })
 	password: string;
 
-	@Field(() => String, {
-		description: 'Tipo de usuario (detail, wholesale, employee, dealer)',
+	@Field(() => CustomerType, {
+		description: 'Tipo de cliente',
 	})
-	@Prop({ type: String, default: 'detail' })
-	type: string;
+	@Prop({ type: Types.ObjectId, ref: 'CustomerType', required: true })
+	type: Types.ObjectId;
 
 	@Field(() => Role, {
 		description: 'Rol que ocupa el usuario',

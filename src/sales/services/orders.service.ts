@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
+import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
@@ -18,7 +19,6 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
 import { InvoicesService } from './invoices.service';
-import { PointOfSalesService } from './point-of-sales.service';
 
 const statuTypes = [
 	'open',
@@ -27,13 +27,6 @@ const statuTypes = [
 	'closed',
 	'sent',
 	'invoiced',
-];
-
-const populate = [
-	{
-		path: 'type',
-		model: 'CustomerType',
-	},
 ];
 
 @Injectable()
@@ -45,8 +38,8 @@ export class OrdersService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
-		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly invoicesService: InvoicesService,
+		private readonly customerTypesService: CustomerTypeService,
 	) {}
 
 	async create({ status }: CreateOrderInput, user: User) {
@@ -55,7 +48,7 @@ export class OrdersService {
 				throw new BadRequestException('El estado del pedido no es correcto');
 			}
 
-			if (user.type === 'employee' && status === 'open') {
+			if (user.pointOfSale && status === 'open') {
 				const customer = await this.customersService.getCustomerDefault();
 				const shop = await this.shopsService.findById(user.shop._id.toString());
 
@@ -295,6 +288,9 @@ export class OrdersService {
 					}
 				}
 
+				const customerType = await this.customerTypesService.findById(
+					order.customer.type.toString(),
+				);
 				for (let i = 0; i < productsUpdate.length; i++) {
 					const detail = productsUpdate[i];
 
@@ -309,15 +305,12 @@ export class OrdersService {
 							);
 						}
 
-						//descuentos
-						const discount =0// order?.customer.type.discount;
-
 						newDetails.push({
 							product,
 							status: 'new',
 							quantity: detail.quantity,
 							price: product.price,
-							discount,
+							discount: (customerType.discount / 100) * product.price,
 							createdAt: new Date(),
 							updateAt: new Date(),
 						});
@@ -359,10 +352,33 @@ export class OrdersService {
 				warehouseId: order.shop.defaultWarehouse.toString(),
 			});
 
+			const subtotal = newDetails.reduce(
+				(sum, detail) => sum + detail.price * detail.quantity,
+				0,
+			);
+
+			const discount = newDetails.reduce(
+				(sum, detail) => sum + detail.quantity * detail.discount,
+				0,
+			);
+
+			const total = subtotal - discount;
+
+			const tax = 0;
+
+			const summary = {
+				...order.summary,
+				total,
+				discount,
+				subtotal,
+				tax,
+			};
+
 			return this.orderModel.findByIdAndUpdate(orderId, {
 				$set: {
 					details: newDetails,
 					user,
+					summary,
 				},
 			});
 		} catch (error) {
@@ -479,10 +495,24 @@ export class OrdersService {
 				}
 			}
 
+			const totalPaid = newPayments.reduce(
+				(sum, payment) => sum + payment.total,
+				0,
+			);
+
+			const change = totalPaid - order.summary.total;
+
+			const summary = {
+				...order.summary,
+				totalPaid,
+				change,
+			};
+
 			return this.orderModel.findByIdAndUpdate(orderId, {
 				$set: {
 					payments: newPayments,
 					user,
+					summary,
 				},
 			});
 		} catch (error) {

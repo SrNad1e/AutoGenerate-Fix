@@ -14,6 +14,7 @@ const populate = [
 	'role',
 	'shop',
 	'pointOfSale',
+	'type',
 	{
 		path: 'shop',
 		populate: {
@@ -22,12 +23,12 @@ const populate = [
 		},
 	},
 	{
-		path:'pointOfSale',
-		populate:{
-			path:'authorization',
-			model:'AuthorizationDian'
-		}
-	}
+		path: 'pointOfSale',
+		populate: {
+			path: 'authorization',
+			model: 'AuthorizationDian',
+		},
+	},
 ];
 
 @Injectable()

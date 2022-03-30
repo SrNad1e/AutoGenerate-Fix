@@ -133,7 +133,17 @@ export class Order extends Document {
 	invoice?: Types.ObjectId;
 
 	@Field(() => SummaryOrder, { description: 'Resumen de los pagosy totales' })
-	@Prop({ type: Object })
+	@Prop({
+		type: Object,
+		default: {
+			total: 0,
+			discount: 0,
+			subtotal: 0,
+			tax: 0,
+			change: 0,
+			totalOPaid: 0,
+		},
+	})
 	summary: SummaryOrder;
 
 	@Field(() => [DetailOrder], {
