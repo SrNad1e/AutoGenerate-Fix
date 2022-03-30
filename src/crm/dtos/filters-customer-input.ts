@@ -30,7 +30,8 @@ export class SortCustomer {
 @InputType()
 export class FiltersCustomerInput {
 	@Field(() => String, {
-		description: 'comodin para la busque de documento, nombre y apellido',
+		description:
+			'comodin para la busque de documento, nombre, apellido, teléfono, correo, ',
 		nullable: true,
 	})
 	dato: string;

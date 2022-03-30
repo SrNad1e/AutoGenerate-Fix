@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
+import { CreateCustomerInput } from '../dtos/create-customer-input';
 import { FiltersCustomerInput } from '../dtos/filters-customer-input';
 
 import { Customer } from '../entities/customer.entity';
+import { DocumentTypesService } from './document-types.service';
 
 const populate = [
 	{
@@ -15,7 +17,9 @@ const populate = [
 @Injectable()
 export class CustomersService {
 	constructor(
-		@InjectModel(Customer.name) private customerModel: PaginateModel<Customer>,
+		@InjectModel(Customer.name)
+		private readonly customerModel: PaginateModel<Customer>,
+		private readonly documentTypesService: DocumentTypesService,
 	) {}
 
 	async findAll({
@@ -80,6 +84,15 @@ export class CustomersService {
 		} catch (error) {
 			throw new NotFoundException(`Error al consultar el usuario, ${error}`);
 		}
+	}
+
+	async create({ documentTypeId }: CreateCustomerInput) {
+		const documentType = await this.documentTypesService.findById(
+			documentTypeId,
+		);
+		return this.customerModel.create({
+			documentType,
+		});
 	}
 
 	/**

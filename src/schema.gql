@@ -40,7 +40,7 @@ type Address {
   field2: String!
 
   """Define si la dirección es la principal"""
-  isMain: Boolean!
+  isMain: Boolean
 
   """Número de la casa"""
   loteNumber: Float!
@@ -226,6 +226,9 @@ type Customer {
   """Usuario asigando al cliente"""
   assigningUser: User
 
+  """Fecha de nacimiento"""
+  birthday: DateTime
+
   """Fecha de creación"""
   createdAt: DateTime!
 
@@ -235,7 +238,7 @@ type Customer {
   """Tipo de documento"""
   documentType: DocumentType!
 
-  """Número telefonico tiene whatsapp"""
+  """Número telefónico tiene whatsapp"""
   email: String
 
   """Nombres del cliente"""
@@ -514,6 +517,9 @@ type DetailTransfer {
 }
 
 type DocumentType {
+  """Identificador de mongo"""
+  _id: String!
+
   """Abreviación (CC, NIT, TI, CE, PASS)"""
   abbreviation: String!
 
@@ -551,7 +557,9 @@ input FiltersCustomerInput {
   """Si el cliente se encuentra activo"""
   active: Boolean
 
-  """comodin para la busque de documento, nombre y apellido"""
+  """
+  comodin para la busque de documento, nombre, apellido, teléfono, correo, 
+  """
   dato: String
 
   """Cantidad de registros"""
@@ -857,6 +865,7 @@ type Mutation {
   generateStockRequest(shopId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
+  updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
   updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
@@ -1871,6 +1880,14 @@ type SummaryOrder {
 
   """Total pago del pedido"""
   totalPaid: Float!
+}
+
+input UpdateOrderInput {
+  """Identificación del cliente"""
+  customerId: String
+
+  """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
+  status: String
 }
 
 input UpdateStockAdjustmentInput {

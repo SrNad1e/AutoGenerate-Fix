@@ -1,14 +1,21 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Prop } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 
+@Schema({ timestamps: true })
 @ObjectType()
 export class DocumentType {
+	@Field(() => String, { description: 'Identificador de mongo' })
+	_id: Types.ObjectId;
+
 	@Field(() => String, { description: 'Nombre del tipo de documento' })
+	@Prop({ type: String, required: true })
 	name: string;
 
 	@Field(() => String, { description: 'Abreviación (CC, NIT, TI, CE, PASS)' })
+	@Prop({ type: String, required: true })
 	abbreviation: string;
 
 	@Field(() => User, {
@@ -23,3 +30,5 @@ export class DocumentType {
 	@Field(() => Date, { description: 'Fecha de actualización' })
 	updatedAt: Date;
 }
+export const DocumentTypeSchema = SchemaFactory.createForClass(DocumentType);
+

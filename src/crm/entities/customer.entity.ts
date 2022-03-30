@@ -46,6 +46,7 @@ export class Address {
 
 	@Field(() => Boolean, {
 		description: 'Define si la dirección es la principal',
+		nullable: true,
 	})
 	isMain: boolean;
 }
@@ -61,7 +62,7 @@ export class Customer extends Document {
 	documentType: DocumentType;
 
 	@Field(() => String, { description: 'Número de documento' })
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, unique: true, required: true })
 	document: string;
 
 	@Field(() => String, { description: 'Nombres del cliente' })
@@ -99,7 +100,7 @@ export class Customer extends Document {
 	isWhatsapp: boolean;
 
 	@Field(() => String, {
-		description: 'Número telefonico tiene whatsapp',
+		description: 'Número telefónico tiene whatsapp',
 		nullable: true,
 	})
 	@Prop({ type: String })
@@ -116,6 +117,13 @@ export class Customer extends Document {
 	})
 	@Prop({ type: Boolean, default: true })
 	active: boolean;
+
+	@Field(() => Date, {
+		description: 'Fecha de nacimiento',
+		nullable: true,
+	})
+	@Prop({ type: Date })
+	birthday: Date;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cliente',

@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { FiltersCustomerInput } from '../dtos/filters-customer-input';
 import { Customer } from '../entities/customer.entity';
-import { ResponseCustomer } from '../entities/response-customer';
+import { ResponseCustomer } from '../dtos/response-customer';
 import { CustomersService } from '../services/customers.service';
 
 @Resolver()
