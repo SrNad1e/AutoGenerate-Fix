@@ -39,19 +39,21 @@ export class CustomersService {
 							$regex: dato,
 							$options: 'i',
 						},
+					},
+					{
 						firstName: {
 							$regex: dato,
 							$options: 'i',
 						},
+					},
+					{
 						lastName: {
 							$regex: dato,
 							$options: 'i',
 						},
+					},
+					{
 						email: {
-							$regex: dato,
-							$options: 'i',
-						},
-						phone: {
 							$regex: dato,
 							$options: 'i',
 						},
