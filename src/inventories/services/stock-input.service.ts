@@ -169,9 +169,8 @@ export class StockInputService {
 
 			for (let i = 0; i < details.length; i++) {
 				const { quantity, productId } = details[i];
-				const product = await this.productsService.validateStock(
+				const product = await this.productsService.findById(
 					productId,
-					quantity,
 					warehouseId,
 				);
 
@@ -284,9 +283,8 @@ export class StockInputService {
 							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
-					const product = await this.productsService.validateStock(
+					const product = await this.productsService.findById(
 						productId,
-						quantity,
 						stockInput.warehouse._id.toString(),
 					);
 					newDetails.push({
