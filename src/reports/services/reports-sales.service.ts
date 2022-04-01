@@ -96,8 +96,8 @@ export class ReportsSalesService {
 				dateFinish.toDate(),
 			);*/
 			salesReport = salesReport.map((item) => {
-				const total =
-					data.find((dato) => dato.shopId === item.shop.shopId)?.total || 0;
+				const total =0
+					//data.find((dato) => dato.shopId === item.shop.shopId)?.total || 0;
 
 				return {
 					...item,

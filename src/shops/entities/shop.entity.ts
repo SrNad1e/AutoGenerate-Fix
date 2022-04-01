@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { UserMysql } from 'src/users/entities/user.entity';
+
+import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from './warehouse.entity';
 
 @Schema({ timestamps: true })
@@ -10,38 +11,36 @@ export class Shop extends mongoose.Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: mongoose.ObjectId;
 
-	@Field()
+	@Field(() => String, { description: 'Nombre de la tienda' })
 	@Prop({ type: String, required: true, unique: true })
 	name: string;
 
-	@Field(() => UserMysql)
-	@Prop({ type: Object })
-	user: UserMysql;
-
-	@Field()
+	@Field(() => String, {
+		description: 'Estado de la tienda (active, inactive, suspend)',
+	})
 	@Prop({ type: String, default: 'active' })
 	status: string;
 
-	@Field()
-	@Prop({ type: String })
+	@Field(() => String, { description: 'Dirección de la tienda' })
+	@Prop({ type: String, required: true })
 	address: string;
 
-	@Field()
+	@Field(() => String, { description: 'Teléfono de la tienda', nullable: true })
 	@Prop({ type: String })
 	phone: string;
 
-	@Field()
-	@Prop({ type: Number })
+	@Field(() => Number, { description: 'Méta asiganda a la tienda' })
+	@Prop({ type: Number, default: 0 })
 	goal: number;
 
 	@Field(() => Warehouse, {
 		description: 'Bodega predeterminada para la tienda',
-		nullable: true,
 	})
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: Warehouse.name,
 		autopopulate: true,
+		required: true,
 	})
 	defaultWarehouse: mongoose.Schema.Types.ObjectId;
 
@@ -60,17 +59,15 @@ export class Shop extends mongoose.Document {
 	})
 	warehouseMain: mongoose.Schema.Types.ObjectId;
 
-	@Field(() => Boolean, { description: 'Valida si la tienda es mayorista' })
-	@Prop({
-		type: Boolean,
-		default: false,
-	})
-	isWholesale: boolean;
+	@Field(() => User, { description: 'Usuario que crea la tienda' })
+	@Prop({ type: Object, required: true })
+	user: User;
 
-	//TODO: se debe normalizar los ids de los modelos
-	@Field()
-	@Prop({ type: Number, unique: true })
-	shopId?: number;
+	@Field(() => Date, { description: 'Fecha de creación' })
+	createdAt: Date;
+
+	@Field(() => Date, { description: 'Fecha de creación' })
+	updatedAt: Date;
 }
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);

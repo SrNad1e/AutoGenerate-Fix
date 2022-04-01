@@ -1465,22 +1465,36 @@ type Shipping {
 type Shop {
   """Identificador de mongo"""
   _id: String!
+
+  """Dirección de la tienda"""
   address: String!
 
+  """Fecha de creación"""
+  createdAt: DateTime!
+
   """Bodega predeterminada para la tienda"""
-  defaultWarehouse: Warehouse
+  defaultWarehouse: Warehouse!
+
+  """Méta asiganda a la tienda"""
   goal: Float!
 
   """Es centro de distribución"""
   isMain: Boolean!
 
-  """Valida si la tienda es mayorista"""
-  isWholesale: Boolean!
+  """Nombre de la tienda"""
   name: String!
-  phone: String!
-  shopId: Float!
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Estado de la tienda (active, inactive, suspend)"""
   status: String!
-  user: UserMysql!
+
+  """Fecha de creación"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la tienda"""
+  user: User!
 
   """Bodega de centro de distribución asignado"""
   warehouseMain: Warehouse
@@ -1975,9 +1989,6 @@ type User {
   """Nombre de usuario"""
   createdAt: DateTime!
 
-  """Id de mysql"""
-  id: User @deprecated(reason: "Id para migración")
-
   """Nombre de la persona que usa el usuario"""
   name: String!
 
@@ -2006,24 +2017,6 @@ type User {
   username: String!
 }
 
-type UserMysql {
-  active: Boolean!
-  authentication_token: String!
-  created_at: DateTime!
-  customer_id: Float!
-  email: String!
-  id: Float!
-  identification: String!
-  last_login_at: DateTime!
-  name: String!
-  owner_user_id: Float!
-  password: String!
-  role_id: Float!
-  shop_id: Float!
-  user: String!
-  wholesale_member: Boolean!
-}
-
 type Warehouse {
   """Identificador de mongo"""
   _id: String!
@@ -2031,8 +2024,8 @@ type Warehouse {
   """Estado de la bodega"""
   active: Boolean!
 
-  """ID Mysql"""
-  id: Float @deprecated(reason: "Mysql migración")
+  """Fecha de creación"""
+  createdAt: DateTime!
 
   """Máxima cantidad de productos en la bodega"""
   max: Float!
@@ -2043,8 +2036,8 @@ type Warehouse {
   """Nombre de la bodega"""
   name: String!
 
-  """Tienda a la que pertenece"""
-  shop: Shop!
+  """Fecha de creación"""
+  updatedAt: DateTime!
 
   """Usuario que creó el usuario"""
   user: User!

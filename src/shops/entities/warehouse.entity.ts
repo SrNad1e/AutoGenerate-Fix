@@ -5,17 +5,12 @@ import { Document, Types } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
-import { Shop } from './shop.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
 export class Warehouse extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
-
-	@Field(() => Shop, { description: 'Tienda a la que pertenece' })
-	@Prop({ type: Object, required: true })
-	shop: Shop;
 
 	@Field(() => String, { description: 'Nombre de la bodega' })
 	@Prop({ type: String, required: true, unique: true })
@@ -24,10 +19,6 @@ export class Warehouse extends Document {
 	@Field(() => Boolean, { description: 'Estado de la bodega' })
 	@Prop({ type: Boolean, default: true })
 	active: boolean;
-
-	@Field(() => User, { description: 'Usuario que creó el usuario' })
-	@Prop({ type: Object, required: true })
-	user: User;
 
 	@Field(() => Number, {
 		description: 'Máxima cantidad de productos en la bodega',
@@ -41,13 +32,15 @@ export class Warehouse extends Document {
 	@Prop({ type: Number, required: true })
 	min: number;
 
-	@Field(() => Number, {
-		description: 'ID Mysql',
-		deprecationReason: 'Mysql migración',
-		nullable: true,
-	})
-	@Prop({ type: Number })
-	id: number;
+	@Field(() => User, { description: 'Usuario que creó el usuario' })
+	@Prop({ type: Object, required: true })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación' })
+	createdAt: Date;
+
+	@Field(() => Date, { description: 'Fecha de creación' })
+	updatedAt: Date;
 }
 
 export const WarehouseSchema = SchemaFactory.createForClass(Warehouse);

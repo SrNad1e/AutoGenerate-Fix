@@ -169,8 +169,9 @@ export class StockInputService {
 
 			for (let i = 0; i < details.length; i++) {
 				const { quantity, productId } = details[i];
-				const product = await this.productsService.findById(
+				const product = await this.productsService.validateStock(
 					productId,
+					quantity,
 					warehouseId,
 				);
 
@@ -272,17 +273,20 @@ export class StockInputService {
 			for (let i = 0; i < details.length; i++) {
 				const { action, productId, quantity } = details[i];
 
+				const productFind = stockInput.details.find(
+					(item) => item.product._id.toString() === productId.toString(),
+				);
+				console.log(productFind);
+
 				if (action === 'create') {
-					const productFind = stockInput.details.find(
-						(item) => item.product._id.toString() === productId.toString(),
-					);
 					if (productFind) {
 						throw new BadRequestException(
 							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
-					const product = await this.productsService.findById(
+					const product = await this.productsService.validateStock(
 						productId,
+						quantity,
 						stockInput.warehouse._id.toString(),
 					);
 					newDetails.push({

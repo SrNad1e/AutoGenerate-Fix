@@ -74,15 +74,6 @@ export class User extends Document {
 
 	@Field(() => Date, { description: 'Nombre de usuario' })
 	updatedAt: Date;
-
-	//TODO: id de mysql para migracion
-	@Field(() => User, {
-		description: 'Id de mysql',
-		deprecationReason: 'Id para migración',
-		nullable: true,
-	})
-	@Prop({ type: Number })
-	id: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
