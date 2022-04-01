@@ -166,8 +166,9 @@ export class StockOutputService {
 
 			for (let i = 0; i < details.length; i++) {
 				const { quantity, productId } = details[i];
-				const product = await this.productsService.findById(
+				const product = await this.productsService.validateStock(
 					productId,
+					quantity,
 					warehouseId,
 				);
 
@@ -267,8 +268,15 @@ export class StockOutputService {
 					}
 					return detail;
 				});
+
 			for (let i = 0; i < details.length; i++) {
 				const { action, productId, quantity } = details[i];
+
+				const product = await this.productsService.validateStock(
+					productId,
+					quantity,
+					stockInput.warehouse._id.toString(),
+				);
 
 				if (action === 'create') {
 					const productFind = stockInput.details.find(
@@ -279,10 +287,7 @@ export class StockOutputService {
 							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
-					const product = await this.productsService.findById(
-						productId,
-						stockInput.warehouse._id.toString(),
-					);
+
 					newDetails.push({
 						product,
 						quantity,

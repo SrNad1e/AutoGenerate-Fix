@@ -128,9 +128,7 @@ export class ProductsService {
 	}
 
 	async findOne({ warehouseId, ...params }: FiltersProductInput) {
-		const product = await (
-			await this.productModel.findOne(params)
-		).populate(populate);
+		const product = await this.productModel.findOne(params).populate(populate);
 
 		if (warehouseId) {
 			if (warehouseId === 'all') {
