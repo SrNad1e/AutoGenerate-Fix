@@ -97,7 +97,39 @@ export class OrdersService {
 				}
 
 				dataUpdate['customer'] = customer;
-				//TODO: actualizar costos y descuentos si el usuario cambia
+
+				if (customer.type._id.toString() !== order.customer.type.toString()) {
+					const newDetails = order.details.map((detail) => ({
+						...detail,
+						discount:
+							(customer?.type['discount'] / 100) * detail?.product?.price,
+						updatedAt: new Date(),
+					}));
+
+					const subtotal = newDetails.reduce(
+						(sum, detail) => sum + detail.price * detail.quantity,
+						0,
+					);
+
+					const discount = newDetails.reduce(
+						(sum, detail) => sum + detail.quantity * detail.discount,
+						0,
+					);
+
+					const total = subtotal - discount;
+
+					const tax = 0;
+
+					const summary = {
+						...order.summary,
+						total,
+						discount,
+						subtotal,
+						tax,
+					};
+					dataUpdate['summary'] = summary;
+					dataUpdate['details'] = newDetails;
+				}
 			}
 			let invoice;
 
@@ -226,6 +258,10 @@ export class OrdersService {
 				(item) => item.action === 'update',
 			);
 
+			const customerType = await this.customerTypesService.findById(
+				order.customer.type._id.toString(),
+			);
+
 			if (productsUpdate) {
 				for (let i = 0; i < productsUpdate.length; i++) {
 					const { quantity, productId } = productsUpdate[i];
@@ -240,30 +276,22 @@ export class OrdersService {
 						);
 					}
 
-					await this.productsService.validateStock(
+					const product = await this.productsService.validateStock(
 						productId,
 						quantity > newDetails[index].quantity
 							? quantity - newDetails[index].quantity
 							: quantity,
 						order?.shop?.defaultWarehouse.toString(),
 					);
+
+					newDetails[index] = {
+						...newDetails[index],
+						product,
+						quantity,
+						discount: (customerType.discount / 100) * product?.price,
+						updatedAt: new Date(),
+					};
 				}
-
-				newDetails = newDetails.map((detail) => {
-					const productFind = productsUpdate.find(
-						(item) => item.productId === detail?.product?._id.toString(),
-					);
-
-					if (productFind) {
-						return {
-							...detail,
-							quantity: productFind.quantity,
-							updatedAt: new Date(),
-						};
-					}
-
-					return detail;
-				});
 			}
 
 			const productsCreate = details?.filter(
@@ -271,10 +299,6 @@ export class OrdersService {
 			);
 
 			if (productsCreate) {
-				const customerType = await this.customerTypesService.findById(
-					order.customer.type._id.toString(),
-				);
-
 				for (let i = 0; i < productsCreate.length; i++) {
 					const { quantity, productId } = productsCreate[i];
 
