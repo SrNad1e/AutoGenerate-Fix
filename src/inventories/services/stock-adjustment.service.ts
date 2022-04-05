@@ -10,6 +10,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
+import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { FiltersStockAdjustmentInput } from '../dtos/filters-stockAdjustment.input';
@@ -165,7 +166,7 @@ export class StockAdjustmentService {
 				);
 			}
 
-			const detailsInput = [];
+			const detailsAdjustment = [];
 
 			for (let i = 0; i < details.length; i++) {
 				const { quantity, productId } = details[i];
@@ -173,21 +174,20 @@ export class StockAdjustmentService {
 					productId,
 					warehouseId,
 				);
-
-				detailsInput.push({
+				detailsAdjustment.push({
 					product,
 					quantity,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
 			}
-			const total = detailsInput.reduce(
+			const total = detailsAdjustment.reduce(
 				(sum, detail) => sum + detail.quantity * detail.product.cost,
 				0,
 			);
 			const newStockInput = new this.stockAdjustmetnModel({
 				warehouse,
-				details: detailsInput,
+				details: detailsAdjustment,
 				total,
 				user,
 				...options,
@@ -196,19 +196,39 @@ export class StockAdjustmentService {
 			const response = await (await newStockInput.save()).populate(populate);
 
 			if (options.status === 'confirmed') {
-				//TODO: revisar proceso de inventarios
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-				}));
+				const detailsDelete = response.details
+					.filter(
+						(detail) => detail.product.stock[0].quantity > detail.quantity,
+					)
+					.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.product.stock[0].quantity - detail.quantity,
+					}));
+
+				const detailsAdd = response.details
+					.filter(
+						(detail) => detail.product.stock[0].quantity < detail.quantity,
+					)
+					.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.quantity,
+					}));
 
 				const deleteStockHistoryInput: DeleteStockHistoryInput = {
-					details: detailHistory,
+					details: detailsDelete,
+					warehouseId,
+					documentId: response._id.toString(),
+					documentType: 'adjustment',
+				};
+
+				const addStockHistoryInput: AddStockHistoryInput = {
+					details: detailsAdd,
 					warehouseId,
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.addStock(addStockHistoryInput);
 			}
 			return response;
 		} catch (error) {
@@ -314,19 +334,39 @@ export class StockAdjustmentService {
 			);
 
 			if (options.status === 'confirmed') {
-				//TODO: organizar el proceso de inventarios
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-				}));
+				const detailsDelete = response.details
+					.filter(
+						(detail) => detail.product.stock[0].quantity > detail.quantity,
+					)
+					.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.product.stock[0].quantity - detail.quantity,
+					}));
+
+				const detailsAdd = response.details
+					.filter(
+						(detail) => detail.product.stock[0].quantity < detail.quantity,
+					)
+					.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.quantity,
+					}));
 
 				const deleteStockHistoryInput: DeleteStockHistoryInput = {
-					details: detailHistory,
+					details: detailsDelete,
+					warehouseId: response.warehouse._id.toString(),
+					documentId: response._id.toString(),
+					documentType: 'adjustment',
+				};
+
+				const addStockHistoryInput: AddStockHistoryInput = {
+					details: detailsAdd,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.addStock(addStockHistoryInput);
 			}
 
 			return response;
@@ -344,19 +384,39 @@ export class StockAdjustmentService {
 			);
 
 			if (options.status === 'confirmed') {
-				//TODO: organizar el proceso de inventarios
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-				}));
+				const detailsDelete = response.details
+					.filter(
+						(detail) => detail.product.stock[0].quantity > detail.quantity,
+					)
+					.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.product.stock[0].quantity - detail.quantity,
+					}));
+
+				const detailsAdd = response.details
+					.filter(
+						(detail) => detail.product.stock[0].quantity < detail.quantity,
+					)
+					.map((detail) => ({
+						productId: detail.product._id.toString(),
+						quantity: detail.quantity,
+					}));
 
 				const deleteStockHistoryInput: DeleteStockHistoryInput = {
-					details: detailHistory,
+					details: detailsDelete,
+					warehouseId: response.warehouse._id.toString(),
+					documentId: response._id.toString(),
+					documentType: 'adjustment',
+				};
+
+				const addStockHistoryInput: AddStockHistoryInput = {
+					details: detailsAdd,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
 				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.addStock(addStockHistoryInput);
 			}
 
 			return response;
