@@ -181,6 +181,7 @@ export class StockHistoryService {
 					quantity,
 					warehouseId,
 				);
+
 				if (product) {
 					const newHistory = new this.stockHistoryModel({
 						warehouse: warehouseId,

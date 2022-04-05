@@ -275,7 +275,6 @@ export class StockInputService {
 				const productFind = stockInput.details.find(
 					(item) => item.product._id.toString() === productId.toString(),
 				);
-				console.log(productFind);
 
 				if (action === 'create') {
 					if (productFind) {

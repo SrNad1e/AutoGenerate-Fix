@@ -52,7 +52,7 @@ export class OrdersService {
 				throw new BadRequestException('El estado del pedido no es correcto');
 			}
 
-			if (user.pointOfSale && status === 'open') {
+			if (user?.pointOfSale && status === 'open') {
 				const customer = await this.customersService.getCustomerDefault();
 				const shop = await this.shopsService.findById(user.shop._id.toString());
 
@@ -63,8 +63,13 @@ export class OrdersService {
 				user._id.toString(),
 			);
 			const shop = await this.shopsService.getShopWholesale();
-
-			return this.orderModel.create({ customer, shop, user });
+			if (customer) {
+				return this.orderModel.create({ customer, shop, user });
+			} else {
+				throw new NotFoundException(
+					`El usuario no pertenece a un cliente, favor valide el usuario`,
+				);
+			}
 		} catch (error) {
 			return error;
 		}
@@ -92,6 +97,7 @@ export class OrdersService {
 				}
 
 				dataUpdate['customer'] = customer;
+				//TODO: actualizar costos y descuentos si el usuario cambia
 			}
 			let invoice;
 
@@ -222,38 +228,25 @@ export class OrdersService {
 
 			if (productsUpdate) {
 				for (let i = 0; i < productsUpdate.length; i++) {
-					const detail = productsUpdate[i];
+					const { quantity, productId } = productsUpdate[i];
 
 					const index = newDetails.findIndex(
-						(item) => item.product._id.toString() === detail.productId,
+						(item) => item.product._id.toString() === productId,
 					);
 
 					if (index < 0) {
 						throw new BadRequestException(
-							`El producto ${detail.productId} no existe en el pedido ${order?.number}`,
+							`El producto ${productId} no existe en el pedido ${order?.number}`,
 						);
 					}
-				}
 
-				for (let i = 0; i < productsUpdate.length; i++) {
-					const detail = productsUpdate[i];
-
-					const product = await this.productsService.findOne({
-						warehouseId: order?.shop?.defaultWarehouse.toString(),
-						_id: detail.productId,
-					});
-
-					if (product) {
-						if (product?.stock[0]?.quantity < detail?.quantity) {
-							throw new BadRequestException(
-								`El producto ${product?.reference} / ${product?.barcode} no tiene unidades disponibles, Disponible: ${product?.stock[0]?.quantity}`,
-							);
-						}
-					} else {
-						throw new NotFoundException(
-							'Uno de los productos enviados para actualizar no existe',
-						);
-					}
+					await this.productsService.validateStock(
+						productId,
+						quantity > newDetails[index].quantity
+							? quantity - newDetails[index].quantity
+							: quantity,
+						order?.shop?.defaultWarehouse.toString(),
+					);
 				}
 
 				newDetails = newDetails.map((detail) => {
@@ -278,11 +271,15 @@ export class OrdersService {
 			);
 
 			if (productsCreate) {
+				const customerType = await this.customerTypesService.findById(
+					order.customer.type._id.toString(),
+				);
+
 				for (let i = 0; i < productsCreate.length; i++) {
-					const detail = productsCreate[i];
+					const { quantity, productId } = productsCreate[i];
 
 					const index = newDetails.findIndex(
-						(item) => item.product._id.toString() === detail.productId,
+						(item) => item.product._id.toString() === productId,
 					);
 
 					if (index >= 0) {
@@ -290,39 +287,22 @@ export class OrdersService {
 							`El producto ${newDetails[index].product.reference}/${newDetails[index].product.barcode} ya existe en la orden ${order?.number} y no se puede agregar`,
 						);
 					}
-				}
 
-				const customerType = await this.customerTypesService.findById(
-					order.customer.type.toString(),
-				);
-				for (let i = 0; i < productsUpdate.length; i++) {
-					const detail = productsUpdate[i];
+					const product = await this.productsService.validateStock(
+						productId,
+						quantity,
+						order?.shop?.defaultWarehouse.toString(),
+					);
 
-					const product = await this.productsService.findOne({
-						warehouseId: order?.shop?.defaultWarehouse.toString(),
-						_id: detail.productId,
+					newDetails.push({
+						product,
+						status: 'new',
+						quantity,
+						price: product.price,
+						discount: (customerType.discount / 100) * product.price,
+						createdAt: new Date(),
+						updatedAt: new Date(),
 					});
-					if (product) {
-						if (product?.stock[0]?.quantity < detail?.quantity) {
-							throw new BadRequestException(
-								`El producto ${product?.reference} / ${product?.barcode} no tiene unidades disponibles, Disponible: ${product?.stock[0]?.quantity}`,
-							);
-						}
-
-						newDetails.push({
-							product,
-							status: 'new',
-							quantity: detail.quantity,
-							price: product.price,
-							discount: (customerType.discount / 100) * product.price,
-							createdAt: new Date(),
-							updatedAt: new Date(),
-						});
-					} else {
-						throw new NotFoundException(
-							'Uno de los productos enviados para crear no existe',
-						);
-					}
 				}
 			}
 
@@ -333,13 +313,9 @@ export class OrdersService {
 					(item) => item.product._id.toString() === product.productId,
 				)?.quantity;
 
-				if (product.quantity < quantityOld) {
-					productsDelete.push(product);
-				}
+				productsDelete.push({ ...product, quantity: quantityOld });
 
-				if (product.quantity > quantityOld) {
-					productsCreate.push(product);
-				}
+				productsCreate.push(product);
 			}
 
 			await this.stockHistoryService.addStock({
@@ -378,13 +354,20 @@ export class OrdersService {
 				tax,
 			};
 
-			return this.orderModel.findByIdAndUpdate(orderId, {
-				$set: {
-					details: newDetails,
-					user,
-					summary,
+			return this.orderModel.findByIdAndUpdate(
+				orderId,
+				{
+					$set: {
+						details: newDetails,
+						user,
+						summary,
+					},
 				},
-			});
+				{
+					new: true,
+					lean: true,
+				},
+			);
 		} catch (error) {
 			return error;
 		}

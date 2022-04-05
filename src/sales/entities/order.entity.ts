@@ -150,7 +150,7 @@ export class Order extends Document {
 		description: 'Productos que tiene el pedido',
 		nullable: true,
 	})
-	@Prop({ type: Array })
+	@Prop({ type: Array, default: [] })
 	details: DetailOrder[];
 
 	@Field(() => PointOfSale, { description: 'Punto de venta asigando' })

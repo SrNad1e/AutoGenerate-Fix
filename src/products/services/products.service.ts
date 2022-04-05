@@ -296,58 +296,54 @@ export class ProductsService {
 	 * @returns si todo sale bien el producto actualizado
 	 */
 	async deleteStock(productId: string, quantity: number, warehouseId: string) {
-		try {
-			const product = await this.productModel.findById(productId).lean();
+		const product = await this.productModel.findById(productId).lean();
 
-			if (!product) {
-				throw new BadRequestException('El producto no existe');
-			}
-
-			const stockSelected = product.stock.find(
-				(item) => item.warehouse._id.toString() === warehouseId,
-			);
-			if (stockSelected.quantity < quantity) {
-				throw new BadRequestException(
-					`Inventario insuficiente, stock ${stockSelected.quantity}`,
-				);
-			}
-
-			const stock = product.stock.map((item) => {
-				if (item.warehouse._id.toString() === warehouseId) {
-					return {
-						warehouse: item.warehouse._id,
-						quantity: item.quantity - quantity,
-					};
-				}
-
-				return item;
-			});
-
-			const response = await this.productModel.findByIdAndUpdate(
-				productId,
-				{
-					$set: {
-						stock,
-					},
-				},
-				{
-					lean: true,
-					new: true,
-					populate,
-				},
-			);
-
-			const newStock = response.stock.filter(
-				(item) => item.warehouse._id.toString() === warehouseId,
-			);
-
-			return {
-				...response,
-				stock: newStock,
-			};
-		} catch (error) {
-			return error;
+		if (!product) {
+			throw new BadRequestException('El producto no existe');
 		}
+
+		const stockSelected = product.stock.find(
+			(item) => item.warehouse._id.toString() === warehouseId,
+		);
+		if (stockSelected.quantity < quantity) {
+			throw new BadRequestException(
+				`Inventario insuficiente para el producto ${product.reference} / ${product.barcode}, stock ${stockSelected.quantity}`,
+			);
+		}
+
+		const stock = product.stock.map((item) => {
+			if (item.warehouse._id.toString() === warehouseId) {
+				return {
+					warehouse: item.warehouse._id,
+					quantity: item.quantity - quantity,
+				};
+			}
+
+			return item;
+		});
+
+		const response = await this.productModel.findByIdAndUpdate(
+			productId,
+			{
+				$set: {
+					stock,
+				},
+			},
+			{
+				lean: true,
+				new: true,
+				populate,
+			},
+		);
+
+		const newStock = response.stock.filter(
+			(item) => item.warehouse._id.toString() === warehouseId,
+		);
+
+		return {
+			...response,
+			stock: newStock,
+		};
 	}
 
 	/**
@@ -362,7 +358,7 @@ export class ProductsService {
 		quantity: number,
 		warehouseId: string,
 	) {
-		try {
+		if (productId) {
 			const product = await this.findById(productId, warehouseId);
 
 			if (!product) {
@@ -376,8 +372,8 @@ export class ProductsService {
 			}
 
 			return product;
-		} catch (error) {
-			throw error;
+		} else {
+			throw new BadRequestException(`El id del producto no es válido`);
 		}
 	}
 
