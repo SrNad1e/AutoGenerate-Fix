@@ -98,7 +98,9 @@ export class OrdersService {
 
 				dataUpdate['customer'] = customer;
 
-				if (customer.type._id.toString() !== order.customer.type.toString()) {
+				if (
+					customer.type._id.toString() !== order.customer.type._id.toString()
+				) {
 					const newDetails = order.details.map((detail) => ({
 						...detail,
 						discount:
@@ -193,9 +195,16 @@ export class OrdersService {
 				dataUpdate['status'] = status;
 			}
 
-			return this.orderModel.findByIdAndUpdate(orderId, {
-				$set: { ...dataUpdate, user, invoice },
-			});
+			return this.orderModel.findByIdAndUpdate(
+				orderId,
+				{
+					$set: { ...dataUpdate, user, invoice },
+				},
+				{
+					new: true,
+					lean: true,
+				},
+			);
 		} catch (error) {
 			return error;
 		}
