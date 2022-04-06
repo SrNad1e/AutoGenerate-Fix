@@ -26,10 +26,19 @@ import { ShopsModule } from 'src/shops/shops.module';
 @Module({
 	imports: [
 		MongooseModule.forFeature([
-			{ name: Product.name, schema: ProductSchema },
 			{ name: Color.name, schema: ColorSchema },
 			{ name: Size.name, schema: SizeSchema },
 			{ name: Provider.name, schema: ProviderSchema },
+		]),
+		MongooseModule.forFeatureAsync([
+			{
+				name: Product.name,
+				useFactory: () => {
+					const schema = ProductSchema;
+					schema.index({ reference: 1, description: 1, barcode: 1 }, {name: 'text'});
+					return schema;
+				},
+			},
 		]),
 		TypeOrmModule.forFeature([
 			ProductMysql,

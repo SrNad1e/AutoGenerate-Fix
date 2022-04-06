@@ -58,7 +58,7 @@ export class Product extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, required: true, index:'text' })
 	@Field(() => String, { description: 'Referencia del producto' })
 	reference: string;
 

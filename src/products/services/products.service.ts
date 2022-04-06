@@ -81,6 +81,12 @@ export class ProductsService {
 			filters.status = status;
 		}
 
+		if (name) {
+			filters.$text = {
+				$search: name,
+			};
+		}
+
 		const options = {
 			limit,
 			page: page,
@@ -92,11 +98,6 @@ export class ProductsService {
 		const response = await this.productModel.paginate(
 			{
 				...filters,
-				$or: [
-					{ barcode: name },
-					{ description: { $regex: name, $options: 'i' } },
-					{ reference: { $regex: name, $options: 'i' } },
-				],
 			},
 			options,
 		);
