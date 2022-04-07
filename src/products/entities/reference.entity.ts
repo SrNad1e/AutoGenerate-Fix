@@ -3,6 +3,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
+import { Brand } from './brand.entity';
+import { Company } from './company.entity';
 
 @ObjectType()
 export class Shipping {

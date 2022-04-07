@@ -60,6 +60,23 @@ type AuthorizationDian {
   prefix: String!
 }
 
+type Brand {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación de la marca"""
+  createdAt: DateTime!
+
+  """Nombre de la marca"""
+  name: String!
+
+  """Fecha de actualización de la marca"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la marca"""
+  user: User!
+}
+
 type City {
   """Identificador de mongo"""
   _id: String!
@@ -98,6 +115,38 @@ type Color {
 
   """Nombre interno del color"""
   name_internal: String!
+}
+
+type Company {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Dirección de la compañía"""
+  address: String!
+
+  """Fecha de creación de la compañia"""
+  createdAt: DateTime!
+
+  """Documento de la compañía"""
+  document: String!
+
+  """Url del logo de la compañía"""
+  logo: String!
+
+  """Nombre de la compañía"""
+  name: String!
+
+  """Teléfono de la compañía"""
+  phone: String!
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean!
+
+  """Fecha de actualización de la compañia"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la compañia"""
+  user: User!
 }
 
 type Configs {
@@ -1018,8 +1067,14 @@ type Product {
   """Código de barras del producto"""
   barcode: String!
 
+  """Marca del producto"""
+  brand: Brand!
+
   """Color del producto"""
   color: Color!
+
+  """Compañias del producto"""
+  company: [Company!]!
 
   """Fecha de creación del producto"""
   createdAt: DateTime!
