@@ -1018,32 +1018,14 @@ type Product {
   """Código de barras del producto"""
   barcode: String!
 
-  """Determina si el producto se puede cambiar"""
-  changeable: Boolean!
-
   """Color del producto"""
   color: Color!
 
-  """Costo del producto"""
-  cost: Float!
-
-  """Descripción del producto"""
-  description: String!
-
-  """Identificador de mysql"""
-  id: Float @deprecated(reason: "Campo para migración de mysql")
-
-  """Precio del producto"""
-  price: Float!
-
-  """Fabricante del producto"""
-  provider: Provider!
+  """Fecha de creación del producto"""
+  createdAt: DateTime!
 
   """Referencia del producto"""
-  reference: String!
-
-  """Medidas del producto"""
-  shipping: Shipping!
+  reference: Reference!
 
   """Talla del producto"""
   size: Size!
@@ -1054,22 +1036,11 @@ type Product {
   """Inventario del producto por bodegas"""
   stock: [Stock!]!
 
+  """Fecha de actualización del producto"""
+  updatedAt: DateTime!
+
   """Usuario que crea el producto"""
   user: User!
-}
-
-type Provider {
-  """Identificador de mongo"""
-  _id: String!
-
-  """Estado del proveedor"""
-  active: Boolean!
-
-  """Id de mysql"""
-  id: Boolean @deprecated(reason: "Campo para migración de mysql")
-
-  """Nombre del proveedor"""
-  name: String!
 }
 
 type Query {
@@ -1098,6 +1069,38 @@ type Query {
   user(username: String!): User!
   users: [User!]!
   warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): ResponseWarehouses!
+}
+
+type Reference {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Determina si la referencia se puede cambiar"""
+  changeable: Boolean!
+
+  """Costo del producto"""
+  cost: Float!
+
+  """Fecha de creación de la referencia"""
+  createdAt: DateTime!
+
+  """Descripción de la referencia"""
+  description: String!
+
+  """Identificador de mongo"""
+  name: String!
+
+  """Precio del producto"""
+  price: Float!
+
+  """Medidas del producto"""
+  shipping: Shipping!
+
+  """Fecha de actualización de la referencia"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la referencia"""
+  user: User!
 }
 
 type ReportSalesResponse {
@@ -1446,11 +1449,20 @@ type Role {
 }
 
 type Shipping {
+  """Fecha de creación del dato de envio"""
+  createdAt: DateTime!
+
   """Alto del producto"""
   height: Float!
 
   """Largo del producto"""
   long: Float!
+
+  """Fecha de actualización del dato de envio"""
+  updatedAt: DateTime!
+
+  """Usuario que crea los datos de envío"""
+  user: User!
 
   """Volumen del producto"""
   volume: Float!
@@ -1672,8 +1684,17 @@ input SortWarehouse {
 }
 
 type Stock {
+  """Fecha de creación del dato de envio"""
+  createdAt: DateTime!
+
   """Cantidad de productos en la bodega"""
   quantity: Float!
+
+  """Fecha de actualización del dato de envio"""
+  updatedAt: DateTime!
+
+  """Usuario que crea los datos de envío"""
+  user: User!
 
   """Identificador de la bodega"""
   warehouse: Warehouse!

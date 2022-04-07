@@ -11,7 +11,6 @@ import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
 import { ColorMysql } from 'src/products/entities/color.entity';
 import { SizeMysql } from 'src/products/entities/size.entity';
-import { ProviderMysql } from 'src/products/entities/provider.entity';
 import { WarehouseMysql } from 'src/shops/entities/warehouse.entity';
 import {
 	StockTransferDetailMysql,
@@ -59,7 +58,6 @@ import {
 						UserMysql,
 						ColorMysql,
 						SizeMysql,
-						ProviderMysql,
 						WarehouseMysql,
 					],
 				};

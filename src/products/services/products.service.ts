@@ -17,8 +17,8 @@ import {
 import { Product } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
-import { ProvidersService } from './providers.service';
 import { SizesService } from './sizes.service';
+import { ReferencesService } from './references.service';
 
 const populate = [
 	{
@@ -33,6 +33,7 @@ const populate = [
 	{ path: 'color', model: 'Color' },
 	{ path: 'size', model: 'Size' },
 	{ path: 'provider', model: 'Provider' },
+	{ path: 'reference', model: 'Reference' },
 ];
 
 @Injectable()
@@ -44,9 +45,9 @@ export class ProductsService {
 		private readonly productRepo: Repository<ProductMysql>,
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
-		private readonly providersService: ProvidersService,
 		private readonly usersService: UsersService,
 		private readonly warehousesService: WarehousesService,
+		private readonly referencesService: ReferencesService,
 	) {}
 
 	async findAll(params: FiltersProductsInput) {
@@ -191,39 +192,49 @@ export class ProductsService {
 				quantity: 100,
 			}));
 
+			const userDefault = await this.usersService.findOne('admin');
+
 			for (let i = 0; i < productsMysql.length; i++) {
 				const product = productsMysql[i];
+				let reference = await this.referencesService.findOne({
+					name: product.reference,
+				});
+				if (!reference) {
+					await this.referencesService.create(
+						{
+							name: product.reference,
+							description: product.description,
+							changeable: product.changeable,
+							price: product.price,
+							cost: product.cost,
+							weight: product.shipping_weight,
+							width: product.shipping_width,
+							long: product.shipping_long,
+							height: product.shipping_height,
+							volume: product.shipping_volume,
+						},
+						userDefault,
+					);
 
+					reference = await this.referencesService.findOne({
+						name: product.reference,
+					});
+				}
 				const color = await this.colorsService.getByIdMysql(product.color_id);
 				const size = await this.sizesService.getByIdMysql(product.size_id);
-				const provider = await this.providersService.getByIdMysql(
-					product.provider_id,
-				);
+
 				const user = await this.usersService.getByIdMysql(
 					product.owner_user_id,
 				);
 
 				productsMongo.push({
-					reference: product.reference,
-					description: product.description,
+					reference: reference?._id,
 					barcode: product.barcode,
-					changeable: product.changeable,
 					color: color._id,
 					size: size._id,
-					provider: provider._id,
-					price: product.price,
-					cost: product.cost,
 					status: product.state ? 'active' : 'inactive',
 					user: user,
-					shipping: {
-						width: product.shipping_width,
-						height: product.shipping_height,
-						long: product.shipping_long,
-						weight: product.shipping_weight,
-						volume: product.shipping_volume,
-					},
 					stock,
-					id: product.id,
 				});
 			}
 

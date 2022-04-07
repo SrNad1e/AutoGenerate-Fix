@@ -104,7 +104,8 @@ export class OrdersService {
 					const newDetails = order.details.map((detail) => ({
 						...detail,
 						discount:
-							(customer?.type['discount'] / 100) * detail?.product?.price,
+							(customer?.type['discount'] / 100) *
+							detail?.product?.reference['price'],
 						updatedAt: new Date(),
 					}));
 
@@ -297,7 +298,8 @@ export class OrdersService {
 						...newDetails[index],
 						product,
 						quantity,
-						discount: (customerType.discount / 100) * product?.price,
+						discount:
+							(customerType.discount / 100) * product?.reference['price'],
 						updatedAt: new Date(),
 					};
 				}
@@ -331,8 +333,9 @@ export class OrdersService {
 						product,
 						status: 'new',
 						quantity,
-						price: product.price,
-						discount: (customerType.discount / 100) * product.price,
+						price: product.reference['price'],
+						discount:
+							(customerType.discount / 100) * product.reference['price'],
 						createdAt: new Date(),
 						updatedAt: new Date(),
 					});

@@ -296,7 +296,7 @@ export class StockInputService {
 			}
 
 			const total = newDetails.reduce(
-				(sum, detail) => sum + detail.quantity * detail.product.cost,
+				(sum, detail) => sum + detail.quantity * detail.product.reference['cost'],
 				0,
 			);
 
