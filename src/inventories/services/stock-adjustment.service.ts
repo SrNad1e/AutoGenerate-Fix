@@ -7,7 +7,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { Color } from 'src/products/entities/color.entity';
+import { Reference } from 'src/products/entities/reference.entity';
+import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
@@ -27,18 +31,22 @@ const populate = [
 				populate: [
 					{
 						path: 'size',
-						model: 'Size',
+						model: Size.name,
 					},
 					{
 						path: 'color',
-						model: 'Color',
+						model: Color.name,
+					},
+					{
+						path: 'reference',
+						model: Reference.name,
 					},
 					{
 						path: 'stock',
 						populate: [
 							{
 								path: 'warehouse',
-								model: 'Warehouse',
+								model: Warehouse.name,
 							},
 						],
 					},
@@ -59,19 +67,16 @@ export class StockAdjustmentService {
 		private readonly stockHistoryService: StockHistoryService,
 	) {}
 
-	async findAll(
-		{
-			number,
-			sort,
-			status,
-			warehouseId,
-			limit = 20,
-			page = 1,
-			dateFinal,
-			dateInitial,
-		}: FiltersStockAdjustmentInput,
-		user: User,
-	) {
+	async findAll({
+		number,
+		sort,
+		status,
+		warehouseId,
+		limit = 20,
+		page = 1,
+		dateFinal,
+		dateInitial,
+	}: FiltersStockAdjustmentInput) {
 		const filters: FilterQuery<StockAdjustment> = {};
 		try {
 			if (number) {

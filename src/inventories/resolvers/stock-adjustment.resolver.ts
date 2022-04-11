@@ -28,7 +28,6 @@ export class StockAdjustmentResolver {
 	) {
 		return this.stockAdjustmentService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
 		);
 	}
 
