@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
@@ -19,6 +19,7 @@ export class AuthService {
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
+				company: user.company._id,
 				sub: user._id,
 			}),
 			user,
@@ -42,13 +43,17 @@ export class AuthService {
 	async validateUser(
 		username: string,
 		passwordOld: string,
-	): Promise<Partial<User>> | undefined {
+	): Promise<Partial<User>>{
 		const user = await this.usersService.findOne(username);
-
-		if (user /*&& bcrypt.compareSync(passwordOld, user.password)*/) {
-			const { password, ...userSent } = user;
-			return userSent;
+		if (!user) {
+			throw new UnauthorizedException(`Usuario no existe`);
 		}
-		return null;
+
+		/*if (!bcrypt.compareSync(passwordOld, user.password)) {
+			throw new UnauthorizedException(`Usuario o contraseña incorrectos`);
+		}*/
+
+		const { password, ...userSent } = user;
+		return userSent;
 	}
 }

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
@@ -8,4 +7,7 @@ export class LoginUserInput {
 
 	@Field({ description: 'Contraseña de usuario' })
 	password: string;
+
+	@Field({ description: 'Identificador de la compañía del usuario' })
+	companyId: string;
 }

@@ -249,14 +249,26 @@ input CreateStockTransferInput {
 }
 
 input CreateUserInput {
+  """Identificador de la empresa a la que pertenece el usuario"""
+  company: String!
+
+  """Identificador del tipo de cliente"""
+  customerType: String!
+
   """Nombre del usuario"""
   name: String!
 
   """Contraseña de usuario"""
   password: String!
 
-  """Rol asignado al usuario"""
+  """Identificador del punto de venta asignado al usuario"""
+  pointOfSale: String
+
+  """Identificador del roll del usuario"""
   role: String!
+
+  """Identificador de la tienda asignada al usuario"""
+  shop: String!
 
   """Usuario registrado"""
   username: String!
@@ -893,6 +905,9 @@ type LoginResponse {
 }
 
 input LoginUserInput {
+  """Identificador de la compañía del usuario"""
+  companyId: String!
+
   """Contraseña de usuario"""
   password: String!
 
@@ -1067,14 +1082,8 @@ type Product {
   """Código de barras del producto"""
   barcode: String!
 
-  """Marca del producto"""
-  brand: Brand!
-
   """Color del producto"""
   color: Color!
-
-  """Compañias del producto"""
-  company: [Company!]!
 
   """Fecha de creación del producto"""
   createdAt: DateTime!
@@ -1130,8 +1139,14 @@ type Reference {
   """Identificador de mongo"""
   _id: String!
 
+  """Marca del producto"""
+  brand: Brand!
+
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!
+
+  """Compañias del producto"""
+  company: [Company!]!
 
   """Costo del producto"""
   cost: Float!
@@ -2045,14 +2060,26 @@ input UpdateStockTransferInput {
 }
 
 input UpdateUserInput {
+  """Identificador de la empresa a la que pertenece el usuario"""
+  company: String
+
+  """Identificador del tipo de cliente"""
+  customerType: String
+
   """Nombre del usuario"""
   name: String
 
   """Contraseña de usuario"""
   password: String
 
-  """Rol asignado al usuario"""
+  """Identificador del punto de venta asignado al usuario"""
+  pointOfSale: String
+
+  """Identificador del roll del usuario"""
   role: String
+
+  """Identificador de la tienda asignada al usuario"""
+  shop: String
 
   """Usuario registrado"""
   username: String
@@ -2062,10 +2089,16 @@ type User {
   """Identificador de mongo"""
   _id: String!
 
+  """Empresa a la que pertenece el usuario"""
+  company: Company!
+
   """Nombre de usuario"""
   createdAt: DateTime!
 
-  """Nombre de la persona que usa el usuario"""
+  """Tipo de cliente"""
+  customerType: CustomerType!
+
+  """Nombre de para mostrar del usuario"""
   name: String!
 
   """Contraseña de usuario"""
@@ -2080,16 +2113,13 @@ type User {
   """Tienda a la que se encuentra asiganado el usuario"""
   shop: Shop!
 
-  """Tipo de cliente"""
-  type: CustomerType!
-
   """Nombre de usuario"""
   updatedAt: DateTime!
 
   """Usuario que creó el usuario"""
-  user: User!
+  user: User
 
-  """Nombre de usuario"""
+  """Cuenta de usuario"""
   username: String!
 }
 

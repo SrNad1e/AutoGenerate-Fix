@@ -193,7 +193,7 @@ export class ProductsService {
 			}));
 
 			const userDefault = await this.usersService.findOne('admin');
-
+			//const brand = 
 			for (let i = 0; i < productsMysql.length; i++) {
 				const product = productsMysql[i];
 				let reference = await this.referencesService.findOne({

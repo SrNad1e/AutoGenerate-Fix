@@ -72,14 +72,6 @@ export class Product extends Document {
 	@Field(() => String, { description: 'Estado del producto' })
 	status: string;
 
-	@Prop({ type: Types.ObjectId, ref: Brand.name, required: true })
-	@Field(() => Brand, { description: 'Marca del producto' })
-	brand: Types.ObjectId;
-
-	@Prop({ type: [Types.ObjectId], ref: Company.name, required: true })
-	@Field(() => [Company], { description: 'Compañias del producto' })
-	company: Types.ObjectId[];
-
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea el producto' })
 	user: User;

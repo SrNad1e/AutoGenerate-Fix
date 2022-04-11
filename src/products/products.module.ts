@@ -20,6 +20,8 @@ import { Reference, ReferenceSchema } from './entities/reference.entity';
 import { ReferencesService } from './services/references.service';
 import { Brand, BrandSchema } from './entities/brand.entity';
 import { Company, CompanySchema } from './entities/company.entity';
+import { BrandsService } from './services/brands.service';
+import { CompaniesService } from './services/companies.service';
 
 @Module({
 	imports: [
@@ -55,6 +57,8 @@ import { Company, CompanySchema } from './entities/company.entity';
 		ColorsService,
 		ProductsResolver,
 		ReferencesService,
+		BrandsService,
+		CompaniesService,
 	],
 	exports: [ProductsService],
 	controllers: [ProductsController],

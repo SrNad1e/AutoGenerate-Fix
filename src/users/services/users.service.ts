@@ -14,7 +14,8 @@ const populate = [
 	'role',
 	'shop',
 	'pointOfSale',
-	'type',
+	'customerType',
+	'company',
 	{
 		path: 'shop',
 		populate: {
@@ -27,6 +28,14 @@ const populate = [
 		populate: {
 			path: 'authorization',
 			model: 'AuthorizationDian',
+		},
+	},
+
+	{
+		path: 'role',
+		populate: {
+			path: 'permissions',
+			model: 'Permission',
 		},
 	},
 ];
