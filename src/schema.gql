@@ -1036,20 +1036,20 @@ type Permission {
   """Identificador de mongo"""
   _id: String!
 
-  """Tipo de acción crud que genera acceso"""
+  """Tipo de acción (list, see, create, update, autogenerate)"""
   action: String!
 
   """Detalle de la acción"""
   description: String!
 
-  """módulo al que perteneces el permiso"""
+  """Módulo al que pertenece el permiso"""
   module: String!
 
   """Nombre de la acción"""
   name: String!
 
-  """Título de la acción"""
-  title: String!
+  """Opción del módulo al que pertenece el permiso"""
+  option: String!
 }
 
 type PointOfSale {
@@ -1501,6 +1501,9 @@ type ResponseWarehouses {
 type Role {
   """Identificador de mongo"""
   _id: String!
+
+  """Permite hacer consultas con otra bodega"""
+  changeWarehouse: Boolean!
 
   """Fecha de creación del rol"""
   createdAt: DateTime!

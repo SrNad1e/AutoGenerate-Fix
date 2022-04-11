@@ -1,6 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 import { Permission } from './permission.entity';
 import { User } from './user.entity';
@@ -9,7 +9,7 @@ import { User } from './user.entity';
 @ObjectType()
 export class Role {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: ObjectId;
+	_id: Types.ObjectId;
 
 	@Field({ description: 'Nombre asiganado al rol' })
 	@Prop({ type: String, required: true })
@@ -18,8 +18,12 @@ export class Role {
 	@Field(() => [Permission], {
 		description: 'Permisos al los quie tiene el rol',
 	})
-	@Prop({ type: Array })
-	permissions: Permission[];
+	@Prop({ type: [Types.ObjectId] })
+	permissions: Types.ObjectId[];
+
+	@Field({ description: 'Permite hacer consultas con otra bodega' })
+	@Prop({ type: Boolean, default: false })
+	changeWarehouse: boolean;
 
 	@Field(() => User, { description: 'Usuario que creó o modificó el rol' })
 	@Prop({ type: Object, required: true })
