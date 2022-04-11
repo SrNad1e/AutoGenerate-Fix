@@ -28,13 +28,14 @@ export class StockAdjustmentResolver {
 	) {
 		return this.stockAdjustmentService.findAll(
 			context.req.body.variables.input,
+			context.req.user,
 		);
 	}
 
 	@Query(() => StockAdjustment, { name: 'stockAdjustmentId' })
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string) {
-		return this.stockAdjustmentService.findById(id);
+	findById(@Args('id') id: string, @Context() context) {
+		return this.stockAdjustmentService.findById(id, context.req.user);
 	}
 
 	@Mutation(() => StockAdjustment, { name: 'createStockAdjustment' })

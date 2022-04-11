@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -67,80 +68,86 @@ export class StockAdjustmentService {
 		private readonly stockHistoryService: StockHistoryService,
 	) {}
 
-	async findAll({
-		number,
-		sort,
-		status,
-		warehouseId,
-		limit = 20,
-		page = 1,
-		dateFinal,
-		dateInitial,
-	}: FiltersStockAdjustmentInput) {
+	async findAll(
+		{
+			number,
+			sort,
+			status,
+			warehouseId,
+			limit = 20,
+			page = 1,
+			dateFinal,
+			dateInitial,
+		}: FiltersStockAdjustmentInput,
+		user: User,
+	) {
 		const filters: FilterQuery<StockAdjustment> = {};
-		try {
-			if (number) {
-				filters.number = number;
-			}
 
-			if (status) {
-				filters.status = status;
-			}
-
-			if (warehouseId) {
-				filters['warehouse._id'] = new Types.ObjectId(warehouseId);
-			}
-
-			const options = {
-				limit,
-				page,
-				sort,
-				lean: true,
-				populate,
-			};
-
-			if (sort?.warehouse) {
-				options.sort['warehouse.name'] = sort.warehouse;
-			}
-
-			if (dateInitial) {
-				if (!dateFinal) {
-					throw new BadRequestException('Debe enviarse una fecha final');
-				}
-
-				filters['createdAt'] = {
-					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
-				};
-			} else if (dateFinal) {
-				if (!dateInitial) {
-					throw new BadRequestException('Debe enviarse una fecha inicial');
-				}
-				filters['createdAt'] = {
-					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
-				};
-			}
-
-			return this.stockAdjustmetnModel.paginate(filters, options);
-		} catch (error) {
-			return error;
+		if (user.username !== 'admin') {
+			filters.company === user.company._id;
 		}
+
+		if (number) {
+			filters.number = number;
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+
+		if (warehouseId) {
+			filters['warehouse._id'] = new Types.ObjectId(warehouseId);
+		}
+
+		const options = {
+			limit,
+			page,
+			sort,
+			lean: true,
+			populate,
+		};
+
+		if (sort?.warehouse) {
+			options.sort['warehouse.name'] = sort.warehouse;
+		}
+
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		}
+
+		return this.stockAdjustmetnModel.paginate(filters, options);
 	}
 
-	async findById(id: string) {
-		try {
-			const response = await this.stockAdjustmetnModel
-				.findById(id)
-				.populate(populate)
-				.lean();
-			if (response) {
-				return response;
-			}
-			throw new NotFoundException('La entrada no existe');
-		} catch (error) {
-			return error;
+	async findById(_id: string, user: User) {
+		const filters: FilterQuery<StockAdjustment> = { _id };
+
+		if (user.username !== 'admin') {
+			filters.company === user.company._id;
 		}
+
+		const response = await this.stockAdjustmetnModel
+			.findOne(filters)
+			.populate(populate)
+			.lean();
+		if (response) {
+			return response;
+		}
+		throw new NotFoundException('La entrada no existe');
 	}
 
 	async create(
@@ -261,6 +268,13 @@ export class StockAdjustmentService {
 		user: User,
 	) {
 		const stockAdjustment = await this.stockAdjustmetnModel.findById(id).lean();
+
+		if (stockAdjustment.company._id !== user.company._id) {
+			throw new UnauthorizedException(
+				`El usuario no se encuentra autorizado para hacer cambios en el ajuste`,
+			);
+		}
+
 		if (options.status) {
 			if (!statusTypes.includes(options.status)) {
 				throw new BadRequestException(

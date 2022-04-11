@@ -6,6 +6,7 @@ import { Document, Types } from 'mongoose';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { Company } from 'src/products/entities/company.entity';
 
 @ObjectType()
 export class DetailInput {
@@ -53,6 +54,10 @@ export class StockInput extends Document {
 	@Field(() => Warehouse, { description: 'Bodega de la entrada' })
 	@Prop({ type: Object, required: true })
 	warehouse: Warehouse;
+
+	@Field(() => Company, { description: 'Compañía a la que pertence el ajuste' })
+	@Prop({ type: Object, required: true })
+	company: Company;
 
 	@Field(() => String, {
 		description: 'Observación de la entrada',
