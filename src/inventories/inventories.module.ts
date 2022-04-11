@@ -105,11 +105,15 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 				name: StockAdjustment.name,
 				useFactory: async (connection: Connection) => {
 					const schema = StockAdjustmentSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
+
+					schema.post('save', (pru) => {
+						console.log(pru);
+					});
+					/*const AutoIncrement = AutoIncrementFactory(connection);
 					schema.plugin(AutoIncrement, {
 						id: 'stock_adjustment_increment',
 						inc_field: 'number',
-					});
+					});*/
 					return schema;
 				},
 				inject: [getConnectionToken('')],

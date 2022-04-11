@@ -13,5 +13,13 @@ export class CompaniesService {
 		private readonly companyModel: PaginateModel<Company>,
 	) {}
 
+	async findById(id: string) {
+		return this.companyModel.findById(id).lean();
+	}
+
+	async findOne(name: string) {
+		return this.companyModel.findOne({ name }).lean();
+	}
+
 	async create({}: CreateCompanyInput, user: User) {}
 }

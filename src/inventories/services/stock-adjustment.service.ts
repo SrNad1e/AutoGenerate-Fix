@@ -59,16 +59,19 @@ export class StockAdjustmentService {
 		private readonly stockHistoryService: StockHistoryService,
 	) {}
 
-	async findAll({
-		number,
-		sort,
-		status,
-		warehouseId,
-		limit = 20,
-		page = 1,
-		dateFinal,
-		dateInitial,
-	}: FiltersStockAdjustmentInput) {
+	async findAll(
+		{
+			number,
+			sort,
+			status,
+			warehouseId,
+			limit = 20,
+			page = 1,
+			dateFinal,
+			dateInitial,
+		}: FiltersStockAdjustmentInput,
+		user: User,
+	) {
 		const filters: FilterQuery<StockAdjustment> = {};
 		try {
 			if (number) {

@@ -38,7 +38,7 @@ import { CompaniesService } from './services/companies.service';
 				useFactory: () => {
 					const schema = ProductSchema;
 					schema.index(
-						{ reference: 1, description: 1, barcode: 1 },
+						{ "reference.name": 1, description: 1, barcode: 1 },
 						{ name: 'text' },
 					);
 					return schema;

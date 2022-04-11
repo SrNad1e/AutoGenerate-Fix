@@ -19,6 +19,8 @@ import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { ReferencesService } from './references.service';
+import { BrandsService } from './brands.service';
+import { CompaniesService } from './companies.service';
 
 const populate = [
 	{
@@ -48,6 +50,8 @@ export class ProductsService {
 		private readonly usersService: UsersService,
 		private readonly warehousesService: WarehousesService,
 		private readonly referencesService: ReferencesService,
+		private readonly brandsService: BrandsService,
+		private readonly companiesService: CompaniesService,
 	) {}
 
 	async findAll(params: FiltersProductsInput) {
@@ -84,13 +88,15 @@ export class ProductsService {
 
 		if (name) {
 			filters.$text = {
-				$search: name,
+				$search: `"${name}"`,
 			};
 		}
 
+		console.log(filters);
+
 		const options = {
 			limit,
-			page: page,
+			page,
 			sort,
 			lean: true,
 			populate,
@@ -193,12 +199,34 @@ export class ProductsService {
 			}));
 
 			const userDefault = await this.usersService.findOne('admin');
-			//const brand = 
+
 			for (let i = 0; i < productsMysql.length; i++) {
 				const product = productsMysql[i];
+				const color = await this.colorsService.getByIdMysql(product.color_id);
+				const size = await this.sizesService.getByIdMysql(product.size_id);
+
+				const user = await this.usersService.getByIdMysql(
+					product.owner_user_id,
+				);
+
 				let reference = await this.referencesService.findOne({
 					name: product.reference,
 				});
+
+				const brandSearch =
+					product.provider_id === 1
+						? 'Toulouse'
+						: product.provider_id === 2
+						? 'LuckyWoman'
+						: 'Externos';
+				let brand = await this.brandsService.findOne(brandSearch);
+				const company = await this.companiesService.findOne('Cirotex');
+
+				if (!brand) {
+					await this.brandsService.create({ name: brandSearch }, user);
+					brand = await this.brandsService.findOne(brandSearch);
+				}
+
 				if (!reference) {
 					await this.referencesService.create(
 						{
@@ -212,6 +240,8 @@ export class ProductsService {
 							long: product.shipping_long,
 							height: product.shipping_height,
 							volume: product.shipping_volume,
+							brand: brand._id.toString(),
+							company: company._id.toString(),
 						},
 						userDefault,
 					);
@@ -220,13 +250,6 @@ export class ProductsService {
 						name: product.reference,
 					});
 				}
-				const color = await this.colorsService.getByIdMysql(product.color_id);
-				const size = await this.sizesService.getByIdMysql(product.size_id);
-
-				const user = await this.usersService.getByIdMysql(
-					product.owner_user_id,
-				);
-
 				productsMongo.push({
 					reference: reference?._id,
 					barcode: product.barcode,

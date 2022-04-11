@@ -31,4 +31,10 @@ export class CreateReferenceInput {
 
 	@Field(() => Number, { description: 'Volumen del producto' })
 	volume: number;
+
+	@Field(() => String, { description: 'Marca de la referencia' })
+	brand: string;
+
+	@Field(() => String, { description: 'Compañía de la referencia' })
+	company: string;
 }
