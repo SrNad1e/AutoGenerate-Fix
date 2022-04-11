@@ -1,8 +1,7 @@
-/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import {
@@ -12,23 +11,27 @@ import {
 } from '../dtos/shop.dto';
 import { Shop } from '../entities/shop.entity';
 import { Shop as ShopMysql } from '../entities/shopMysql.entity';
+import { Warehouse } from '../entities/warehouse.entity';
 
 const populate = [
 	{
 		path: 'defaultWarehouse',
-		model: 'Warehouse',
+		model: Warehouse.name,
 	},
 	{
 		path: 'warehouseMain',
-		model: 'Warehouse',
+		model: Warehouse.name,
 	},
 ];
 
 @Injectable()
 export class ShopsService {
 	constructor(
-		@InjectModel(Shop.name) private shopModel: Model<Shop>,
-		@InjectRepository(ShopMysql) private shopMysqlRepo: Repository<ShopMysql>,
+		@InjectModel(Shop.name) private readonly shopModel: Model<Shop>,
+		@InjectRepository(ShopMysql)
+		private readonly shopMysqlRepo: Repository<ShopMysql>,
+		@InjectModel(Warehouse.name)
+		private readonly warehouseModel: PaginateModel<Warehouse>,
 	) {}
 
 	async getAll(params: FilterShopsDto) {
@@ -89,18 +92,27 @@ export class ShopsService {
 
 	async migrate() {
 		try {
-			//consultamos las tiendas
 			const shopsMysql = await this.shopMysqlRepo.find();
 
-			//guardamos las tiendas
 			for (let i = 0; i < shopsMysql.length; i++) {
 				const shopMysql = shopsMysql[i];
+
+				const defaultWarehouse = await this.warehouseModel
+					.findOne({
+						name: shopMysql.name,
+					})
+					.lean();
+
 				const newShop = new this.shopModel({
 					name: shopMysql.name,
 					address: shopMysql.address,
 					phone: shopMysql.phone,
 					shopId: shopMysql.id,
+					defaultWarehouse: defaultWarehouse?._id,
 					createdAt: shopMysql.created_at,
+					user: {
+						name: 'Migración',
+					},
 				});
 				await newShop.save();
 			}

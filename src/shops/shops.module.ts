@@ -24,28 +24,9 @@ import { WarehousesResolver } from './resolvers/warehouses.resolver';
 				name: Warehouse.name,
 				schema: WarehouseSchema,
 			},
-		]),
-		MongooseModule.forFeatureAsync([
 			{
 				name: Shop.name,
-				useFactory: () => {
-					const schema = ShopSchema;
-					schema.pre('find', (next) => {
-						if (typeof this === 'object') {
-							//	this?.populate('warehouse');
-						}
-						next();
-					});
-					schema.pre('findOne', () => {
-						const context = this || undefined;
-						context && context.populate('warehouse');
-					});
-					schema.pre('findOById', () => {
-						const context = this || undefined;
-						context && context.populate('warehouse');
-					});
-					return schema;
-				},
+				schema: ShopSchema,
 			},
 		]),
 		TypeOrmModule.forFeature([ShopMysql, WarehouseMysql]),

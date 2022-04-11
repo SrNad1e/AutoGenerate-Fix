@@ -40,6 +40,10 @@ export class WarehousesService {
 		return this.warehouseModel.paginate(filters, options);
 	}
 
+	async findOne(params: FiltersWarehouseInput) {
+		return this.warehouseModel.findOne(params).lean();
+	}
+
 	/**
 	 * @description obtiene una bodega con base al id de mysql
 	 * @param id identificador en la base de datos mysql
@@ -64,6 +68,8 @@ export class WarehousesService {
 					id,
 					name,
 					shop,
+					max: 100,
+					min: 10,
 					user: {
 						id: 0,
 						name: 'Usuario de migración',
