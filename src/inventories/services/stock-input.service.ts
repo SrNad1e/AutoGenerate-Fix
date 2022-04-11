@@ -182,7 +182,7 @@ export class StockInputService {
 				});
 			}
 			const total = detailsInput.reduce(
-				(sum, detail) => sum + detail.quantity * detail.product.cost,
+				(sum, detail) => sum + detail.quantity * detail.product.reference.cost,
 				0,
 			);
 			const newStockInput = new this.stockInputModel({

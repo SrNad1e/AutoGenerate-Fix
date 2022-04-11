@@ -162,7 +162,10 @@ export class ProductsService {
 	}
 
 	async findById(id: string, warehouseId?: string) {
-		const productQuery = await this.productModel.findById(id).lean();
+		const productQuery = await this.productModel
+			.findById(id)
+			.populate(populate)
+			.lean();
 		if (productQuery) {
 			const { stock, ...product } = productQuery;
 			if (warehouseId) {
