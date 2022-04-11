@@ -1777,6 +1777,9 @@ type StockAdjustment {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía a la que pertence el ajuste"""
+  company: Company!
+
   """Fecha de creación de la entrada"""
   createdAt: DateTime!
 

@@ -194,11 +194,18 @@ export class StockAdjustmentService {
 				(sum, detail) => sum + detail.quantity * detail.product.reference.cost,
 				0,
 			);
+
+			const stockAdjustment = await this.stockAdjustmetnModel
+				.findOne({ 'company._id': user.company._id })
+				.sort({ _id: -1 });
+
 			const newStockInput = new this.stockAdjustmetnModel({
 				warehouse,
 				details: detailsAdjustment,
 				total,
 				user,
+				company: user.company,
+				number: (stockAdjustment?.number || 0) + 1,
 				...options,
 			});
 

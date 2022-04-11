@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Company } from 'src/products/entities/company.entity';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -32,7 +33,7 @@ export class StockAdjustment extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Número consecutivo' })
-	@Prop({ type: Number, default: 0, unique: true })
+	@Prop({ type: Number, requiere: true, unique: true })
 	number: number;
 
 	@Field(() => [DetailAdjustment], { description: 'Detalles del ajuste' })
@@ -52,6 +53,10 @@ export class StockAdjustment extends Document {
 	@Field(() => Warehouse, { description: 'Bodega del ajuste' })
 	@Prop({ type: Object, required: true })
 	warehouse: Warehouse;
+
+	@Field(() => Company, { description: 'Compañía a la que pertence el ajuste' })
+	@Prop({ type: Object, required: true })
+	company: Company;
 
 	@Field(() => String, {
 		description: 'Observación de la entrada',

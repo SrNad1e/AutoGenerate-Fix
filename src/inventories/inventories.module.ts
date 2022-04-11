@@ -104,30 +104,19 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 				},
 				inject: [getConnectionToken('')],
 			},
+		]),
+		MongooseModule.forFeature([
 			{
 				name: StockAdjustment.name,
-				useFactory: async (connection: Connection) => {
-					const schema = StockAdjustmentSchema;
-
-					schema.post('save', (pru) => {
-						console.log(pru);
-					});
-					/*const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'stock_adjustment_increment',
-						inc_field: 'number',
-					});*/
-					return schema;
-				},
-				inject: [getConnectionToken('')],
+				schema: StockAdjustmentSchema,
 			},
 			{
 				name: StockHistory.name,
-				useFactory: () => StockHistorySchema,
+				schema: StockHistorySchema,
 			},
 			{
 				name: Order.name,
-				useFactory: () => OrderSchema,
+				schema: OrderSchema,
 			},
 		]),
 	],
