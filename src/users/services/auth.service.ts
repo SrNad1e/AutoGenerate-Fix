@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 import { LoginResponse } from '../dtos/login-response';
+import { LoginUserInput } from '../dtos/login-user.input';
 import { User } from '../entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -15,7 +16,13 @@ export class AuthService {
 		private jwtService: JwtService,
 	) {}
 
-	async login(user: User): Promise<LoginResponse> {
+	async login(
+		user: User,
+		{ companyId }: LoginUserInput,
+	): Promise<LoginResponse> {
+		if (user.username !== 'admin' && user.company._id.toString() !== companyId) {
+			throw new UnauthorizedException(`El usuario no tiene acceso a la compañia`)
+		}
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
@@ -43,7 +50,7 @@ export class AuthService {
 	async validateUser(
 		username: string,
 		passwordOld: string,
-	): Promise<Partial<User>>{
+	): Promise<Partial<User>> {
 		const user = await this.usersService.findOne(username);
 		if (!user) {
 			throw new UnauthorizedException(`Usuario no existe`);

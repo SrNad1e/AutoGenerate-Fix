@@ -19,13 +19,16 @@ export class AuthResolver {
 		@Args('loginUserInput') _: LoginUserInput,
 		@Context() context,
 	): Promise<LoginResponse> {
-		return this.authService.login(context.user);
+		return this.authService.login(
+			context.user,
+			context.req.body.variables.input,
+		);
 	}
 
 	@Mutation(() => User)
 	@UseGuards(JwtAuthGuard)
 	async signup(
-		@Args('createUserInput') createUserInput: CreateUserInput,
+		@Args('createUserInput') _: CreateUserInput,
 		@Context() context,
 	): Promise<User> {
 		return this.authService.signup({
