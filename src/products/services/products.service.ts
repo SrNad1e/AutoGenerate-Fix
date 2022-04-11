@@ -21,6 +21,7 @@ import { SizesService } from './sizes.service';
 import { ReferencesService } from './references.service';
 import { BrandsService } from './brands.service';
 import { CompaniesService } from './companies.service';
+import { User } from 'src/users/entities/user.entity';
 
 const populate = [
 	{
@@ -34,7 +35,6 @@ const populate = [
 	},
 	{ path: 'color', model: 'Color' },
 	{ path: 'size', model: 'Size' },
-	{ path: 'provider', model: 'Provider' },
 	{ path: 'reference', model: 'Reference' },
 ];
 
@@ -54,7 +54,7 @@ export class ProductsService {
 		private readonly companiesService: CompaniesService,
 	) {}
 
-	async findAll(params: FiltersProductsInput) {
+	async findAll(params: FiltersProductsInput, user: Partial<User>) {
 		const filters: FilterQuery<Product> = {};
 		const {
 			colorId,
@@ -87,12 +87,14 @@ export class ProductsService {
 		}
 
 		if (name) {
-			filters.$text = {
-				$search: `"${name}"`,
+			const references = await this.referencesService.findAll({
+				name,
+				companyId: user.company._id.toString(),
+			});
+			filters.companies = {
+				$in: references.map((item) => item._id),
 			};
 		}
-
-		console.log(filters);
 
 		const options = {
 			limit,

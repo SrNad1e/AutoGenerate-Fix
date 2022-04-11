@@ -354,19 +354,25 @@ export class OrdersService {
 				productsCreate.push(product);
 			}
 
-			await this.stockHistoryService.addStock({
-				details: productsDelete,
-				documentId: orderId,
-				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse.toString(),
-			});
+			await this.stockHistoryService.addStock(
+				{
+					details: productsDelete,
+					documentId: orderId,
+					documentType: 'order',
+					warehouseId: order.shop.defaultWarehouse.toString(),
+				},
+				user,
+			);
 
-			await this.stockHistoryService.deleteStock({
-				details: productsCreate,
-				documentId: orderId,
-				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse.toString(),
-			});
+			await this.stockHistoryService.deleteStock(
+				{
+					details: productsCreate,
+					documentId: orderId,
+					documentType: 'order',
+					warehouseId: order.shop.defaultWarehouse.toString(),
+				},
+				user,
+			);
 
 			const subtotal = newDetails.reduce(
 				(sum, detail) => sum + detail.price * detail.quantity,

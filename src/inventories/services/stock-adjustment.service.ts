@@ -230,8 +230,11 @@ export class StockAdjustmentService {
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
-				await this.stockHistoryService.addStock(addStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+				);
+				await this.stockHistoryService.addStock(addStockHistoryInput, user);
 			}
 			return response;
 		} catch (error) {
@@ -369,8 +372,11 @@ export class StockAdjustmentService {
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
-				await this.stockHistoryService.addStock(addStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+				);
+				await this.stockHistoryService.addStock(addStockHistoryInput, user);
 			}
 
 			return response;
@@ -419,8 +425,11 @@ export class StockAdjustmentService {
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
-				await this.stockHistoryService.addStock(addStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+				);
+				await this.stockHistoryService.addStock(addStockHistoryInput, user);
 			}
 
 			return response;

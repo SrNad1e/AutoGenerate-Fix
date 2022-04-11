@@ -69,7 +69,7 @@ export class Reference extends Document {
 
 	@Prop({ type: [Types.ObjectId], ref: Company.name, required: true })
 	@Field(() => [Company], { description: 'Compañias del producto' })
-	company: Types.ObjectId[];
+	companies: Types.ObjectId[];
 
 	@Field(() => User, { description: 'Usuario que crea la referencia' })
 	user: User;

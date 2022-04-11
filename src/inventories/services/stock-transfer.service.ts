@@ -259,7 +259,10 @@ export class StockTransferService {
 					documentId: response._id.toString(),
 					documentType: 'transfer',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					userOrigin,
+				);
 			}
 
 			return response;
@@ -405,7 +408,10 @@ export class StockTransferService {
 						documentId: response._id.toString(),
 						documentType: 'transfer',
 					};
-					await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+					);
 				}
 
 				if (options.status === 'confirmed') {
@@ -429,7 +435,10 @@ export class StockTransferService {
 						documentId: response._id.toString(),
 						documentType: 'transfer',
 					};
-					await this.stockHistoryService.addStock(deleteStockHistoryInput);
+					await this.stockHistoryService.addStock(
+						deleteStockHistoryInput,
+						user,
+					);
 				}
 
 				return response;
@@ -461,7 +470,10 @@ export class StockTransferService {
 						documentId: response._id.toString(),
 						documentType: 'transfer',
 					};
-					await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+					);
 				}
 
 				if (options.status === 'confirmed') {
@@ -476,7 +488,10 @@ export class StockTransferService {
 						documentId: response._id.toString(),
 						documentType: 'transfer',
 					};
-					await this.stockHistoryService.addStock(deleteStockHistoryInput);
+					await this.stockHistoryService.addStock(
+						deleteStockHistoryInput,
+						user,
+					);
 				}
 
 				return response;

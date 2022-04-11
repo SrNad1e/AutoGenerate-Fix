@@ -1146,7 +1146,7 @@ type Reference {
   changeable: Boolean!
 
   """Compañias del producto"""
-  company: [Company!]!
+  companies: [Company!]!
 
   """Costo del producto"""
   cost: Float!

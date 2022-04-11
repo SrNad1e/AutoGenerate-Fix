@@ -205,7 +205,10 @@ export class StockOutputService {
 					documentId: response._id.toString(),
 					documentType: 'output',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+				);
 			}
 			return response;
 		} catch (error) {
@@ -298,7 +301,8 @@ export class StockOutputService {
 			}
 
 			const total = newDetails.reduce(
-				(sum, detail) => sum + detail.quantity * detail.product.reference['cost'],
+				(sum, detail) =>
+					sum + detail.quantity * detail.product.reference['cost'],
 				0,
 			);
 
@@ -326,7 +330,10 @@ export class StockOutputService {
 					documentId: response._id.toString(),
 					documentType: 'output',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+				);
 			}
 
 			return response;
@@ -355,7 +362,10 @@ export class StockOutputService {
 					documentId: response._id.toString(),
 					documentType: 'output',
 				};
-				await this.stockHistoryService.deleteStock(deleteStockHistoryInput);
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+				);
 			}
 
 			return response;

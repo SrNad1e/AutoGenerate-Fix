@@ -5,6 +5,7 @@ import { PaginateModel } from 'mongoose';
 import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
+import { User } from 'src/users/entities/user.entity';
 import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
@@ -32,12 +33,10 @@ export class StockHistoryService {
 		private readonly productsService: ProductsService,
 	) {}
 
-	async addStock({
-		details,
-		documentId,
-		documentType,
-		warehouseId,
-	}: AddStockHistoryInput) {
+	async addStock(
+		{ details, documentId, documentType, warehouseId }: AddStockHistoryInput,
+		user: Partial<User>,
+	) {
 		let item;
 		try {
 			const validateQuantity = details.find((item) => !(item.quantity > 0));
@@ -77,11 +76,14 @@ export class StockHistoryService {
 
 			const products = details.map((detail) => detail.productId.toString());
 
-			const { totalDocs } = await this.productsService.findAll({
-				ids: products,
-				status: 'active',
-				limit: -1,
-			});
+			const { totalDocs } = await this.productsService.findAll(
+				{
+					ids: products,
+					status: 'active',
+					limit: -1,
+				},
+				user,
+			);
 			if (totalDocs !== products.length) {
 				throw new BadRequestException(
 					`Un producto no existe o se encuentra inactivo, revise la lista de productos`,
@@ -117,12 +119,10 @@ export class StockHistoryService {
 		}
 	}
 
-	async deleteStock({
-		details,
-		documentId,
-		documentType,
-		warehouseId,
-	}: DeleteStockHistoryInput) {
+	async deleteStock(
+		{ details, documentId, documentType, warehouseId }: DeleteStockHistoryInput,
+		user: Partial<User>,
+	) {
 		let item;
 
 		try {
@@ -162,11 +162,14 @@ export class StockHistoryService {
 
 			const products = details.map((detail) => detail.productId.toString());
 
-			const { totalDocs } = await this.productsService.findAll({
-				ids: products,
-				status: 'active',
-				limit: -1,
-			});
+			const { totalDocs } = await this.productsService.findAll(
+				{
+					ids: products,
+					status: 'active',
+					limit: -1,
+				},
+				user,
+			);
 
 			if (totalDocs !== products.length) {
 				throw new BadRequestException(

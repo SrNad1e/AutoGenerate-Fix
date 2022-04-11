@@ -21,7 +21,10 @@ export class ProductsResolver {
 		_: FiltersProductsInput,
 		@Context() context,
 	) {
-		return this.productsService.findAll(context.req.body.variables.input);
+		return this.productsService.findAll(
+			context.req.body.variables.input,
+			context.req.user,
+		);
 	}
 
 	@Query(() => Product, { name: 'product' })

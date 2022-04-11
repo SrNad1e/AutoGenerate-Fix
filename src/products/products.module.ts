@@ -28,19 +28,16 @@ import { CompaniesService } from './services/companies.service';
 		MongooseModule.forFeature([
 			{ name: Color.name, schema: ColorSchema },
 			{ name: Size.name, schema: SizeSchema },
-			{ name: Reference.name, schema: ReferenceSchema },
 			{ name: Brand.name, schema: BrandSchema },
 			{ name: Company.name, schema: CompanySchema },
+			{ name: Product.name, schema: ProductSchema },
 		]),
 		MongooseModule.forFeatureAsync([
 			{
-				name: Product.name,
+				name: Reference.name,
 				useFactory: () => {
-					const schema = ProductSchema;
-					schema.index(
-						{ "reference.name": 1, description: 1, barcode: 1 },
-						{ name: 'text' },
-					);
+					const schema = ReferenceSchema;
+					schema.index({ name: "text", description: "text" }, { name: 'text' });
 					return schema;
 				},
 			},
