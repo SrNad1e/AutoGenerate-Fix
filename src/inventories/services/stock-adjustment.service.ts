@@ -260,7 +260,7 @@ export class StockAdjustmentService {
 		{ details, ...options }: UpdateStockAdjustmentInput,
 		user: User,
 	) {
-		const stockInput = await this.stockAdjustmetnModel.findById(id).lean();
+		const stockAdjustment = await this.stockAdjustmetnModel.findById(id).lean();
 		if (options.status) {
 			if (!statusTypes.includes(options.status)) {
 				throw new BadRequestException(
@@ -268,19 +268,19 @@ export class StockAdjustmentService {
 				);
 			}
 
-			if (!stockInput) {
+			if (!stockAdjustment) {
 				throw new BadRequestException('El ajuste no existe');
 			}
 
-			if (stockInput.status === 'cancelled') {
+			if (stockAdjustment.status === 'cancelled') {
 				throw new BadRequestException('El ajuste se encuenta cancelado');
 			}
 
-			if (stockInput.status === 'confirmed') {
+			if (stockAdjustment.status === 'confirmed') {
 				throw new BadRequestException('El ajuste se encuentra confirmado');
 			}
 
-			if (options.status === stockInput.status) {
+			if (options.status === stockAdjustment.status) {
 				throw new BadRequestException(
 					'El estado del ajuste debe cambiar o enviarse vacío',
 				);
@@ -292,7 +292,7 @@ export class StockAdjustmentService {
 				.filter((detail) => detail.action === 'delete')
 				.map((detail) => detail.productId.toString());
 
-			const newDetails = stockInput.details
+			const newDetails = stockAdjustment.details
 				.filter(
 					(detail) => !productsDelete.includes(detail.product._id.toString()),
 				)
@@ -314,7 +314,7 @@ export class StockAdjustmentService {
 				const { action, productId, quantity } = details[i];
 
 				if (action === 'create') {
-					const productFind = stockInput.details.find(
+					const productFind = stockAdjustment.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);
 					if (productFind) {
@@ -324,7 +324,7 @@ export class StockAdjustmentService {
 					}
 					const product = await this.productsService.findById(
 						productId,
-						stockInput.warehouse._id.toString(),
+						stockAdjustment.warehouse._id.toString(),
 					);
 					newDetails.push({
 						product,
