@@ -2,14 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input AddConfigInput {
-  data: [DataInput!]!
-  description: String!
-  module: String!
-  name: String!
-  title: String!
-}
-
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
   orderId: String!
@@ -223,21 +215,6 @@ type Company {
   user: User!
 }
 
-type Configs {
-  createdAt: DateTime!
-  data: [Data!]!
-  description: String!
-  name: String!
-  title: String!
-  updatedAt: DateTime!
-}
-
-type Configuration {
-  _id: ID!
-  configs: [Configs!]!
-  module: String!
-}
-
 input CreateOrderInput {
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
   status: String!
@@ -419,18 +396,6 @@ type CustomerType {
 
   """Usuario que creó o editó el tipo de cliente"""
   user: User!
-}
-
-type Data {
-  name: String!
-  type: String!
-  value: String!
-}
-
-input DataInput {
-  name: String!
-  type: String!
-  value: String!
 }
 
 """
@@ -990,7 +955,6 @@ input LoginUserInput {
 }
 
 type Mutation {
-  addConfi(addConfigData: AddConfigInput!): Configuration!
   addPaymentsOrder(addPaymentsOrderInput: AddPaymentsOrderInput!): Order!
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
@@ -1183,16 +1147,12 @@ type Product {
 
 type Query {
   colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
-  configuration(module: String!): Configuration
   currentUser: User!
   customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
-  getAll: [Configuration!]!
-  getForName(module: String!, name: String!): Configuration!
   orderId(id: String!): [Order!]!
   ordersByPointOfSale(idPointOfSale: String!): [Order!]!
   product(filtersProductInput: FiltersProductInput = {}): Product!
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
-  reportSales(year: Float!): [ReportSalesResponse!]!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockAdjustmentId(id: String!): StockAdjustment!
   stockAdjustments(filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
@@ -1257,11 +1217,6 @@ type Reference {
 
   """Usuario que crea la referencia"""
   user: User!
-}
-
-type ReportSalesResponse {
-  shop: Shop!
-  weeks: [Float!]!
 }
 
 type ResponseColor {

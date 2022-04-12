@@ -5,13 +5,11 @@ import { GraphQLModule } from '@nestjs/graphql';
 import * as Joi from 'joi';
 
 import config from './config';
-import { ConfigurationsModule } from './configurations/configurations.module';
 import { DatabasesModule } from './databases/databases.module';
 import { enviroments } from './enviroments';
 import { ImagesModule } from './images/images.module';
 import { InventoriesModule } from './inventories/inventories.module';
 import { ProductsModule } from './products/products.module';
-import { ReportsModule } from './reports/reports.module';
 import { ShopsModule } from './shops/shops.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { UsersModule } from './users/users.module';
@@ -31,8 +29,8 @@ import { CrmModule } from './crm/crm.module';
 			validationSchema: Joi.object({
 				MONGO_DB: Joi.string().required(),
 				MONGO_PORT: Joi.number().required(),
-				//MONGO_PASSWORD: Joi.string().required(),
-				//MONGO_USER: Joi.string().required(),
+				MONGO_PASSWORD: Joi.string().required(),
+				MONGO_USER: Joi.string().required(),
 				MONGO_HOST: Joi.string().required(),
 				MONGO_CONNECTION: Joi.string().required(),
 				PORT: Joi.number().required(),
@@ -44,12 +42,10 @@ import { CrmModule } from './crm/crm.module';
 				SECRET_TOKEN: Joi.string().required(),
 			}),
 		}),
-		ConfigurationsModule,
 		DatabasesModule,
 		ImagesModule,
 		InventoriesModule,
 		ProductsModule,
-		ReportsModule,
 		ShopsModule,
 		TreasuryModule,
 		UsersModule,
