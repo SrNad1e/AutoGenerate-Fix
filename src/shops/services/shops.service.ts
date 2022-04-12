@@ -66,7 +66,7 @@ export class ShopsService {
 	}
 
 	async findById(shopId: string) {
-		return (await this.shopModel.findById(shopId)).populate(populate);
+		return await this.shopModel.findById(shopId).populate(populate).lean();
 	}
 
 	async create(params: CreateShopParamsDto) {

@@ -54,8 +54,9 @@ export class OrdersService {
 
 			if (user?.pointOfSale && status === 'open') {
 				const customer = await this.customersService.getCustomerDefault();
-				const shop = await this.shopsService.findById(user.shop._id.toString());
-
+				const shop = await this.shopsService.findById(
+					user.pointOfSale['shop'].toString(),
+				);
 				return this.orderModel.create({ customer, shop, user });
 			}
 
