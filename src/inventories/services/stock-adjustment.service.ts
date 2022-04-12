@@ -154,112 +154,101 @@ export class StockAdjustmentService {
 		{ details, warehouseId, ...options }: CreateStockAdjustmentInput,
 		user: Partial<User>,
 	) {
-		try {
-			if (!(details?.length > 0)) {
-				throw new BadRequestException('El ajuste no puede estar vacía');
-			}
-
-			if (options.status) {
-				if (!statusTypes.includes(options.status)) {
-					throw new BadRequestException(
-						`Es estado ${options.status} no es un estado válido`,
-					);
-				}
-
-				if (options.status === 'cancelled') {
-					throw new BadRequestException(
-						'El ajuste no puede ser creada, valide el estado del ajuste',
-					);
-				}
-			}
-
-			const warehouse = await this.warehousesService.findById(warehouseId);
-
-			if (!warehouse?.active) {
-				throw new BadRequestException(
-					'La bodega no existe o se encuentra inactiva',
-				);
-			}
-
-			const detailsAdjustment = [];
-
-			for (let i = 0; i < details.length; i++) {
-				const { quantity, productId } = details[i];
-				const product = await this.productsService.findById(
-					productId,
-					warehouseId,
-				);
-				detailsAdjustment.push({
-					product,
-					quantity,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				});
-			}
-
-			const total = detailsAdjustment.reduce(
-				(sum, detail) => sum + detail.quantity * detail.product.reference.cost,
-				0,
-			);
-
-			const stockAdjustment = await this.stockAdjustmetnModel
-				.findOne({ 'company._id': user.company._id })
-				.sort({ _id: -1 });
-
-			const newStockInput = new this.stockAdjustmetnModel({
-				warehouse,
-				details: detailsAdjustment,
-				total,
-				user,
-				company: user.company,
-				number: (stockAdjustment?.number || 0) + 1,
-				...options,
-			});
-
-			const response = await (await newStockInput.save()).populate(populate);
-
-			if (options.status === 'confirmed') {
-				const detailsDelete = response.details
-					.filter(
-						(detail) => detail.product.stock[0].quantity > detail.quantity,
-					)
-					.map((detail) => ({
-						productId: detail.product._id.toString(),
-						quantity: detail.product.stock[0].quantity - detail.quantity,
-					}));
-
-				const detailsAdd = response.details
-					.filter(
-						(detail) => detail.product.stock[0].quantity < detail.quantity,
-					)
-					.map((detail) => ({
-						productId: detail.product._id.toString(),
-						quantity: detail.quantity,
-					}));
-
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
-					details: detailsDelete,
-					warehouseId,
-					documentId: response._id.toString(),
-					documentType: 'adjustment',
-				};
-
-				const addStockHistoryInput: AddStockHistoryInput = {
-					details: detailsAdd,
-					warehouseId,
-					documentId: response._id.toString(),
-					documentType: 'adjustment',
-				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-				);
-				await this.stockHistoryService.addStock(addStockHistoryInput, user);
-			}
-			return response;
-		} catch (error) {
-			return error;
+		if (!(details?.length > 0)) {
+			throw new BadRequestException('El ajuste no puede estar vacía');
 		}
+
+		if (options.status) {
+			if (!statusTypes.includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+
+			if (options.status === 'cancelled') {
+				throw new BadRequestException(
+					'El ajuste no puede ser creada, valide el estado del ajuste',
+				);
+			}
+		}
+
+		const warehouse = await this.warehousesService.findById(warehouseId);
+
+		if (!warehouse?.active) {
+			throw new BadRequestException(
+				'La bodega no existe o se encuentra inactiva',
+			);
+		}
+
+		const detailsAdjustment = [];
+
+		for (let i = 0; i < details.length; i++) {
+			const { quantity, productId } = details[i];
+			const product = await this.productsService.findById(
+				productId,
+				warehouseId,
+			);
+			detailsAdjustment.push({
+				product,
+				quantity,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
+		}
+
+		const total = detailsAdjustment.reduce(
+			(sum, detail) => sum + detail.quantity * detail.product.reference.cost,
+			0,
+		);
+
+		const stockAdjustment = await this.stockAdjustmetnModel
+			.findOne({ 'company._id': user.company._id })
+			.sort({ _id: -1 });
+
+		const newStockInput = new this.stockAdjustmetnModel({
+			warehouse,
+			details: detailsAdjustment,
+			total,
+			user,
+			company: user.company,
+			number: (stockAdjustment?.number || 0) + 1,
+			...options,
+		});
+
+		const response = await (await newStockInput.save()).populate(populate);
+
+		if (options.status === 'confirmed') {
+			const detailsDelete = response.details
+				.filter((detail) => detail.product.stock[0].quantity > detail.quantity)
+				.map((detail) => ({
+					productId: detail.product._id.toString(),
+					quantity: detail.product.stock[0].quantity - detail.quantity,
+				}));
+
+			const detailsAdd = response.details
+				.filter((detail) => detail.product.stock[0].quantity < detail.quantity)
+				.map((detail) => ({
+					productId: detail.product._id.toString(),
+					quantity: detail.quantity,
+				}));
+
+			const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				details: detailsDelete,
+				warehouseId,
+				documentId: response._id.toString(),
+				documentType: 'adjustment',
+			};
+
+			const addStockHistoryInput: AddStockHistoryInput = {
+				details: detailsAdd,
+				warehouseId,
+				documentId: response._id.toString(),
+				documentType: 'adjustment',
+			};
+			await this.stockHistoryService.deleteStock(deleteStockHistoryInput, user);
+			await this.stockHistoryService.addStock(addStockHistoryInput, user);
+		}
+		return response;
 	}
 
 	async update(

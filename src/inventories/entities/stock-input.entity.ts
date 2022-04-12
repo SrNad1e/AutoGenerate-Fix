@@ -55,7 +55,7 @@ export class StockInput extends Document {
 	@Prop({ type: Object, required: true })
 	warehouse: Warehouse;
 
-	@Field(() => Company, { description: 'Compañía a la que pertence el ajuste' })
+	@Field(() => Company, { description: 'Compañía a la que pertence la entrada' })
 	@Prop({ type: Object, required: true })
 	company: Company;
 

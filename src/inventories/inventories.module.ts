@@ -79,19 +79,6 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 				inject: [getConnectionToken('')],
 			},
 			{
-				name: StockInput.name,
-				useFactory: async (connection: Connection) => {
-					const schema = StockInputSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'stock_input_increment',
-						inc_field: 'number',
-					});
-					return schema;
-				},
-				inject: [getConnectionToken('')],
-			},
-			{
 				name: StockOutput.name,
 				useFactory: async (connection: Connection) => {
 					const schema = StockOutputSchema;
@@ -109,6 +96,10 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 			{
 				name: StockAdjustment.name,
 				schema: StockAdjustmentSchema,
+			},
+			{
+				name: StockInput.name,
+				schema: StockInputSchema,
 			},
 			{
 				name: StockHistory.name,

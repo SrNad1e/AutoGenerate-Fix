@@ -1812,7 +1812,7 @@ type StockInput {
   """Identificador de mongo"""
   _id: String!
 
-  """Compañía a la que pertence el ajuste"""
+  """Compañía a la que pertence la entrada"""
   company: Company!
 
   """Fecha de creación de la entrada"""
