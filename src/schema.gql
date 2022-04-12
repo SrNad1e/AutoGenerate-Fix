@@ -1847,6 +1847,9 @@ type StockOutput {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía a la que pertence la salida"""
+  company: Company!
+
   """Fecha de creación de la salida"""
   createdAt: DateTime!
 

@@ -24,13 +24,16 @@ export class StockOutputResolver {
 		_: FiltersStockOutputInput,
 		@Context() context,
 	) {
-		return this.stockOutputService.findAll(context.req.body.variables.input);
+		return this.stockOutputService.findAll(
+			context.req.body.variables.input,
+			context.req.user,
+		);
 	}
 
 	@Query(() => StockOutput, { name: 'stockOutputId' })
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string) {
-		return this.stockOutputService.findById(id);
+	findById(@Args('id') id: string, @Context() context) {
+		return this.stockOutputService.findById(id, context.req.user);
 	}
 
 	@Mutation(() => StockOutput, { name: 'createStockOutput' })

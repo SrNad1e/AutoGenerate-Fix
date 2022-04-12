@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	UnauthorizedException,
 } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { InjectModel } from '@nestjs/mongoose';
@@ -58,170 +59,91 @@ export class StockOutputService {
 		private readonly stockHistoryService: StockHistoryService,
 	) {}
 
-	async findAll({
-		number,
-		sort,
-		status,
-		warehouseId,
-		limit = 20,
-		page = 1,
-		dateFinal,
-		dateInitial,
-	}: FiltersStockOutputInput) {
+	async findAll(
+		{
+			number,
+			sort,
+			status,
+			warehouseId,
+			limit = 20,
+			page = 1,
+			dateFinal,
+			dateInitial,
+		}: FiltersStockOutputInput,
+		user: Partial<User>,
+	) {
 		const filters: FilterQuery<StockOutput> = {};
-		try {
-			if (number) {
-				filters.number = number;
-			}
 
-			if (status) {
-				filters.status = status;
-			}
-
-			if (warehouseId) {
-				filters['warehouse._id'] = new Types.ObjectId(warehouseId);
-			}
-
-			const options = {
-				limit,
-				page,
-				sort,
-				lean: true,
-				populate,
-			};
-			if (sort?.warehouse) {
-				options.sort['warehouse.name'] = sort.warehouse;
-			}
-			if (dateInitial) {
-				if (!dateFinal) {
-					throw new BadRequestException('Debe enviarse una fecha final');
-				}
-
-				filters['createdAt'] = {
-					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
-				};
-			} else if (dateFinal) {
-				if (!dateInitial) {
-					throw new BadRequestException('Debe enviarse una fecha inicial');
-				}
-				filters['createdAt'] = {
-					$gte: new Date(dateInitial),
-					$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
-				};
-			}
-			return this.stockOutputModel.paginate(filters, options);
-		} catch (error) {
-			return error;
+		if (user.username !== 'admin') {
+			filters.company === user.company._id;
 		}
+
+		if (number) {
+			filters.number = number;
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+
+		if (warehouseId) {
+			filters['warehouse._id'] = new Types.ObjectId(warehouseId);
+		}
+
+		const options = {
+			limit,
+			page,
+			sort,
+			lean: true,
+			populate,
+		};
+		if (sort?.warehouse) {
+			options.sort['warehouse.name'] = sort.warehouse;
+		}
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		}
+		return this.stockOutputModel.paginate(filters, options);
 	}
 
-	async findById(id: string) {
-		try {
-			const response = await this.stockOutputModel
-				.findById(id)
-				.populate(populate)
-				.lean();
-			if (response) {
-				return response;
-			}
-			throw new NotFoundException('La entrada no existe');
-		} catch (error) {
-			return error;
+	async findById(_id: string, user: Partial<User>) {
+		const filters: FilterQuery<StockOutput> = { _id };
+		if (user.username !== 'admin') {
+			filters.company === user.company._id;
 		}
+		const response = await this.stockOutputModel
+			.findById(filters)
+			.populate(populate)
+			.lean();
+		if (response) {
+			return response;
+		}
+		throw new NotFoundException('La entrada no existe');
 	}
 
 	async create(
 		{ details, warehouseId, ...options }: CreateStockOutputInput,
 		user: Partial<User>,
 	) {
-		try {
-			if (!(details?.length > 0)) {
-				throw new BadRequestException('La salida no puede estar vacía');
-			}
-
-			if (options.status) {
-				if (!statusTypes.includes(options.status)) {
-					throw new BadRequestException(
-						`Es estado ${options.status} no es un estado válido`,
-					);
-				}
-
-				if (options.status === 'cancelled') {
-					throw new BadRequestException(
-						'La entrada no puede ser creada, valide el estado de la salida',
-					);
-				}
-			}
-
-			const warehouse = await this.warehousesService.findById(warehouseId);
-
-			if (!warehouse?.active) {
-				throw new BadRequestException(
-					'La bodega no existe o se encuentra inactiva',
-				);
-			}
-
-			const detailsInput = [];
-
-			for (let i = 0; i < details.length; i++) {
-				const { quantity, productId } = details[i];
-				const product = await this.productsService.validateStock(
-					productId,
-					quantity,
-					warehouseId,
-				);
-
-				detailsInput.push({
-					product,
-					quantity,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				});
-			}
-			const total = detailsInput.reduce(
-				(sum, detail) => sum + detail.quantity * detail.product.reference.cost,
-				0,
-			);
-			const newStockInput = new this.stockOutputModel({
-				warehouse,
-				details: detailsInput,
-				total,
-				user,
-				...options,
-			});
-
-			const response = await (await newStockInput.save()).populate(populate);
-
-			if (options.status === 'confirmed') {
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-				}));
-
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
-					details: detailHistory,
-					warehouseId,
-					documentId: response._id.toString(),
-					documentType: 'output',
-				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-				);
-			}
-			return response;
-		} catch (error) {
-			return error;
+		if (!(details?.length > 0)) {
+			throw new BadRequestException('La salida no puede estar vacía');
 		}
-	}
 
-	async update(
-		id: string,
-		{ details, ...options }: UpdateStockOutputInput,
-		user: User,
-	) {
-		const stockInput = await this.stockOutputModel.findById(id).lean();
 		if (options.status) {
 			if (!statusTypes.includes(options.status)) {
 				throw new BadRequestException(
@@ -229,19 +151,110 @@ export class StockOutputService {
 				);
 			}
 
-			if (!stockInput) {
+			if (options.status === 'cancelled') {
+				throw new BadRequestException(
+					'La entrada no puede ser creada, valide el estado de la salida',
+				);
+			}
+		}
+
+		const warehouse = await this.warehousesService.findById(warehouseId);
+
+		if (!warehouse?.active) {
+			throw new BadRequestException(
+				'La bodega no existe o se encuentra inactiva',
+			);
+		}
+
+		const detailsInput = [];
+
+		for (let i = 0; i < details.length; i++) {
+			const { quantity, productId } = details[i];
+			const product = await this.productsService.validateStock(
+				productId,
+				quantity,
+				warehouseId,
+			);
+
+			detailsInput.push({
+				product,
+				quantity,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
+		}
+
+		const total = detailsInput.reduce(
+			(sum, detail) => sum + detail.quantity * detail.product.reference.cost,
+			0,
+		);
+
+		const stockOutput = await this.stockOutputModel
+			.findOne({ 'company._id': user.company._id })
+			.sort({ _id: -1 });
+
+		const newStockInput = new this.stockOutputModel({
+			warehouse,
+			details: detailsInput,
+			total,
+			user,
+			company: user.company,
+			number: (stockOutput?.number || 0) + 1,
+			...options,
+		});
+
+		const response = await (await newStockInput.save()).populate(populate);
+
+		if (options.status === 'confirmed') {
+			const detailHistory = response.details.map((detail) => ({
+				productId: detail.product._id.toString(),
+				quantity: detail.quantity,
+			}));
+
+			const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				details: detailHistory,
+				warehouseId,
+				documentId: response._id.toString(),
+				documentType: 'output',
+			};
+			await this.stockHistoryService.deleteStock(deleteStockHistoryInput, user);
+		}
+		return response;
+	}
+
+	async update(
+		id: string,
+		{ details, ...options }: UpdateStockOutputInput,
+		user: User,
+	) {
+		const stockOutput = await this.stockOutputModel.findById(id).lean();
+
+		if (stockOutput.company._id !== user.company._id) {
+			throw new UnauthorizedException(
+				`El usuario no se encuentra autorizado para hacer cambios en la salida`,
+			);
+		}
+
+		if (options.status) {
+			if (!statusTypes.includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+
+			if (!stockOutput) {
 				throw new BadRequestException('La salida no existe');
 			}
 
-			if (stockInput.status === 'cancelled') {
+			if (stockOutput.status === 'cancelled') {
 				throw new BadRequestException('La salida se encuenta cancelada');
 			}
 
-			if (stockInput.status === 'confirmed') {
+			if (stockOutput.status === 'confirmed') {
 				throw new BadRequestException('La salida se encuentra confirmada');
 			}
 
-			if (options.status === stockInput.status) {
+			if (options.status === stockOutput.status) {
 				throw new BadRequestException(
 					'El estado de la salida debe cambiar o enviarse vacío',
 				);
@@ -253,7 +266,7 @@ export class StockOutputService {
 				.filter((detail) => detail.action === 'delete')
 				.map((detail) => detail.productId.toString());
 
-			const newDetails = stockInput.details
+			const newDetails = stockOutput.details
 				.filter(
 					(detail) => !productsDelete.includes(detail.product._id.toString()),
 				)
@@ -278,11 +291,11 @@ export class StockOutputService {
 				const product = await this.productsService.validateStock(
 					productId,
 					quantity,
-					stockInput.warehouse._id.toString(),
+					stockOutput.warehouse._id.toString(),
 				);
 
 				if (action === 'create') {
-					const productFind = stockInput.details.find(
+					const productFind = stockOutput.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);
 					if (productFind) {

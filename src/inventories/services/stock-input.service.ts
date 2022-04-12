@@ -74,6 +74,7 @@ export class StockInputService {
 		user: Partial<User>,
 	) {
 		const filters: FilterQuery<StockInput> = {};
+
 		if (user.username !== 'admin') {
 			filters.company === user.company._id;
 		}
@@ -261,6 +262,7 @@ export class StockInputService {
 				);
 			}
 		}
+
 		if (details && details.length > 0) {
 			const productsDelete = details
 				.filter((detail) => detail.action === 'delete')

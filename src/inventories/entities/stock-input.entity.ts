@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
@@ -55,7 +54,9 @@ export class StockInput extends Document {
 	@Prop({ type: Object, required: true })
 	warehouse: Warehouse;
 
-	@Field(() => Company, { description: 'Compañía a la que pertence la entrada' })
+	@Field(() => Company, {
+		description: 'Compañía a la que pertence la entrada',
+	})
 	@Prop({ type: Object, required: true })
 	company: Company;
 
