@@ -307,7 +307,7 @@ export class OrdersService {
 
 				if (index >= 0) {
 					throw new BadRequestException(
-						`El producto ${newDetails[index].product.reference}/${newDetails[index].product.barcode} ya existe en la orden ${order?.number} y no se puede agregar`,
+						`El producto ${newDetails[index].product.reference['name']}/${newDetails[index].product.barcode} ya existe en la orden ${order?.number} y no se puede agregar`,
 					);
 				}
 
@@ -346,7 +346,7 @@ export class OrdersService {
 				details: productsDelete,
 				documentId: orderId,
 				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse.toString(),
+				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
 			},
 			user,
 		);
@@ -356,7 +356,7 @@ export class OrdersService {
 				details: productsCreate,
 				documentId: orderId,
 				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse.toString(),
+				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
 			},
 			user,
 		);

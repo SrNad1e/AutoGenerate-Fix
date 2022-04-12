@@ -345,7 +345,7 @@ export class ProductsService {
 		const stockSelected = product.stock.find(
 			(item) => item.warehouse._id.toString() === warehouseId,
 		);
-		if (stockSelected.quantity < quantity) {
+		if (stockSelected?.quantity < quantity) {
 			throw new BadRequestException(
 				`Inventario insuficiente para el producto ${product.reference} / ${product.barcode}, stock ${stockSelected.quantity}`,
 			);
