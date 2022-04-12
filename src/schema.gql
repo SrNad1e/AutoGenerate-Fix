@@ -52,6 +52,23 @@ type Address {
   number2: Float!
 }
 
+type Attrib {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación de la atributo"""
+  createdAt: DateTime!
+
+  """Nombre de la atributo"""
+  name: String!
+
+  """Fecha de actualización de la atributo"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la atributo"""
+  user: User!
+}
+
 type AuthorizationDian {
   """Identificador de mongo"""
   _id: String!
@@ -74,6 +91,63 @@ type Brand {
   updatedAt: DateTime!
 
   """Usuario que crea la marca"""
+  user: User!
+}
+
+type CategoryLevel1 {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación de la categoría"""
+  createdAt: DateTime!
+
+  """Nombre de la categoría"""
+  name: String!
+
+  """Fecha de actualización de la categoría"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la categoría"""
+  user: User!
+}
+
+type CategoryLevel2 {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Categoría padre"""
+  categoryParent: CategoryLevel1!
+
+  """Fecha de creación de la categoría"""
+  createdAt: DateTime!
+
+  """Nombre de la categoría"""
+  name: String!
+
+  """Fecha de actualización de la categoría"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la categoría"""
+  user: User!
+}
+
+type CategoryLevel3 {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Categoría padre"""
+  categoryParent: CategoryLevel2!
+
+  """Fecha de creación de la categoría"""
+  createdAt: DateTime!
+
+  """Nombre de la categoría"""
+  name: String!
+
+  """Fecha de actualización de la categoría"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la categoría"""
   user: User!
 }
 
@@ -1094,7 +1168,7 @@ type Product {
   """Talla del producto"""
   size: Size!
 
-  """Estado del producto"""
+  """Estado del producto (active, inactive)"""
   status: String!
 
   """Inventario del producto por bodegas"""
@@ -1139,16 +1213,28 @@ type Reference {
   """Identificador de mongo"""
   _id: String!
 
-  """Marca del producto"""
+  """Atributos de la referencia"""
+  attribs: [Attrib!]!
+
+  """Marca de la referencia"""
   brand: Brand!
+
+  """Categoría Nivel 1 de la referencia"""
+  categoryLevel1: CategoryLevel1!
+
+  """Categoría Nivel 2 de la referencia"""
+  categoryLevel2: CategoryLevel2!
+
+  """Categoría Nivel 3 de la referencia"""
+  categoryLevel3: CategoryLevel3!
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!
 
-  """Compañias del producto"""
+  """Compañias que pueden usar la referencia"""
   companies: [Company!]!
 
-  """Costo del producto"""
+  """Costo de la referencia"""
   cost: Float!
 
   """Fecha de creación de la referencia"""
@@ -1157,13 +1243,13 @@ type Reference {
   """Descripción de la referencia"""
   description: String!
 
-  """Identificador de mongo"""
+  """Nombre de la referencia"""
   name: String!
 
-  """Precio del producto"""
+  """Precio de la referencia"""
   price: Float!
 
-  """Medidas del producto"""
+  """Medidas de la referencia"""
   shipping: Shipping!
 
   """Fecha de actualización de la referencia"""

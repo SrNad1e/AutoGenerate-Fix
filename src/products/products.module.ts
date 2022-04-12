@@ -22,6 +22,19 @@ import { Brand, BrandSchema } from './entities/brand.entity';
 import { Company, CompanySchema } from './entities/company.entity';
 import { BrandsService } from './services/brands.service';
 import { CompaniesService } from './services/companies.service';
+import { Attrib, AttribSchema } from './entities/attrib.entity';
+import {
+	CategoryLevel1,
+	CategoryLevel1Schema,
+} from './entities/category-level1.entity';
+import {
+	CategoryLevel2,
+	CategoryLevel2Schema,
+} from './entities/category-level2.entity';
+import {
+	CategoryLevel3,
+	CategoryLevel3Schema,
+} from './entities/category-level3.entity';
 
 @Module({
 	imports: [
@@ -31,13 +44,17 @@ import { CompaniesService } from './services/companies.service';
 			{ name: Brand.name, schema: BrandSchema },
 			{ name: Company.name, schema: CompanySchema },
 			{ name: Product.name, schema: ProductSchema },
+			{ name: Attrib.name, schema: AttribSchema },
+			{ name: CategoryLevel1.name, schema: CategoryLevel1Schema },
+			{ name: CategoryLevel2.name, schema: CategoryLevel2Schema },
+			{ name: CategoryLevel3.name, schema: CategoryLevel3Schema },
 		]),
 		MongooseModule.forFeatureAsync([
 			{
 				name: Reference.name,
 				useFactory: () => {
 					const schema = ReferenceSchema;
-					schema.index({ name: "text", description: "text" }, { name: 'text' });
+					schema.index({ name: 'text', description: 'text' }, { name: 'text' });
 					return schema;
 				},
 			},

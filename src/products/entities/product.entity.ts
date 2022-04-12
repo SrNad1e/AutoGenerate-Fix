@@ -8,8 +8,6 @@ import { Size } from './size.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Reference } from './reference.entity';
-import { Brand } from './brand.entity';
-import { Company } from './company.entity';
 
 @ObjectType()
 export class Stock {
@@ -68,8 +66,10 @@ export class Product extends Document {
 	})
 	size: Types.ObjectId;
 
-	@Prop({ type: String, default: 'Active' })
-	@Field(() => String, { description: 'Estado del producto' })
+	@Prop({ type: String, default: 'active' })
+	@Field(() => String, {
+		description: 'Estado del producto (active, inactive)',
+	})
 	status: string;
 
 	@Prop({ type: Object, required: true })

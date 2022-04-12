@@ -3,7 +3,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
+import { Attrib } from './attrib.entity';
 import { Brand } from './brand.entity';
+import { CategoryLevel1 } from './category-level1.entity';
+import { CategoryLevel2 } from './category-level2.entity';
+import { CategoryLevel3 } from './category-level3.entity';
 import { Company } from './company.entity';
 
 @ObjectType()
@@ -41,7 +45,7 @@ export class Reference extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
-	@Field(() => String, { description: 'Identificador de mongo' })
+	@Field(() => String, { description: 'Nombre de la referencia' })
 	@Prop({ type: String, required: true })
 	name: string;
 
@@ -56,21 +60,48 @@ export class Reference extends Document {
 	changeable: boolean;
 
 	@Prop({ type: Number, required: true })
-	@Field(() => Number, { description: 'Precio del producto' })
+	@Field(() => Number, { description: 'Precio de la referencia' })
 	price: number;
 
 	@Prop({ type: Number, required: true })
-	@Field(() => Number, { description: 'Costo del producto' })
+	@Field(() => Number, { description: 'Costo de la referencia' })
 	cost: number;
 
 	@Prop({ type: Types.ObjectId, ref: Brand.name, required: true })
-	@Field(() => Brand, { description: 'Marca del producto' })
+	@Field(() => Brand, { description: 'Marca de la referencia' })
 	brand: Types.ObjectId;
 
+	@Prop({ type: Types.ObjectId, ref: CategoryLevel1.name, required: true })
+	@Field(() => CategoryLevel1, {
+		description: 'Categoría Nivel 1 de la referencia',
+	})
+	categoryLevel1: Types.ObjectId;
+
+	@Prop({ type: Types.ObjectId, ref: CategoryLevel2.name, required: true })
+	@Field(() => CategoryLevel2, {
+		description: 'Categoría Nivel 2 de la referencia',
+	})
+	categoryLevel2: Types.ObjectId;
+
+	@Prop({ type: Types.ObjectId, ref: CategoryLevel3.name, required: true })
+	@Field(() => CategoryLevel3, {
+		description: 'Categoría Nivel 3 de la referencia',
+	})
+	categoryLevel3: Types.ObjectId;
+
+	@Prop({ type: [Types.ObjectId], ref: Attrib.name, required: true })
+	@Field(() => [Attrib], {
+		description: 'Atributos de la referencia',
+	})
+	attribs: Types.ObjectId[];
+
 	@Prop({ type: [Types.ObjectId], ref: Company.name, required: true })
-	@Field(() => [Company], { description: 'Compañias del producto' })
+	@Field(() => [Company], {
+		description: 'Compañias que pueden usar la referencia',
+	})
 	companies: Types.ObjectId[];
 
+	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la referencia' })
 	user: User;
 
@@ -84,7 +115,7 @@ export class Reference extends Document {
 			volume: 0,
 		},
 	})
-	@Field(() => Shipping, { description: 'Medidas del producto' })
+	@Field(() => Shipping, { description: 'Medidas de la referencia' })
 	shipping: Shipping;
 
 	@Field(() => Date, { description: 'Fecha de creación de la referencia' })
