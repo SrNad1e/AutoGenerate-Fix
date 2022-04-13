@@ -231,7 +231,10 @@ export class StockInputService {
 	) {
 		const stockInput = await this.stockInputModel.findById(id).lean();
 
-		if (stockInput.company._id !== user.company._id) {
+		if (
+			user.username !== 'admin' &&
+			stockInput.company._id !== user.company._id
+		) {
 			throw new UnauthorizedException(
 				`El usuario no se encuentra autorizado para hacer cambios en la entrada`,
 			);

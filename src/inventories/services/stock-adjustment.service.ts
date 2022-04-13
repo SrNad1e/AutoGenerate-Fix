@@ -258,7 +258,10 @@ export class StockAdjustmentService {
 	) {
 		const stockAdjustment = await this.stockAdjustmetnModel.findById(id).lean();
 
-		if (stockAdjustment.company._id !== user.company._id) {
+		if (
+			user.username !== 'admin' &&
+			stockAdjustment.company._id !== user.company._id
+		) {
 			throw new UnauthorizedException(
 				`El usuario no se encuentra autorizado para hacer cambios en el ajuste`,
 			);

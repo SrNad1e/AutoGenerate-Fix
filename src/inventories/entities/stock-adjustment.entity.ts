@@ -33,7 +33,7 @@ export class StockAdjustment extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Número consecutivo' })
-	@Prop({ type: Number, requiere: true, unique: true })
+	@Prop({ type: Number, requiere: true })
 	number: number;
 
 	@Field(() => [DetailAdjustment], { description: 'Detalles del ajuste' })

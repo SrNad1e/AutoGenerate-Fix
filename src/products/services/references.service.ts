@@ -41,7 +41,7 @@ export class ReferencesService {
 			cost,
 			limit = 10,
 			page = 1,
-			name = '',
+			name,
 			sort,
 			price,
 		}: FiltersReferencesInput,
@@ -63,7 +63,7 @@ export class ReferencesService {
 
 		if (name) {
 			filters.$text = {
-				$search: `"${name}"`,
+				$search: `${name}`,
 			};
 		}
 

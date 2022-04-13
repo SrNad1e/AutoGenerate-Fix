@@ -229,7 +229,10 @@ export class StockOutputService {
 	) {
 		const stockOutput = await this.stockOutputModel.findById(id).lean();
 
-		if (stockOutput.company._id !== user.company._id) {
+		if (
+			user.username !== 'admin' &&
+			stockOutput.company._id !== user.company._id
+		) {
 			throw new UnauthorizedException(
 				`El usuario no se encuentra autorizado para hacer cambios en la salida`,
 			);
