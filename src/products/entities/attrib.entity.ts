@@ -14,6 +14,10 @@ export class Attrib extends Document {
 	@Prop({ type: String, required: true })
 	name: string;
 
+	@Field(() => Boolean, { description: 'Está activo' })
+	@Prop({ type: Boolean, required: true })
+	active: boolean;
+
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la atributo' })
 	user: User;

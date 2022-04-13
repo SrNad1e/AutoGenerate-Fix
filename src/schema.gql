@@ -48,6 +48,9 @@ type Attrib {
   """Identificador de mongo"""
   _id: String!
 
+  """Está activo"""
+  active: Boolean!
+
   """Fecha de creación de la atributo"""
   createdAt: DateTime!
 
@@ -213,6 +216,11 @@ type Company {
 
   """Usuario que crea la compañia"""
   user: User!
+}
+
+input CreateAttribInput {
+  """Nombre del atributo"""
+  name: String!
 }
 
 input CreateColorInput {
@@ -713,6 +721,23 @@ type DocumentType {
   user: User!
 }
 
+input FiltersAttribsInput {
+  """Estado del atributo"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre del atributo"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortAttrib
+}
+
 input FiltersColorInput {
   """Estado de la bodega"""
   active: Boolean
@@ -1076,6 +1101,7 @@ type Mutation {
   addPaymentsOrder(addPaymentsOrderInput: AddPaymentsOrderInput!): Order!
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
+  createAttrib(createAttribInput: CreateAttribInput!): Attrib!
   createColor(createColorInput: CreateColorInput!): Color!
   createOrder(createOrderInput: CreateOrderInput!): Order!
   createProduct(createProductInput: CreateProductInput!): Product!
@@ -1089,6 +1115,7 @@ type Mutation {
   generateStockRequest(shopId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
+  updateAttrib(id: String!, updateAttribInput: UpdateAttribInput!): Attrib!
   updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
   updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
   updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
@@ -1272,6 +1299,7 @@ type Product {
 }
 
 type Query {
+  attribs(filtersAttribsInput: FiltersAttribsInput = {}): ResponseAttribs!
   colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
   currentUser: User!
   customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
@@ -1345,6 +1373,38 @@ type Reference {
 
   """Usuario que crea la referencia"""
   user: User!
+}
+
+type ResponseAttribs {
+  """Lista de atributos"""
+  docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
 }
 
 type ResponseColor {
@@ -1800,6 +1860,13 @@ type Size {
   value: String!
 }
 
+input SortAttrib {
+  active: Float
+  createdAt: Float
+  name: Float
+  updatedAt: Float
+}
+
 input SortColor {
   active: Float
   createdAt: Float
@@ -2206,6 +2273,14 @@ type SummaryOrder {
 
   """Total pago del pedido"""
   totalPaid: Float!
+}
+
+input UpdateAttribInput {
+  """Se encuentra activa el atributo"""
+  active: Boolean
+
+  """Valor asignado al atributo"""
+  name: String
 }
 
 input UpdateColorInput {

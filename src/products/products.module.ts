@@ -36,6 +36,8 @@ import {
 	CategoryLevel3Schema,
 } from './entities/category-level3.entity';
 import { ReferencesResolver } from './resolvers/references.resolver';
+import { AttribsService } from './services/attribs.service';
+import { AttribsResolver } from './resolvers/attribs.resolver';
 
 @Module({
 	imports: [
@@ -75,6 +77,8 @@ import { ReferencesResolver } from './resolvers/references.resolver';
 		BrandsService,
 		CompaniesService,
 		ReferencesResolver,
+		AttribsService,
+		AttribsResolver,
 	],
 	exports: [ProductsService],
 	controllers: [ProductsController],

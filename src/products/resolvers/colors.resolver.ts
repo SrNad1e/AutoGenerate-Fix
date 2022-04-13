@@ -17,7 +17,7 @@ export class ColorsResolver {
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({ name: 'filtersColorInput', nullable: true, defaultValue: {} })
-		filtersColorInput: FiltersColorInput,
+		_: FiltersColorInput,
 		@Context() context,
 	) {
 		return this.colorsService.findAll(context.req.body.variables.input);

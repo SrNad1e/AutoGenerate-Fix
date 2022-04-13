@@ -20,10 +20,14 @@ export class ColorsService {
 		private readonly colorRepo: Repository<ColorMysql>,
 	) {}
 
-	async findAll(props: FiltersColorInput): Promise<Partial<ResponseColor>> {
+	async findAll({
+		name = '',
+		limit = 10,
+		page = 1,
+		active,
+		sort,
+	}: FiltersColorInput): Promise<Partial<ResponseColor>> {
 		const filters: FilterQuery<Color> = {};
-
-		const { name = '', limit = 10, page = 1, active, sort } = props;
 
 		if (active) {
 			filters.active = active;
