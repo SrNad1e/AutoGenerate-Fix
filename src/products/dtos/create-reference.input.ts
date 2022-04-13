@@ -37,4 +37,13 @@ export class CreateReferenceInput {
 
 	@Field(() => String, { description: 'Compañía de la referencia' })
 	company: string;
+
+	@Field(() => String, { description: 'Categoría nivel 1 de la referencia' })
+	categoryLevel1: string;
+
+	@Field(() => String, { description: 'Categoría nivel 2 de la referencia' })
+	categoryLevel2: string;
+
+	@Field(() => String, { description: 'Categoría nivel 3 de la referencia' })
+	categoryLevel3: string;
 }

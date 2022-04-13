@@ -718,6 +718,38 @@ input FiltersProductsInput {
   warehouseId: String
 }
 
+input FiltersReferencesInput {
+  """Identificación de la marca"""
+  brandId: String
+
+  """Identificación de la marca"""
+  categoryLevel1Id: String
+
+  """Identificación de la marca"""
+  categoryLevel2Id: String
+
+  """Identificación de la marca"""
+  categoryLevel3Id: String
+
+  """Costo para la busqueda de referencias"""
+  cost: Float
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para la busqueda de las referencias"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Precio para la busqueda de referencias"""
+  price: Float
+
+  """Ordenamiento"""
+  sort: SortReference
+}
+
 input FiltersSizeInput {
   """Estado de la bodega"""
   active: Boolean
@@ -1153,6 +1185,7 @@ type Query {
   ordersByPointOfSale(idPointOfSale: String!): [Order!]!
   product(filtersProductInput: FiltersProductInput = {}): Product!
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
+  references(filtersReferencesInput: FiltersReferencesInput = {}): ResponseReferences!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockAdjustmentId(id: String!): StockAdjustment!
   stockAdjustments(filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
@@ -1286,6 +1319,38 @@ type ResponseCustomer {
 type ResponseProduct {
   """Lista de productos"""
   docs: [Product!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseReferences {
+  """Lista de referencias"""
+  docs: [Reference!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -1682,6 +1747,14 @@ input SortProduct {
   price: Float
   reference: Float
   status: Float
+}
+
+input SortReference {
+  changeable: Float
+  cost: Float
+  description: Float
+  name: Float
+  price: Float
 }
 
 input SortSize {

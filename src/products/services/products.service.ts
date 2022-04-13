@@ -54,9 +54,8 @@ export class ProductsService {
 		private readonly companiesService: CompaniesService,
 	) {}
 
-	async findAll(params: FiltersProductsInput, user: Partial<User>) {
-		const filters: FilterQuery<Product> = {};
-		const {
+	async findAll(
+		{
 			colorId,
 			limit = 10,
 			page = 1,
@@ -66,7 +65,10 @@ export class ProductsService {
 			sort,
 			ids,
 			warehouseId,
-		} = params;
+		}: FiltersProductsInput,
+		user: Partial<User>,
+	) {
+		const filters: FilterQuery<Product> = {};
 
 		if (ids) {
 			filters._id = {
@@ -87,12 +89,14 @@ export class ProductsService {
 		}
 
 		if (name) {
-			const references = await this.referencesService.findAll({
-				name,
-				companyId: user.company._id.toString(),
-			});
+			const references = await this.referencesService.findAll(
+				{
+					name,
+				},
+				user,
+			);
 			filters.companies = {
-				$in: references.map((item) => item._id),
+				$in: references.docs.map((item) => item._id),
 			};
 		}
 
@@ -247,6 +251,9 @@ export class ProductsService {
 							volume: product.shipping_volume,
 							brand: brand._id.toString(),
 							company: company._id.toString(),
+							categoryLevel1: '6256c4f3d1df9f6796b1a42d',
+							categoryLevel2: '6256c530d1df9f6796b1a42e',
+							categoryLevel3: '6256c54cd1df9f6796b1a42f',
 						},
 						userDefault,
 					);
