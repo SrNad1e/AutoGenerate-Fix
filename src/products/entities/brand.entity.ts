@@ -14,6 +14,10 @@ export class Brand extends Document {
 	@Field(() => String, { description: 'Nombre de la marca' })
 	name: string;
 
+	@Prop({ type: Boolean, default: true })
+	@Field(() => Boolean, { description: 'Esta activa la marca' })
+	active: boolean;
+
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la marca' })
 	user: User;

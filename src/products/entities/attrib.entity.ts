@@ -15,7 +15,7 @@ export class Attrib extends Document {
 	name: string;
 
 	@Field(() => Boolean, { description: 'Está activo' })
-	@Prop({ type: Boolean, required: true })
+	@Prop({ type: Boolean, default: true })
 	active: boolean;
 
 	@Prop({ type: Object, required: true })

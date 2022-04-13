@@ -76,6 +76,9 @@ type Brand {
   """Identificador de mongo"""
   _id: String!
 
+  """Esta activa la marca"""
+  active: Boolean!
+
   """Fecha de creación de la marca"""
   createdAt: DateTime!
 
@@ -190,6 +193,9 @@ type Company {
   """Identificador de mongo"""
   _id: String!
 
+  """Esta activa la compañía"""
+  active: Boolean!
+
   """Dirección de la compañía"""
   address: String!
 
@@ -220,6 +226,11 @@ type Company {
 
 input CreateAttribInput {
   """Nombre del atributo"""
+  name: String!
+}
+
+input CreateBrandInput {
+  """Nombre de la marca"""
   name: String!
 }
 
@@ -738,6 +749,23 @@ input FiltersAttribsInput {
   sort: SortAttrib
 }
 
+input FiltersBrandsInput {
+  """Estado del atributo"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre del atributo"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortBrand
+}
+
 input FiltersColorInput {
   """Estado de la bodega"""
   active: Boolean
@@ -1102,6 +1130,7 @@ type Mutation {
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createAttrib(createAttribInput: CreateAttribInput!): Attrib!
+  createBrand(createBrandInput: CreateBrandInput!): Brand!
   createColor(createColorInput: CreateColorInput!): Color!
   createOrder(createOrderInput: CreateOrderInput!): Order!
   createProduct(createProductInput: CreateProductInput!): Product!
@@ -1116,6 +1145,7 @@ type Mutation {
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateAttrib(id: String!, updateAttribInput: UpdateAttribInput!): Attrib!
+  updateBrand(id: String!, updateBrandInput: UpdateBrandInput!): Brand!
   updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
   updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
   updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
@@ -1300,6 +1330,7 @@ type Product {
 
 type Query {
   attribs(filtersAttribsInput: FiltersAttribsInput = {}): ResponseAttribs!
+  brands(filtersBrandsInput: FiltersBrandsInput = {}): ResponseBrands!
   colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
   currentUser: User!
   customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
@@ -1378,6 +1409,38 @@ type Reference {
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+type ResponseBrands {
+  """Lista de marcas"""
+  docs: [Brand!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -1867,6 +1930,13 @@ input SortAttrib {
   updatedAt: Float
 }
 
+input SortBrand {
+  active: Float
+  createdAt: Float
+  name: Float
+  updatedAt: Float
+}
+
 input SortColor {
   active: Float
   createdAt: Float
@@ -2280,6 +2350,14 @@ input UpdateAttribInput {
   active: Boolean
 
   """Valor asignado al atributo"""
+  name: String
+}
+
+input UpdateBrandInput {
+  """Se encuentra activa la marca"""
+  active: Boolean
+
+  """Valor asignado a la marca"""
   name: String
 }
 

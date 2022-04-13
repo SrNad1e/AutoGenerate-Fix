@@ -38,6 +38,7 @@ import {
 import { ReferencesResolver } from './resolvers/references.resolver';
 import { AttribsService } from './services/attribs.service';
 import { AttribsResolver } from './resolvers/attribs.resolver';
+import { BrandsResolver } from './resolvers/brands.resolver';
 
 @Module({
 	imports: [
@@ -79,6 +80,7 @@ import { AttribsResolver } from './resolvers/attribs.resolver';
 		ReferencesResolver,
 		AttribsService,
 		AttribsResolver,
+		BrandsResolver,
 	],
 	exports: [ProductsService],
 	controllers: [ProductsController],

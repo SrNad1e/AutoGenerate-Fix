@@ -23,6 +23,7 @@ export class Company extends Document {
 		description: 'Si pertenece al régimen simplificado',
 	})
 	regimenSimplify: boolean;
+	
 
 	@Prop({ type: String, required: true })
 	@Field(() => String, { description: 'Dirección de la compañía' })
@@ -35,6 +36,10 @@ export class Company extends Document {
 	@Prop({ type: String, required: true })
 	@Field(() => String, { description: 'Url del logo de la compañía' })
 	logo: string;
+
+	@Prop({ type: Boolean, default: true })
+	@Field(() => Boolean, { description: 'Esta activa la compañía' })
+	active: boolean;
 
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la compañia' })
