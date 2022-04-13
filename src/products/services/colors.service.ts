@@ -7,6 +7,9 @@ import { Repository } from 'typeorm';
 import { ResponseColor } from '../dtos/response-color';
 import { FiltersColorInput } from '../dtos/filters-color.input';
 import { Color, ColorMysql } from '../entities/color.entity';
+import { CreateColorInput } from '../dtos/create-color.input';
+import { User } from 'src/users/entities/user.entity';
+import { UpdateColorInput } from '../dtos/update-color.input';
 
 @Injectable()
 export class ColorsService {
@@ -47,6 +50,37 @@ export class ColorsService {
 
 	async findById(id: string) {
 		return this.colorModel.findById(id).lean();
+	}
+
+	async create(props: CreateColorInput, user: User) {
+		const color = await this.colorModel.findOne({
+			name_internal: props.name_internal,
+		});
+
+		if (!color) {
+			throw new NotFoundException('El nombre del color ya existe');
+		}
+
+		const newColor = new this.colorModel({ ...props, user });
+
+		return newColor.save();
+	}
+
+	async update(id: string, props: UpdateColorInput, user: User) {
+		const color = await this.findById(id);
+
+		if (!color) {
+			throw new NotFoundException('El color que quiere actualizar no existe');
+		}
+
+		const colorName = await this.colorModel.findOne({
+			name_internal: props.name_internal,
+		});
+
+		if (!colorName) {
+			throw new NotFoundException('El nombre del color ya existe');
+		}
+		return this.colorModel.findByIdAndUpdate(id, { ...props, user });
 	}
 
 	async getByIdMysql(id: number) {

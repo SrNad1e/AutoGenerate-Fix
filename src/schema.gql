@@ -215,6 +215,20 @@ type Company {
   user: User!
 }
 
+input CreateColorInput {
+  """Url asignado al color"""
+  html: String!
+
+  """Imagen asignada al color"""
+  image: String!
+
+  """Nombre asignado al color"""
+  name: String!
+
+  """Nombre interno asignado al color"""
+  name_internal: String!
+}
+
 input CreateOrderInput {
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
   status: String!
@@ -276,6 +290,11 @@ input CreateReferenceInput {
 
   """Ancho del producto"""
   width: Float!
+}
+
+input CreateSizeInput {
+  """Valor asignado a la talla"""
+  name: String!
 }
 
 input CreateStockAdjustmentInput {
@@ -1057,9 +1076,11 @@ type Mutation {
   addPaymentsOrder(addPaymentsOrderInput: AddPaymentsOrderInput!): Order!
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
+  createColor(createColorInput: CreateColorInput!): Color!
   createOrder(createOrderInput: CreateOrderInput!): Order!
   createProduct(createProductInput: CreateProductInput!): Product!
   createReference(createReferenceInput: CreateReferenceInput!): Reference!
+  createSize(createSizeInput: CreateSizeInput!): Size!
   createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
@@ -1068,9 +1089,11 @@ type Mutation {
   generateStockRequest(shopId: String!): StockRequest!
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
+  updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
   updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
   updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
   updateReference(id: String!, updateReferenceInput: UpdateReferenceInput!): Reference!
+  updateSize(id: String!, updateSizeInput: UpdateSizeInput!): Size!
   updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
@@ -2185,6 +2208,20 @@ type SummaryOrder {
   totalPaid: Float!
 }
 
+input UpdateColorInput {
+  """Url asignado al color"""
+  html: String
+
+  """Imagen asignada al color"""
+  image: String
+
+  """Nombre asignado al color"""
+  name: String
+
+  """Nombre interno asignado al color"""
+  name_internal: String
+}
+
 input UpdateOrderInput {
   """Identificación del cliente"""
   customerId: String
@@ -2252,6 +2289,14 @@ input UpdateReferenceInput {
 
   """Ancho del producto"""
   width: Float
+}
+
+input UpdateSizeInput {
+  """Se encuentra activa la talla"""
+  active: Boolean
+
+  """Valor asignado a la talla"""
+  name: String
 }
 
 input UpdateStockAdjustmentInput {

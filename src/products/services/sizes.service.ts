@@ -2,9 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, Model, PaginateModel } from 'mongoose';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { CreateSizeInput } from '../dtos/create-size.input';
 import { FiltersSizeInput } from '../dtos/filters-size.input';
 import { ResponseSize } from '../dtos/response-size';
+import { UpdateSizeInput } from '../dtos/update-size.input';
 
 import { Size, SizeMysql } from '../entities/size.entity';
 
@@ -44,6 +47,33 @@ export class SizesService {
 
 	async findById(id: string) {
 		return this.sizeModel.findById(id).lean();
+	}
+
+	async create(props: CreateSizeInput, user: User) {
+		const size = await this.sizeModel.findOne({ name: props.name });
+
+		if (!size) {
+			throw new NotFoundException('El nombre de la talla ya existe');
+		}
+
+		const newSize = new this.sizeModel({ ...props, user });
+
+		return newSize.save();
+	}
+
+	async update(id: string, props: UpdateSizeInput, user: User) {
+		const size = await this.findById(id);
+
+		if (!size) {
+			throw new NotFoundException('La talla que quiere actualizar no existe');
+		}
+
+		const sizeName = await this.sizeModel.findOne({ name: props.name });
+
+		if (!sizeName) {
+			throw new NotFoundException('El nombre de la talla ya existe');
+		}
+		return this.sizeModel.findByIdAndUpdate(id, { ...props, user });
 	}
 
 	async getByIdMysql(id: number) {
