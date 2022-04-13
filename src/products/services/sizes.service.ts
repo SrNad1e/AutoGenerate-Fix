@@ -42,6 +42,10 @@ export class SizesService {
 		);
 	}
 
+	async findById(id: string) {
+		return this.sizeModel.findById(id).lean();
+	}
+
 	async getByIdMysql(id: number) {
 		return this.sizeModel.findOne({ id });
 	}

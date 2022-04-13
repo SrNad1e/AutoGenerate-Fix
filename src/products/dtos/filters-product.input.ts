@@ -54,6 +54,9 @@ export class FiltersProductsInput {
 	@Field({ description: 'Id de talla', nullable: true })
 	sizeId?: string;
 
+	@Field({ description: 'Id de referencia', nullable: true })
+	referenceId?: string;
+
 	@Field(() => SortProduct, { description: 'Ordenamiento', nullable: true })
 	sort?: SortProduct;
 
@@ -75,6 +78,12 @@ export class FiltersProductInput {
 
 	@Field({ description: 'Código de barras producto', nullable: true })
 	barcode?: string;
+
+	@Field({ description: 'Color del producto', nullable: true })
+	color?: string;
+
+	@Field({ description: 'talla del producto', nullable: true })
+	size?: string;
 
 	@Field(() => String, {
 		description: 'Referencia del producto',

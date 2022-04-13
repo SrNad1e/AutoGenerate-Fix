@@ -119,10 +119,10 @@ export class ReferencesService {
 			},
 		});
 
-		return reference.save();
+		return (await reference.save()).populate(populate);
 	}
 
-	async update(id: string, {}: UpdateReferenceInput, user: User) {
+	async update(id: string, params: UpdateReferenceInput, user: User) {
 		const reference = await this.referenceModel.findById(id).lean();
 
 		if (!reference) {
@@ -137,5 +137,11 @@ export class ReferencesService {
 				'La referencia no está habilitada para la sucursal del usuario',
 			);
 		}
+
+		return this.referenceModel.findByIdAndUpdate(id, {
+			$set: {
+				...params,
+			},
+		});
 	}
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
-import { CreateBrandInput } from '../dtos/crete-brand.input';
+import { CreateBrandInput } from '../dtos/create-brand.input';
 import { Brand } from '../entities/brand.entity';
 
 @Injectable()

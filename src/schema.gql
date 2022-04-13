@@ -220,6 +220,17 @@ input CreateOrderInput {
   status: String!
 }
 
+input CreateProductInput {
+  """Identificador del color"""
+  colorId: String!
+
+  """Identificador de la referencia"""
+  referenceId: String!
+
+  """Identificador de la talla"""
+  sizeId: String!
+}
+
 input CreateReferenceInput {
   """Marca de la referencia"""
   brandId: String!
@@ -726,11 +737,17 @@ input FiltersProductInput {
   """Código de barras producto"""
   barcode: String
 
+  """Color del producto"""
+  color: String
+
   """Descripción del producto"""
   description: String
 
   """Referencia del producto"""
   reference: String
+
+  """talla del producto"""
+  size: String
 
   """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
@@ -751,6 +768,9 @@ input FiltersProductsInput {
 
   """Página actual"""
   page: Float
+
+  """Id de referencia"""
+  referenceId: String
 
   """Id de talla"""
   sizeId: String
@@ -1038,6 +1058,7 @@ type Mutation {
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createOrder(createOrderInput: CreateOrderInput!): Order!
+  createProduct(createProductInput: CreateProductInput!): Product!
   createReference(createReferenceInput: CreateReferenceInput!): Reference!
   createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
@@ -1048,6 +1069,7 @@ type Mutation {
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
+  updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
   updateReference(id: String!, updateReferenceInput: UpdateReferenceInput!): Reference!
   updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
@@ -2168,6 +2190,20 @@ input UpdateOrderInput {
   customerId: String
 
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
+  status: String
+}
+
+input UpdateProductInput {
+  """Código de barras del producto"""
+  barcode: String
+
+  """Identificador del color"""
+  colorId: String
+
+  """Identificador de la talla"""
+  sizeId: String
+
+  """Estado del producto (active, inactive)"""
   status: String
 }
 

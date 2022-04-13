@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { WarehousesService } from 'src/shops/services/warehouses.service';
@@ -22,6 +22,8 @@ import { ReferencesService } from './references.service';
 import { BrandsService } from './brands.service';
 import { CompaniesService } from './companies.service';
 import { User } from 'src/users/entities/user.entity';
+import { CreateProductInput } from '../dtos/create-product.input';
+import { UpdateProductInput } from '../dtos/update-product.input';
 
 const populate = [
 	{
@@ -37,6 +39,8 @@ const populate = [
 	{ path: 'size', model: 'Size' },
 	{ path: 'reference', model: 'Reference' },
 ];
+
+const statusTypes = ['active', 'inactive'];
 
 @Injectable()
 export class ProductsService {
@@ -65,6 +69,7 @@ export class ProductsService {
 			sort,
 			ids,
 			warehouseId,
+			referenceId,
 		}: FiltersProductsInput,
 		user: Partial<User>,
 	) {
@@ -99,6 +104,10 @@ export class ProductsService {
 			filters.reference = {
 				$in: references.docs.map((item) => item._id),
 			};
+		}
+
+		if (referenceId) {
+			filters.reference = new Types.ObjectId(referenceId);
 		}
 
 		const options = {
@@ -194,6 +203,107 @@ export class ProductsService {
 		} else {
 			throw new NotFoundException('El producto no existe');
 		}
+	}
+
+	async create(props: CreateProductInput, user: User) {
+		const reference = await this.referencesService.findById(
+			props.referenceId,
+			user,
+		);
+		if (!reference) {
+			throw new NotFoundException('La referencia no existe');
+		}
+
+		const product = await this.findOne({
+			size: props.sizeId,
+			color: props.colorId,
+			reference: props.referenceId,
+		});
+
+		if (product) {
+			throw new NotFoundException(
+				`La combianción de talla y color ya existe para la referencia ${reference.name}`,
+			);
+		}
+
+		const color = await this.colorsService.findById(props.colorId);
+
+		if (!color) {
+			throw new NotFoundException('El color no existe');
+		}
+
+		const size = await this.sizesService.findById(props.colorId);
+
+		if (!size) {
+			throw new NotFoundException('La talla no existe');
+		}
+
+		const products = await this.findAll({}, user);
+		const total = () => {
+			const totalData = products.totalDocs + 1;
+			if (totalData < 10) {
+				return `00000${totalData}`;
+			}
+
+			if (totalData < 100) {
+				return `0000${totalData}`;
+			}
+
+			if (totalData < 1000) {
+				return `000${totalData}`;
+			}
+
+			if (totalData < 10000) {
+				return `00${totalData}`;
+			}
+
+			if (totalData < 100000) {
+				return `0${totalData}`;
+			}
+
+			if (totalData < 1000000) {
+				return `${totalData}`;
+			}
+		};
+		const barcode = `7700000${total()}`;
+		const newProduct = new this.productModel({ ...props, barcode, user });
+
+		return (await newProduct.save()).populate(populate);
+	}
+
+	async update(id: string, props: UpdateProductInput, user: User) {
+		const product = await this.productModel.findById(id).lean();
+
+		if (!product) {
+			throw new NotFoundException('El producto no existe');
+		}
+		const color = await this.colorsService.findById(props.colorId);
+
+		if (!color) {
+			throw new NotFoundException('El color no existe');
+		}
+
+		const size = await this.sizesService.findById(props.colorId);
+
+		if (!size) {
+			throw new NotFoundException('La talla no existe');
+		}
+
+		if (!statusTypes.includes(props.status)) {
+			throw new NotFoundException(`El estado ${props.status} no es válido`);
+		}
+
+		const productCodeBar = await this.findOne({ barcode: props.barcode });
+
+		if (productCodeBar) {
+			throw new NotFoundException(
+				`El código de barras ${props.barcode}, está asignada al producto ${productCodeBar.reference.name} / ${productCodeBar.color.name} - ${productCodeBar.size.value}  `,
+			);
+		}
+
+		return this.productModel.findByIdAndUpdate(id, {
+			$set: { ...props, user },
+		});
 	}
 
 	async migration() {

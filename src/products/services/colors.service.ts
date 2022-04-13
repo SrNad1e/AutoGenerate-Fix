@@ -45,6 +45,10 @@ export class ColorsService {
 		);
 	}
 
+	async findById(id: string) {
+		return this.colorModel.findById(id).lean();
+	}
+
 	async getByIdMysql(id: number) {
 		return this.colorModel.findOne({ id }).lean();
 	}
