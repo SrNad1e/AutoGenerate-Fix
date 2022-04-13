@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
@@ -6,6 +10,7 @@ import { User } from 'src/users/entities/user.entity';
 import { CreateReferenceInput } from '../dtos/create-reference.input';
 import { FiltersReferenceInput } from '../dtos/filters-reference.input';
 import { FiltersReferencesInput } from '../dtos/filters-references.input';
+import { UpdateReferenceInput } from '../dtos/update-reference';
 import { Attrib } from '../entities/attrib.entity';
 import { Brand } from '../entities/brand.entity';
 import { CategoryLevel1 } from '../entities/category-level1.entity';
@@ -63,7 +68,7 @@ export class ReferencesService {
 		}
 
 		if (user?.company['_id']) {
-			filters.company = new Types.ObjectId(user?.company['_id']);
+			filters.companies = new Types.ObjectId(user?.company['_id']);
 		}
 
 		const options = {
@@ -75,6 +80,23 @@ export class ReferencesService {
 		};
 
 		return this.referenceModel.paginate(filters, options);
+	}
+
+	async findById(_id: string, user: User) {
+		const filters: FilterQuery<Reference> = { _id };
+
+		if (user.username !== 'admin') {
+			filters.companies === user.company._id;
+		}
+
+		const response = await this.referenceModel
+			.findOne(filters)
+			.populate(populate)
+			.lean();
+		if (response) {
+			return response;
+		}
+		throw new NotFoundException('La referencia no existe');
 	}
 
 	async findOne(params: FiltersReferenceInput) {
@@ -98,5 +120,22 @@ export class ReferencesService {
 		});
 
 		return reference.save();
+	}
+
+	async update(id: string, {}: UpdateReferenceInput, user: User) {
+		const reference = await this.referenceModel.findById(id).lean();
+
+		if (!reference) {
+			throw new NotFoundException('La referencia no existe');
+		}
+
+		if (
+			user.username !== 'admin' &&
+			!reference.companies.includes(user.company._id)
+		) {
+			throw new UnauthorizedException(
+				'La referencia no está habilitada para la sucursal del usuario',
+			);
+		}
 	}
 }

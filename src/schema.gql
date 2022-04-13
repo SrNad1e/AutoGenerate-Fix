@@ -220,6 +220,53 @@ input CreateOrderInput {
   status: String!
 }
 
+input CreateReferenceInput {
+  """Marca de la referencia"""
+  brandId: String!
+
+  """Categoría nivel 1 de la referencia"""
+  categoryLevel1Id: String!
+
+  """Categoría nivel 2 de la referencia"""
+  categoryLevel2Id: String!
+
+  """Categoría nivel 3 de la referencia"""
+  categoryLevel3Id: String!
+
+  """Se puede cambiar"""
+  changeable: Boolean!
+
+  """Compañía de la referencia"""
+  companyId: String!
+
+  """Costo de la referencia"""
+  cost: Float!
+
+  """Descripción de la referencia"""
+  description: String!
+
+  """Alto del producto"""
+  height: Float!
+
+  """Largo del producto"""
+  long: Float!
+
+  """Nombre de la referencia"""
+  name: String!
+
+  """Precio de la referencia"""
+  price: Float!
+
+  """Volumen del producto"""
+  volume: Float!
+
+  """Peso del producto"""
+  weight: Float!
+
+  """Ancho del producto"""
+  width: Float!
+}
+
 input CreateStockAdjustmentInput {
   """Productos del ajuste"""
   details: [DetailStockAdjustmentCreateInput!]!
@@ -991,6 +1038,7 @@ type Mutation {
   addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createOrder(createOrderInput: CreateOrderInput!): Order!
+  createReference(createReferenceInput: CreateReferenceInput!): Reference!
   createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
@@ -1000,6 +1048,7 @@ type Mutation {
   login(loginUserInput: LoginUserInput!): LoginResponse!
   signup(createUserInput: CreateUserInput!): User!
   updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
+  updateReference(id: String!, updateReferenceInput: UpdateReferenceInput!): Reference!
   updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
@@ -1185,6 +1234,7 @@ type Query {
   ordersByPointOfSale(idPointOfSale: String!): [Order!]!
   product(filtersProductInput: FiltersProductInput = {}): Product!
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
+  referenceId(id: String!): Reference!
   references(filtersReferencesInput: FiltersReferencesInput = {}): ResponseReferences!
   sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
   stockAdjustmentId(id: String!): StockAdjustment!
@@ -2119,6 +2169,53 @@ input UpdateOrderInput {
 
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
   status: String
+}
+
+input UpdateReferenceInput {
+  """Identificador de los atributos de la referencia"""
+  attribIds: [String!]
+
+  """Identificador de la marca de la referencia"""
+  brandId: String
+
+  """Identificador de la categoría level 1 de la referencia"""
+  categoryLevel1Id: String
+
+  """Identificador de la categoría level 2 de la referencia"""
+  categoryLevel2Id: String
+
+  """Identificador de la categoría level 3 de la referencia"""
+  categoryLevel3Id: String
+
+  """Se puede cambiar de la referencia"""
+  changeable: Boolean
+
+  """Costo de la referencia"""
+  cost: Float
+
+  """Descripción de la referencia"""
+  description: String
+
+  """Alto del producto"""
+  height: Float
+
+  """Largo del producto"""
+  long: Float
+
+  """Nombre de la referencia"""
+  name: String
+
+  """Precio de la referencia"""
+  price: Float
+
+  """Volumen del producto"""
+  volume: Float
+
+  """Peso del producto"""
+  weight: Float
+
+  """Ancho del producto"""
+  width: Float
 }
 
 input UpdateStockAdjustmentInput {

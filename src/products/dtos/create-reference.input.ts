@@ -1,6 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
-@ObjectType()
+@InputType()
 export class CreateReferenceInput {
 	@Field(() => String, { description: 'Nombre de la referencia' })
 	name: string;
@@ -33,17 +33,17 @@ export class CreateReferenceInput {
 	volume: number;
 
 	@Field(() => String, { description: 'Marca de la referencia' })
-	brand: string;
+	brandId: string;
 
 	@Field(() => String, { description: 'Compañía de la referencia' })
-	company: string;
+	companyId: string;
 
 	@Field(() => String, { description: 'Categoría nivel 1 de la referencia' })
-	categoryLevel1: string;
+	categoryLevel1Id: string;
 
 	@Field(() => String, { description: 'Categoría nivel 2 de la referencia' })
-	categoryLevel2: string;
+	categoryLevel2Id: string;
 
 	@Field(() => String, { description: 'Categoría nivel 3 de la referencia' })
-	categoryLevel3: string;
+	categoryLevel3Id: string;
 }
