@@ -131,7 +131,7 @@ export class ProductsService {
 					return doc;
 				}
 
-				const stock = doc.stock.filter(
+				const stock = doc.stock?.filter(
 					(item) => item.warehouse._id.toString() === warehouseId,
 				);
 
@@ -145,6 +145,7 @@ export class ProductsService {
 				stock: [],
 			};
 		});
+
 		return {
 			...response,
 			docs,
