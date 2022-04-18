@@ -15,13 +15,17 @@ export class StockAdjustmentResolver {
 		private readonly stockAdjustmentService: StockAdjustmentService,
 	) {}
 
-	@Query(() => ResponseStockAdjustment, { name: 'stockAdjustments' })
+	@Query(() => ResponseStockAdjustment, {
+		name: 'stockAdjustments',
+		description: 'Lista de ajustes de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersStockAdjustmentInput',
 			nullable: true,
 			defaultValue: {},
+			description: 'Filtros de lista de ajustes de productos',
 		})
 		_: FiltersStockAdjustmentInput,
 		@Context() context,
@@ -32,16 +36,28 @@ export class StockAdjustmentResolver {
 		);
 	}
 
-	@Query(() => StockAdjustment, { name: 'stockAdjustmentId' })
+	@Query(() => StockAdjustment, {
+		name: 'stockAdjustmentId',
+		description: 'Obtiene un ajuste de productos con base a su identificador',
+	})
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string, @Context() context) {
+	findById(
+		@Args('id', { description: 'Identificador del ajuste de productos' })
+		id: string,
+		@Context() context,
+	) {
 		return this.stockAdjustmentService.findById(id, context.req.user);
 	}
 
-	@Mutation(() => StockAdjustment, { name: 'createStockAdjustment' })
+	@Mutation(() => StockAdjustment, {
+		name: 'createStockAdjustment',
+		description: 'Crea un ajuste de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createStockAdjustmentInput')
+		@Args('createStockAdjustmentInput', {
+			description: 'Crea un ajuste de productos',
+		})
 		_: CreateStockAdjustmentInput,
 		@Context() context,
 	) {
@@ -51,12 +67,18 @@ export class StockAdjustmentResolver {
 		);
 	}
 
-	@Mutation(() => StockAdjustment, { name: 'updateStockAdjustment' })
+	@Mutation(() => StockAdjustment, {
+		name: 'updateStockAdjustment',
+		description: 'Actualiza un ajuste de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateStockAdjustmentInput')
+		@Args('id', { description: 'Identificador de ajuste de productos' })
+		id: string,
+		@Args('updateStockAdjustmentInput', {
+			description: 'Datos para actualizar el ajuste de productos',
+		})
 		_: UpdateStockAdjustmentInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.stockAdjustmentService.update(

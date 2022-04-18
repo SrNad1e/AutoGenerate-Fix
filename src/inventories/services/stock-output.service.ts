@@ -12,11 +12,14 @@ import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
-import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { FiltersStockOutputInput } from '../dtos/filters-stockOutput.input';
 import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockHistoryService } from './stock-history.service';
+import { Size } from 'src/products/entities/size.entity';
+import { Color } from 'src/products/entities/color.entity';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 
 const populate = [
 	{
@@ -27,18 +30,18 @@ const populate = [
 				populate: [
 					{
 						path: 'size',
-						model: 'Size',
+						model: Size.name,
 					},
 					{
 						path: 'color',
-						model: 'Color',
+						model: Color.name,
 					},
 					{
 						path: 'stock',
 						populate: [
 							{
 								path: 'warehouse',
-								model: 'Warehouse',
+								model: Warehouse.name,
 							},
 						],
 					},
@@ -211,7 +214,7 @@ export class StockOutputService {
 				quantity: detail.quantity,
 			}));
 
-			const deleteStockHistoryInput: DeleteStockHistoryInput = {
+			const deleteStockHistoryInput: CreateStockHistoryInput = {
 				details: detailHistory,
 				warehouseId,
 				documentId: response._id.toString(),
@@ -340,7 +343,7 @@ export class StockOutputService {
 					quantity: detail.quantity,
 				}));
 
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
@@ -372,7 +375,7 @@ export class StockOutputService {
 					quantity: detail.quantity,
 				}));
 
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),

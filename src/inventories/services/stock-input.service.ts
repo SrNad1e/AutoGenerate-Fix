@@ -8,10 +8,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { Color } from 'src/products/entities/color.entity';
+import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
-import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
+import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
 import { FiltersStockInputInput } from '../dtos/filters-stockInput.input';
 import { UpdateStockInputInput } from '../dtos/update-stockInput-input';
@@ -27,18 +30,18 @@ const populate = [
 				populate: [
 					{
 						path: 'size',
-						model: 'Size',
+						model: Size.name,
 					},
 					{
 						path: 'color',
-						model: 'Color',
+						model: Color.name,
 					},
 					{
 						path: 'stock',
 						populate: [
 							{
 								path: 'warehouse',
-								model: 'Warehouse',
+								model: Warehouse.name,
 							},
 						],
 					},
@@ -213,7 +216,7 @@ export class StockInputService {
 				quantity: detail.quantity,
 			}));
 
-			const addStockHistoryInput: AddStockHistoryInput = {
+			const addStockHistoryInput: CreateStockHistoryInput = {
 				details: detailHistory,
 				warehouseId,
 				documentId: response._id.toString(),
@@ -339,7 +342,7 @@ export class StockInputService {
 					quantity: detail.quantity,
 				}));
 
-				const addStockHistoryInput: AddStockHistoryInput = {
+				const addStockHistoryInput: CreateStockHistoryInput = {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
@@ -368,7 +371,7 @@ export class StockInputService {
 					quantity: detail.quantity,
 				}));
 
-				const addStockHistoryInput: AddStockHistoryInput = {
+				const addStockHistoryInput: CreateStockHistoryInput = {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),

@@ -6,8 +6,7 @@ import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
-import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
-import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
+import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistory } from '../entities/stock-history.entity';
 import { StockInput } from '../entities/stock-input.entity';
@@ -34,7 +33,7 @@ export class StockHistoryService {
 	) {}
 
 	async addStock(
-		{ details, documentId, documentType, warehouseId }: AddStockHistoryInput,
+		{ details, documentId, documentType, warehouseId }: CreateStockHistoryInput,
 		user: Partial<User>,
 	) {
 		let item;
@@ -120,7 +119,7 @@ export class StockHistoryService {
 	}
 
 	async deleteStock(
-		{ details, documentId, documentType, warehouseId }: DeleteStockHistoryInput,
+		{ details, documentId, documentType, warehouseId }: CreateStockHistoryInput,
 		user: Partial<User>,
 	) {
 		let item;

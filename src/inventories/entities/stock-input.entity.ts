@@ -7,7 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Detalle de la salida de productos' })
 export class DetailInput {
 	@Field(() => Product, { description: 'Producto de la entrada' })
 	product: Product;
@@ -27,7 +27,7 @@ export class DetailInput {
 }
 
 @Schema({ timestamps: true, collection: 'stockinput' })
-@ObjectType()
+@ObjectType({ description: 'Salida de productos' })
 export class StockInput extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

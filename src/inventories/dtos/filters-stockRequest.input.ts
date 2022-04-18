@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 
-@InputType()
+@InputType({ description: 'Ordenamiento del solicitudes de productos' })
 export class SortStockRequest {
 	@Field(() => Number, {
 		description: 'Ordenamiento por número',
@@ -40,7 +40,9 @@ export class SortStockRequest {
 	updatedAt: number;
 }
 
-@InputType()
+@InputType({
+	description: 'Filtros para el listado de solicitudes de productos',
+})
 export class FiltersStockRequestInput {
 	@Field(() => Number, {
 		description: 'Número consecutivo asignado al traslado',

@@ -341,6 +341,7 @@ input CreateSizeInput {
   name: String!
 }
 
+"""Datos para crear el ajuste de productos"""
 input CreateStockAdjustmentInput {
   """Productos del ajuste"""
   details: [DetailStockAdjustmentCreateInput!]!
@@ -355,6 +356,7 @@ input CreateStockAdjustmentInput {
   warehouseId: String!
 }
 
+"""Datos para crear la entrada de productos"""
 input CreateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputCreateInput!]!
@@ -369,6 +371,7 @@ input CreateStockInputInput {
   warehouseId: String!
 }
 
+"""Datos para crear la salida de productos"""
 input CreateStockOutputInput {
   """Productos de la salida"""
   details: [DetailStockOutputCreateInput!]!
@@ -383,6 +386,7 @@ input CreateStockOutputInput {
   warehouseId: String!
 }
 
+"""Datos para crear la solicitud de productos"""
 input CreateStockRequestInput {
   """Productos de la solicitud"""
   details: [DetailStockRequestCreateInput!]!
@@ -400,6 +404,7 @@ input CreateStockRequestInput {
   warehouseOriginId: String!
 }
 
+"""Productos para marcar agregados para el historial"""
 input CreateStockTransferInput {
   """Productos del traslado"""
   details: [DetailStockTransferCreateInput!]!
@@ -537,6 +542,7 @@ input DetailAddProductsOrderInput {
   quantity: Float!
 }
 
+"""Detalle de ajuste de productos"""
 type DetailAdjustment {
   """Fecha de agregado del deltalle al ajuste"""
   createdAt: DateTime!
@@ -551,6 +557,7 @@ type DetailAdjustment {
   updatedAt: DateTime!
 }
 
+"""Detalle de la salida de productos"""
 type DetailInput {
   """Fecha de agregado del deltalle a la entrada"""
   createdAt: DateTime!
@@ -598,6 +605,7 @@ type DetailOrder {
   updatedAt: DateTime!
 }
 
+"""Detalle de la salida de productos"""
 type DetailOutput {
   """Fecha de agregado del deltalle a la salida"""
   createdAt: DateTime!
@@ -626,6 +634,7 @@ type DetailRequest {
   updatedAt: DateTime!
 }
 
+"""Productos del ajuste de productos"""
 input DetailStockAdjustmentCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -634,6 +643,7 @@ input DetailStockAdjustmentCreateInput {
   quantity: Float!
 }
 
+"""Detalle del ajuste de productos"""
 input DetailStockAdjustmentInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -645,6 +655,7 @@ input DetailStockAdjustmentInput {
   quantity: Float!
 }
 
+"""Productos de la entrada de productos"""
 input DetailStockInputCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -653,6 +664,7 @@ input DetailStockInputCreateInput {
   quantity: Float!
 }
 
+"""Detalle de la entrada de productos"""
 input DetailStockInputInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -664,6 +676,7 @@ input DetailStockInputInput {
   quantity: Float!
 }
 
+"""Productos de la salida de productos"""
 input DetailStockOutputCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -672,6 +685,7 @@ input DetailStockOutputCreateInput {
   quantity: Float!
 }
 
+"""Detalle de la salida de productos"""
 input DetailStockOutputInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -683,6 +697,7 @@ input DetailStockOutputInput {
   quantity: Float!
 }
 
+"""Productos de la solicitud de productos"""
 input DetailStockRequestCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -691,6 +706,7 @@ input DetailStockRequestCreateInput {
   quantity: Float!
 }
 
+"""Detalle de la solicitud de productos"""
 input DetailStockRequestInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -702,6 +718,7 @@ input DetailStockRequestInput {
   quantity: Float!
 }
 
+"""Productos del historial de inventario"""
 input DetailStockTransferCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -710,6 +727,7 @@ input DetailStockTransferCreateInput {
   quantity: Float!
 }
 
+"""Detalle del traslado de productos"""
 input DetailStockTransferInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -721,6 +739,7 @@ input DetailStockTransferInput {
   quantity: Float!
 }
 
+"""Detalle del traslado de productos"""
 type DetailTransfer {
   """Fecha de agregado el producto"""
   createdAt: DateTime!
@@ -941,6 +960,7 @@ input FiltersSizeInput {
   sort: SortSize
 }
 
+"""Filtros para el listado de ajsutes de productos"""
 input FiltersStockAdjustmentInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -970,6 +990,7 @@ input FiltersStockAdjustmentInput {
   warehouseId: String
 }
 
+"""Filtros para el listado de entradas de productos"""
 input FiltersStockInputInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -999,6 +1020,7 @@ input FiltersStockInputInput {
   warehouseId: String
 }
 
+"""Filtros para el listado de salidas de productos"""
 input FiltersStockOutputInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -1028,6 +1050,7 @@ input FiltersStockOutputInput {
   warehouseId: String
 }
 
+"""Filtros para el listado de solicitudes de productos"""
 input FiltersStockRequestInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -1057,6 +1080,7 @@ input FiltersStockRequestInput {
   warehouseOriginId: String
 }
 
+"""Filtros para el listado de traslados de productos"""
 input FiltersStockTransferInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -1205,7 +1229,6 @@ type Mutation {
     """Productos y pedido para actualizar"""
     addProductsOrderInput: AddProductsOrderInput!
   ): Order!
-  confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
 
   """Crea un atributo"""
   createAttrib(
@@ -1248,12 +1271,42 @@ type Mutation {
     """Datos para crear la talla"""
     createSizeInput: CreateSizeInput!
   ): Size!
-  createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
-  createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
-  createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
-  createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
-  createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
-  generateStockRequest(shopId: String!): StockRequest!
+
+  """Crea un ajuste de productos"""
+  createStockAdjustment(
+    """Crea un ajuste de productos"""
+    createStockAdjustmentInput: CreateStockAdjustmentInput!
+  ): StockAdjustment!
+
+  """Crea una entrada de productos"""
+  createStockInput(
+    """Datos para crear una entrada de productos"""
+    createStockInputInput: CreateStockInputInput!
+  ): StockInput!
+
+  """Crea una salida de productos"""
+  createStockOutput(
+    """Datos para crear una salida de productos"""
+    createStockOutputInput: CreateStockOutputInput!
+  ): StockOutput!
+
+  """Crea una solicitud"""
+  createStockRequest(
+    """Datos para crear una solicitud de productos"""
+    createStockRequestInput: CreateStockRequestInput!
+  ): StockRequest!
+
+  """Crea una traslado de productos"""
+  createStockTransfer(
+    """Datos para la creación de un traslado de productos"""
+    createStockTransferInput: CreateStockTransferInput!
+  ): StockTransfer!
+
+  """Autogenera una solicitud de productos por bodega"""
+  generateStockRequest(
+    """Tienda para validar el inventario"""
+    shopId: String!
+  ): StockRequest!
 
   """Se encarga de realizar el ingreso al sistema por el usuario"""
   login(
@@ -1329,11 +1382,51 @@ type Mutation {
     """Datos para actualizar la talla"""
     updateSizeInput: UpdateSizeInput!
   ): Size!
-  updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
-  updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
-  updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
-  updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
-  updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
+
+  """Actualiza un ajuste de productos"""
+  updateStockAdjustment(
+    """Identificador de ajuste de productos"""
+    id: String!
+
+    """Datos para actualizar el ajuste de productos"""
+    updateStockAdjustmentInput: UpdateStockAdjustmentInput!
+  ): StockAdjustment!
+
+  """Actualiza una entrada de productos"""
+  updateStockInput(
+    """Identificador de la entrada de productos a actualizar"""
+    id: String!
+
+    """Datos para actualizar una entrada de productos"""
+    updateStockInputInput: UpdateStockInputInput!
+  ): StockInput!
+
+  """Actualiza una salida de productos"""
+  updateStockOutput(
+    """Identificador de la salida de productos a actualizar"""
+    id: String!
+
+    """Datos para actualizar salida de productos"""
+    updateStockOutputInput: UpdateStockOutputInput!
+  ): StockOutput!
+
+  """Actualiza una solicitud de productos"""
+  updateStockRequest(
+    """Identificador de la solicitud de productos"""
+    id: String!
+
+    """Datos para actualizar en la solicitud de productos"""
+    updateStockRequestInput: UpdateStockRequestInput!
+  ): StockRequest!
+
+  """Actualiza traslado"""
+  updateStockTransfer(
+    """Identificador del traslado de productos"""
+    id: String!
+
+    """Datos para actualizar el traslado"""
+    updateStockTransferInput: UpdateStockTransferInput!
+  ): StockTransfer!
   updateUser(
     """Identificador del usuario que se desea actualizar"""
     id: String!
@@ -1587,16 +1680,66 @@ type Query {
     """Filtros para consultar las tallas"""
     filtersSizeInput: FiltersSizeInput = {}
   ): ResponseSize!
-  stockAdjustmentId(id: String!): StockAdjustment!
-  stockAdjustments(filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
-  stockInputId(id: String!): StockInput!
-  stockInputs(filtersStockInputInput: FiltersStockInputInput = {}): ResponseStockInput!
-  stockOutputId(id: String!): StockOutput!
-  stockOutputs(filtersStockOutputInput: FiltersStockOutputInput = {}): ResponseStockOutput!
-  stockRequestId(id: String!): StockRequest!
-  stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
-  stockTransferId(id: String!): StockTransfer!
-  stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
+
+  """Obtiene un ajuste de productos con base a su identificador"""
+  stockAdjustmentId(
+    """Identificador del ajuste de productos"""
+    id: String!
+  ): StockAdjustment!
+
+  """Lista de ajustes de productos"""
+  stockAdjustments(
+    """Filtros de lista de ajustes de productos"""
+    filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}
+  ): ResponseStockAdjustment!
+
+  """Obtiene una entrada de productos con base a su identificador"""
+  stockInputId(
+    """Identificador de la entrada de productos"""
+    id: String!
+  ): StockInput!
+
+  """Lista de entradas de productos"""
+  stockInputs(
+    """Filtros de lista de entradas de productos"""
+    filtersStockInputInput: FiltersStockInputInput = {}
+  ): ResponseStockInput!
+
+  """Obtiene una salida de productos con base al identificador"""
+  stockOutputId(
+    """Identificador de la salida de productos"""
+    id: String!
+  ): StockOutput!
+
+  """Listado de salidas de productos"""
+  stockOutputs(
+    """Filtros del listado de salidas de productos"""
+    filtersStockOutputInput: FiltersStockOutputInput = {}
+  ): ResponseStockOutput!
+
+  """Obtiene una solicitud de productos por su identificador"""
+  stockRequestId(
+    """Identificador de la solicitud de productos"""
+    id: String!
+  ): StockRequest!
+
+  """Lista las solicitudes de productos"""
+  stockRequests(
+    """Filtros de las solicitudes de productos"""
+    filtersStockRequestInput: FiltersStockRequestInput = {}
+  ): ResponseStockRequest!
+
+  """Consulta el trasldo por el identificador"""
+  stockTransferId(
+    """Identificador del traslado"""
+    id: String!
+  ): StockTransfer!
+
+  """Obtiene listado de traslados de productos entre bodegas"""
+  stockTransfers(
+    """Filtros para listado de traslados de productos entre bodegas"""
+    filtersStockTransferInput: FiltersStockTransferInput = {}
+  ): ResponseStockTransfer!
 
   """Consulta todos los usuarios con base a los filtros"""
   users(
@@ -1892,6 +2035,7 @@ type ResponseSize {
   totalPages: Float!
 }
 
+"""Lista de ajustes de productos"""
 type ResponseStockAdjustment {
   """Lista de ajustes"""
   docs: [StockAdjustment!]!
@@ -1924,6 +2068,7 @@ type ResponseStockAdjustment {
   totalPages: Float!
 }
 
+"""Lista de entradas de productos"""
 type ResponseStockInput {
   """Lista de entradas"""
   docs: [StockInput!]!
@@ -1956,6 +2101,7 @@ type ResponseStockInput {
   totalPages: Float!
 }
 
+"""Lista de salidas de productos"""
 type ResponseStockOutput {
   """Lista de salidas"""
   docs: [StockOutput!]!
@@ -1988,6 +2134,7 @@ type ResponseStockOutput {
   totalPages: Float!
 }
 
+"""Lista de solicitudes de productos"""
 type ResponseStockRequest {
   """Lista de solicitudes"""
   docs: [StockRequest!]!
@@ -2020,6 +2167,7 @@ type ResponseStockRequest {
   totalPages: Float!
 }
 
+"""Lista de traslados de productos"""
 type ResponseStockTransfer {
   """Lista de traslados"""
   docs: [StockTransfer!]!
@@ -2283,6 +2431,7 @@ input SortSize {
   value: Float
 }
 
+"""Ordenamiento del ajuste de productos"""
 input SortStockAdjustment {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2303,6 +2452,7 @@ input SortStockAdjustment {
   warehouse: Float
 }
 
+"""Ordenamiento de la entrada de productos"""
 input SortStockInput {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2323,6 +2473,7 @@ input SortStockInput {
   warehouse: Float
 }
 
+"""Ordenamiento de la salida de productos"""
 input SortStockOutput {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2343,6 +2494,7 @@ input SortStockOutput {
   warehouse: Float
 }
 
+"""Ordenamiento del solicitudes de productos"""
 input SortStockRequest {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2363,6 +2515,7 @@ input SortStockRequest {
   warehouseOrigin: Float
 }
 
+"""Ordenamiento del traslado de productos"""
 input SortStockTransfer {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2419,6 +2572,7 @@ type Stock {
   warehouse: Warehouse!
 }
 
+"""Ajuste de productos"""
 type StockAdjustment {
   """Identificador de mongo"""
   _id: String!
@@ -2454,6 +2608,7 @@ type StockAdjustment {
   warehouse: Warehouse!
 }
 
+"""Salida de productos"""
 type StockInput {
   """Identificador de mongo"""
   _id: String!
@@ -2489,6 +2644,7 @@ type StockInput {
   warehouse: Warehouse!
 }
 
+"""Salida de productos"""
 type StockOutput {
   """Identificador de mongo"""
   _id: String!
@@ -2524,6 +2680,7 @@ type StockOutput {
   warehouse: Warehouse!
 }
 
+"""Solicitud de productos"""
 type StockRequest {
   """Identificador de mongo"""
   _id: String!
@@ -2559,6 +2716,7 @@ type StockRequest {
   warehouseOrigin: Warehouse!
 }
 
+"""Translado de productos"""
 type StockTransfer {
   """Identificador de mongo"""
   _id: String!
@@ -2761,6 +2919,7 @@ input UpdateSizeInput {
   name: String
 }
 
+"""Datos para actualizar el ajuste de productos"""
 input UpdateStockAdjustmentInput {
   """Productos del ajuste"""
   details: [DetailStockAdjustmentInput!]
@@ -2772,6 +2931,7 @@ input UpdateStockAdjustmentInput {
   status: String
 }
 
+"""Datos para actualizar la entrada de productos"""
 input UpdateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputInput!]
@@ -2783,6 +2943,7 @@ input UpdateStockInputInput {
   status: String
 }
 
+"""Datos para actualizar la salida de productos"""
 input UpdateStockOutputInput {
   """Productos de la salida"""
   details: [DetailStockOutputInput!]
@@ -2794,6 +2955,7 @@ input UpdateStockOutputInput {
   status: String
 }
 
+"""Datos para actualizar la solicitud de productos"""
 input UpdateStockRequestInput {
   """Productos de la solicitud"""
   details: [DetailStockRequestInput!]
@@ -2805,6 +2967,7 @@ input UpdateStockRequestInput {
   status: String
 }
 
+"""Datos para actualizar el traslado de productos"""
 input UpdateStockTransferInput {
   """Productos del traslado"""
   details: [DetailStockTransferInput!]

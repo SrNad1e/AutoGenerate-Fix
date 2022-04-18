@@ -6,7 +6,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Historial de movimientos de inventario' })
 export class StockHistory extends Document {
 	@Field(() => String, { description: 'Identificador mongo' })
 	_id: Types.ObjectId;
@@ -28,7 +28,8 @@ export class StockHistory extends Document {
 	product: Types.ObjectId;
 
 	@Field(() => String, {
-		description: 'Tipo de documento (transfer, input, adjustment, refund, output, invoice, order)',
+		description:
+			'Tipo de documento (transfer, input, adjustment, refund, output, invoice, order)',
 	})
 	@Prop({ type: String })
 	documentType: string;

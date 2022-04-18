@@ -13,13 +13,17 @@ import { StockInputService } from '../services/stock-input.service';
 export class StockInputResolver {
 	constructor(private readonly stockInputService: StockInputService) {}
 
-	@Query(() => ResponseStockInput, { name: 'stockInputs' })
+	@Query(() => ResponseStockInput, {
+		name: 'stockInputs',
+		description: 'Lista de entradas de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersStockInputInput',
 			nullable: true,
 			defaultValue: {},
+			description: 'Filtros de lista de entradas de productos',
 		})
 		_: FiltersStockInputInput,
 		@Context() context,
@@ -30,16 +34,28 @@ export class StockInputResolver {
 		);
 	}
 
-	@Query(() => StockInput, { name: 'stockInputId' })
+	@Query(() => StockInput, {
+		name: 'stockInputId',
+		description: 'Obtiene una entrada de productos con base a su identificador',
+	})
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string, @Context() context) {
+	findById(
+		@Args('id', { description: 'Identificador de la entrada de productos' })
+		id: string,
+		@Context() context,
+	) {
 		return this.stockInputService.findById(id, context.req.user);
 	}
 
-	@Mutation(() => StockInput, { name: 'createStockInput' })
+	@Mutation(() => StockInput, {
+		name: 'createStockInput',
+		description: 'Crea una entrada de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createStockInputInput')
+		@Args('createStockInputInput', {
+			description: 'Datos para crear una entrada de productos',
+		})
 		_: CreateStockInputInput,
 		@Context() context,
 	) {
@@ -49,12 +65,20 @@ export class StockInputResolver {
 		);
 	}
 
-	@Mutation(() => StockInput, { name: 'updateStockInput' })
+	@Mutation(() => StockInput, {
+		name: 'updateStockInput',
+		description: 'Actualiza una entrada de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateStockInputInput')
+		@Args('id', {
+			description: 'Identificador de la entrada de productos a actualizar',
+		})
+		id: string,
+		@Args('updateStockInputInput', {
+			description: 'Datos para actualizar una entrada de productos',
+		})
 		_: UpdateStockInputInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.stockInputService.update(

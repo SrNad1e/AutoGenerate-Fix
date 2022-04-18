@@ -9,17 +9,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, Model, PaginateModel, Types } from 'mongoose';
 
+import { Color } from 'src/products/entities/color.entity';
+import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
-import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
+import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
-import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
 import { FiltersStockTransferInput } from '../dtos/filters-stockTransfer.input';
 import {
 	DetailStockTransferInput,
 	UpdateStockTransferInput,
 } from '../dtos/update-stockTransfer-input';
+import { StockRequest } from '../entities/stock-request.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { StockHistoryService } from './stock-history.service';
 import { StockRequestService } from './stock-request.service';
@@ -33,18 +36,18 @@ const populate = [
 				populate: [
 					{
 						path: 'size',
-						model: 'Size',
+						model: Size.name,
 					},
 					{
 						path: 'color',
-						model: 'Color',
+						model: Color.name,
 					},
 					{
 						path: 'stock',
 						populate: [
 							{
 								path: 'warehouse',
-								model: 'Warehouse',
+								model: Warehouse.name,
 							},
 						],
 					},
@@ -52,7 +55,7 @@ const populate = [
 			},
 		],
 	},
-	{ path: 'requests', model: 'StockRequest' },
+	{ path: 'requests', model: StockRequest.name },
 ];
 
 const statusTypes = ['open', 'cancelled', 'sent', 'confirmed', 'incomplete'];
@@ -253,7 +256,7 @@ export class StockTransferService {
 					quantity: detail.quantity,
 				}));
 
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
 					details: detailHistory,
 					warehouseId: warehouseOriginId,
 					documentId: response._id.toString(),
@@ -402,7 +405,7 @@ export class StockTransferService {
 						quantity: detail.quantity,
 					}));
 
-					const deleteStockHistoryInput: DeleteStockHistoryInput = {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
 						documentId: response._id.toString(),
@@ -429,7 +432,7 @@ export class StockTransferService {
 						quantity: detail.quantity,
 					}));
 
-					const deleteStockHistoryInput: AddStockHistoryInput = {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseDestination._id.toString(),
 						documentId: response._id.toString(),
@@ -464,7 +467,7 @@ export class StockTransferService {
 						quantity: detail.quantity,
 					}));
 
-					const deleteStockHistoryInput: DeleteStockHistoryInput = {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
 						documentId: response._id.toString(),
@@ -482,7 +485,7 @@ export class StockTransferService {
 						quantity: detail.quantity,
 					}));
 
-					const deleteStockHistoryInput: AddStockHistoryInput = {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseDestination._id.toString(),
 						documentId: response._id.toString(),

@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Productos para marcar agregados para el historial' })
 export class CreateStockTransferInput {
 	@Field(() => String, {
 		description: 'Identificador de la bodega de origen del traslado',
@@ -37,7 +37,7 @@ export class CreateStockTransferInput {
 	requests: string[];
 }
 
-@InputType()
+@InputType({ description: 'Productos del historial de inventario' })
 export class DetailStockTransferCreateInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
 	productId: string;

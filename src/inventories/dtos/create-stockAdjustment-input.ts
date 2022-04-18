@@ -1,6 +1,15 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Productos del ajuste de productos' })
+export class DetailStockAdjustmentCreateInput {
+	@Field(() => String, { description: 'Identificador de mongo del producto' })
+	productId: string;
+
+	@Field(() => Number, { description: 'Cantidad de productos' })
+	quantity: number;
+}
+
+@InputType({ description: 'Datos para crear el ajuste de productos' })
 export class CreateStockAdjustmentInput {
 	@Field(() => String, {
 		description: 'Identificador de la bodega para el ajuste',
@@ -23,13 +32,4 @@ export class CreateStockAdjustmentInput {
 		nullable: true,
 	})
 	observation: string;
-}
-
-@InputType()
-export class DetailStockAdjustmentCreateInput {
-	@Field(() => String, { description: 'Identificador de mongo del producto' })
-	productId: string;
-
-	@Field(() => Number, { description: 'Cantidad de productos' })
-	quantity: number;
 }

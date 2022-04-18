@@ -10,7 +10,7 @@ export class DetailHistory {
 }
 
 @InputType()
-export class AddStockHistoryInput {
+export class CreateStockHistoryInput {
 	@Field(() => [DetailHistory], { description: 'Detalle de cada producto' })
 	details: DetailHistory[];
 
@@ -22,7 +22,7 @@ export class AddStockHistoryInput {
 
 	@Field(() => String, {
 		description:
-			'Tipo de documento que realiza el movimiento (transfer, input, refund, adjustment)',
+			'Tipo de documento que realiza el movimiento (transfer, input, refund, adjustment, output, order)',
 	})
 	documentType: string;
 }
