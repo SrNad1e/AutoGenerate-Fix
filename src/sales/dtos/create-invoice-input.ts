@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Medio de pago del producto' })
 export class PaymentInvoiceInput {
 	@Field(() => String, { description: 'Identificador del pago' })
 	paymentId: string;
@@ -9,7 +9,7 @@ export class PaymentInvoiceInput {
 	total: number;
 }
 
-@InputType()
+@InputType({ description: 'Producto de la factura' })
 export class DetailInvoiceInput {
 	@Field(() => String, { description: 'Identificador del producto' })
 	productId: string;
@@ -24,7 +24,7 @@ export class DetailInvoiceInput {
 	discount: number;
 }
 
-@InputType()
+@InputType({ description: 'Datos para crear una factura' })
 export class CreateInvoiceInput {
 	@Field(() => String, { description: 'Identificación del cliente' })
 	customerId: string;

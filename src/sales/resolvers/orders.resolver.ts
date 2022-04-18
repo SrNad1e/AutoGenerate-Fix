@@ -13,32 +13,58 @@ import { OrdersService } from '../services/orders.service';
 export class OrdersResolver {
 	constructor(private readonly ordersService: OrdersService) {}
 
-	@Query(() => [Order], { name: 'ordersByPointOfSale' })
+	@Query(() => [Order], {
+		name: 'ordersByPointOfSale',
+		description: 'Obtener las ordenes por punto de venta',
+	})
 	@UseGuards(JwtAuthGuard)
-	getByPointOfSales(@Args('idPointOfSale') idPointOfSale: string) {
+	getByPointOfSales(
+		@Args('idPointOfSale', { description: 'Identificador del punto de venta' })
+		idPointOfSale: string,
+	) {
 		return this.ordersService.getByPointOfSales(idPointOfSale);
 	}
 
-	@Query(() => [Order], { name: 'orderId' })
+	@Query(() => Order, {
+		name: 'orderId',
+		description: 'Obtiene la orden por el id',
+	})
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string) {
+	findById(
+		@Args('id', { description: 'identificador del pedido' }) id: string,
+	) {
 		return this.ordersService.findById(id);
 	}
 
-	@Mutation(() => Order, { name: 'createOrder' })
+	@Mutation(() => Order, {
+		name: 'createOrder',
+		description: 'Se encarga de crear el pedido',
+	})
 	@UseGuards(JwtAuthGuard)
-	create(@Args('createOrderInput') _: CreateOrderInput, @Context() context) {
+	create(
+		@Args('createOrderInput', {
+			description: 'Parámetros para la creación del pedido',
+		})
+		_: CreateOrderInput,
+		@Context() context,
+	) {
 		return this.ordersService.create(
 			context.req.body.variables.input,
 			context.req.user,
 		);
 	}
 
-	@Mutation(() => Order, { name: 'updateOrder' })
+	@Mutation(() => Order, {
+		name: 'updateOrder',
+		description: 'Se encarga actualizar un pedido',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('id') id: string,
-		@Args('updateOrderInput') _: UpdateOrderInput,
+		@Args('id', { description: 'Identificador del pedido' }) id: string,
+		@Args('updateOrderInput', {
+			description: 'Parámetros para actualizar el pedido',
+		})
+		_: UpdateOrderInput,
 		@Context() context,
 	) {
 		return this.ordersService.update(
@@ -48,10 +74,16 @@ export class OrdersResolver {
 		);
 	}
 
-	@Mutation(() => Order, { name: 'addProductsOrder' })
+	@Mutation(() => Order, {
+		name: 'addProductsOrder',
+		description: 'Se encarga de agregar productos a un pedido',
+	})
 	@UseGuards(JwtAuthGuard)
 	addProducts(
-		@Args('addProductsOrderInput') _: AddProductsOrderInput,
+		@Args('addProductsOrderInput', {
+			description: 'Productos y pedido para actualizar',
+		})
+		_: AddProductsOrderInput,
 		@Context() context,
 	) {
 		return this.ordersService.addProducts(
@@ -60,10 +92,16 @@ export class OrdersResolver {
 		);
 	}
 
-	@Mutation(() => Order, { name: 'addPaymentsOrder' })
+	@Mutation(() => Order, {
+		name: 'addPaymentsOrder',
+		description: 'Se encarga de agregar medios de pago',
+	})
 	@UseGuards(JwtAuthGuard)
 	addPayments(
-		@Args('addPaymentsOrderInput') _: AddPaymentsOrderInput,
+		@Args('addPaymentsOrderInput', {
+			description: 'Medios de pago y orden a actualizar',
+		})
+		_: AddPaymentsOrderInput,
 		@Context() context,
 	) {
 		return this.ordersService.addPayments(

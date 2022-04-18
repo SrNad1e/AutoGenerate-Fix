@@ -3,7 +3,7 @@ import { Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'authorizationDIAN' })
-@ObjectType()
+@ObjectType({ description: 'Autorizacion DIAN de la tienda' })
 export class AuthorizationDian extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

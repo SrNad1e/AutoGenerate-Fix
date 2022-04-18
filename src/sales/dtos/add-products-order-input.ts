@@ -1,19 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
-export class AddProductsOrderInput {
-	@Field(() => String, {
-		description: 'Id del pedido que se requiere agreagr o editar productos',
-	})
-	orderId: string;
-
-	@Field(() => [DetailAddProductsOrderInput], {
-		description: 'Productos a crear o actualizar',
-	})
-	details: DetailAddProductsOrderInput[];
-}
-
-@InputType()
+@InputType({ description: 'Producto que se va a agregar' })
 export class DetailAddProductsOrderInput {
 	@Field(() => String, {
 		description: 'Identificador Producto agregado al pedido',
@@ -27,4 +14,17 @@ export class DetailAddProductsOrderInput {
 		description: 'Acción a realizar con el producto (create, update, delete)',
 	})
 	action: string;
+}
+
+@InputType({ description: 'Datos para agregar productos al pedido' })
+export class AddProductsOrderInput {
+	@Field(() => String, {
+		description: 'Id del pedido que se requiere agreagr o editar productos',
+	})
+	orderId: string;
+
+	@Field(() => [DetailAddProductsOrderInput], {
+		description: 'Productos a crear o actualizar',
+	})
+	details: DetailAddProductsOrderInput[];
 }

@@ -2,6 +2,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Datos para agregar medios de pago al pedido"""
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
   orderId: String!
@@ -10,6 +11,7 @@ input AddPaymentsOrderInput {
   payments: [PaymentsOrderInput!]!
 }
 
+"""Datos para agregar productos al pedido"""
 input AddProductsOrderInput {
   """Productos a crear o actualizar"""
   details: [DetailAddProductsOrderInput!]!
@@ -64,6 +66,7 @@ type Attrib {
   user: User!
 }
 
+"""Autorizacion DIAN de la tienda"""
 type AuthorizationDian {
   """Identificador de mongo"""
   _id: String!
@@ -248,6 +251,7 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
   status: String!
@@ -500,6 +504,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Producto que se va a agregar"""
 input DetailAddProductsOrderInput {
   """Acción a realizar con el producto (create, update, delete)"""
   action: String!
@@ -539,14 +544,16 @@ type DetailInput {
   updatedAt: DateTime!
 }
 
+"""Productos de la factura"""
 type DetailInvoice {
-  """Producto agregado al pedido"""
+  """Producto agregado a la factura"""
   product: Product!
 
-  """Cantidad de productos en el pedido"""
+  """Cantidad de productos en la factura"""
   quantity: Float!
 }
 
+"""Productos del pedido"""
 type DetailOrder {
   """Fecha de agregado del producto al pedido"""
   createdAt: DateTime!
@@ -1099,6 +1106,7 @@ input FiltersWarehousesInput {
   sort: SortWarehouse
 }
 
+"""Factura"""
 type Invoice {
   """Identificador de mongo"""
   _id: String!
@@ -1115,7 +1123,7 @@ type Invoice {
   """Cliente para la factura"""
   customer: Customer!
 
-  """Productos que tiene el pedido"""
+  """Productos de la factura"""
   details: [DetailInvoice!]
 
   """Número de factura"""
@@ -1127,13 +1135,13 @@ type Invoice {
   """Tienda donde se realiza la factura"""
   shop: Shop!
 
-  """Resumen de los pagosy totales"""
+  """Resumen de los pagos y totales"""
   summary: SummaryInvoice!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
 
-  """Usuario que creó o editó el pedido"""
+  """Usuario que creó o editó la factrura"""
   user: User!
 }
 
@@ -1159,13 +1167,27 @@ input LoginUserInput {
 }
 
 type Mutation {
-  addPaymentsOrder(addPaymentsOrderInput: AddPaymentsOrderInput!): Order!
-  addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
+  """Se encarga de agregar medios de pago"""
+  addPaymentsOrder(
+    """Medios de pago y orden a actualizar"""
+    addPaymentsOrderInput: AddPaymentsOrderInput!
+  ): Order!
+
+  """Se encarga de agregar productos a un pedido"""
+  addProductsOrder(
+    """Productos y pedido para actualizar"""
+    addProductsOrderInput: AddProductsOrderInput!
+  ): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
   createAttrib(createAttribInput: CreateAttribInput!): Attrib!
   createBrand(createBrandInput: CreateBrandInput!): Brand!
   createColor(createColorInput: CreateColorInput!): Color!
-  createOrder(createOrderInput: CreateOrderInput!): Order!
+
+  """Se encarga de crear el pedido"""
+  createOrder(
+    """Parámetros para la creación del pedido"""
+    createOrderInput: CreateOrderInput!
+  ): Order!
   createProduct(createProductInput: CreateProductInput!): Product!
   createReference(createReferenceInput: CreateReferenceInput!): Reference!
   createSize(createSizeInput: CreateSizeInput!): Size!
@@ -1190,7 +1212,15 @@ type Mutation {
   updateAttrib(id: String!, updateAttribInput: UpdateAttribInput!): Attrib!
   updateBrand(id: String!, updateBrandInput: UpdateBrandInput!): Brand!
   updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
-  updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
+
+  """Se encarga actualizar un pedido"""
+  updateOrder(
+    """Identificador del pedido"""
+    id: String!
+
+    """Parámetros para actualizar el pedido"""
+    updateOrderInput: UpdateOrderInput!
+  ): Order!
   updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
   updateReference(id: String!, updateReferenceInput: UpdateReferenceInput!): Reference!
   updateSize(id: String!, updateSizeInput: UpdateSizeInput!): Size!
@@ -1208,6 +1238,7 @@ type Mutation {
   ): User!
 }
 
+"""Pedido de productos"""
 type Order {
   """Identificador de mongo"""
   _id: String!
@@ -1273,6 +1304,7 @@ type Payment {
   user: User!
 }
 
+"""Medios de pago de la factura"""
 type PaymentInvoice {
   """Método de pago usado"""
   payment: Payment!
@@ -1281,6 +1313,7 @@ type PaymentInvoice {
   total: Float!
 }
 
+"""Medio de pago usado en el pedido"""
 type PaymentOrder {
   """Fecha de agregado del pago al pedido"""
   createdAt: DateTime!
@@ -1295,6 +1328,7 @@ type PaymentOrder {
   updatedAt: DateTime!
 }
 
+"""Medio de pago que se va a agregar"""
 input PaymentsOrderInput {
   """Acción a realizar con el medio de pago (create, update, delete)"""
   action: String!
@@ -1327,6 +1361,7 @@ type Permission {
   option: String!
 }
 
+"""Punto de venta de la tienda"""
 type PointOfSale {
   """Identificador de mongo"""
   _id: String!
@@ -1390,8 +1425,18 @@ type Query {
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
   customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
-  orderId(id: String!): [Order!]!
-  ordersByPointOfSale(idPointOfSale: String!): [Order!]!
+
+  """Obtiene la orden por el id"""
+  orderId(
+    """identificador del pedido"""
+    id: String!
+  ): Order!
+
+  """Obtener las ordenes por punto de venta"""
+  ordersByPointOfSale(
+    """Identificador del punto de venta"""
+    idPointOfSale: String!
+  ): [Order!]!
   product(filtersProductInput: FiltersProductInput = {}): Product!
   products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
   referenceId(id: String!): Reference!
@@ -2390,26 +2435,28 @@ type StockTransfer {
   warehouseOrigin: Warehouse!
 }
 
+"""Resumen de la factura"""
 type SummaryInvoice {
-  """Cambio del pedido"""
+  """Cambio de la factura"""
   change: Float!
 
-  """Descuento del pedido"""
+  """Descuento de la factura"""
   discount: Float!
 
-  """Subtotal del pedido"""
+  """Subtotal de la factura"""
   subtotal: Float!
 
-  """Impuestos del pedido"""
+  """Impuestos de la factura"""
   tax: Float!
 
-  """Total del pedido"""
+  """Total de la factura"""
   total: Float!
 
-  """Total pago del pedido"""
+  """Total pago de la factura"""
   totalPaid: Float!
 }
 
+"""Datos de resumen del pedido"""
 type SummaryOrder {
   """Cambio del pedido"""
   change: Float!
@@ -2460,6 +2507,7 @@ input UpdateColorInput {
   name_internal: String
 }
 
+"""Datos para actualizar el pedido"""
 input UpdateOrderInput {
   """Identificación del cliente"""
   customerId: String
