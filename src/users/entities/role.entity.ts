@@ -18,7 +18,7 @@ export class Role {
 	@Field(() => [Permission], {
 		description: 'Permisos al los quie tiene el rol',
 	})
-	@Prop({ type: [Types.ObjectId] })
+	@Prop({ type: [Types.ObjectId], ref: Permission.name })
 	permissions: Types.ObjectId[];
 
 	@Field({ description: 'Permite hacer consultas con otra bodega' })

@@ -1248,9 +1248,13 @@ type Order {
   user: User!
 }
 
+"""Medios de pago"""
 type Payment {
   """Identificador de mongo"""
   _id: String!
+
+  """Estado del tipo de los médios de pago"""
+  active: Boolean!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -1258,7 +1262,7 @@ type Payment {
   """Nombre del medio de pago"""
   name: String!
 
-  """Tipo de medio de pago (cash, bank, credit)"""
+  """Tipo de medio de pago (cash, bank, credit, bonus)"""
   type: String!
 
   """Fecha de actualización"""

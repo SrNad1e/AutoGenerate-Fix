@@ -52,7 +52,7 @@ export class User extends Document {
 	})
 	@Prop({
 		type: Types.ObjectId,
-		ref: 'Shop',
+		ref: Shop.name,
 		autopopulate: true,
 		required: true,
 	})
@@ -60,7 +60,7 @@ export class User extends Document {
 
 	@Prop({
 		type: Types.ObjectId,
-		ref: 'PointOfSale',
+		ref: PointOfSale.name,
 		autopopulate: true,
 	})
 	@Field(() => PointOfSale, {
@@ -71,7 +71,7 @@ export class User extends Document {
 
 	@Prop({
 		type: Types.ObjectId,
-		ref: 'Company',
+		ref: Company.name,
 		autopopulate: true,
 		required: true,
 	})
