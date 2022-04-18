@@ -1,29 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, PaginateModel } from 'mongoose';
-import { User } from 'src/users/entities/user.entity';
+import { FilterQuery, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
+
+import { User } from 'src/users/entities/user.entity';
 import { CreateSizeInput } from '../dtos/create-size.input';
 import { FiltersSizeInput } from '../dtos/filters-size.input';
 import { ResponseSize } from '../dtos/response-size';
 import { UpdateSizeInput } from '../dtos/update-size.input';
-
 import { Size, SizeMysql } from '../entities/size.entity';
 
 @Injectable()
 export class SizesService {
 	constructor(
 		@InjectModel(Size.name)
-		private sizeModel: Model<Size> & PaginateModel<Size>,
+		private sizeModel: PaginateModel<Size>,
 		@InjectRepository(SizeMysql)
 		private readonly sizeRepo: Repository<SizeMysql>,
 	) {}
 
-	async findAll(props: FiltersSizeInput): Promise<Partial<ResponseSize>> {
+	async findAll({
+		name,
+		limit = 10,
+		page = 1,
+		active,
+		sort,
+	}: FiltersSizeInput): Promise<Partial<ResponseSize>> {
 		const filters: FilterQuery<Size> = {};
 
-		const { name = '', limit = 10, page = 1, active, sort } = props;
+		if (name) {
+			filters.value = { $regex: name, $options: 'i' };
+		}
 
 		if (active) {
 			filters.active = active;
@@ -36,13 +44,7 @@ export class SizesService {
 			sort,
 		};
 
-		return this.sizeModel.paginate(
-			{
-				...filters,
-				value: { $regex: name, $options: 'i' },
-			},
-			options,
-		);
+		return this.sizeModel.paginate(filters, options);
 	}
 
 	async findById(id: string) {
@@ -76,8 +78,13 @@ export class SizesService {
 		return this.sizeModel.findByIdAndUpdate(id, { ...props, user });
 	}
 
+	/**
+	 * @description se encarga de consultar las tallas por id de mysql
+	 * @param id identificador de mysql de la talla
+	 * @returns talla
+	 */
 	async getByIdMysql(id: number) {
-		return this.sizeModel.findOne({ id });
+		return this.sizeModel.findOne({ id }).lean();
 	}
 
 	async migration() {

@@ -13,20 +13,28 @@ import { SizesService } from '../services/sizes.service';
 export class SizesResolver {
 	constructor(private readonly sizesService: SizesService) {}
 
-	@Query(() => ResponseSize, { name: 'sizes' })
+	@Query(() => ResponseSize, {
+		name: 'sizes',
+		description: 'Listar las tallas',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersSizeInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersSizeInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para consultar las tallas',
+		})
 		_: FiltersSizeInput,
 		@Context() context,
 	) {
 		return this.sizesService.findAll(context.req.body.variables.input);
 	}
 
-	@Mutation(() => Size, { name: 'createSize' })
+	@Mutation(() => Size, { name: 'createSize', description: 'Crear una talla' })
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createSizeInput')
+		@Args('createSizeInput', { description: 'Datos para crear la talla' })
 		_: CreateSizeInput,
 		@Context() context,
 	) {
@@ -36,12 +44,16 @@ export class SizesResolver {
 		);
 	}
 
-	@Mutation(() => Size, { name: 'updateSize' })
+	@Mutation(() => Size, {
+		name: 'updateSize',
+		description: 'Actualizar la talla',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateSizeInput')
+		@Args('id', { description: 'Identificador de la talla a actualizar' })
+		id: string,
+		@Args('updateSizeInput', { description: 'Datos para actualizar la talla' })
 		_: UpdateSizeInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.sizesService.update(

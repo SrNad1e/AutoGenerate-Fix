@@ -10,7 +10,7 @@ import { CategoryLevel2 } from './category-level2.entity';
 import { CategoryLevel3 } from './category-level3.entity';
 import { Company } from '../../configurations/entities/company.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Datos de medidas para el envío de los productos' })
 export class Shipping {
 	@Field(() => Number, { description: 'Ancho del producto' })
 	width: number;
@@ -40,7 +40,7 @@ export class Shipping {
 }
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Referencia de los productos' })
 export class Reference extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

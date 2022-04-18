@@ -4,7 +4,7 @@ import { Document, ObjectId } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Categoría del producto nivel 1' })
 @Schema({ timestamps: true })
 export class CategoryLevel1 extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })

@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, FilterQuery } from 'mongoose';
+
 import { User } from 'src/users/entities/user.entity';
 import { CreateAttribInput } from '../dtos/create-attrib.input';
-
 import { FiltersAttribsInput } from '../dtos/filters-attribs.input';
 import { UpdateAttribInput } from '../dtos/update-attrib.input';
 import { Attrib } from '../entities/attrib.entity';

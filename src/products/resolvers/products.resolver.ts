@@ -16,10 +16,18 @@ import { ProductsService } from '../services/products.service';
 export class ProductsResolver {
 	constructor(private readonly productsService: ProductsService) {}
 
-	@Query(() => ResponseProduct, { name: 'products' })
+	@Query(() => ResponseProduct, {
+		name: 'products',
+		description: 'Lista los productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersProductsInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersProductsInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para consoltar los productos',
+		})
 		_: FiltersProductsInput,
 		@Context() context,
 	) {
@@ -29,20 +37,28 @@ export class ProductsResolver {
 		);
 	}
 
-	@Query(() => Product, { name: 'product' })
+	@Query(() => Product, { name: 'product', description: 'Obtiene un producto' })
 	@UseGuards(JwtAuthGuard)
 	findOne(
-		@Args({ name: 'filtersProductInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersProductInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para obtener el primer producto de la busqueda',
+		})
 		_: FiltersProductInput,
 		@Context() context,
 	) {
 		return this.productsService.findOne(context.req.body.variables.input);
 	}
 
-	@Mutation(() => Product, { name: 'createProduct' })
+	@Mutation(() => Product, {
+		name: 'createProduct',
+		description: 'Crea un producto',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createProductInput')
+		@Args('createProductInput', { description: 'Datos para crear un producto' })
 		_: CreateProductInput,
 		@Context() context,
 	) {
@@ -52,12 +68,18 @@ export class ProductsResolver {
 		);
 	}
 
-	@Mutation(() => Product, { name: 'updateProduct' })
+	@Mutation(() => Product, {
+		name: 'updateProduct',
+		description: 'Se encarga actualizar un producto',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateProductInput')
+		@Args('id', { description: 'Identificador del producto a actualizar' })
+		id: string,
+		@Args('updateProductInput', {
+			description: 'Datos a actualizar en el producto',
+		})
 		_: UpdateProductInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.productsService.update(

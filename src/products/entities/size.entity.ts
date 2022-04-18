@@ -1,13 +1,14 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import { Types, Document } from 'mongoose';
+import { User } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
-export class Size {
+@ObjectType({ description: 'Talla del producto' })
+export class Size extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: mongoose.ObjectId;
+	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Valor de la talla' })
 	@Prop({ type: String, required: true })
@@ -17,7 +18,18 @@ export class Size {
 	@Prop({ type: Boolean, default: true })
 	active: boolean;
 
-	//TODO: temporal id de mysql
+	@Prop({ type: Object, required: true })
+	@Field(() => User, { description: 'Usuario que crea la talla' })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación de la talla' })
+	createdAt: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de actualización de la talla',
+	})
+	updatedAt: Date;
+
 	@Field(() => Number, {
 		description: 'Identificador mysql',
 		deprecationReason: 'Campo para migración de mysql',

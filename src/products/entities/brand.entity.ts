@@ -4,7 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Marca del producto' })
 @Schema({ timestamps: true })
 export class Brand extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })

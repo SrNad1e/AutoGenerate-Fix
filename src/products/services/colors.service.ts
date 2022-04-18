@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { ResponseColor } from '../dtos/response-color';
@@ -15,7 +15,7 @@ import { UpdateColorInput } from '../dtos/update-color.input';
 export class ColorsService {
 	constructor(
 		@InjectModel(Color.name)
-		private readonly colorModel: Model<Color> & PaginateModel<Color>,
+		private readonly colorModel: PaginateModel<Color>,
 		@InjectRepository(ColorMysql)
 		private readonly colorRepo: Repository<ColorMysql>,
 	) {}
@@ -87,15 +87,19 @@ export class ColorsService {
 		return this.colorModel.findByIdAndUpdate(id, { ...props, user });
 	}
 
+	/**
+	 * @description busca el color por el id de mysql
+	 * @deprecated ya no se va a usar, solo para migraciones
+	 * @param id identificador de mysql del color
+	 * @returns color
+	 */
 	async getByIdMysql(id: number) {
 		return this.colorModel.findOne({ id }).lean();
 	}
 
 	async migration() {
 		try {
-			//consultar mysql
 			const colorsMysql = await this.colorRepo.find();
-			//transformar
 
 			const colorsMongo = colorsMysql.map((color) => {
 				const image = JSON.parse(color.image)?.imageSizes.thumbnail;
@@ -117,6 +121,5 @@ export class ColorsService {
 		} catch (e) {
 			throw new NotFoundException(`Error al migrar colores, ${e} `);
 		}
-		//guardar mongo
 	}
 }

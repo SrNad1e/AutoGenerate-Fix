@@ -13,20 +13,28 @@ import { CreateColorInput } from '../dtos/create-color.input';
 export class ColorsResolver {
 	constructor(private readonly colorsService: ColorsService) {}
 
-	@Query(() => ResponseColor, { name: 'colors' })
+	@Query(() => ResponseColor, {
+		name: 'colors',
+		description: 'Lista los colores',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersColorInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersColorInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para obtener los colores',
+		})
 		_: FiltersColorInput,
 		@Context() context,
 	) {
 		return this.colorsService.findAll(context.req.body.variables.input);
 	}
 
-	@Mutation(() => Color, { name: 'createColor' })
+	@Mutation(() => Color, { name: 'createColor', description: 'Crea un color' })
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createColorInput')
+		@Args('createColorInput', { description: 'Datos para crear el color' })
 		_: CreateColorInput,
 		@Context() context,
 	) {
@@ -36,12 +44,16 @@ export class ColorsResolver {
 		);
 	}
 
-	@Mutation(() => Color, { name: 'updateColor' })
+	@Mutation(() => Color, {
+		name: 'updateColor',
+		description: 'Actualiza el color',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateSizeInput')
+		@Args('id', { description: 'Identificador del color a actualizar' })
+		id: string,
+		@Args('updateColorInput', { description: 'Datos para actualizar un color' })
 		_: UpdateColorInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.colorsService.update(

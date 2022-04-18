@@ -24,6 +24,10 @@ import { User } from 'src/users/entities/user.entity';
 import { CreateProductInput } from '../dtos/create-product.input';
 import { UpdateProductInput } from '../dtos/update-product.input';
 import { CompaniesService } from 'src/configurations/services/companies.service';
+import { Reference } from '../entities/reference.entity';
+import { Size } from '../entities/size.entity';
+import { Color } from '../entities/color.entity';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
 
 const populate = [
 	{
@@ -31,13 +35,13 @@ const populate = [
 		populate: [
 			{
 				path: 'warehouse',
-				model: 'Warehouse',
+				model: Warehouse.name,
 			},
 		],
 	},
-	{ path: 'color', model: 'Color' },
-	{ path: 'size', model: 'Size' },
-	{ path: 'reference', model: 'Reference' },
+	{ path: 'color', model: Color.name },
+	{ path: 'size', model: Size.name },
+	{ path: 'reference', model: Reference.name },
 ];
 
 const statusTypes = ['active', 'inactive'];

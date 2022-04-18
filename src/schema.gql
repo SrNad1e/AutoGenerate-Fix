@@ -46,6 +46,7 @@ type Address {
   number2: Float!
 }
 
+"""Atributo del producto"""
 type Attrib {
   """Identificador de mongo"""
   _id: String!
@@ -75,6 +76,7 @@ type AuthorizationDian {
   prefix: String!
 }
 
+"""Marca del producto"""
 type Brand {
   """Identificador de mongo"""
   _id: String!
@@ -95,6 +97,7 @@ type Brand {
   user: User!
 }
 
+"""Categoría del producto nivel 1"""
 type CategoryLevel1 {
   """Identificador de mongo"""
   _id: String!
@@ -112,6 +115,7 @@ type CategoryLevel1 {
   user: User!
 }
 
+"""Categoría del producto nivel 2"""
 type CategoryLevel2 {
   """Identificador de mongo"""
   _id: String!
@@ -132,6 +136,7 @@ type CategoryLevel2 {
   user: User!
 }
 
+"""Categoría del producto nivel 3"""
 type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
@@ -169,12 +174,16 @@ type City {
   user: User!
 }
 
+"""Color del producto"""
 type Color {
   """Identificador de mongo"""
   _id: String!
 
   """Estado del color"""
   active: Boolean!
+
+  """Fecha de creación del color"""
+  createdAt: DateTime!
 
   """Color en formato html"""
   html: String!
@@ -190,6 +199,12 @@ type Color {
 
   """Nombre interno del color"""
   name_internal: String!
+
+  """Fecha de actualización del color"""
+  updatedAt: DateTime!
+
+  """Usuario que crea el color"""
+  user: User!
 }
 
 type Company {
@@ -1179,18 +1194,48 @@ type Mutation {
     addProductsOrderInput: AddProductsOrderInput!
   ): Order!
   confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
-  createAttrib(createAttribInput: CreateAttribInput!): Attrib!
-  createBrand(createBrandInput: CreateBrandInput!): Brand!
-  createColor(createColorInput: CreateColorInput!): Color!
+
+  """Crea un atributo"""
+  createAttrib(
+    """Datos para crear un atributo"""
+    createAttribInput: CreateAttribInput!
+  ): Attrib!
+
+  """Crea una marca"""
+  createBrand(
+    """Datos para crear una marca"""
+    createBrandInput: CreateBrandInput!
+  ): Brand!
+
+  """Crea un color"""
+  createColor(
+    """Datos para crear el color"""
+    createColorInput: CreateColorInput!
+  ): Color!
 
   """Se encarga de crear el pedido"""
   createOrder(
     """Parámetros para la creación del pedido"""
     createOrderInput: CreateOrderInput!
   ): Order!
-  createProduct(createProductInput: CreateProductInput!): Product!
-  createReference(createReferenceInput: CreateReferenceInput!): Reference!
-  createSize(createSizeInput: CreateSizeInput!): Size!
+
+  """Crea un producto"""
+  createProduct(
+    """Datos para crear un producto"""
+    createProductInput: CreateProductInput!
+  ): Product!
+
+  """Crea una referencia"""
+  createReference(
+    """Datos para la creación de la referencia"""
+    createReferenceInput: CreateReferenceInput!
+  ): Reference!
+
+  """Crear una talla"""
+  createSize(
+    """Datos para crear la talla"""
+    createSizeInput: CreateSizeInput!
+  ): Size!
   createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
   createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
   createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
@@ -1209,9 +1254,33 @@ type Mutation {
     """Datos para la creación del usuario"""
     createUserInput: CreateUserInput!
   ): User!
-  updateAttrib(id: String!, updateAttribInput: UpdateAttribInput!): Attrib!
-  updateBrand(id: String!, updateBrandInput: UpdateBrandInput!): Brand!
-  updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
+
+  """Actualiza un atributo"""
+  updateAttrib(
+    """Identificador del atributo a actualizar"""
+    id: String!
+
+    """Datos a actualizar en el atributo"""
+    updateAttribInput: UpdateAttribInput!
+  ): Attrib!
+
+  """Actualiza la marca"""
+  updateBrand(
+    """Identificador de la marca a actualizar"""
+    id: String!
+
+    """Datos a actualizar en la marca"""
+    updateBrandInput: UpdateBrandInput!
+  ): Brand!
+
+  """Actualiza el color"""
+  updateColor(
+    """Identificador del color a actualizar"""
+    id: String!
+
+    """Datos para actualizar un color"""
+    updateColorInput: UpdateColorInput!
+  ): Color!
 
   """Se encarga actualizar un pedido"""
   updateOrder(
@@ -1221,9 +1290,33 @@ type Mutation {
     """Parámetros para actualizar el pedido"""
     updateOrderInput: UpdateOrderInput!
   ): Order!
-  updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
-  updateReference(id: String!, updateReferenceInput: UpdateReferenceInput!): Reference!
-  updateSize(id: String!, updateSizeInput: UpdateSizeInput!): Size!
+
+  """Se encarga actualizar un producto"""
+  updateProduct(
+    """Identificador del producto a actualizar"""
+    id: String!
+
+    """Datos a actualizar en el producto"""
+    updateProductInput: UpdateProductInput!
+  ): Product!
+
+  """Actualiza una referencia"""
+  updateReference(
+    """Identificador de la referencia para actualizar"""
+    id: String!
+
+    """Datos para actualizar la referencia"""
+    updateReferenceInput: UpdateReferenceInput!
+  ): Reference!
+
+  """Actualizar la talla"""
+  updateSize(
+    """Identificador de la talla a actualizar"""
+    id: String!
+
+    """Datos para actualizar la talla"""
+    updateSizeInput: UpdateSizeInput!
+  ): Size!
   updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
   updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
@@ -1385,6 +1478,7 @@ type PointOfSale {
   user: User!
 }
 
+"""Productos del sistema"""
 type Product {
   """Identificador de mongo"""
   _id: String!
@@ -1418,9 +1512,23 @@ type Product {
 }
 
 type Query {
-  attribs(filtersAttribsInput: FiltersAttribsInput = {}): ResponseAttribs!
-  brands(filtersBrandsInput: FiltersBrandsInput = {}): ResponseBrands!
-  colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
+  """Listado de atributos"""
+  attribs(
+    """Filtros para listar los atributos"""
+    filtersAttribsInput: FiltersAttribsInput = {}
+  ): ResponseAttribs!
+
+  """Listado de marcas"""
+  brands(
+    """Filtros para listar las marcas"""
+    filtersBrandsInput: FiltersBrandsInput = {}
+  ): ResponseBrands!
+
+  """Lista los colores"""
+  colors(
+    """Filtros para obtener los colores"""
+    filtersColorInput: FiltersColorInput = {}
+  ): ResponseColor!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
@@ -1437,11 +1545,36 @@ type Query {
     """Identificador del punto de venta"""
     idPointOfSale: String!
   ): [Order!]!
-  product(filtersProductInput: FiltersProductInput = {}): Product!
-  products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
-  referenceId(id: String!): Reference!
-  references(filtersReferencesInput: FiltersReferencesInput = {}): ResponseReferences!
-  sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
+
+  """Obtiene un producto"""
+  product(
+    """Filtros para obtener el primer producto de la busqueda"""
+    filtersProductInput: FiltersProductInput = {}
+  ): Product!
+
+  """Lista los productos"""
+  products(
+    """Filtros para consoltar los productos"""
+    filtersProductsInput: FiltersProductsInput = {}
+  ): ResponseProduct!
+
+  """Obtiene la referencia por el identificador"""
+  referenceId(
+    """Identificador de la referencia"""
+    id: String!
+  ): Reference!
+
+  """Listado de las referencias"""
+  references(
+    """Filtros para las referencias"""
+    filtersReferencesInput: FiltersReferencesInput = {}
+  ): ResponseReferences!
+
+  """Listar las tallas"""
+  sizes(
+    """Filtros para consultar las tallas"""
+    filtersSizeInput: FiltersSizeInput = {}
+  ): ResponseSize!
   stockAdjustmentId(id: String!): StockAdjustment!
   stockAdjustments(filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
   stockInputId(id: String!): StockInput!
@@ -1466,6 +1599,7 @@ type Query {
   ): ResponseWarehouses!
 }
 
+"""Referencia de los productos"""
 type Reference {
   """Identificador de mongo"""
   _id: String!
@@ -1960,6 +2094,7 @@ type Role {
   user: User!
 }
 
+"""Datos de medidas para el envío de los productos"""
 type Shipping {
   """Fecha de creación del dato de envio"""
   createdAt: DateTime!
@@ -2027,6 +2162,7 @@ type Shop {
   warehouseMain: Warehouse
 }
 
+"""Talla del producto"""
 type Size {
   """Identificador de mongo"""
   _id: String!
@@ -2034,8 +2170,17 @@ type Size {
   """Estado de la talla"""
   active: Boolean!
 
+  """Fecha de creación de la talla"""
+  createdAt: DateTime!
+
   """Identificador mysql"""
   id: Float @deprecated(reason: "Campo para migración de mysql")
+
+  """Fecha de actualización de la talla"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la talla"""
+  user: User!
 
   """Valor de la talla"""
   value: String!
@@ -2232,6 +2377,7 @@ input SortWarehouse {
   updatedAt: Float
 }
 
+"""Inventario por bodegas del producto"""
 type Stock {
   """Fecha de creación del dato de envio"""
   createdAt: DateTime!

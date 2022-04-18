@@ -13,20 +13,28 @@ import { BrandsService } from '../services/brands.service';
 export class BrandsResolver {
 	constructor(private readonly brandsService: BrandsService) {}
 
-	@Query(() => ResponseBrands, { name: 'brands' })
+	@Query(() => ResponseBrands, {
+		name: 'brands',
+		description: 'Listado de marcas',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersBrandsInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersBrandsInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para listar las marcas',
+		})
 		_: FiltersBrandsInput,
 		@Context() context,
 	) {
 		return this.brandsService.findAll(context.req.body.variables.input);
 	}
 
-	@Mutation(() => Brand, { name: 'createBrand' })
+	@Mutation(() => Brand, { name: 'createBrand', description: 'Crea una marca' })
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createBrandInput')
+		@Args('createBrandInput', { description: 'Datos para crear una marca' })
 		_: CreateBrandInput,
 		@Context() context,
 	) {
@@ -36,12 +44,16 @@ export class BrandsResolver {
 		);
 	}
 
-	@Mutation(() => Brand, { name: 'updateBrand' })
+	@Mutation(() => Brand, {
+		name: 'updateBrand',
+		description: 'Actualiza la marca',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateBrandInput')
+		@Args('id', { description: 'Identificador de la marca a actualizar' })
+		id: string,
+		@Args('updateBrandInput', { description: 'Datos a actualizar en la marca' })
 		_: UpdateBrandInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.brandsService.update(
