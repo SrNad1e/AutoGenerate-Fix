@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Global, Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
@@ -7,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { ProductMysql } from 'src/products/entities/product.entity';
-import { Shop as ShopMysql } from 'src/shops/entities/shopMysql.entity';
 import { UserMysql } from 'src/users/entities/user.entity';
 import { ColorMysql } from 'src/products/entities/color.entity';
 import { SizeMysql } from 'src/products/entities/size.entity';
@@ -16,6 +14,7 @@ import {
 	StockTransferDetailMysql,
 	StockTransferMysql,
 } from 'src/inventories/entities/stock-transfer.entity';
+import { ShopMysql } from 'src/shops/entities/shop.entity';
 
 @Global()
 @Module({

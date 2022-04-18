@@ -1,15 +1,17 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import { Types, Document } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from './warehouse.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 @Schema({ timestamps: true })
 @ObjectType()
-export class Shop extends mongoose.Document {
+export class Shop extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: mongoose.ObjectId;
+	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre de la tienda' })
 	@Prop({ type: String, required: true, unique: true })
@@ -29,7 +31,7 @@ export class Shop extends mongoose.Document {
 	@Prop({ type: String })
 	phone: string;
 
-	@Field(() => Number, { description: 'Méta asiganda a la tienda' })
+	@Field(() => Number, { description: 'Meta asiganda a la tienda' })
 	@Prop({ type: Number, default: 0 })
 	goal: number;
 
@@ -37,12 +39,23 @@ export class Shop extends mongoose.Document {
 		description: 'Bodega predeterminada para la tienda',
 	})
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
+		type: Types.ObjectId,
 		ref: Warehouse.name,
 		autopopulate: true,
 		required: true,
 	})
-	defaultWarehouse: mongoose.Schema.Types.ObjectId;
+	defaultWarehouse: Types.ObjectId;
+
+	@Field(() => Warehouse, {
+		description: 'Empresa que usa la tienda',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: Company.name,
+		autopopulate: true,
+		required: true,
+	})
+	company: Types.ObjectId;
 
 	@Field(() => Boolean, { description: 'Es centro de distribución' })
 	@Prop({ type: Boolean, default: false })
@@ -53,11 +66,11 @@ export class Shop extends mongoose.Document {
 		nullable: true,
 	})
 	@Prop({
-		type: mongoose.Schema.Types.ObjectId,
+		type: Types.ObjectId,
 		ref: Warehouse.name,
 		autopopulate: true,
 	})
-	warehouseMain: mongoose.Schema.Types.ObjectId;
+	warehouseMain: Types.ObjectId;
 
 	@Field(() => User, { description: 'Usuario que crea la tienda' })
 	@Prop({ type: Object, required: true })
@@ -71,3 +84,27 @@ export class Shop extends mongoose.Document {
 }
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);
+
+@Entity({ name: 'shops' })
+export class ShopMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
+
+	@Column({ type: 'int' })
+	owner_user_id: number;
+
+	@Column({ type: 'varchar' })
+	address: string;
+
+	@Column({ type: 'varchar' })
+	name: string;
+
+	@Column({ type: 'varchar' })
+	phone: string;
+
+	@Column({ type: 'tinyint' })
+	active: boolean;
+
+	@Column({ type: 'datetime' })
+	created_at: string;
+}

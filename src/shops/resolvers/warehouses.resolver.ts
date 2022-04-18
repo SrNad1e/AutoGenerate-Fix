@@ -2,8 +2,8 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
-import { FiltersWarehouseInput } from '../dtos/filters-warehouse.input';
-import { ResponseWarehouses } from '../dtos/response-warehouse';
+import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
+import { ResponseWarehouses } from '../dtos/response-warehouses';
 import { Warehouse } from '../entities/warehouse.entity';
 import { WarehousesService } from '../services/warehouses.service';
 
@@ -11,15 +11,24 @@ import { WarehousesService } from '../services/warehouses.service';
 export class WarehousesResolver {
 	constructor(private readonly warehousesService: WarehousesService) {}
 
-	@Query(() => ResponseWarehouses, { name: 'warehouses' })
+	@Query(() => ResponseWarehouses, {
+		name: 'warehouses',
+		description: 'Se encarga de listar las bodegas',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersWarehouseInput', nullable: true, defaultValue: {} })
-		filtersWarehouseInput: FiltersWarehouseInput,
+		@Args({
+			name: 'filtersWarehouseInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para consultar las bodegas',
+		})
+		_: FiltersWarehousesInput,
 		@Context() context,
 	) {
 		return this.warehousesService.findAll(
-			context.req.body.variables.input || {},
+			context.req.body.variables.input,
+			context.req.user,
 		);
 	}
 }

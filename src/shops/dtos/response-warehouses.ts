@@ -1,8 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+
 import { Warehouse } from '../entities/warehouse.entity';
 
-
-@ObjectType()
+@ObjectType({ description: 'Respuesta a la consulta de bodegas' })
 export class ResponseWarehouses {
 	@Field(() => [Warehouse], { description: 'Lista de salidas' })
 	docs: Warehouse[];

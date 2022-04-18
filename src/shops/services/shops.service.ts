@@ -1,16 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, Model, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
+import { CompaniesService } from 'src/configurations/services/companies.service';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { CreateShopInput } from '../dtos/create-shop.input';
+import { FiltersShopsInput } from '../dtos/filters-shops.input';
+import { UpdateShopInput } from '../dtos/update-shop.input';
 
-import {
-	CreateShopParamsDto,
-	FilterShopsDto,
-	UpdateShopParamsDto,
-} from '../dtos/shop.dto';
-import { Shop } from '../entities/shop.entity';
-import { Shop as ShopMysql } from '../entities/shopMysql.entity';
+import { Shop, ShopMysql } from '../entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 
 const populate = [
@@ -27,16 +26,21 @@ const populate = [
 @Injectable()
 export class ShopsService {
 	constructor(
-		@InjectModel(Shop.name) private readonly shopModel: Model<Shop>,
+		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
 		@InjectRepository(ShopMysql)
 		private readonly shopMysqlRepo: Repository<ShopMysql>,
 		@InjectModel(Warehouse.name)
 		private readonly warehouseModel: PaginateModel<Warehouse>,
+		private readonly companiesService: CompaniesService,
 	) {}
 
-	async getAll(params: FilterShopsDto) {
+	async getAll(params: FiltersShopsInput, user: User) {
 		const filters: FilterQuery<Shop> = {};
 		const { limit = 20, page = 1, name, status, sort } = params;
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(user.company._id);
+		}
 
 		if (name) {
 			filters['name'] = { $regex: name, $options: 'i' };
@@ -46,36 +50,86 @@ export class ShopsService {
 			filters.status = status;
 		}
 
-		const result = await this.shopModel
-			.find(filters)
-			.limit(limit)
-			.skip(page)
-			.sort(sort)
-			.exec();
-
-		return {
-			data: result,
-			total: result?.length,
+		const options: PaginateOptions = {
 			limit,
 			page,
+			sort,
+			lean: true,
+			populate,
 		};
-	}
 
-	async getByIdMysql(shopId: number) {
-		return await this.shopModel.findOne({ shopId });
+		return this.shopModel.paginate(filters, options);
 	}
 
 	async findById(shopId: string) {
-		return await this.shopModel.findById(shopId).populate(populate).lean();
+		return this.shopModel.findById(shopId).populate(populate).lean();
 	}
 
-	async create(params: CreateShopParamsDto) {
+	async create(params: CreateShopInput) {
 		const newShop = new this.shopModel(params);
 		return newShop.save();
 	}
 
-	async update(id: string, params: UpdateShopParamsDto) {
-		return this.shopModel.findByIdAndUpdate(id, params, { new: true });
+	async update(
+		id: string,
+		{
+			defaultWarehouseId,
+			companyId,
+			warehouseMainId,
+			...props
+		}: UpdateShopInput,
+	) {
+		const params: Partial<Shop> = {
+			...props,
+		};
+
+		if (defaultWarehouseId) {
+			const defaultWarehouse = await this.warehouseModel.findById(
+				defaultWarehouseId,
+			);
+
+			if (!defaultWarehouse) {
+				throw new NotFoundException('La bodega por defecto no exite');
+			}
+			params.defaultWarehouse = new Types.ObjectId(defaultWarehouseId);
+		}
+
+		if (warehouseMainId) {
+			const warehouseMain = await this.warehouseModel.findById(warehouseMainId);
+
+			if (!warehouseMain) {
+				throw new NotFoundException('La bodega principal');
+			}
+			params.warehouseMain = new Types.ObjectId(warehouseMainId);
+		}
+
+		if (companyId) {
+			const company = await this.companiesService.findById(companyId);
+
+			if (!company) {
+				throw new NotFoundException('La empresa no existe');
+			}
+			params.company = new Types.ObjectId(companyId);
+		}
+
+		return this.shopModel.findByIdAndUpdate(
+			id,
+			{ $set: params },
+			{
+				new: true,
+				lean: true,
+				populate,
+			},
+		);
+	}
+
+	/**
+	 * @description se encarga de consultar la tienda por id de mysql
+	 * @param shopId identificador de la tienda
+	 * @returns tienda
+	 */
+	async getByIdMysql(shopId: number) {
+		return this.shopModel.findOne({ shopId }).populate(populate).lean();
 	}
 
 	/**
@@ -83,11 +137,10 @@ export class ShopsService {
 	 * @returns tienda mayorista
 	 */
 	async getShopWholesale() {
-		try {
-			return this.shopModel.findOne({ isWholesale: true }).lean();
-		} catch (error) {
-			return error;
-		}
+		return this.shopModel
+			.findOne({ isWholesale: true })
+			.populate(populate)
+			.lean();
 	}
 
 	async migrate() {

@@ -1078,7 +1078,8 @@ input FiltersUsersInput {
   status: String
 }
 
-input FiltersWarehouseInput {
+"""Filtros de las bodegas"""
+input FiltersWarehousesInput {
   """Estado de la bodega"""
   active: Boolean
 
@@ -1412,7 +1413,12 @@ type Query {
     """Filtros para consultar los usuarios"""
     filtersUsersInput: FiltersUsersInput!
   ): [User!]!
-  warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): ResponseWarehouses!
+
+  """Se encarga de listar las bodegas"""
+  warehouses(
+    """Filtros para consultar las bodegas"""
+    filtersWarehouseInput: FiltersWarehousesInput = {}
+  ): ResponseWarehouses!
 }
 
 type Reference {
@@ -1849,6 +1855,7 @@ type ResponseStockTransfer {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de bodegas"""
 type ResponseWarehouses {
   """Lista de salidas"""
   docs: [Warehouse!]!
@@ -1941,13 +1948,16 @@ type Shop {
   """Dirección de la tienda"""
   address: String!
 
+  """Empresa que usa la tienda"""
+  company: Warehouse!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
   """Bodega predeterminada para la tienda"""
   defaultWarehouse: Warehouse!
 
-  """Méta asiganda a la tienda"""
+  """Meta asiganda a la tienda"""
   goal: Float!
 
   """Es centro de distribución"""
@@ -2168,10 +2178,13 @@ input SortUser {
   username: Float
 }
 
+"""Ordenamiento de la bodega"""
 input SortWarehouse {
   active: Float
+  createdAt: Float
   isMain: Float
   name: Float
+  updatedAt: Float
 }
 
 type Stock {
@@ -2660,12 +2673,16 @@ type User {
   username: String!
 }
 
+"""Modelo de la bodega"""
 type Warehouse {
   """Identificador de mongo"""
   _id: String!
 
   """Estado de la bodega"""
   active: Boolean!
+
+  """Empresa a la que pertenece la bodega"""
+  company: Company!
 
   """Fecha de creación"""
   createdAt: DateTime!

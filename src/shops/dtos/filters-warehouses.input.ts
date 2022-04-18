@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento de la bodega' })
 export class SortWarehouse {
 	@Field(() => Number, { nullable: true })
 	name?: number;
@@ -10,10 +10,16 @@ export class SortWarehouse {
 
 	@Field(() => Number, { nullable: true })
 	isMain?: number;
+
+	@Field(() => Number, { nullable: true })
+	createdAt?: number;
+
+	@Field(() => Number, { nullable: true })
+	updatedAt?: number;
 }
 
-@InputType()
-export class FiltersWarehouseInput {
+@InputType({ description: 'Filtros de las bodegas' })
+export class FiltersWarehousesInput {
 	@Field({ description: 'Comodín busqueda de la bodega', nullable: true })
 	name?: string;
 
