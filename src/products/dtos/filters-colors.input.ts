@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento para el listado de colores' })
 export class SortColor {
 	@Field({ nullable: true })
 	name?: number;
@@ -18,7 +18,7 @@ export class SortColor {
 	updatedAt?: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para la lista de colores' })
 export class FiltersColorInput {
 	@Field({ description: 'Comodín busqueda del color', nullable: true })
 	name?: string;

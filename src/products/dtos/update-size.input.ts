@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Datos para actualizar la talla' })
 export class UpdateSizeInput {
 	@Field(() => String, {
 		description: 'Valor asignado a la talla',

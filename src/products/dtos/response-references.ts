@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Reference } from '../entities/reference.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Respuesta al listado de las referencias' })
 export class ResponseReferences {
 	@Field(() => [Reference], { description: 'Lista de referencias' })
 	docs: Reference[];

@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { Color } from '../entities/color.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Respuesta al listado de los colores' })
 export class ResponseColor {
 	@Field(() => [Color], { description: 'Lista de colores' })
 	docs: Color[];

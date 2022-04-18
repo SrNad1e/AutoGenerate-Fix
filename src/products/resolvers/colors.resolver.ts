@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { ResponseColor } from '../dtos/response-color';
-import { FiltersColorInput } from '../dtos/filters-color.input';
+import { FiltersColorInput } from '../dtos/filters-colors.input';
 import { Color } from '../entities/color.entity';
 import { ColorsService } from '../services/colors.service';
 import { UpdateColorInput } from '../dtos/update-color.input';

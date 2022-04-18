@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { Attrib } from '../entities/attrib.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Respuesta al listado de los atributos' })
 export class ResponseAttribs {
 	@Field(() => [Attrib], { description: 'Lista de atributos' })
 	docs: Attrib[];

@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Datos para actualizar el atributo' })
 export class UpdateAttribInput {
 	@Field(() => String, {
 		description: 'Valor asignado al atributo',

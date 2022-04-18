@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { Size } from '../entities/size.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Respuesta al listado de las tallas' })
 export class ResponseSize {
 	@Field(() => [Size], { description: 'Lista de tallas' })
 	docs: Size[];

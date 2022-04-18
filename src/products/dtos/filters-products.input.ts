@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento para el listado de productos' })
 export class SortProduct {
 	@Field(() => Number, { nullable: true })
 	reference?: number;
@@ -24,7 +24,7 @@ export class SortProduct {
 	status?: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para la lista de productos' })
 export class FiltersProductsInput {
 	@Field(() => [String], {
 		description: 'Identificadores de mongo',

@@ -13,7 +13,7 @@ import { UsersService } from 'src/users/services/users.service';
 import {
 	FiltersProductInput,
 	FiltersProductsInput,
-} from '../dtos/filters-product.input';
+} from '../dtos/filters-products.input';
 import { Product } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';

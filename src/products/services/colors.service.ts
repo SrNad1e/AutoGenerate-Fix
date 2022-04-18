@@ -5,7 +5,7 @@ import { FilterQuery, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { ResponseColor } from '../dtos/response-color';
-import { FiltersColorInput } from '../dtos/filters-color.input';
+import { FiltersColorInput } from '../dtos/filters-colors.input';
 import { Color, ColorMysql } from '../entities/color.entity';
 import { CreateColorInput } from '../dtos/create-color.input';
 import { User } from 'src/users/entities/user.entity';

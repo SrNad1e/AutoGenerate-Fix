@@ -6,7 +6,7 @@ import { CreateProductInput } from '../dtos/create-product.input';
 import {
 	FiltersProductInput,
 	FiltersProductsInput,
-} from '../dtos/filters-product.input';
+} from '../dtos/filters-products.input';
 import { ResponseProduct } from '../dtos/response-product';
 import { UpdateProductInput } from '../dtos/update-product.input';
 import { Product } from '../entities/product.entity';

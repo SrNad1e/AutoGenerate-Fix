@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento para el listado de referencias' })
 export class SortReference {
 	@Field(() => Number, { nullable: true })
 	name?: number;
@@ -18,7 +18,7 @@ export class SortReference {
 	cost?: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para la lista de referencias' })
 export class FiltersReferencesInput {
 	@Field(() => String, {
 		description: 'Comodín para la busqueda de las referencias',

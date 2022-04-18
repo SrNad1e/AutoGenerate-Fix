@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Filtros para obtener una referencia' })
 export class FiltersReferenceInput {
 	@Field(() => String, {
 		description: 'Identificador de mongo',

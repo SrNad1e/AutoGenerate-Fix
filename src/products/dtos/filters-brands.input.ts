@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento para el listado de marcas' })
 export class SortBrand {
 	@Field({ nullable: true })
 	name?: number;
@@ -15,7 +15,7 @@ export class SortBrand {
 	updatedAt?: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para la lista de marcas' })
 export class FiltersBrandsInput {
 	@Field(() => String, { description: 'Nombre del atributo', nullable: true })
 	name?: string;

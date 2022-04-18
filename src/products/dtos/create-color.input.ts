@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Datos para crear un color' })
 export class CreateColorInput {
 	@Field(() => String, { description: 'Nombre asignado al color' })
 	name: string;
