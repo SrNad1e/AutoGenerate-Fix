@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Datos para hacer login' })
 export class LoginUserInput {
 	@Field({ description: 'Usuario registrado' })
 	username: string;
@@ -8,6 +8,6 @@ export class LoginUserInput {
 	@Field({ description: 'Contraseña de usuario' })
 	password: string;
 
-	@Field({ description: 'Identificador de la compañía del usuario' })
+	@Field({ description: 'Identificador de la compañía' })
 	companyId: string;
 }

@@ -16,7 +16,7 @@ import { Brand } from '../entities/brand.entity';
 import { CategoryLevel1 } from '../entities/category-level1.entity';
 import { CategoryLevel2 } from '../entities/category-level2.entity';
 import { CategoryLevel3 } from '../entities/category-level3.entity';
-import { Company } from '../entities/company.entity';
+import { Company } from '../../configurations/entities/company.entity';
 import { Reference } from '../entities/reference.entity';
 
 const populate = [
@@ -50,7 +50,7 @@ export class ReferencesService {
 		const filters: FilterQuery<Reference> = {};
 
 		if (brandId) {
-			filters.brand = brandId;
+			filters.brand = new Types.ObjectId(brandId);
 		}
 
 		if (cost) {

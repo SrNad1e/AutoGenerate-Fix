@@ -16,6 +16,7 @@ import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
 import { SalesModule } from './sales/sales.module';
 import { CrmModule } from './crm/crm.module';
+import { ConfigurationsModule } from './configurations/configurations.module';
 @Module({
 	imports: [
 		GraphQLModule.forRoot({
@@ -51,6 +52,7 @@ import { CrmModule } from './crm/crm.module';
 		UsersModule,
 		SalesModule,
 		CrmModule,
+		ConfigurationsModule,
 	],
 	providers: [AppGateway],
 })

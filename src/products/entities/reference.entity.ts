@@ -8,7 +8,7 @@ import { Brand } from './brand.entity';
 import { CategoryLevel1 } from './category-level1.entity';
 import { CategoryLevel2 } from './category-level2.entity';
 import { CategoryLevel3 } from './category-level3.entity';
-import { Company } from './company.entity';
+import { Company } from '../../configurations/entities/company.entity';
 
 @ObjectType()
 export class Shipping {

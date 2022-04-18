@@ -20,10 +20,10 @@ import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { ReferencesService } from './references.service';
 import { BrandsService } from './brands.service';
-import { CompaniesService } from './companies.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateProductInput } from '../dtos/create-product.input';
 import { UpdateProductInput } from '../dtos/update-product.input';
+import { CompaniesService } from 'src/configurations/services/companies.service';
 
 const populate = [
 	{
@@ -131,7 +131,7 @@ export class ProductsService {
 					return doc;
 				}
 
-				const stock = doc.stock.filter(
+				const stock = doc.stock?.filter(
 					(item) => item.warehouse._id.toString() === warehouseId,
 				);
 
@@ -145,6 +145,7 @@ export class ProductsService {
 				stock: [],
 			};
 		});
+
 		return {
 			...response,
 			docs,

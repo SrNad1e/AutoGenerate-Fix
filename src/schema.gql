@@ -395,12 +395,13 @@ input CreateStockTransferInput {
   warehouseOriginId: String!
 }
 
+"""Datos para la creación de un usuario"""
 input CreateUserInput {
   """Identificador de la empresa a la que pertenece el usuario"""
-  company: String!
+  companyId: String!
 
   """Identificador del tipo de cliente"""
-  customerType: String!
+  customerTypeId: String
 
   """Nombre del usuario"""
   name: String!
@@ -409,13 +410,13 @@ input CreateUserInput {
   password: String!
 
   """Identificador del punto de venta asignado al usuario"""
-  pointOfSale: String
+  pointOfSaleId: String
 
-  """Identificador del roll del usuario"""
+  """Identificador del rol del usuario"""
   role: String!
 
   """Identificador de la tienda asignada al usuario"""
-  shop: String!
+  shopId: String!
 
   """Usuario registrado"""
   username: String!
@@ -1051,6 +1052,32 @@ input FiltersStockTransferInput {
   warehouseOriginId: String
 }
 
+"""Filtros a aplicar para consultar los usuarios"""
+input FiltersUsersInput {
+  """Identificador del tipo de cliente"""
+  customerTypeId: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """
+  Comodín para la busqueda por nombre,nombre de usuario, documento o correo
+  """
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Identificador del rol"""
+  roleId: String
+
+  """Ordenamiento"""
+  sort: SortUser
+
+  """Estado del usuario (active, inactive, suspend)"""
+  status: String
+}
+
 input FiltersWarehouseInput {
   """Estado de la bodega"""
   active: Boolean
@@ -1109,13 +1136,18 @@ type Invoice {
   user: User!
 }
 
+"""Respuesta despues de hacer el login"""
 type LoginResponse {
+  """Token para la conexión"""
   access_token: String!
+
+  """Usuario almacenado en la base de datos"""
   user: User!
 }
 
+"""Datos para hacer login"""
 input LoginUserInput {
-  """Identificador de la compañía del usuario"""
+  """Identificador de la compañía"""
   companyId: String!
 
   """Contraseña de usuario"""
@@ -1142,8 +1174,18 @@ type Mutation {
   createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
   createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
   generateStockRequest(shopId: String!): StockRequest!
-  login(loginUserInput: LoginUserInput!): LoginResponse!
-  signup(createUserInput: CreateUserInput!): User!
+
+  """Se encarga de realizar el ingreso al sistema por el usuario"""
+  login(
+    """Datos de usuario para realizar el login"""
+    loginUserInput: LoginUserInput!
+  ): LoginResponse!
+
+  """Se encarga de crear el usuario desde aplicaciones externas"""
+  signup(
+    """Datos para la creación del usuario"""
+    createUserInput: CreateUserInput!
+  ): User!
   updateAttrib(id: String!, updateAttribInput: UpdateAttribInput!): Attrib!
   updateBrand(id: String!, updateBrandInput: UpdateBrandInput!): Brand!
   updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
@@ -1156,7 +1198,13 @@ type Mutation {
   updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
   updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
   updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
-  updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
+  updateUser(
+    """Identificador del usuario que se desea actualizar"""
+    id: String!
+
+    """Datos a actualiazar en el usuario"""
+    updateUserInput: UpdateUserInput!
+  ): User!
 }
 
 type Order {
@@ -1253,6 +1301,7 @@ input PaymentsOrderInput {
   total: Float!
 }
 
+"""Permisos a los que tiene el usuario"""
 type Permission {
   """Identificador de mongo"""
   _id: String!
@@ -1332,6 +1381,8 @@ type Query {
   attribs(filtersAttribsInput: FiltersAttribsInput = {}): ResponseAttribs!
   brands(filtersBrandsInput: FiltersBrandsInput = {}): ResponseBrands!
   colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
+
+  """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
   customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
   orderId(id: String!): [Order!]!
@@ -1351,8 +1402,12 @@ type Query {
   stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
   stockTransferId(id: String!): StockTransfer!
   stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
-  user(username: String!): User!
-  users: [User!]!
+
+  """Consulta todos los usuarios con base a los filtros"""
+  users(
+    """Filtros para consultar los usuarios"""
+    filtersUsersInput: FiltersUsersInput!
+  ): [User!]!
   warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): ResponseWarehouses!
 }
 
@@ -1822,9 +1877,13 @@ type ResponseWarehouses {
   totalPages: Float!
 }
 
+"""Rol del usuario """
 type Role {
   """Identificador de mongo"""
   _id: String!
+
+  """Se encuentra activo el rol"""
+  active: Boolean!
 
   """Permite hacer consultas con otra bodega"""
   changeWarehouse: Boolean!
@@ -2094,6 +2153,15 @@ input SortStockTransfer {
 
   """Ordenamiento por bodega de origen"""
   warehouseOrigin: Float
+}
+
+"""Ordenamiento de los usuarios"""
+input SortUser {
+  createdAt: Float
+  name: Float
+  status: Float
+  updatedAt: Float
+  username: Float
 }
 
 input SortWarehouse {
@@ -2516,12 +2584,13 @@ input UpdateStockTransferInput {
   status: String
 }
 
+"""Datos para actualizar el usuario"""
 input UpdateUserInput {
   """Identificador de la empresa a la que pertenece el usuario"""
-  company: String
+  companyId: String
 
   """Identificador del tipo de cliente"""
-  customerType: String
+  customerTypeId: String
 
   """Nombre del usuario"""
   name: String
@@ -2530,18 +2599,22 @@ input UpdateUserInput {
   password: String
 
   """Identificador del punto de venta asignado al usuario"""
-  pointOfSale: String
+  pointOfSaleId: String
 
-  """Identificador del roll del usuario"""
+  """Identificador del rol del usuario"""
   role: String
 
   """Identificador de la tienda asignada al usuario"""
-  shop: String
+  shopId: String
+
+  """Estado del usuario"""
+  status: String
 
   """Usuario registrado"""
   username: String
 }
 
+"""Usuario que manipula los datos de la aplicación"""
 type User {
   """Identificador de mongo"""
   _id: String!
@@ -2553,7 +2626,7 @@ type User {
   createdAt: DateTime!
 
   """Tipo de cliente"""
-  customerType: CustomerType!
+  customerType: CustomerType
 
   """Nombre de para mostrar del usuario"""
   name: String!
@@ -2569,6 +2642,9 @@ type User {
 
   """Tienda a la que se encuentra asiganado el usuario"""
   shop: Shop!
+
+  """Estado del usuario (active, inactive, suspend)"""
+  status: String!
 
   """Nombre de usuario"""
   updatedAt: DateTime!

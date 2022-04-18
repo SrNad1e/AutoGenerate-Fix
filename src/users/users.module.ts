@@ -18,13 +18,14 @@ import { AuthResolver } from './resolvers/auth.resolver';
 import { LocalStrategy } from './libs/local.strategy';
 import config from 'src/config';
 import { JwtStrategy } from './libs/jwt.strategy';
-import { ShopsModule } from 'src/shops/shops.module';
 import { Shop, ShopSchema } from 'src/shops/entities/shop.entity';
 import { UsersController } from './controllers/users.controller';
+import { ConfigurationsModule } from 'src/configurations/configurations.module';
 
 @Module({
 	imports: [
 		PassportModule,
+		ConfigurationsModule,
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;

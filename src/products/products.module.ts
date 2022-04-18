@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,9 +18,7 @@ import { ShopsModule } from 'src/shops/shops.module';
 import { Reference, ReferenceSchema } from './entities/reference.entity';
 import { ReferencesService } from './services/references.service';
 import { Brand, BrandSchema } from './entities/brand.entity';
-import { Company, CompanySchema } from './entities/company.entity';
 import { BrandsService } from './services/brands.service';
-import { CompaniesService } from './services/companies.service';
 import { Attrib, AttribSchema } from './entities/attrib.entity';
 import {
 	CategoryLevel1,
@@ -39,6 +36,7 @@ import { ReferencesResolver } from './resolvers/references.resolver';
 import { AttribsService } from './services/attribs.service';
 import { AttribsResolver } from './resolvers/attribs.resolver';
 import { BrandsResolver } from './resolvers/brands.resolver';
+import { ConfigurationsModule } from 'src/configurations/configurations.module';
 
 @Module({
 	imports: [
@@ -46,7 +44,6 @@ import { BrandsResolver } from './resolvers/brands.resolver';
 			{ name: Color.name, schema: ColorSchema },
 			{ name: Size.name, schema: SizeSchema },
 			{ name: Brand.name, schema: BrandSchema },
-			{ name: Company.name, schema: CompanySchema },
 			{ name: Product.name, schema: ProductSchema },
 			{ name: Attrib.name, schema: AttribSchema },
 			{ name: CategoryLevel1.name, schema: CategoryLevel1Schema },
@@ -66,6 +63,7 @@ import { BrandsResolver } from './resolvers/brands.resolver';
 		TypeOrmModule.forFeature([ProductMysql, SizeMysql, ColorMysql]),
 		UsersModule,
 		ShopsModule,
+		ConfigurationsModule,
 	],
 	providers: [
 		ProductsService,
@@ -76,7 +74,6 @@ import { BrandsResolver } from './resolvers/brands.resolver';
 		ProductsResolver,
 		ReferencesService,
 		BrandsService,
-		CompaniesService,
 		ReferencesResolver,
 		AttribsService,
 		AttribsResolver,

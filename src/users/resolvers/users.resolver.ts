@@ -5,34 +5,51 @@ import { UsersService } from '../services/users.service';
 import { User } from '../entities/user.entity';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { FiltersUsersInput } from '../dtos/filters-users.input';
 
 @Resolver(() => User)
 export class UsersResolver {
 	constructor(private readonly usersService: UsersService) {}
 
-	@Query(() => [User], { name: 'users' })
+	@Query(() => [User], {
+		name: 'users',
+		description: 'Consulta todos los usuarios con base a los filtros',
+	})
 	@UseGuards(JwtAuthGuard)
-	findAll() {
-		return this.usersService.findAll();
+	findAll(
+		@Args('filtersUsersInput', {
+			description: 'Filtros para consultar los usuarios',
+		})
+		_: FiltersUsersInput,
+		@Context() context,
+	) {
+		return this.usersService.findAll(
+			context.req.body.variables.input,
+			context.req.user,
+		);
 	}
 
-	@Query(() => User, { name: 'currentUser' })
+	@Query(() => User, {
+		name: 'currentUser',
+		description:
+			'Se encarga de obtener el usuario dependiendo del token enviado',
+	})
 	@UseGuards(JwtAuthGuard)
 	getCurrent(@Context() context) {
 		return context.req.user;
 	}
 
-	@Query(() => User, { name: 'user' })
-	@UseGuards(JwtAuthGuard)
-	findOne(@Args('username', { type: () => String }) username: string) {
-		return this.usersService.findOne(username);
-	}
-
 	@Mutation(() => User)
 	@UseGuards(JwtAuthGuard)
 	updateUser(
-		@Args('updateUserInput') updateUserInput: UpdateUserInput,
-		@Args('id') id: string,
+		@Args('updateUserInput', {
+			description: 'Datos a actualiazar en el usuario',
+		})
+		updateUserInput: UpdateUserInput,
+		@Args('id', {
+			description: 'Identificador del usuario que se desea actualizar',
+		})
+		id: string,
 		@Context() context,
 	) {
 		return this.usersService.update(id, updateUserInput, context.req.user);

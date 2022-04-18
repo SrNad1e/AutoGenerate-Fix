@@ -5,7 +5,7 @@ import { Document, Types } from 'mongoose';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { Company } from 'src/products/entities/company.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 @ObjectType()
 export class DetailInput {
