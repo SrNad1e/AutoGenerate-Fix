@@ -1,9 +1,13 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
+import { CompaniesService } from 'src/configurations/services/companies.service';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
 import { User } from '../entities/user.entity';
@@ -12,16 +16,22 @@ import { UsersService } from './users.service';
 @Injectable()
 export class AuthService {
 	constructor(
-		private usersService: UsersService,
-		private jwtService: JwtService,
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService,
+		private readonly companiesService: CompaniesService,
 	) {}
 
 	async login(
 		user: User,
 		{ companyId }: LoginUserInput,
 	): Promise<LoginResponse> {
-		if (user.username !== 'admin' && user.company._id.toString() !== companyId) {
-			throw new UnauthorizedException(`El usuario no tiene acceso a la compañia`)
+		if (
+			user.username !== 'admin' &&
+			user.company._id.toString() !== companyId
+		) {
+			throw new UnauthorizedException(
+				`El usuario no tiene acceso a la compañia`,
+			);
 		}
 		return {
 			access_token: this.jwtService.sign({
@@ -35,8 +45,16 @@ export class AuthService {
 
 	async signup(userCreate: Partial<User>): Promise<User> {
 		const user = await this.usersService.findOne(userCreate?.username);
+		const company = await this.companiesService.findById(userCreate.id);
+
+		if (!company) {
+			throw new NotFoundException('La empresa no existe');
+		}
+
 		if (user) {
-			throw new Error(`El usuario ${userCreate.username} ya existe`);
+			throw new NotFoundException(
+				`El usuario ${userCreate.username} ya existe`,
+			);
 		}
 		return this.usersService.create(userCreate);
 	}
@@ -56,9 +74,9 @@ export class AuthService {
 			throw new UnauthorizedException(`Usuario no existe`);
 		}
 
-		/*if (!bcrypt.compareSync(passwordOld, user.password)) {
+		if (!bcrypt.compareSync(passwordOld, user.password)) {
 			throw new UnauthorizedException(`Usuario o contraseña incorrectos`);
-		}*/
+		}
 
 		const { password, ...userSent } = user;
 		return userSent;

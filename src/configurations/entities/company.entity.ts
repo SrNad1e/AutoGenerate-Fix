@@ -23,7 +23,6 @@ export class Company extends Document {
 		description: 'Si pertenece al régimen simplificado',
 	})
 	regimenSimplify: boolean;
-	
 
 	@Prop({ type: String, required: true })
 	@Field(() => String, { description: 'Dirección de la compañía' })

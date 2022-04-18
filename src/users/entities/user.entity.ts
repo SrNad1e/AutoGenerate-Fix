@@ -7,10 +7,10 @@ import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { CustomerType } from 'src/crm/entities/customerType.entity';
-import { Company } from 'src/products/entities/company.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Usuario que manipula los datos de la aplicación' })
 export class User extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
@@ -29,12 +29,6 @@ export class User extends Document {
 	@Prop({ type: String, required: true })
 	password: string;
 
-	@Field(() => CustomerType, {
-		description: 'Tipo de cliente',
-	})
-	@Prop({ type: Types.ObjectId, ref: 'CustomerType', required: true })
-	customerType: Types.ObjectId;
-
 	@Field(() => Role, {
 		description: 'Rol que ocupa el usuario',
 	})
@@ -45,6 +39,13 @@ export class User extends Document {
 		required: true,
 	})
 	role: Types.ObjectId;
+
+	@Field(() => CustomerType, {
+		description: 'Tipo de cliente',
+		nullable: true,
+	})
+	@Prop({ type: Types.ObjectId, ref: 'CustomerType' })
+	customerType: Types.ObjectId;
 
 	@Field(() => Shop, {
 		description: 'Tienda a la que se encuentra asiganado el usuario',
@@ -78,6 +79,12 @@ export class User extends Document {
 		description: 'Empresa a la que pertenece el usuario',
 	})
 	company: Types.ObjectId;
+
+	@Prop({ type: String })
+	@Field(() => String, {
+		description: 'Estado del usuario (active, inactive, suspend)',
+	})
+	status: string;
 
 	@Field(() => User, {
 		description: 'Usuario que creó el usuario',

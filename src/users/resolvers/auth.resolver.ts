@@ -13,10 +13,15 @@ import { AuthService } from '../services/auth.service';
 export class AuthResolver {
 	constructor(private authService: AuthService) {}
 
-	@Mutation(() => LoginResponse)
+	@Mutation(() => LoginResponse, {
+		description: 'Se encarga de realizar el ingreso al sistema por el usuario',
+	})
 	@UseGuards(GqlAuthGuard)
 	async login(
-		@Args('loginUserInput') _: LoginUserInput,
+		@Args('loginUserInput', {
+			description: 'Datos de usuario para realizar el login',
+		})
+		_: LoginUserInput,
 		@Context() context,
 	): Promise<LoginResponse> {
 		return this.authService.login(
@@ -25,10 +30,15 @@ export class AuthResolver {
 		);
 	}
 
-	@Mutation(() => User)
+	@Mutation(() => User, {
+		description: 'Se encarga de crear el usuario desde aplicaciones externas',
+	})
 	@UseGuards(JwtAuthGuard)
 	async signup(
-		@Args('createUserInput') _: CreateUserInput,
+		@Args('createUserInput', {
+			description: 'Datos para la creación del usuario',
+		})
+		_: CreateUserInput,
 		@Context() context,
 	): Promise<User> {
 		return this.authService.signup({

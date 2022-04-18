@@ -6,7 +6,7 @@ import { Permission } from './permission.entity';
 import { User } from './user.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Rol del usuario ' })
 export class Role {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
@@ -24,6 +24,10 @@ export class Role {
 	@Field({ description: 'Permite hacer consultas con otra bodega' })
 	@Prop({ type: Boolean, default: false })
 	changeWarehouse: boolean;
+
+	@Field(() => Boolean, { description: 'Se encuentra activo el rol' })
+	@Prop({ type: Boolean })
+	active: boolean;
 
 	@Field(() => User, { description: 'Usuario que creó o modificó el rol' })
 	@Prop({ type: Object, required: true })

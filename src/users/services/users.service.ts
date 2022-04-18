@@ -3,31 +3,39 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Model } from 'mongoose';
-import { Shop } from 'src/shops/entities/shop.entity';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
+import { Company } from 'src/configurations/entities/company.entity';
+import { CustomerType } from 'src/crm/entities/customerType.entity';
+import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
+import { Shop } from 'src/shops/entities/shop.entity';
+import { FiltersUsersInput } from '../dtos/filters-users.input';
 import { UpdateUserInput } from '../dtos/update-user.input';
+import { Role } from '../entities/role.entity';
 import { User, UserMysql } from '../entities/user.entity';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
+import { Permission } from '../entities/permission.entity';
 
 const populate = [
-	'role',
-	'shop',
-	'pointOfSale',
-	'customerType',
-	'company',
+	{ path: 'role', model: Role.name },
+	{ path: 'shop', model: Shop.name },
+	{ path: 'pointOfSale', model: PointOfSale.name },
+	{ path: 'customerType', model: CustomerType.name },
+	{ path: 'company', model: Company.name },
 	{
 		path: 'shop',
 		populate: {
 			path: 'defaultWarehouse',
-			model: 'Warehouse',
+			model: Warehouse.name,
 		},
 	},
 	{
 		path: 'pointOfSale',
 		populate: {
 			path: 'authorization',
-			model: 'AuthorizationDian',
+			model: AuthorizationDian.name,
 		},
 	},
 
@@ -35,7 +43,7 @@ const populate = [
 		path: 'role',
 		populate: {
 			path: 'permissions',
-			model: 'Permission',
+			model: Permission.name,
 		},
 	},
 ];
@@ -43,18 +51,54 @@ const populate = [
 @Injectable()
 export class UsersService {
 	constructor(
-		@InjectModel(User.name) private readonly userModel: Model<User>,
+		@InjectModel(User.name) private readonly userModel: PaginateModel<User>,
 		@InjectRepository(UserMysql)
 		private readonly userRepo: Repository<UserMysql>,
-		@InjectModel(Shop.name) private readonly shopModel: Model<Shop>,
+		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
 	) {}
 
-	async getByIdMysql(id: number) {
-		return this.userModel.findOne({ id }).populate(populate).lean();
-	}
+	async findAll(
+		{
+			customerTypeId,
+			name,
+			roleId,
+			status,
+			limit = 10,
+			page = 1,
+			sort,
+		}: FiltersUsersInput,
+		user: User,
+	) {
+		const filters: FilterQuery<User> = {};
 
-	async findAll(): Promise<Partial<User[]>> {
-		return await this.userModel.find().populate(populate).lean();
+		if (customerTypeId) {
+			filters.customer = new Types.ObjectId(customerTypeId);
+		}
+
+		if (name) {
+		}
+
+		if (roleId) {
+			filters.role = new Types.ObjectId(roleId);
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+
+		if (user?.company['_id']) {
+			filters.company = new Types.ObjectId(user?.company['_id']);
+		}
+
+		const options: PaginateOptions = {
+			limit,
+			page,
+			sort,
+			lean: true,
+			populate,
+		};
+
+		return this.userModel.paginate(filters, options);
 	}
 
 	async findOne(username: string): Promise<User> {
@@ -114,6 +158,15 @@ export class UsersService {
 			)
 			.populate(populate)
 			.lean();
+	}
+
+	/**
+	 * @description se usa para la migración
+	 * @param id identificador mysql del usuario
+	 * @returns usuario mysql
+	 */
+	async getByIdMysql(id: number) {
+		return this.userModel.findOne({ id }).populate(populate).lean();
 	}
 
 	async migration() {

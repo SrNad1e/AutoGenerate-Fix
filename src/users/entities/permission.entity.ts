@@ -2,8 +2,8 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongoose';
 
-@ObjectType()
 @Schema()
+@ObjectType({ description: 'Permisos a los que tiene el usuario' })
 export class Permission {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: ObjectId;
