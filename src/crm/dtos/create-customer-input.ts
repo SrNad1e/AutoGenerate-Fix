@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Address } from '../entities/customer.entity';
 
-@InputType()
+@InputType({ description: 'Datos para crear un cliente' })
 export class CreateCustomerInput {
 	@Field(() => String, { description: 'Identificación del tipo de documento' })
 	documentTypeId: string;

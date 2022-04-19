@@ -1,9 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+
 import { User } from 'src/users/entities/user.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Ciudad de la dirección' })
 export class City extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

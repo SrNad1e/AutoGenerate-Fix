@@ -5,7 +5,7 @@ import { Document, Types } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Tipos de clientes' })
 export class CustomerType extends Document {
 	@Field(() => String, { description: 'Identificación de mongo' })
 	_id: Types.ObjectId;

@@ -12,6 +12,6 @@ export class DocumentTypesService {
 	) {}
 
 	async findById(id: string) {
-		return this.documentTypeModel.findById(id);
+		return this.documentTypeModel.findById(id).lean();
 	}
 }

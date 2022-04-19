@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+
 import { Customer } from '../entities/customer.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Respuesta del listado de clientes' })
 export class ResponseCustomer {
 	@Field(() => [Customer], { description: 'Lista de clientes' })
 	docs: Customer[];

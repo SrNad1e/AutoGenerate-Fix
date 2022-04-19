@@ -20,6 +20,7 @@ input AddProductsOrderInput {
   orderId: String!
 }
 
+"""Dirección del cliente"""
 type Address {
   """Ciudad a la que pertenece"""
   city: City!
@@ -157,6 +158,7 @@ type CategoryLevel3 {
   user: User!
 }
 
+"""Ciudad de la dirección"""
 type City {
   """Identificador de mongo"""
   _id: String!
@@ -207,6 +209,7 @@ type Color {
   user: User!
 }
 
+"""Empresa"""
 type Company {
   """Identificador de mongo"""
   _id: String!
@@ -452,6 +455,7 @@ input CreateUserInput {
   username: String!
 }
 
+"""Cliente"""
 type Customer {
   """Identificador de mongo"""
   _id: String!
@@ -505,6 +509,7 @@ type Customer {
   user: User!
 }
 
+"""Tipos de clientes"""
 type CustomerType {
   """Identificación de mongo"""
   _id: String!
@@ -760,6 +765,7 @@ type DetailTransfer {
   updatedAt: DateTime!
 }
 
+"""Tipo de documento de identificación"""
 type DocumentType {
   """Identificador de mongo"""
   _id: String!
@@ -834,6 +840,7 @@ input FiltersColorInput {
   sort: SortColor
 }
 
+"""Filtros de listado de clientes"""
 input FiltersCustomerInput {
   """Si el cliente se encuentra activo"""
   active: Boolean
@@ -1637,7 +1644,12 @@ type Query {
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
-  customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
+
+  """Listado de clientes"""
+  customers(
+    """Filtros para consultar el listado de clientes"""
+    filtersCustomerInput: FiltersCustomerInput = {}
+  ): ResponseCustomer!
 
   """Obtiene la orden por el id"""
   orderId(
@@ -1904,6 +1916,7 @@ type ResponseColor {
   totalPages: Float!
 }
 
+"""Respuesta del listado de clientes"""
 type ResponseCustomer {
   """Lista de clientes"""
   docs: [Customer!]!
@@ -2377,6 +2390,7 @@ input SortColor {
   updatedAt: Float
 }
 
+"""Ordenamiento del cliente"""
 input SortCustomer {
   """ordernamiento por docuemnto"""
   active: Float!
