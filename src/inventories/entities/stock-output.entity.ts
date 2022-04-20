@@ -1,14 +1,13 @@
-/* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Company } from 'src/configurations/entities/company.entity';
 
+import { Company } from 'src/configurations/entities/company.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Detalle de la salida de productos' })
 export class DetailOutput {
 	@Field(() => Product, { description: 'Producto de la salida' })
 	product: Product;
@@ -28,7 +27,7 @@ export class DetailOutput {
 }
 
 @Schema({ timestamps: true, collection: 'stockoutput' })
-@ObjectType()
+@ObjectType({ description: 'Salida de productos' })
 export class StockOutput extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

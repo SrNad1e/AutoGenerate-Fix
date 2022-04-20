@@ -7,7 +7,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { Color } from 'src/products/entities/color.entity';
+import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
+import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
@@ -23,18 +26,18 @@ const populate = {
 		populate: [
 			{
 				path: 'size',
-				model: 'Size',
+				model: Size.name,
 			},
 			{
 				path: 'color',
-				model: 'Color',
+				model: Color.name,
 			},
 			{
 				path: 'stock',
 				populate: [
 					{
 						path: 'warehouse',
-						model: 'Warehouse',
+						model: Warehouse.name,
 					},
 				],
 			},

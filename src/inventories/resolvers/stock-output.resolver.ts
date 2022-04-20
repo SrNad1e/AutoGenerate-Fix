@@ -13,13 +13,17 @@ import { StockOutputService } from '../services/stock-output.service';
 export class StockOutputResolver {
 	constructor(private readonly stockOutputService: StockOutputService) {}
 
-	@Query(() => ResponseStockOutput, { name: 'stockOutputs' })
+	@Query(() => ResponseStockOutput, {
+		name: 'stockOutputs',
+		description: 'Listado de salidas de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersStockOutputInput',
 			nullable: true,
 			defaultValue: {},
+			description: 'Filtros del listado de salidas de productos',
 		})
 		_: FiltersStockOutputInput,
 		@Context() context,
@@ -30,16 +34,28 @@ export class StockOutputResolver {
 		);
 	}
 
-	@Query(() => StockOutput, { name: 'stockOutputId' })
+	@Query(() => StockOutput, {
+		name: 'stockOutputId',
+		description: 'Obtiene una salida de productos con base al identificador',
+	})
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string, @Context() context) {
+	findById(
+		@Args('id', { description: 'Identificador de la salida de productos' })
+		id: string,
+		@Context() context,
+	) {
 		return this.stockOutputService.findById(id, context.req.user);
 	}
 
-	@Mutation(() => StockOutput, { name: 'createStockOutput' })
+	@Mutation(() => StockOutput, {
+		name: 'createStockOutput',
+		description: 'Crea una salida de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createStockOutputInput')
+		@Args('createStockOutputInput', {
+			description: 'Datos para crear una salida de productos',
+		})
 		_: CreateStockOutputInput,
 		@Context() context,
 	) {
@@ -49,12 +65,20 @@ export class StockOutputResolver {
 		);
 	}
 
-	@Mutation(() => StockOutput, { name: 'updateStockOutput' })
+	@Mutation(() => StockOutput, {
+		name: 'updateStockOutput',
+		description: 'Actualiza una salida de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateStockOutputInput')
+		@Args('id', {
+			description: 'Identificador de la salida de productos a actualizar',
+		})
+		id: string,
+		@Args('updateStockOutputInput', {
+			description: 'Datos para actualizar salida de productos',
+		})
 		_: UpdateStockOutputInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.stockOutputService.update(

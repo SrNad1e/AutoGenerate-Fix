@@ -5,7 +5,7 @@ import { Types } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Tipo de documento de identificación' })
 export class DocumentType {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
@@ -31,4 +31,3 @@ export class DocumentType {
 	updatedAt: Date;
 }
 export const DocumentTypeSchema = SchemaFactory.createForClass(DocumentType);
-

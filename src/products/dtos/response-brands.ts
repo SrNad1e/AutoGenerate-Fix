@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { Brand } from '../entities/brand.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Respuesta al listado de las marcas' })
 export class ResponseBrands {
 	@Field(() => [Brand], { description: 'Lista de marcas' })
 	docs: Brand[];

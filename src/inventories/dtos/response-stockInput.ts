@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { StockInput } from '../entities/stock-input.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Lista de entradas de productos' })
 export class ResponseStockInput {
 	@Field(() => [StockInput], { description: 'Lista de entradas' })
 	docs: StockInput[];

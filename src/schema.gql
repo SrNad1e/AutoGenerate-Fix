@@ -2,6 +2,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Datos para agregar medios de pago al pedido"""
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
   orderId: String!
@@ -10,6 +11,7 @@ input AddPaymentsOrderInput {
   payments: [PaymentsOrderInput!]!
 }
 
+"""Datos para agregar productos al pedido"""
 input AddProductsOrderInput {
   """Productos a crear o actualizar"""
   details: [DetailAddProductsOrderInput!]!
@@ -18,6 +20,7 @@ input AddProductsOrderInput {
   orderId: String!
 }
 
+"""Dirección del cliente"""
 type Address {
   """Ciudad a la que pertenece"""
   city: City!
@@ -44,6 +47,7 @@ type Address {
   number2: Float!
 }
 
+"""Atributo del producto"""
 type Attrib {
   """Identificador de mongo"""
   _id: String!
@@ -64,6 +68,7 @@ type Attrib {
   user: User!
 }
 
+"""Autorizacion DIAN de la tienda"""
 type AuthorizationDian {
   """Identificador de mongo"""
   _id: String!
@@ -72,6 +77,7 @@ type AuthorizationDian {
   prefix: String!
 }
 
+"""Marca del producto"""
 type Brand {
   """Identificador de mongo"""
   _id: String!
@@ -92,6 +98,7 @@ type Brand {
   user: User!
 }
 
+"""Categoría del producto nivel 1"""
 type CategoryLevel1 {
   """Identificador de mongo"""
   _id: String!
@@ -109,6 +116,7 @@ type CategoryLevel1 {
   user: User!
 }
 
+"""Categoría del producto nivel 2"""
 type CategoryLevel2 {
   """Identificador de mongo"""
   _id: String!
@@ -129,6 +137,7 @@ type CategoryLevel2 {
   user: User!
 }
 
+"""Categoría del producto nivel 3"""
 type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
@@ -149,6 +158,7 @@ type CategoryLevel3 {
   user: User!
 }
 
+"""Ciudad de la dirección"""
 type City {
   """Identificador de mongo"""
   _id: String!
@@ -166,12 +176,16 @@ type City {
   user: User!
 }
 
+"""Color del producto"""
 type Color {
   """Identificador de mongo"""
   _id: String!
 
   """Estado del color"""
   active: Boolean!
+
+  """Fecha de creación del color"""
+  createdAt: DateTime!
 
   """Color en formato html"""
   html: String!
@@ -187,8 +201,15 @@ type Color {
 
   """Nombre interno del color"""
   name_internal: String!
+
+  """Fecha de actualización del color"""
+  updatedAt: DateTime!
+
+  """Usuario que crea el color"""
+  user: User!
 }
 
+"""Empresa"""
 type Company {
   """Identificador de mongo"""
   _id: String!
@@ -224,16 +245,19 @@ type Company {
   user: User!
 }
 
+"""Datos para crear un atributo"""
 input CreateAttribInput {
   """Nombre del atributo"""
   name: String!
 }
 
+"""Datos para crear una marca"""
 input CreateBrandInput {
   """Nombre de la marca"""
   name: String!
 }
 
+"""Datos para crear un color"""
 input CreateColorInput {
   """Url asignado al color"""
   html: String!
@@ -248,11 +272,13 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
   status: String!
 }
 
+"""Datos para crear un producto"""
 input CreateProductInput {
   """Identificador del color"""
   colorId: String!
@@ -264,6 +290,7 @@ input CreateProductInput {
   sizeId: String!
 }
 
+"""Datos para crear una referencia"""
 input CreateReferenceInput {
   """Marca de la referencia"""
   brandId: String!
@@ -311,11 +338,13 @@ input CreateReferenceInput {
   width: Float!
 }
 
+"""Datos para crear una talla"""
 input CreateSizeInput {
   """Valor asignado a la talla"""
   name: String!
 }
 
+"""Datos para crear el ajuste de productos"""
 input CreateStockAdjustmentInput {
   """Productos del ajuste"""
   details: [DetailStockAdjustmentCreateInput!]!
@@ -330,6 +359,7 @@ input CreateStockAdjustmentInput {
   warehouseId: String!
 }
 
+"""Datos para crear la entrada de productos"""
 input CreateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputCreateInput!]!
@@ -344,6 +374,7 @@ input CreateStockInputInput {
   warehouseId: String!
 }
 
+"""Datos para crear la salida de productos"""
 input CreateStockOutputInput {
   """Productos de la salida"""
   details: [DetailStockOutputCreateInput!]!
@@ -358,6 +389,7 @@ input CreateStockOutputInput {
   warehouseId: String!
 }
 
+"""Datos para crear la solicitud de productos"""
 input CreateStockRequestInput {
   """Productos de la solicitud"""
   details: [DetailStockRequestCreateInput!]!
@@ -375,6 +407,7 @@ input CreateStockRequestInput {
   warehouseOriginId: String!
 }
 
+"""Productos para marcar agregados para el historial"""
 input CreateStockTransferInput {
   """Productos del traslado"""
   details: [DetailStockTransferCreateInput!]!
@@ -422,6 +455,7 @@ input CreateUserInput {
   username: String!
 }
 
+"""Cliente"""
 type Customer {
   """Identificador de mongo"""
   _id: String!
@@ -475,6 +509,7 @@ type Customer {
   user: User!
 }
 
+"""Tipos de clientes"""
 type CustomerType {
   """Identificación de mongo"""
   _id: String!
@@ -500,6 +535,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Producto que se va a agregar"""
 input DetailAddProductsOrderInput {
   """Acción a realizar con el producto (create, update, delete)"""
   action: String!
@@ -511,6 +547,7 @@ input DetailAddProductsOrderInput {
   quantity: Float!
 }
 
+"""Detalle de ajuste de productos"""
 type DetailAdjustment {
   """Fecha de agregado del deltalle al ajuste"""
   createdAt: DateTime!
@@ -525,6 +562,7 @@ type DetailAdjustment {
   updatedAt: DateTime!
 }
 
+"""Detalle de la salida de productos"""
 type DetailInput {
   """Fecha de agregado del deltalle a la entrada"""
   createdAt: DateTime!
@@ -539,14 +577,16 @@ type DetailInput {
   updatedAt: DateTime!
 }
 
+"""Productos de la factura"""
 type DetailInvoice {
-  """Producto agregado al pedido"""
+  """Producto agregado a la factura"""
   product: Product!
 
-  """Cantidad de productos en el pedido"""
+  """Cantidad de productos en la factura"""
   quantity: Float!
 }
 
+"""Productos del pedido"""
 type DetailOrder {
   """Fecha de agregado del producto al pedido"""
   createdAt: DateTime!
@@ -570,6 +610,7 @@ type DetailOrder {
   updatedAt: DateTime!
 }
 
+"""Detalle de la salida de productos"""
 type DetailOutput {
   """Fecha de agregado del deltalle a la salida"""
   createdAt: DateTime!
@@ -598,6 +639,7 @@ type DetailRequest {
   updatedAt: DateTime!
 }
 
+"""Productos del ajuste de productos"""
 input DetailStockAdjustmentCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -606,6 +648,7 @@ input DetailStockAdjustmentCreateInput {
   quantity: Float!
 }
 
+"""Detalle del ajuste de productos"""
 input DetailStockAdjustmentInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -617,6 +660,7 @@ input DetailStockAdjustmentInput {
   quantity: Float!
 }
 
+"""Productos de la entrada de productos"""
 input DetailStockInputCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -625,6 +669,7 @@ input DetailStockInputCreateInput {
   quantity: Float!
 }
 
+"""Detalle de la entrada de productos"""
 input DetailStockInputInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -636,6 +681,7 @@ input DetailStockInputInput {
   quantity: Float!
 }
 
+"""Productos de la salida de productos"""
 input DetailStockOutputCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -644,6 +690,7 @@ input DetailStockOutputCreateInput {
   quantity: Float!
 }
 
+"""Detalle de la salida de productos"""
 input DetailStockOutputInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -655,6 +702,7 @@ input DetailStockOutputInput {
   quantity: Float!
 }
 
+"""Productos de la solicitud de productos"""
 input DetailStockRequestCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -663,6 +711,7 @@ input DetailStockRequestCreateInput {
   quantity: Float!
 }
 
+"""Detalle de la solicitud de productos"""
 input DetailStockRequestInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -674,6 +723,7 @@ input DetailStockRequestInput {
   quantity: Float!
 }
 
+"""Productos del historial de inventario"""
 input DetailStockTransferCreateInput {
   """Identificador de mongo del producto"""
   productId: String!
@@ -682,6 +732,7 @@ input DetailStockTransferCreateInput {
   quantity: Float!
 }
 
+"""Detalle del traslado de productos"""
 input DetailStockTransferInput {
   """Acción a efectuar con el producto (delete, update, create)"""
   action: String!
@@ -693,6 +744,7 @@ input DetailStockTransferInput {
   quantity: Float!
 }
 
+"""Detalle del traslado de productos"""
 type DetailTransfer {
   """Fecha de agregado el producto"""
   createdAt: DateTime!
@@ -713,6 +765,7 @@ type DetailTransfer {
   updatedAt: DateTime!
 }
 
+"""Tipo de documento de identificación"""
 type DocumentType {
   """Identificador de mongo"""
   _id: String!
@@ -733,6 +786,7 @@ type DocumentType {
   user: User!
 }
 
+"""Filtros para la lista de atributos"""
 input FiltersAttribsInput {
   """Estado del atributo"""
   active: Boolean
@@ -750,6 +804,7 @@ input FiltersAttribsInput {
   sort: SortAttrib
 }
 
+"""Filtros para la lista de marcas"""
 input FiltersBrandsInput {
   """Estado del atributo"""
   active: Boolean
@@ -767,6 +822,7 @@ input FiltersBrandsInput {
   sort: SortBrand
 }
 
+"""Filtros para la lista de colores"""
 input FiltersColorInput {
   """Estado de la bodega"""
   active: Boolean
@@ -784,6 +840,7 @@ input FiltersColorInput {
   sort: SortColor
 }
 
+"""Filtros de listado de clientes"""
 input FiltersCustomerInput {
   """Si el cliente se encuentra activo"""
   active: Boolean
@@ -826,6 +883,7 @@ input FiltersProductInput {
   warehouseId: String
 }
 
+"""Filtros para la lista de productos"""
 input FiltersProductsInput {
   """Id de color"""
   colorId: String
@@ -858,6 +916,7 @@ input FiltersProductsInput {
   warehouseId: String
 }
 
+"""Filtros para la lista de referencias"""
 input FiltersReferencesInput {
   """Identificación de la marca"""
   brandId: String
@@ -890,6 +949,7 @@ input FiltersReferencesInput {
   sort: SortReference
 }
 
+"""Filtros para la lista de tallas"""
 input FiltersSizeInput {
   """Estado de la bodega"""
   active: Boolean
@@ -907,6 +967,7 @@ input FiltersSizeInput {
   sort: SortSize
 }
 
+"""Filtros para el listado de ajsutes de productos"""
 input FiltersStockAdjustmentInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -936,6 +997,7 @@ input FiltersStockAdjustmentInput {
   warehouseId: String
 }
 
+"""Filtros para el listado de entradas de productos"""
 input FiltersStockInputInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -965,6 +1027,7 @@ input FiltersStockInputInput {
   warehouseId: String
 }
 
+"""Filtros para el listado de salidas de productos"""
 input FiltersStockOutputInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -994,6 +1057,7 @@ input FiltersStockOutputInput {
   warehouseId: String
 }
 
+"""Filtros para el listado de solicitudes de productos"""
 input FiltersStockRequestInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -1023,6 +1087,7 @@ input FiltersStockRequestInput {
   warehouseOriginId: String
 }
 
+"""Filtros para el listado de traslados de productos"""
 input FiltersStockTransferInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -1078,7 +1143,8 @@ input FiltersUsersInput {
   status: String
 }
 
-input FiltersWarehouseInput {
+"""Filtros de las bodegas"""
+input FiltersWarehousesInput {
   """Estado de la bodega"""
   active: Boolean
 
@@ -1098,6 +1164,7 @@ input FiltersWarehouseInput {
   sort: SortWarehouse
 }
 
+"""Factura"""
 type Invoice {
   """Identificador de mongo"""
   _id: String!
@@ -1114,7 +1181,7 @@ type Invoice {
   """Cliente para la factura"""
   customer: Customer!
 
-  """Productos que tiene el pedido"""
+  """Productos de la factura"""
   details: [DetailInvoice!]
 
   """Número de factura"""
@@ -1126,13 +1193,13 @@ type Invoice {
   """Tienda donde se realiza la factura"""
   shop: Shop!
 
-  """Resumen de los pagosy totales"""
+  """Resumen de los pagos y totales"""
   summary: SummaryInvoice!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
 
-  """Usuario que creó o editó el pedido"""
+  """Usuario que creó o editó la factrura"""
   user: User!
 }
 
@@ -1158,22 +1225,95 @@ input LoginUserInput {
 }
 
 type Mutation {
-  addPaymentsOrder(addPaymentsOrderInput: AddPaymentsOrderInput!): Order!
-  addProductsOrder(addProductsOrderInput: AddProductsOrderInput!): Order!
-  confirmDetailStockTransfer(id: String!, updateStockTransferInput: DetailStockTransferInput!): StockTransfer!
-  createAttrib(createAttribInput: CreateAttribInput!): Attrib!
-  createBrand(createBrandInput: CreateBrandInput!): Brand!
-  createColor(createColorInput: CreateColorInput!): Color!
-  createOrder(createOrderInput: CreateOrderInput!): Order!
-  createProduct(createProductInput: CreateProductInput!): Product!
-  createReference(createReferenceInput: CreateReferenceInput!): Reference!
-  createSize(createSizeInput: CreateSizeInput!): Size!
-  createStockAdjustment(createStockAdjustmentInput: CreateStockAdjustmentInput!): StockAdjustment!
-  createStockInput(createStockInputInput: CreateStockInputInput!): StockInput!
-  createStockOutput(createStockOutputInput: CreateStockOutputInput!): StockOutput!
-  createStockRequest(createStockRequestInput: CreateStockRequestInput!): StockRequest!
-  createStockTransfer(createStockTransferInput: CreateStockTransferInput!): StockTransfer!
-  generateStockRequest(shopId: String!): StockRequest!
+  """Se encarga de agregar medios de pago"""
+  addPaymentsOrder(
+    """Medios de pago y orden a actualizar"""
+    addPaymentsOrderInput: AddPaymentsOrderInput!
+  ): Order!
+
+  """Se encarga de agregar productos a un pedido"""
+  addProductsOrder(
+    """Productos y pedido para actualizar"""
+    addProductsOrderInput: AddProductsOrderInput!
+  ): Order!
+
+  """Crea un atributo"""
+  createAttrib(
+    """Datos para crear un atributo"""
+    createAttribInput: CreateAttribInput!
+  ): Attrib!
+
+  """Crea una marca"""
+  createBrand(
+    """Datos para crear una marca"""
+    createBrandInput: CreateBrandInput!
+  ): Brand!
+
+  """Crea un color"""
+  createColor(
+    """Datos para crear el color"""
+    createColorInput: CreateColorInput!
+  ): Color!
+
+  """Se encarga de crear el pedido"""
+  createOrder(
+    """Parámetros para la creación del pedido"""
+    createOrderInput: CreateOrderInput!
+  ): Order!
+
+  """Crea un producto"""
+  createProduct(
+    """Datos para crear un producto"""
+    createProductInput: CreateProductInput!
+  ): Product!
+
+  """Crea una referencia"""
+  createReference(
+    """Datos para la creación de la referencia"""
+    createReferenceInput: CreateReferenceInput!
+  ): Reference!
+
+  """Crear una talla"""
+  createSize(
+    """Datos para crear la talla"""
+    createSizeInput: CreateSizeInput!
+  ): Size!
+
+  """Crea un ajuste de productos"""
+  createStockAdjustment(
+    """Crea un ajuste de productos"""
+    createStockAdjustmentInput: CreateStockAdjustmentInput!
+  ): StockAdjustment!
+
+  """Crea una entrada de productos"""
+  createStockInput(
+    """Datos para crear una entrada de productos"""
+    createStockInputInput: CreateStockInputInput!
+  ): StockInput!
+
+  """Crea una salida de productos"""
+  createStockOutput(
+    """Datos para crear una salida de productos"""
+    createStockOutputInput: CreateStockOutputInput!
+  ): StockOutput!
+
+  """Crea una solicitud"""
+  createStockRequest(
+    """Datos para crear una solicitud de productos"""
+    createStockRequestInput: CreateStockRequestInput!
+  ): StockRequest!
+
+  """Crea una traslado de productos"""
+  createStockTransfer(
+    """Datos para la creación de un traslado de productos"""
+    createStockTransferInput: CreateStockTransferInput!
+  ): StockTransfer!
+
+  """Autogenera una solicitud de productos por bodega"""
+  generateStockRequest(
+    """Tienda para validar el inventario"""
+    shopId: String!
+  ): StockRequest!
 
   """Se encarga de realizar el ingreso al sistema por el usuario"""
   login(
@@ -1186,18 +1326,114 @@ type Mutation {
     """Datos para la creación del usuario"""
     createUserInput: CreateUserInput!
   ): User!
-  updateAttrib(id: String!, updateAttribInput: UpdateAttribInput!): Attrib!
-  updateBrand(id: String!, updateBrandInput: UpdateBrandInput!): Brand!
-  updateColor(id: String!, updateSizeInput: UpdateColorInput!): Color!
-  updateOrder(id: String!, updateOrderInput: UpdateOrderInput!): Order!
-  updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
-  updateReference(id: String!, updateReferenceInput: UpdateReferenceInput!): Reference!
-  updateSize(id: String!, updateSizeInput: UpdateSizeInput!): Size!
-  updateStockAdjustment(id: String!, updateStockAdjustmentInput: UpdateStockAdjustmentInput!): StockAdjustment!
-  updateStockInput(id: String!, updateStockInputInput: UpdateStockInputInput!): StockInput!
-  updateStockOutput(id: String!, updateStockOutputInput: UpdateStockOutputInput!): StockOutput!
-  updateStockRequest(id: String!, updateStockRequestInput: UpdateStockRequestInput!): StockRequest!
-  updateStockTransfer(id: String!, updateStockTransferInput: UpdateStockTransferInput!): StockTransfer!
+
+  """Actualiza un atributo"""
+  updateAttrib(
+    """Identificador del atributo a actualizar"""
+    id: String!
+
+    """Datos a actualizar en el atributo"""
+    updateAttribInput: UpdateAttribInput!
+  ): Attrib!
+
+  """Actualiza la marca"""
+  updateBrand(
+    """Identificador de la marca a actualizar"""
+    id: String!
+
+    """Datos a actualizar en la marca"""
+    updateBrandInput: UpdateBrandInput!
+  ): Brand!
+
+  """Actualiza el color"""
+  updateColor(
+    """Identificador del color a actualizar"""
+    id: String!
+
+    """Datos para actualizar un color"""
+    updateColorInput: UpdateColorInput!
+  ): Color!
+
+  """Se encarga actualizar un pedido"""
+  updateOrder(
+    """Identificador del pedido"""
+    id: String!
+
+    """Parámetros para actualizar el pedido"""
+    updateOrderInput: UpdateOrderInput!
+  ): Order!
+
+  """Se encarga actualizar un producto"""
+  updateProduct(
+    """Identificador del producto a actualizar"""
+    id: String!
+
+    """Datos a actualizar en el producto"""
+    updateProductInput: UpdateProductInput!
+  ): Product!
+
+  """Actualiza una referencia"""
+  updateReference(
+    """Identificador de la referencia para actualizar"""
+    id: String!
+
+    """Datos para actualizar la referencia"""
+    updateReferenceInput: UpdateReferenceInput!
+  ): Reference!
+
+  """Actualizar la talla"""
+  updateSize(
+    """Identificador de la talla a actualizar"""
+    id: String!
+
+    """Datos para actualizar la talla"""
+    updateSizeInput: UpdateSizeInput!
+  ): Size!
+
+  """Actualiza un ajuste de productos"""
+  updateStockAdjustment(
+    """Identificador de ajuste de productos"""
+    id: String!
+
+    """Datos para actualizar el ajuste de productos"""
+    updateStockAdjustmentInput: UpdateStockAdjustmentInput!
+  ): StockAdjustment!
+
+  """Actualiza una entrada de productos"""
+  updateStockInput(
+    """Identificador de la entrada de productos a actualizar"""
+    id: String!
+
+    """Datos para actualizar una entrada de productos"""
+    updateStockInputInput: UpdateStockInputInput!
+  ): StockInput!
+
+  """Actualiza una salida de productos"""
+  updateStockOutput(
+    """Identificador de la salida de productos a actualizar"""
+    id: String!
+
+    """Datos para actualizar salida de productos"""
+    updateStockOutputInput: UpdateStockOutputInput!
+  ): StockOutput!
+
+  """Actualiza una solicitud de productos"""
+  updateStockRequest(
+    """Identificador de la solicitud de productos"""
+    id: String!
+
+    """Datos para actualizar en la solicitud de productos"""
+    updateStockRequestInput: UpdateStockRequestInput!
+  ): StockRequest!
+
+  """Actualiza traslado"""
+  updateStockTransfer(
+    """Identificador del traslado de productos"""
+    id: String!
+
+    """Datos para actualizar el traslado"""
+    updateStockTransferInput: UpdateStockTransferInput!
+  ): StockTransfer!
   updateUser(
     """Identificador del usuario que se desea actualizar"""
     id: String!
@@ -1207,6 +1443,7 @@ type Mutation {
   ): User!
 }
 
+"""Pedido de productos"""
 type Order {
   """Identificador de mongo"""
   _id: String!
@@ -1248,9 +1485,13 @@ type Order {
   user: User!
 }
 
+"""Medios de pago"""
 type Payment {
   """Identificador de mongo"""
   _id: String!
+
+  """Estado del tipo de los médios de pago"""
+  active: Boolean!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -1258,7 +1499,7 @@ type Payment {
   """Nombre del medio de pago"""
   name: String!
 
-  """Tipo de medio de pago (cash, bank, credit)"""
+  """Tipo de medio de pago (cash, bank, credit, bonus)"""
   type: String!
 
   """Fecha de actualización"""
@@ -1268,6 +1509,7 @@ type Payment {
   user: User!
 }
 
+"""Medios de pago de la factura"""
 type PaymentInvoice {
   """Método de pago usado"""
   payment: Payment!
@@ -1276,6 +1518,7 @@ type PaymentInvoice {
   total: Float!
 }
 
+"""Medio de pago usado en el pedido"""
 type PaymentOrder {
   """Fecha de agregado del pago al pedido"""
   createdAt: DateTime!
@@ -1290,6 +1533,7 @@ type PaymentOrder {
   updatedAt: DateTime!
 }
 
+"""Medio de pago que se va a agregar"""
 input PaymentsOrderInput {
   """Acción a realizar con el medio de pago (create, update, delete)"""
   action: String!
@@ -1322,6 +1566,7 @@ type Permission {
   option: String!
 }
 
+"""Punto de venta de la tienda"""
 type PointOfSale {
   """Identificador de mongo"""
   _id: String!
@@ -1345,6 +1590,7 @@ type PointOfSale {
   user: User!
 }
 
+"""Productos del sistema"""
 type Product {
   """Identificador de mongo"""
   _id: String!
@@ -1378,39 +1624,149 @@ type Product {
 }
 
 type Query {
-  attribs(filtersAttribsInput: FiltersAttribsInput = {}): ResponseAttribs!
-  brands(filtersBrandsInput: FiltersBrandsInput = {}): ResponseBrands!
-  colors(filtersColorInput: FiltersColorInput = {}): ResponseColor!
+  """Listado de atributos"""
+  attribs(
+    """Filtros para listar los atributos"""
+    filtersAttribsInput: FiltersAttribsInput = {}
+  ): ResponseAttribs!
+
+  """Listado de marcas"""
+  brands(
+    """Filtros para listar las marcas"""
+    filtersBrandsInput: FiltersBrandsInput = {}
+  ): ResponseBrands!
+
+  """Lista los colores"""
+  colors(
+    """Filtros para obtener los colores"""
+    filtersColorInput: FiltersColorInput = {}
+  ): ResponseColor!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
-  customers(filtersCustomerInput: FiltersCustomerInput = {}): ResponseCustomer!
-  orderId(id: String!): [Order!]!
-  ordersByPointOfSale(idPointOfSale: String!): [Order!]!
-  product(filtersProductInput: FiltersProductInput = {}): Product!
-  products(filtersProductsInput: FiltersProductsInput = {}): ResponseProduct!
-  referenceId(id: String!): Reference!
-  references(filtersReferencesInput: FiltersReferencesInput = {}): ResponseReferences!
-  sizes(filtersSizeInput: FiltersSizeInput = {}): ResponseSize!
-  stockAdjustmentId(id: String!): StockAdjustment!
-  stockAdjustments(filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}): ResponseStockAdjustment!
-  stockInputId(id: String!): StockInput!
-  stockInputs(filtersStockInputInput: FiltersStockInputInput = {}): ResponseStockInput!
-  stockOutputId(id: String!): StockOutput!
-  stockOutputs(filtersStockOutputInput: FiltersStockOutputInput = {}): ResponseStockOutput!
-  stockRequestId(id: String!): StockRequest!
-  stockRequests(filtersStockRequestInput: FiltersStockRequestInput = {}): ResponseStockRequest!
-  stockTransferId(id: String!): StockTransfer!
-  stockTransfers(filtersStockTransferInput: FiltersStockTransferInput = {}): ResponseStockTransfer!
+
+  """Listado de clientes"""
+  customers(
+    """Filtros para consultar el listado de clientes"""
+    filtersCustomerInput: FiltersCustomerInput = {}
+  ): ResponseCustomer!
+
+  """Obtiene la orden por el id"""
+  orderId(
+    """identificador del pedido"""
+    id: String!
+  ): Order!
+
+  """Obtener las ordenes por punto de venta"""
+  ordersByPointOfSale(
+    """Identificador del punto de venta"""
+    idPointOfSale: String!
+  ): [Order!]!
+
+  """Obtiene un producto"""
+  product(
+    """Filtros para obtener el primer producto de la busqueda"""
+    filtersProductInput: FiltersProductInput = {}
+  ): Product!
+
+  """Lista los productos"""
+  products(
+    """Filtros para consoltar los productos"""
+    filtersProductsInput: FiltersProductsInput = {}
+  ): ResponseProduct!
+
+  """Obtiene la referencia por el identificador"""
+  referenceId(
+    """Identificador de la referencia"""
+    id: String!
+  ): Reference!
+
+  """Listado de las referencias"""
+  references(
+    """Filtros para las referencias"""
+    filtersReferencesInput: FiltersReferencesInput = {}
+  ): ResponseReferences!
+
+  """Listar las tallas"""
+  sizes(
+    """Filtros para consultar las tallas"""
+    filtersSizeInput: FiltersSizeInput = {}
+  ): ResponseSize!
+
+  """Obtiene un ajuste de productos con base a su identificador"""
+  stockAdjustmentId(
+    """Identificador del ajuste de productos"""
+    id: String!
+  ): StockAdjustment!
+
+  """Lista de ajustes de productos"""
+  stockAdjustments(
+    """Filtros de lista de ajustes de productos"""
+    filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}
+  ): ResponseStockAdjustment!
+
+  """Obtiene una entrada de productos con base a su identificador"""
+  stockInputId(
+    """Identificador de la entrada de productos"""
+    id: String!
+  ): StockInput!
+
+  """Lista de entradas de productos"""
+  stockInputs(
+    """Filtros de lista de entradas de productos"""
+    filtersStockInputInput: FiltersStockInputInput = {}
+  ): ResponseStockInput!
+
+  """Obtiene una salida de productos con base al identificador"""
+  stockOutputId(
+    """Identificador de la salida de productos"""
+    id: String!
+  ): StockOutput!
+
+  """Listado de salidas de productos"""
+  stockOutputs(
+    """Filtros del listado de salidas de productos"""
+    filtersStockOutputInput: FiltersStockOutputInput = {}
+  ): ResponseStockOutput!
+
+  """Obtiene una solicitud de productos por su identificador"""
+  stockRequestId(
+    """Identificador de la solicitud de productos"""
+    id: String!
+  ): StockRequest!
+
+  """Lista las solicitudes de productos"""
+  stockRequests(
+    """Filtros de las solicitudes de productos"""
+    filtersStockRequestInput: FiltersStockRequestInput = {}
+  ): ResponseStockRequest!
+
+  """Consulta el trasldo por el identificador"""
+  stockTransferId(
+    """Identificador del traslado"""
+    id: String!
+  ): StockTransfer!
+
+  """Obtiene listado de traslados de productos entre bodegas"""
+  stockTransfers(
+    """Filtros para listado de traslados de productos entre bodegas"""
+    filtersStockTransferInput: FiltersStockTransferInput = {}
+  ): ResponseStockTransfer!
 
   """Consulta todos los usuarios con base a los filtros"""
   users(
     """Filtros para consultar los usuarios"""
     filtersUsersInput: FiltersUsersInput!
   ): [User!]!
-  warehouses(filtersWarehouseInput: FiltersWarehouseInput = {}): ResponseWarehouses!
+
+  """Se encarga de listar las bodegas"""
+  warehouses(
+    """Filtros para consultar las bodegas"""
+    filtersWarehouseInput: FiltersWarehousesInput = {}
+  ): ResponseWarehouses!
 }
 
+"""Referencia de los productos"""
 type Reference {
   """Identificador de mongo"""
   _id: String!
@@ -1461,6 +1817,7 @@ type Reference {
   user: User!
 }
 
+"""Respuesta al listado de los atributos"""
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
@@ -1493,6 +1850,7 @@ type ResponseAttribs {
   totalPages: Float!
 }
 
+"""Respuesta al listado de las marcas"""
 type ResponseBrands {
   """Lista de marcas"""
   docs: [Brand!]!
@@ -1525,6 +1883,7 @@ type ResponseBrands {
   totalPages: Float!
 }
 
+"""Respuesta al listado de los colores"""
 type ResponseColor {
   """Lista de colores"""
   docs: [Color!]!
@@ -1557,6 +1916,7 @@ type ResponseColor {
   totalPages: Float!
 }
 
+"""Respuesta del listado de clientes"""
 type ResponseCustomer {
   """Lista de clientes"""
   docs: [Customer!]!
@@ -1589,6 +1949,7 @@ type ResponseCustomer {
   totalPages: Float!
 }
 
+"""Respuesta al listado de los productos"""
 type ResponseProduct {
   """Lista de productos"""
   docs: [Product!]!
@@ -1621,6 +1982,7 @@ type ResponseProduct {
   totalPages: Float!
 }
 
+"""Respuesta al listado de las referencias"""
 type ResponseReferences {
   """Lista de referencias"""
   docs: [Reference!]!
@@ -1653,6 +2015,7 @@ type ResponseReferences {
   totalPages: Float!
 }
 
+"""Respuesta al listado de las tallas"""
 type ResponseSize {
   """Lista de tallas"""
   docs: [Size!]!
@@ -1685,6 +2048,7 @@ type ResponseSize {
   totalPages: Float!
 }
 
+"""Lista de ajustes de productos"""
 type ResponseStockAdjustment {
   """Lista de ajustes"""
   docs: [StockAdjustment!]!
@@ -1717,6 +2081,7 @@ type ResponseStockAdjustment {
   totalPages: Float!
 }
 
+"""Lista de entradas de productos"""
 type ResponseStockInput {
   """Lista de entradas"""
   docs: [StockInput!]!
@@ -1749,6 +2114,7 @@ type ResponseStockInput {
   totalPages: Float!
 }
 
+"""Lista de salidas de productos"""
 type ResponseStockOutput {
   """Lista de salidas"""
   docs: [StockOutput!]!
@@ -1781,6 +2147,7 @@ type ResponseStockOutput {
   totalPages: Float!
 }
 
+"""Lista de solicitudes de productos"""
 type ResponseStockRequest {
   """Lista de solicitudes"""
   docs: [StockRequest!]!
@@ -1813,6 +2180,7 @@ type ResponseStockRequest {
   totalPages: Float!
 }
 
+"""Lista de traslados de productos"""
 type ResponseStockTransfer {
   """Lista de traslados"""
   docs: [StockTransfer!]!
@@ -1845,6 +2213,7 @@ type ResponseStockTransfer {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de bodegas"""
 type ResponseWarehouses {
   """Lista de salidas"""
   docs: [Warehouse!]!
@@ -1904,6 +2273,7 @@ type Role {
   user: User!
 }
 
+"""Datos de medidas para el envío de los productos"""
 type Shipping {
   """Fecha de creación del dato de envio"""
   createdAt: DateTime!
@@ -1937,13 +2307,16 @@ type Shop {
   """Dirección de la tienda"""
   address: String!
 
+  """Empresa que usa la tienda"""
+  company: Warehouse!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
   """Bodega predeterminada para la tienda"""
   defaultWarehouse: Warehouse!
 
-  """Méta asiganda a la tienda"""
+  """Meta asiganda a la tienda"""
   goal: Float!
 
   """Es centro de distribución"""
@@ -1968,6 +2341,7 @@ type Shop {
   warehouseMain: Warehouse
 }
 
+"""Talla del producto"""
 type Size {
   """Identificador de mongo"""
   _id: String!
@@ -1975,13 +2349,23 @@ type Size {
   """Estado de la talla"""
   active: Boolean!
 
+  """Fecha de creación de la talla"""
+  createdAt: DateTime!
+
   """Identificador mysql"""
   id: Float @deprecated(reason: "Campo para migración de mysql")
+
+  """Fecha de actualización de la talla"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la talla"""
+  user: User!
 
   """Valor de la talla"""
   value: String!
 }
 
+"""Ordenamiento para el listado de atributos"""
 input SortAttrib {
   active: Float
   createdAt: Float
@@ -1989,6 +2373,7 @@ input SortAttrib {
   updatedAt: Float
 }
 
+"""Ordenamiento para el listado de marcas"""
 input SortBrand {
   active: Float
   createdAt: Float
@@ -1996,6 +2381,7 @@ input SortBrand {
   updatedAt: Float
 }
 
+"""Ordenamiento para el listado de colores"""
 input SortColor {
   active: Float
   createdAt: Float
@@ -2004,6 +2390,7 @@ input SortColor {
   updatedAt: Float
 }
 
+"""Ordenamiento del cliente"""
 input SortCustomer {
   """ordernamiento por docuemnto"""
   active: Float!
@@ -2030,6 +2417,7 @@ input SortCustomer {
   phone: Float!
 }
 
+"""Ordenamiento para el listado de productos"""
 input SortProduct {
   barcode: Float
   changeable: Float
@@ -2040,6 +2428,7 @@ input SortProduct {
   status: Float
 }
 
+"""Ordenamiento para el listado de referencias"""
 input SortReference {
   changeable: Float
   cost: Float
@@ -2048,6 +2437,7 @@ input SortReference {
   price: Float
 }
 
+"""Ordenamiento para el listado de tallas"""
 input SortSize {
   active: Float
   createdAt: Float
@@ -2055,6 +2445,7 @@ input SortSize {
   value: Float
 }
 
+"""Ordenamiento del ajuste de productos"""
 input SortStockAdjustment {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2075,6 +2466,7 @@ input SortStockAdjustment {
   warehouse: Float
 }
 
+"""Ordenamiento de la entrada de productos"""
 input SortStockInput {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2095,6 +2487,7 @@ input SortStockInput {
   warehouse: Float
 }
 
+"""Ordenamiento de la salida de productos"""
 input SortStockOutput {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2115,6 +2508,7 @@ input SortStockOutput {
   warehouse: Float
 }
 
+"""Ordenamiento del solicitudes de productos"""
 input SortStockRequest {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2135,6 +2529,7 @@ input SortStockRequest {
   warehouseOrigin: Float
 }
 
+"""Ordenamiento del traslado de productos"""
 input SortStockTransfer {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -2164,12 +2559,16 @@ input SortUser {
   username: Float
 }
 
+"""Ordenamiento de la bodega"""
 input SortWarehouse {
   active: Float
+  createdAt: Float
   isMain: Float
   name: Float
+  updatedAt: Float
 }
 
+"""Inventario por bodegas del producto"""
 type Stock {
   """Fecha de creación del dato de envio"""
   createdAt: DateTime!
@@ -2187,6 +2586,7 @@ type Stock {
   warehouse: Warehouse!
 }
 
+"""Ajuste de productos"""
 type StockAdjustment {
   """Identificador de mongo"""
   _id: String!
@@ -2222,6 +2622,7 @@ type StockAdjustment {
   warehouse: Warehouse!
 }
 
+"""Salida de productos"""
 type StockInput {
   """Identificador de mongo"""
   _id: String!
@@ -2257,6 +2658,7 @@ type StockInput {
   warehouse: Warehouse!
 }
 
+"""Salida de productos"""
 type StockOutput {
   """Identificador de mongo"""
   _id: String!
@@ -2292,6 +2694,7 @@ type StockOutput {
   warehouse: Warehouse!
 }
 
+"""Solicitud de productos"""
 type StockRequest {
   """Identificador de mongo"""
   _id: String!
@@ -2327,6 +2730,7 @@ type StockRequest {
   warehouseOrigin: Warehouse!
 }
 
+"""Translado de productos"""
 type StockTransfer {
   """Identificador de mongo"""
   _id: String!
@@ -2373,26 +2777,28 @@ type StockTransfer {
   warehouseOrigin: Warehouse!
 }
 
+"""Resumen de la factura"""
 type SummaryInvoice {
-  """Cambio del pedido"""
+  """Cambio de la factura"""
   change: Float!
 
-  """Descuento del pedido"""
+  """Descuento de la factura"""
   discount: Float!
 
-  """Subtotal del pedido"""
+  """Subtotal de la factura"""
   subtotal: Float!
 
-  """Impuestos del pedido"""
+  """Impuestos de la factura"""
   tax: Float!
 
-  """Total del pedido"""
+  """Total de la factura"""
   total: Float!
 
-  """Total pago del pedido"""
+  """Total pago de la factura"""
   totalPaid: Float!
 }
 
+"""Datos de resumen del pedido"""
 type SummaryOrder {
   """Cambio del pedido"""
   change: Float!
@@ -2413,6 +2819,7 @@ type SummaryOrder {
   totalPaid: Float!
 }
 
+"""Datos para actualizar el atributo"""
 input UpdateAttribInput {
   """Se encuentra activa el atributo"""
   active: Boolean
@@ -2421,6 +2828,7 @@ input UpdateAttribInput {
   name: String
 }
 
+"""Datos para actualizar marcas"""
 input UpdateBrandInput {
   """Se encuentra activa la marca"""
   active: Boolean
@@ -2429,6 +2837,7 @@ input UpdateBrandInput {
   name: String
 }
 
+"""Datos para actualizar el color"""
 input UpdateColorInput {
   """Url asignado al color"""
   html: String
@@ -2443,6 +2852,7 @@ input UpdateColorInput {
   name_internal: String
 }
 
+"""Datos para actualizar el pedido"""
 input UpdateOrderInput {
   """Identificación del cliente"""
   customerId: String
@@ -2451,6 +2861,7 @@ input UpdateOrderInput {
   status: String
 }
 
+"""Datos para actualizar el producto"""
 input UpdateProductInput {
   """Código de barras del producto"""
   barcode: String
@@ -2465,6 +2876,7 @@ input UpdateProductInput {
   status: String
 }
 
+"""Datos para actualizar referencia"""
 input UpdateReferenceInput {
   """Identificador de los atributos de la referencia"""
   attribIds: [String!]
@@ -2512,6 +2924,7 @@ input UpdateReferenceInput {
   width: Float
 }
 
+"""Datos para actualizar la talla"""
 input UpdateSizeInput {
   """Se encuentra activa la talla"""
   active: Boolean
@@ -2520,6 +2933,7 @@ input UpdateSizeInput {
   name: String
 }
 
+"""Datos para actualizar el ajuste de productos"""
 input UpdateStockAdjustmentInput {
   """Productos del ajuste"""
   details: [DetailStockAdjustmentInput!]
@@ -2531,6 +2945,7 @@ input UpdateStockAdjustmentInput {
   status: String
 }
 
+"""Datos para actualizar la entrada de productos"""
 input UpdateStockInputInput {
   """Productos de la entrada"""
   details: [DetailStockInputInput!]
@@ -2542,6 +2957,7 @@ input UpdateStockInputInput {
   status: String
 }
 
+"""Datos para actualizar la salida de productos"""
 input UpdateStockOutputInput {
   """Productos de la salida"""
   details: [DetailStockOutputInput!]
@@ -2553,6 +2969,7 @@ input UpdateStockOutputInput {
   status: String
 }
 
+"""Datos para actualizar la solicitud de productos"""
 input UpdateStockRequestInput {
   """Productos de la solicitud"""
   details: [DetailStockRequestInput!]
@@ -2564,6 +2981,7 @@ input UpdateStockRequestInput {
   status: String
 }
 
+"""Datos para actualizar el traslado de productos"""
 input UpdateStockTransferInput {
   """Productos del traslado"""
   details: [DetailStockTransferInput!]
@@ -2656,12 +3074,16 @@ type User {
   username: String!
 }
 
+"""Modelo de la bodega"""
 type Warehouse {
   """Identificador de mongo"""
   _id: String!
 
   """Estado de la bodega"""
   active: Boolean!
+
+  """Empresa a la que pertenece la bodega"""
+  company: Company!
 
   """Fecha de creación"""
   createdAt: DateTime!

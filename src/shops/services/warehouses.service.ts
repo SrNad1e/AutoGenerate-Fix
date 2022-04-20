@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
-import { FiltersWarehouseInput } from '../dtos/filters-warehouse.input';
+import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { Warehouse, WarehouseMysql } from '../entities/warehouse.entity';
 import { ShopsService } from './shops.service';
 
@@ -18,17 +19,34 @@ export class WarehousesService {
 		private readonly shopsService: ShopsService,
 	) {}
 
-	async findAll({
-		name = '',
-		limit = 10,
-		page = 1,
-		sort,
-		...params
-	}: FiltersWarehouseInput) {
-		const filters: FilterQuery<Warehouse> = {
-			name: { $regex: name, $options: 'i' },
-			...params,
-		};
+	async findAll(
+		{
+			name,
+			limit = 10,
+			page = 1,
+			sort,
+			active,
+			isMain,
+		}: FiltersWarehousesInput,
+		user: Partial<User>,
+	) {
+		const filters: FilterQuery<Warehouse> = {};
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(user.company._id);
+		}
+
+		if (name) {
+			filters.name = { $regex: name, $options: 'i' };
+		}
+
+		if (active !== undefined) {
+			filters.active = active;
+		}
+
+		if (isMain !== undefined) {
+			filters.isMain = isMain;
+		}
 
 		const options = {
 			limit,
@@ -40,8 +58,12 @@ export class WarehousesService {
 		return this.warehouseModel.paginate(filters, options);
 	}
 
-	async findOne(params: FiltersWarehouseInput) {
+	async findOne(params: FiltersWarehousesInput) {
 		return this.warehouseModel.findOne(params).lean();
+	}
+
+	async findById(id: string) {
+		return this.warehouseModel.findById(id).lean();
 	}
 
 	/**
@@ -51,10 +73,6 @@ export class WarehousesService {
 	 */
 	async getByIdMysql(id: number): Promise<Warehouse> {
 		return this.warehouseModel.findOne({ id }).lean();
-	}
-
-	async findById(id: string) {
-		return this.warehouseModel.findById(id);
 	}
 
 	async migrate() {

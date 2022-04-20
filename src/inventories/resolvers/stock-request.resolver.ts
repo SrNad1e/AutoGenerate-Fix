@@ -13,13 +13,17 @@ import { StockRequestService } from '../services/stock-request.service';
 export class StockRequestResolver {
 	constructor(private readonly stockRequestService: StockRequestService) {}
 
-	@Query(() => ResponseStockRequest, { name: 'stockRequests' })
+	@Query(() => ResponseStockRequest, {
+		name: 'stockRequests',
+		description: 'Lista las solicitudes de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersStockRequestInput',
 			nullable: true,
 			defaultValue: {},
+			description: 'Filtros de las solicitudes de productos',
 		})
 		_: FiltersStockRequestInput,
 		@Context() context,
@@ -27,16 +31,27 @@ export class StockRequestResolver {
 		return this.stockRequestService.findAll(context.req.body.variables.input);
 	}
 
-	@Query(() => StockRequest, { name: 'stockRequestId' })
+	@Query(() => StockRequest, {
+		name: 'stockRequestId',
+		description: 'Obtiene una solicitud de productos por su identificador',
+	})
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string) {
+	findById(
+		@Args('id', { description: 'Identificador de la solicitud de productos' })
+		id: string,
+	) {
 		return this.stockRequestService.findById(id);
 	}
 
-	@Mutation(() => StockRequest, { name: 'createStockRequest' })
+	@Mutation(() => StockRequest, {
+		name: 'createStockRequest',
+		description: 'Crea una solicitud',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createStockRequestInput')
+		@Args('createStockRequestInput', {
+			description: 'Datos para crear una solicitud de productos',
+		})
 		_: CreateStockRequestInput,
 		@Context() context,
 	) {
@@ -46,12 +61,18 @@ export class StockRequestResolver {
 		);
 	}
 
-	@Mutation(() => StockRequest, { name: 'updateStockRequest' })
+	@Mutation(() => StockRequest, {
+		name: 'updateStockRequest',
+		description: 'Actualiza una solicitud de productos',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateStockRequestInput')
+		@Args('id', { description: 'Identificador de la solicitud de productos' })
+		id: string,
+		@Args('updateStockRequestInput', {
+			description: 'Datos para actualizar en la solicitud de productos',
+		})
 		_: UpdateStockRequestInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.stockRequestService.update(
@@ -61,9 +82,16 @@ export class StockRequestResolver {
 		);
 	}
 
-	@Mutation(() => StockRequest, { name: 'generateStockRequest' })
+	@Mutation(() => StockRequest, {
+		name: 'generateStockRequest',
+		description: 'Autogenera una solicitud de productos por bodega',
+	})
 	@UseGuards(JwtAuthGuard)
-	autogenerate(@Args('shopId') shopId: string, @Context() context) {
+	autogenerate(
+		@Args('shopId', { description: 'Tienda para validar el inventario' })
+		shopId: string,
+		@Context() context,
+	) {
 		return this.stockRequestService.autogenerate(shopId, context.req.user);
 	}
 }

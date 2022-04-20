@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
+
+import { AuthorizationDian } from '../entities/authorization.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
 
 const populate = [
 	{
 		path: 'authorization',
-		model: 'AuthorizationDian',
+		model: AuthorizationDian.name,
 	},
 ];
 

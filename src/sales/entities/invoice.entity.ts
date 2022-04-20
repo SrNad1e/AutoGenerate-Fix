@@ -9,16 +9,16 @@ import { Payment } from 'src/treasury/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
 import { AuthorizationDian } from './authorization.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Productos de la factura' })
 export class DetailInvoice {
-	@Field(() => Product, { description: 'Producto agregado al pedido' })
+	@Field(() => Product, { description: 'Producto agregado a la factura' })
 	product: Product;
 
-	@Field(() => Number, { description: 'Cantidad de productos en el pedido' })
+	@Field(() => Number, { description: 'Cantidad de productos en la factura' })
 	quantity: number;
 }
 
-@ObjectType()
+@ObjectType({ description: 'Medios de pago de la factura' })
 export class PaymentInvoice {
 	@Field(() => Payment, { description: 'Método de pago usado' })
 	payment: Payment;
@@ -27,29 +27,29 @@ export class PaymentInvoice {
 	total: number;
 }
 
-@ObjectType()
+@ObjectType({ description: 'Resumen de la factura' })
 export class SummaryInvoice {
-	@Field(() => Number, { description: 'Total del pedido' })
+	@Field(() => Number, { description: 'Total de la factura' })
 	total: number;
 
-	@Field(() => Number, { description: 'Descuento del pedido' })
+	@Field(() => Number, { description: 'Descuento de la factura' })
 	discount: number;
 
-	@Field(() => Number, { description: 'Subtotal del pedido' })
+	@Field(() => Number, { description: 'Subtotal de la factura' })
 	subtotal: number;
 
-	@Field(() => Number, { description: 'Impuestos del pedido' })
+	@Field(() => Number, { description: 'Impuestos de la factura' })
 	tax: number;
 
-	@Field(() => Number, { description: 'Cambio del pedido' })
+	@Field(() => Number, { description: 'Cambio de la factura' })
 	change: number;
 
-	@Field(() => Number, { description: 'Total pago del pedido' })
+	@Field(() => Number, { description: 'Total pago de la factura' })
 	totalPaid: number;
 }
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Factura' })
 export class Invoice extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
@@ -96,19 +96,21 @@ export class Invoice extends Document {
 	})
 	active: boolean;
 
-	@Field(() => SummaryInvoice, { description: 'Resumen de los pagosy totales' })
+	@Field(() => SummaryInvoice, {
+		description: 'Resumen de los pagos y totales',
+	})
 	@Prop({ type: Object })
 	summary: SummaryInvoice;
 
 	@Field(() => [DetailInvoice], {
-		description: 'Productos que tiene el pedido',
+		description: 'Productos de la factura',
 		nullable: true,
 	})
 	@Prop({ type: Array })
 	details: DetailInvoice[];
 
 	@Field(() => User, {
-		description: 'Usuario que creó o editó el pedido',
+		description: 'Usuario que creó o editó la factrura',
 	})
 	@Prop({ type: Object, required: true })
 	user: User;

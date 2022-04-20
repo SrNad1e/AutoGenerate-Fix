@@ -15,9 +15,8 @@ import { ProductsService } from 'src/products/services/products.service';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
-import { AddStockHistoryInput } from '../dtos/add-stockHistory-input';
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
-import { DeleteStockHistoryInput } from '../dtos/delete-stockHistory-input';
+import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { FiltersStockAdjustmentInput } from '../dtos/filters-stockAdjustment.input';
 import { UpdateStockAdjustmentInput } from '../dtos/update-stockAdjustment-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
@@ -232,14 +231,14 @@ export class StockAdjustmentService {
 					quantity: detail.quantity,
 				}));
 
-			const deleteStockHistoryInput: DeleteStockHistoryInput = {
+			const deleteStockHistoryInput: CreateStockHistoryInput = {
 				details: detailsDelete,
 				warehouseId,
 				documentId: response._id.toString(),
 				documentType: 'adjustment',
 			};
 
-			const addStockHistoryInput: AddStockHistoryInput = {
+			const addStockHistoryInput: CreateStockHistoryInput = {
 				details: detailsAdd,
 				warehouseId,
 				documentId: response._id.toString(),
@@ -378,14 +377,14 @@ export class StockAdjustmentService {
 						quantity: detail.quantity,
 					}));
 
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
 					details: detailsDelete,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
 
-				const addStockHistoryInput: AddStockHistoryInput = {
+				const addStockHistoryInput: CreateStockHistoryInput = {
 					details: detailsAdd,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
@@ -431,14 +430,14 @@ export class StockAdjustmentService {
 						quantity: detail.quantity,
 					}));
 
-				const deleteStockHistoryInput: DeleteStockHistoryInput = {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
 					details: detailsDelete,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
 					documentType: 'adjustment',
 				};
 
-				const addStockHistoryInput: AddStockHistoryInput = {
+				const addStockHistoryInput: CreateStockHistoryInput = {
 					details: detailsAdd,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),

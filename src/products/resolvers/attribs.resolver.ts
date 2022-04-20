@@ -13,20 +13,31 @@ import { AttribsService } from '../services/attribs.service';
 export class AttribsResolver {
 	constructor(private readonly attribsService: AttribsService) {}
 
-	@Query(() => ResponseAttribs, { name: 'attribs' })
+	@Query(() => ResponseAttribs, {
+		name: 'attribs',
+		description: 'Listado de atributos',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersAttribsInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersAttribsInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para listar los atributos',
+		})
 		_: FiltersAttribsInput,
 		@Context() context,
 	) {
 		return this.attribsService.findAll(context.req.body.variables.input);
 	}
 
-	@Mutation(() => Attrib, { name: 'createAttrib' })
+	@Mutation(() => Attrib, {
+		name: 'createAttrib',
+		description: 'Crea un atributo',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createAttribInput')
+		@Args('createAttribInput', { description: 'Datos para crear un atributo' })
 		_: CreateAttribInput,
 		@Context() context,
 	) {
@@ -36,12 +47,18 @@ export class AttribsResolver {
 		);
 	}
 
-	@Mutation(() => Attrib, { name: 'updateAttrib' })
+	@Mutation(() => Attrib, {
+		name: 'updateAttrib',
+		description: 'Actualiza un atributo',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateAttribInput')
+		@Args('id', { description: 'Identificador del atributo a actualizar' })
+		id: string,
+		@Args('updateAttribInput', {
+			description: 'Datos a actualizar en el atributo',
+		})
 		_: UpdateAttribInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.attribsService.update(

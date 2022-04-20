@@ -5,7 +5,7 @@ import { Document, ObjectId, Types } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
 import { CategoryLevel1 } from './category-level1.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Categoría del producto nivel 2' })
 @Schema({ timestamps: true })
 export class CategoryLevel2 extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
@@ -15,13 +15,13 @@ export class CategoryLevel2 extends Document {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Prop({ type: Object, required: true })
-	@Field(() => User, { description: 'Usuario que crea la categoría' })
-	user: User;
-
 	@Prop({ type: Types.ObjectId })
 	@Field(() => CategoryLevel1, { description: 'Categoría padre' })
 	categoryParent: Types.ObjectId;
+
+	@Prop({ type: Object, required: true })
+	@Field(() => User, { description: 'Usuario que crea la categoría' })
+	user: User;
 
 	@Field(() => Date, {
 		description: 'Fecha de creación de la categoría',

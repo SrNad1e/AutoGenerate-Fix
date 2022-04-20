@@ -26,7 +26,7 @@ export class DetailRequest {
 }
 
 @Schema({ timestamps: true, collection: 'stockrequest' })
-@ObjectType()
+@ObjectType({ description: 'Solicitud de productos' })
 export class StockRequest extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

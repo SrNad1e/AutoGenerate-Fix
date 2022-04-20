@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento para el listado de tallas' })
 export class SortSize {
 	@Field({ nullable: true })
 	value?: number;
@@ -15,7 +15,7 @@ export class SortSize {
 	updatedAt?: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para la lista de tallas' })
 export class FiltersSizeInput {
 	@Field({ description: 'Comodín busqueda de la talla', nullable: true })
 	name?: string;

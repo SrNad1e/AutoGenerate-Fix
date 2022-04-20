@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Datos para crear una referencia' })
 export class CreateReferenceInput {
 	@Field(() => String, { description: 'Nombre de la referencia' })
 	name: string;

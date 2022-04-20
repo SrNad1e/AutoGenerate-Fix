@@ -13,10 +13,18 @@ import { ReferencesService } from '../services/references.service';
 export class ReferencesResolver {
 	constructor(private readonly referencesService: ReferencesService) {}
 
-	@Query(() => ResponseReferences, { name: 'references' })
+	@Query(() => ResponseReferences, {
+		name: 'references',
+		description: 'Listado de las referencias',
+	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
-		@Args({ name: 'filtersReferencesInput', nullable: true, defaultValue: {} })
+		@Args({
+			name: 'filtersReferencesInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para las referencias',
+		})
 		_: FiltersReferencesInput,
 		@Context() context,
 	) {
@@ -26,16 +34,27 @@ export class ReferencesResolver {
 		);
 	}
 
-	@Query(() => Reference, { name: 'referenceId' })
+	@Query(() => Reference, {
+		name: 'referenceId',
+		description: 'Obtiene la referencia por el identificador',
+	})
 	@UseGuards(JwtAuthGuard)
-	findById(@Args('id') id: string, @Context() context) {
+	findById(
+		@Args('id', { description: 'Identificador de la referencia' }) id: string,
+		@Context() context,
+	) {
 		return this.referencesService.findById(id, context.req.user);
 	}
 
-	@Mutation(() => Reference, { name: 'createReference' })
+	@Mutation(() => Reference, {
+		name: 'createReference',
+		description: 'Crea una referencia',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createReferenceInput')
+		@Args('createReferenceInput', {
+			description: 'Datos para la creación de la referencia',
+		})
 		_: CreateReferenceInput,
 		@Context() context,
 	) {
@@ -45,12 +64,20 @@ export class ReferencesResolver {
 		);
 	}
 
-	@Mutation(() => Reference, { name: 'updateReference' })
+	@Mutation(() => Reference, {
+		name: 'updateReference',
+		description: 'Actualiza una referencia',
+	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('updateReferenceInput')
+		@Args('id', {
+			description: 'Identificador de la referencia para actualizar',
+		})
+		id: string,
+		@Args('updateReferenceInput', {
+			description: 'Datos para actualizar la referencia',
+		})
 		_: UpdateReferenceInput,
-		@Args('id') id: string,
 		@Context() context,
 	) {
 		return this.referencesService.update(

@@ -10,7 +10,7 @@ import { Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Productos del pedido' })
 export class DetailOrder {
 	@Field(() => Product, { description: 'Producto agregado al pedido' })
 	product: Product;
@@ -38,7 +38,7 @@ export class DetailOrder {
 	updatedAt: Date;
 }
 
-@ObjectType()
+@ObjectType({ description: 'Medio de pago usado en el pedido' })
 export class PaymentOrder {
 	@Field(() => Payment, { description: 'Método de pago usado' })
 	payment: Payment;
@@ -57,7 +57,7 @@ export class PaymentOrder {
 	updatedAt: Date;
 }
 
-@ObjectType()
+@ObjectType({ description: 'Datos de resumen del pedido' })
 export class SummaryOrder {
 	@Field(() => Number, { description: 'Total del pedido' })
 	total: number;
@@ -79,7 +79,7 @@ export class SummaryOrder {
 }
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Pedido de productos' })
 export class Order extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

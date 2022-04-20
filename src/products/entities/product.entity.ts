@@ -9,7 +9,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Reference } from './reference.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Inventario por bodegas del producto' })
 export class Stock {
 	@Field(() => Warehouse, { description: 'Identificador de la bodega' })
 	warehouse: Types.ObjectId;
@@ -30,7 +30,7 @@ export class Stock {
 }
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Productos del sistema' })
 export class Product extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

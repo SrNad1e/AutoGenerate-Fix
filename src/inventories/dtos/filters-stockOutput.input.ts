@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento de la salida de productos' })
 export class SortStockOutput {
 	@Field(() => Number, {
 		description: 'Ordenamiento por número',
@@ -39,7 +39,7 @@ export class SortStockOutput {
 	updatedAt: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para el listado de salidas de productos' })
 export class FiltersStockOutputInput {
 	@Field(() => Number, {
 		description: 'Número consecutivo asignado a la salida',

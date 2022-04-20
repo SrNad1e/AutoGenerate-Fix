@@ -1,13 +1,13 @@
-/* eslint-disable prettier/prettier */
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Modelo de la bodega' })
 export class Warehouse extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
@@ -31,6 +31,12 @@ export class Warehouse extends Document {
 	})
 	@Prop({ type: Number, required: true })
 	min: number;
+
+	@Field(() => Company, {
+		description: 'Empresa a la que pertenece la bodega',
+	})
+	@Prop({ type: Types.ObjectId, required: true, ref: Company.name })
+	company: Types.ObjectId;
 
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
 	@Prop({ type: Object, required: true })

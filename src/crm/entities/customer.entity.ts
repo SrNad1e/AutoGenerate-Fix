@@ -7,7 +7,7 @@ import { City } from './city.entity';
 import { CustomerType } from './customerType.entity';
 import { DocumentType } from './documentType.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Dirección del cliente' })
 export class Address {
 	@Field(() => String, {
 		description: 'Tipo de ubicación (Calle, Avenida, Manzana, Etc)',
@@ -51,7 +51,7 @@ export class Address {
 }
 
 @Schema({ timestamps: true })
-@ObjectType()
+@ObjectType({ description: 'Cliente' })
 export class Customer extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

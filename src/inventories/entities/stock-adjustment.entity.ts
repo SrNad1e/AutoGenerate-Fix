@@ -1,13 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Company } from 'src/configurations/entities/company.entity';
 
+import { Company } from 'src/configurations/entities/company.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Detalle de ajuste de productos' })
 export class DetailAdjustment {
 	@Field(() => Product, { description: 'Producto de la ajuste' })
 	product: Product;
@@ -27,7 +27,7 @@ export class DetailAdjustment {
 }
 
 @Schema({ timestamps: true, collection: 'stockadjustment' })
-@ObjectType()
+@ObjectType({ description: 'Ajuste de productos' })
 export class StockAdjustment extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;

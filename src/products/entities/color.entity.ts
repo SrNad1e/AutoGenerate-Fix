@@ -1,13 +1,14 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { User } from 'src/users/entities/user.entity';
 
 @Schema({ timestamps: true })
-@ObjectType()
-export class Color {
+@ObjectType({ description: 'Color del producto' })
+export class Color extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: mongoose.Types.ObjectId;
+	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre del color' })
 	@Prop({ type: String, required: true })
@@ -31,6 +32,18 @@ export class Color {
 	@Field(() => Boolean, { description: 'Estado del color' })
 	@Prop({ type: Boolean, default: true })
 	active: boolean;
+
+	@Prop({ type: Object, required: true })
+	@Field(() => User, { description: 'Usuario que crea el color' })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación del color' })
+	createdAt: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de actualización del color',
+	})
+	updatedAt: Date;
 
 	//TODO: campo de mysql
 	@Field(() => Number, {

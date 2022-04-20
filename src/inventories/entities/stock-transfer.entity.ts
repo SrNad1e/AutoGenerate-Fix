@@ -8,8 +8,42 @@ import { StockRequest } from './stock-request.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
 
+@ObjectType({ description: 'Detalle del traslado de productos' })
+class DetailTransfer {
+	@Field(() => Product, {
+		description: 'Producto del detalle',
+	})
+	product: Product;
+
+	@Field(() => Number, {
+		description: 'Cantidad del productos en el traslado',
+	})
+	quantity: number;
+
+	@Field(() => Number, {
+		description: 'Cantidad del productos confirmados en el traslado',
+		nullable: true,
+	})
+	quantityConfirmed?: number;
+
+	@Field(() => String, {
+		description: 'Estado del producto (confirmed, new)',
+	})
+	status: string;
+
+	@Field(() => Date, {
+		description: 'Fecha de agregado el producto',
+	})
+	createdAt: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de actualizacion el producto',
+	})
+	updatedAt: Date;
+}
+
 @Schema({ timestamps: true, collection: 'stocktransfer' })
-@ObjectType()
+@ObjectType({ description: 'Translado de productos' })
 export class StockTransfer extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
@@ -88,40 +122,6 @@ export class StockTransfer extends Document {
 }
 
 export const StockTransferSchema = SchemaFactory.createForClass(StockTransfer);
-
-@ObjectType()
-class DetailTransfer {
-	@Field(() => Product, {
-		description: 'Producto del detalle',
-	})
-	product: Product;
-
-	@Field(() => Number, {
-		description: 'Cantidad del productos en el traslado',
-	})
-	quantity: number;
-
-	@Field(() => Number, {
-		description: 'Cantidad del productos confirmados en el traslado',
-		nullable: true,
-	})
-	quantityConfirmed?: number;
-
-	@Field(() => String, {
-		description: 'Estado del producto (confirmed, new)',
-	})
-	status: string;
-
-	@Field(() => Date, {
-		description: 'Fecha de agregado el producto',
-	})
-	createdAt: Date;
-
-	@Field(() => Date, {
-		description: 'Fecha de actualizacion el producto',
-	})
-	updatedAt: Date;
-}
 
 @Entity({ name: 'stock_transfer' })
 export class StockTransferMysql {

@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({ description: 'Ordenamiento para el listado de atributos' })
 export class SortAttrib {
 	@Field({ nullable: true })
 	name?: number;
@@ -15,7 +15,7 @@ export class SortAttrib {
 	updatedAt?: number;
 }
 
-@InputType()
+@InputType({ description: 'Filtros para la lista de atributos' })
 export class FiltersAttribsInput {
 	@Field(() => String, { description: 'Nombre del atributo', nullable: true })
 	name?: string;

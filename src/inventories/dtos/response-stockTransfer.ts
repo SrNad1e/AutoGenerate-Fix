@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { StockTransfer } from '../entities/stock-transfer.entity';
 
-@ObjectType()
+@ObjectType({ description: 'Lista de traslados de productos' })
 export class ResponseStockTransfer {
 	@Field(() => [StockTransfer], { description: 'Lista de traslados' })
 	docs: StockTransfer[];
