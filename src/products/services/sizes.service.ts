@@ -33,7 +33,7 @@ export class SizesService {
 			filters.value = { $regex: name, $options: 'i' };
 		}
 
-		if (active) {
+		if (active !== undefined) {
 			filters.active = active;
 		}
 

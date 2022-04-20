@@ -23,7 +23,7 @@ export class BrandsService {
 	}: FiltersAttribsInput) {
 		const filters: FilterQuery<Brand> = {};
 
-		if (active) {
+		if (active !== undefined) {
 			filters.active = active;
 		}
 

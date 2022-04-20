@@ -61,7 +61,7 @@ export class CustomersService {
 			];
 		}
 
-		if (active) {
+		if (active !== undefined) {
 			filters.active = active;
 		}
 

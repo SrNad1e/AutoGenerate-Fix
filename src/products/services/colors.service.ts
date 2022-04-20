@@ -29,7 +29,7 @@ export class ColorsService {
 	}: FiltersColorInput): Promise<Partial<ResponseColor>> {
 		const filters: FilterQuery<Color> = {};
 
-		if (active) {
+		if (active !== undefined) {
 			filters.active = active;
 		}
 
