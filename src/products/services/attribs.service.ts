@@ -24,7 +24,7 @@ export class AttribsService {
 	}: FiltersAttribsInput) {
 		const filters: FilterQuery<Attrib> = {};
 
-		if (active) {
+		if (active !== undefined) {
 			filters.active = active;
 		}
 

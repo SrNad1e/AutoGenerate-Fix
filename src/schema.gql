@@ -1817,6 +1817,63 @@ type Reference {
   user: User!
 }
 
+"""Respuesta de la referencias"""
+type ReferenceData {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Atributos de la referencia"""
+  attribs: [Attrib!]!
+
+  """Marca de la referencia"""
+  brand: Brand!
+
+  """Categoría Nivel 1 de la referencia"""
+  categoryLevel1: CategoryLevel1!
+
+  """Categoría Nivel 2 de la referencia"""
+  categoryLevel2: CategoryLevel2!
+
+  """Categoría Nivel 3 de la referencia"""
+  categoryLevel3: CategoryLevel3!
+
+  """Determina si la referencia se puede cambiar"""
+  changeable: Boolean!
+
+  """Compañias que pueden usar la referencia"""
+  companies: [Company!]!
+
+  """Costo de la referencia"""
+  cost: Float!
+
+  """Fecha de creación de la referencia"""
+  createdAt: DateTime!
+
+  """Descripción de la referencia"""
+  description: String!
+
+  """Precio con descuento si se envía el tipo de cliente"""
+  discountPrice: Float!
+
+  """Nombre de la referencia"""
+  name: String!
+
+  """Precio de la referencia"""
+  price: Float!
+
+  """Productos de la referencia"""
+  products: [Product!]!
+
+  """Medidas de la referencia"""
+  shipping: Shipping!
+
+  """Fecha de actualización de la referencia"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la referencia"""
+  user: User!
+}
+
 """Respuesta al listado de los atributos"""
 type ResponseAttribs {
   """Lista de atributos"""
@@ -1985,7 +2042,7 @@ type ResponseProduct {
 """Respuesta al listado de las referencias"""
 type ResponseReferences {
   """Lista de referencias"""
-  docs: [Reference!]!
+  docs: [ReferenceData!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!

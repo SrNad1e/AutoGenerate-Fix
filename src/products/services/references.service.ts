@@ -18,6 +18,7 @@ import { CategoryLevel2 } from '../entities/category-level2.entity';
 import { CategoryLevel3 } from '../entities/category-level3.entity';
 import { Company } from '../../configurations/entities/company.entity';
 import { Reference } from '../entities/reference.entity';
+import { Product } from '../entities/product.entity';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -33,6 +34,8 @@ export class ReferencesService {
 	constructor(
 		@InjectModel(Reference.name)
 		private readonly referenceModel: PaginateModel<Reference>,
+		@InjectModel(Product.name)
+		private readonly productModel: PaginateModel<Product>,
 	) {}
 
 	async findAll(
@@ -79,7 +82,24 @@ export class ReferencesService {
 			populate,
 		};
 
-		return this.referenceModel.paginate(filters, options);
+		const references = await this.referenceModel.paginate(filters, options);
+		const responseReferences = [];
+
+		//TODO: falta agregar precio de descuento
+
+		for (let i = 0; i < references?.docs?.length; i++) {
+			const reference = references?.docs[i];
+			const products = await this.productModel.find({
+				reference: reference?._id,
+				status: 'active',
+			});
+			responseReferences.push({
+				...reference,
+				products,
+			});
+		}
+
+		return { ...references, docs: responseReferences };
 	}
 
 	async findById(_id: string, user: User) {

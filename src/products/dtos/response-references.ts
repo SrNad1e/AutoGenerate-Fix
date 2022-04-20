@@ -1,10 +1,25 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+
+import { Product } from '../entities/product.entity';
 import { Reference } from '../entities/reference.entity';
+
+@ObjectType({ description: 'Respuesta de la referencias' })
+class ReferenceData extends Reference {
+	@Field(() => [Product], { description: 'Productos de la referencia' })
+	products: Product[];
+
+	@Field(() => Number, {
+		description: 'Precio con descuento si se envía el tipo de cliente',
+	})
+	discountPrice: number;
+}
 
 @ObjectType({ description: 'Respuesta al listado de las referencias' })
 export class ResponseReferences {
-	@Field(() => [Reference], { description: 'Lista de referencias' })
-	docs: Reference[];
+	@Field(() => [ReferenceData], {
+		description: 'Lista de referencias',
+	})
+	docs: ReferenceData[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;

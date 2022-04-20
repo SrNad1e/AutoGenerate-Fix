@@ -17,7 +17,6 @@ export class ReferencesResolver {
 		name: 'references',
 		description: 'Listado de las referencias',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersReferencesInput',
