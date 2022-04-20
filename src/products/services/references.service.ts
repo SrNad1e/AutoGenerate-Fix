@@ -47,6 +47,7 @@ export class ReferencesService {
 			name,
 			sort,
 			price,
+			typeDiscount,
 		}: FiltersReferencesInput,
 		user: Partial<User>,
 	) {

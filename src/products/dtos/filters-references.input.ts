@@ -55,16 +55,21 @@ export class FiltersReferencesInput {
 		nullable: true,
 	})
 	categoryLevel1Id?: string;
+
 	@Field(() => String, {
 		description: 'Identificación de la marca',
 		nullable: true,
 	})
 	categoryLevel2Id?: string;
+
 	@Field(() => String, {
 		description: 'Identificación de la marca',
 		nullable: true,
 	})
 	categoryLevel3Id?: string;
+
+	@Field(() => String, { description: 'Tipo de descuento', nullable: true })
+	typeDiscount?: string;
 
 	@Field(() => SortReference, { description: 'Ordenamiento', nullable: true })
 	sort?: SortReference;

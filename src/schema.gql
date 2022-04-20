@@ -947,6 +947,9 @@ input FiltersReferencesInput {
 
   """Ordenamiento"""
   sort: SortReference
+
+  """Tipo de descuento"""
+  typeDiscount: String
 }
 
 """Filtros para la lista de tallas"""
