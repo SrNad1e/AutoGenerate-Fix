@@ -48,10 +48,15 @@ export class ReferencesService {
 			sort,
 			price,
 			typeDiscount,
+			active,
 		}: FiltersReferencesInput,
 		user: Partial<User>,
 	) {
 		const filters: FilterQuery<Reference> = {};
+
+		if (active !== undefined) {
+			filters.active = active;
+		}
 
 		if (brandId) {
 			filters.brand = new Types.ObjectId(brandId);
@@ -90,17 +95,22 @@ export class ReferencesService {
 
 		for (let i = 0; i < references?.docs?.length; i++) {
 			const reference = references?.docs[i];
-			const products = await this.productModel.find({
-				reference: reference?._id,
-				status: 'active',
-			});
+			const products = await this.productModel
+				.find({
+					reference: reference?._id,
+					status: 'active',
+				})
+				.populate(['color', 'size']);
 			responseReferences.push({
 				...reference,
 				products,
 			});
 		}
 
-		return { ...references, docs: responseReferences };
+		return {
+			...references,
+			docs: responseReferences,
+		};
 	}
 
 	async findById(_id: string, user: User) {

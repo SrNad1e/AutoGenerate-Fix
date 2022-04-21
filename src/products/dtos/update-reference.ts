@@ -76,4 +76,10 @@ export class UpdateReferenceInput {
 
 	@Field(() => Number, { description: 'Volumen del producto', nullable: true })
 	volume: number;
+
+	@Field(() => Boolean, {
+		description: 'Estado de la referencia',
+		nullable: true,
+	})
+	active: boolean;
 }

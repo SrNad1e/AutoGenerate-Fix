@@ -918,6 +918,9 @@ input FiltersProductsInput {
 
 """Filtros para la lista de referencias"""
 input FiltersReferencesInput {
+  """Referencia activa"""
+  active: Boolean
+
   """Identificación de la marca"""
   brandId: String
 
@@ -1774,6 +1777,9 @@ type Reference {
   """Identificador de mongo"""
   _id: String!
 
+  """Estado de la referencia"""
+  active: Boolean!
+
   """Atributos de la referencia"""
   attribs: [Attrib!]!
 
@@ -1824,6 +1830,9 @@ type Reference {
 type ReferenceData {
   """Identificador de mongo"""
   _id: String!
+
+  """Estado de la referencia"""
+  active: Boolean!
 
   """Atributos de la referencia"""
   attribs: [Attrib!]!
@@ -2938,6 +2947,9 @@ input UpdateProductInput {
 
 """Datos para actualizar referencia"""
 input UpdateReferenceInput {
+  """Estado de la referencia"""
+  active: Boolean
+
   """Identificador de los atributos de la referencia"""
   attribIds: [String!]
 

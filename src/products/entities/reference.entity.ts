@@ -101,6 +101,10 @@ export class Reference extends Document {
 	})
 	companies: Types.ObjectId[];
 
+	@Prop({ type: Boolean, default: true })
+	@Field(() => Boolean, { description: 'Estado de la referencia' })
+	active: boolean;
+
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la referencia' })
 	user: User;
