@@ -61,7 +61,7 @@ export class ColorsService {
 			name_internal: props.name_internal,
 		});
 
-		if (!color) {
+		if (color) {
 			throw new NotFoundException('El nombre del color ya existe');
 		}
 
