@@ -81,7 +81,7 @@ export class ColorsService {
 			name_internal: props.name_internal,
 		});
 
-		if (!colorName) {
+		if (colorName && colorName._id.toString() !== id) {
 			throw new NotFoundException('El nombre del color ya existe');
 		}
 		return this.colorModel.findByIdAndUpdate(id, { ...props, user });
