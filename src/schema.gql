@@ -263,7 +263,7 @@ input CreateColorInput {
   html: String!
 
   """Imagen asignada al color"""
-  image: String!
+  image: String
 
   """Nombre asignado al color"""
   name: String!

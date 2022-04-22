@@ -11,6 +11,9 @@ export class CreateColorInput {
 	@Field(() => String, { description: 'Url asignado al color' })
 	html: string;
 
-	@Field(() => String, { description: 'Imagen asignada al color' })
-	image: string;
+	@Field(() => String, {
+		description: 'Imagen asignada al color',
+		nullable: true,
+	})
+	image?: string;
 }
