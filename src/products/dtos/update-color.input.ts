@@ -14,6 +14,12 @@ export class UpdateColorInput {
 	})
 	name_internal?: string;
 
+	@Field(() => Boolean, {
+		description: 'Estado asignado al color',
+		nullable: true,
+	})
+	active?: boolean;
+
 	@Field(() => String, { description: 'Url asignado al color', nullable: true })
 	html?: string;
 

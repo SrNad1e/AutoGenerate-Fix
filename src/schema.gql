@@ -2908,6 +2908,9 @@ input UpdateBrandInput {
 
 """Datos para actualizar el color"""
 input UpdateColorInput {
+  """Estado asignado al color"""
+  active: Boolean
+
   """Url asignado al color"""
   html: String
 
