@@ -6,7 +6,7 @@ export class UpdateSizeInput {
 		description: 'Valor asignado a la talla',
 		nullable: true,
 	})
-	name?: string;
+	value?: string;
 
 	@Field(() => Boolean, {
 		description: 'Se encuentra activa la talla',
