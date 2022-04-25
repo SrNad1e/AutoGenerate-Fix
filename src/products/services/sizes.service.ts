@@ -52,7 +52,7 @@ export class SizesService {
 	}
 
 	async create(props: CreateSizeInput, user: User) {
-		const size = await this.sizeModel.findOne({ name: props.name });
+		const size = await this.sizeModel.findOne({ value: props.value });
 
 		if (!size) {
 			throw new NotFoundException('El nombre de la talla ya existe');
@@ -70,7 +70,7 @@ export class SizesService {
 			throw new NotFoundException('La talla que quiere actualizar no existe');
 		}
 
-		const sizeName = await this.sizeModel.findOne({ name: props.name });
+		const sizeName = await this.sizeModel.findOne({ value: props.value });
 
 		if (!sizeName) {
 			throw new NotFoundException('El nombre de la talla ya existe');
