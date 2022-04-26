@@ -37,6 +37,7 @@ import { AttribsService } from './services/attribs.service';
 import { AttribsResolver } from './resolvers/attribs.resolver';
 import { BrandsResolver } from './resolvers/brands.resolver';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import { CategoriesService } from './services/categories.service';
 
 @Module({
 	imports: [
@@ -78,6 +79,7 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 		AttribsService,
 		AttribsResolver,
 		BrandsResolver,
+		CategoriesService,
 	],
 	exports: [ProductsService],
 	controllers: [ProductsController],
