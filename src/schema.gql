@@ -341,7 +341,7 @@ input CreateReferenceInput {
 """Datos para crear una talla"""
 input CreateSizeInput {
   """Valor asignado a la talla"""
-  name: String!
+  value: String!
 }
 
 """Datos para crear el ajuste de productos"""
@@ -3005,7 +3005,7 @@ input UpdateSizeInput {
   active: Boolean
 
   """Valor asignado a la talla"""
-  name: String
+  value: String
 }
 
 """Datos para actualizar el ajuste de productos"""
