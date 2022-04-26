@@ -314,7 +314,12 @@ export class ProductsService {
 	async migration() {
 		try {
 			const productsMysql = await this.productRepo.find();
-			const warehouses = await this.warehousesService.findAll({}, {});
+			const warehouses = await this.warehousesService.findAll(
+				{},
+				{
+					username: 'admin',
+				},
+			);
 
 			const productsMongo = [];
 

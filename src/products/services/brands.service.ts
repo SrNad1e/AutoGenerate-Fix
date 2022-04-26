@@ -54,7 +54,7 @@ export class BrandsService {
 
 	async create(props: CreateBrandInput, user: Partial<User>) {
 		const brand = await this.findOne(props.name);
-		if (!brand) {
+		if (brand) {
 			throw new NotFoundException('La marca ya se encuentra registrada');
 		}
 		const newBrand = new this.brandModel({
@@ -76,7 +76,7 @@ export class BrandsService {
 			name: props.name,
 		});
 
-		if (!attribName) {
+		if (attribName) {
 			throw new NotFoundException('El nombre de la marca ya existe');
 		}
 		return this.brandModel.findByIdAndUpdate(id, { ...props, user });
