@@ -4,6 +4,30 @@ import { ObjectId } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 
+@ObjectType({ description: 'Enlaces de diferences tamaños' })
+export class ImageTypes {
+	@Field(() => String, { description: 'Enlace de imagen pequeña' })
+	small: string;
+
+	@Field(() => String, { description: 'Enlace de imagen mediana' })
+	big: string;
+
+	@Field(() => String, { description: 'Enlace de imagen grande' })
+	long: string;
+}
+
+@ObjectType({ description: 'Enlaces de diferences tipos' })
+export class Urls {
+	@Field(() => ImageTypes, { description: 'Enlaces de tipo webp' })
+	webp: ImageTypes;
+
+	@Field(() => ImageTypes, { description: 'Enlaces de tipo jpeg' })
+	jpeg: ImageTypes;
+
+	@Field(() => String, { description: 'Enlaces de tipo webp' })
+	original: string;
+}
+
 @ObjectType({ description: 'Indexación de las imagenes' })
 @Schema({ timestamps: true })
 export class Image {
@@ -14,15 +38,9 @@ export class Image {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Field(() => String, {
-		description: 'Key única con la que se guarda la imaen',
-	})
-	@Prop({ type: String, unique: true })
-	key: string;
-
-	@Field(() => String, { description: 'Dirección de la imagen' })
-	@Prop({ type: String, unique: true })
-	url: string;
+	@Field(() => Urls, { description: 'Direccines de la imagen' })
+	@Prop({ type: Object, required: true })
+	urls: Urls;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la imagen',

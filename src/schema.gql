@@ -1170,6 +1170,18 @@ input FiltersWarehousesInput {
   sort: SortWarehouse
 }
 
+"""Enlaces de diferences tamaños"""
+type ImageTypes {
+  """Enlace de imagen mediana"""
+  big: String!
+
+  """Enlace de imagen grande"""
+  long: String!
+
+  """Enlace de imagen pequeña"""
+  small: String!
+}
+
 """Factura"""
 type Invoice {
   """Identificador de mongo"""
@@ -3105,6 +3117,18 @@ input UpdateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Enlaces de diferences tipos"""
+type Urls {
+  """Enlaces de tipo jpeg"""
+  jpeg: ImageTypes!
+
+  """Enlaces de tipo webp"""
+  original: String!
+
+  """Enlaces de tipo webp"""
+  webp: ImageTypes!
 }
 
 """Usuario que manipula los datos de la aplicación"""
