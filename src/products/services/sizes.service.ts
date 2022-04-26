@@ -72,7 +72,7 @@ export class SizesService {
 
 		const sizeName = await this.sizeModel.findOne({ value: props.value });
 
-		if (sizeName) {
+		if (sizeName && id !== sizeName._id.toString()) {
 			throw new NotFoundException('El nombre de la talla ya existe');
 		}
 		return this.sizeModel.findByIdAndUpdate(id, { ...props, user });

@@ -372,9 +372,9 @@ export class ProductsService {
 							volume: product.shipping_volume,
 							brandId: brand._id.toString(),
 							companyId: company._id.toString(),
-							categoryLevel1Id: '6256c4f3d1df9f6796b1a42d',
-							categoryLevel2Id: '6256c530d1df9f6796b1a42e',
-							categoryLevel3Id: '6256c54cd1df9f6796b1a42f',
+							categoryLevel1Id: '6267e450874de734057c37ff',
+							categoryLevel2Id: '6267e47e874de734057c3800',
+							categoryLevel3Id: '6267e497874de734057c3801',
 						},
 						userDefault,
 					);

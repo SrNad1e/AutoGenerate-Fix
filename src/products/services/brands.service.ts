@@ -76,7 +76,7 @@ export class BrandsService {
 			name: props.name,
 		});
 
-		if (attribName) {
+		if (attribName && id !== attribName._id.toString()) {
 			throw new NotFoundException('El nombre de la marca ya existe');
 		}
 		return this.brandModel.findByIdAndUpdate(id, { ...props, user });

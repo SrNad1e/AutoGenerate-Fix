@@ -19,6 +19,8 @@ import { CategoryLevel3 } from '../entities/category-level3.entity';
 import { Company } from '../../configurations/entities/company.entity';
 import { Reference } from '../entities/reference.entity';
 import { Product } from '../entities/product.entity';
+import { BrandsService } from './brands.service';
+import { CategoriesService } from './categories.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -36,6 +38,8 @@ export class ReferencesService {
 		private readonly referenceModel: PaginateModel<Reference>,
 		@InjectModel(Product.name)
 		private readonly productModel: PaginateModel<Product>,
+		private readonly brandsService: BrandsService,
+		private readonly categoriesService: CategoriesService,
 	) {}
 
 	async findAll(
@@ -135,12 +139,41 @@ export class ReferencesService {
 	}
 
 	async create(
-		{ weight, width, long, volume, height, ...props }: CreateReferenceInput,
+		{
+			weight,
+			width,
+			long,
+			volume,
+			height,
+			brandId,
+			categoryLevel1Id,
+			categoryLevel2Id,
+			categoryLevel3Id,
+			...props
+		}: CreateReferenceInput,
 		user: User,
 	) {
+		const brand = await this.brandsService.findById(brandId);
+		const categoryLevel1 = await this.categoriesService.findById(
+			categoryLevel1Id,
+			1,
+		);
+		const categoryLevel2 = await this.categoriesService.findById(
+			categoryLevel2Id,
+			2,
+		);
+		const categoryLevel3 = await this.categoriesService.findById(
+			categoryLevel3Id,
+			3,
+		);
+
 		const reference = new this.referenceModel({
 			...props,
 			user,
+			brand,
+			categoryLevel1,
+			categoryLevel2,
+			categoryLevel3,
 			shipping: {
 				weight,
 				width,
