@@ -54,7 +54,7 @@ export class AttribsService {
 			name: props.name,
 		});
 
-		if (!attrib) {
+		if (attrib) {
 			throw new NotFoundException('El nombre del atributo ya existe');
 		}
 
@@ -74,7 +74,7 @@ export class AttribsService {
 			name: props.name,
 		});
 
-		if (!attribName) {
+		if (attribName && id !== attribName._id.toString()) {
 			throw new NotFoundException('El nombre del atributo ya existe');
 		}
 		return this.attribModel.findByIdAndUpdate(id, { ...props, user });
