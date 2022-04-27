@@ -193,8 +193,8 @@ type Color {
   """Identificador del color mysql"""
   id: Float @deprecated(reason: "Campo para migración de mysql")
 
-  """Url relativo de la imagen"""
-  image: String
+  """Imagen del color"""
+  image: Image
 
   """Nombre del color"""
   name: String!

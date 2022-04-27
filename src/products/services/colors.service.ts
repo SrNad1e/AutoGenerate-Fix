@@ -10,6 +10,9 @@ import { Color, ColorMysql } from '../entities/color.entity';
 import { CreateColorInput } from '../dtos/create-color.input';
 import { User } from 'src/users/entities/user.entity';
 import { UpdateColorInput } from '../dtos/update-color.input';
+import { Image } from 'src/staticfiles/entities/image.entity';
+
+const populate = [{ path: 'image', model: Image.name }];
 
 @Injectable()
 export class ColorsService {
@@ -18,6 +21,8 @@ export class ColorsService {
 		private readonly colorModel: PaginateModel<Color>,
 		@InjectRepository(ColorMysql)
 		private readonly colorRepo: Repository<ColorMysql>,
+		@InjectModel(Image.name)
+		private readonly imageModel: PaginateModel<Image>,
 	) {}
 
 	async findAll({
@@ -38,6 +43,7 @@ export class ColorsService {
 			page,
 			lean: true,
 			sort,
+			populate,
 		};
 
 		return this.colorModel.paginate(
@@ -53,13 +59,16 @@ export class ColorsService {
 	}
 
 	async findById(id: string) {
-		return this.colorModel.findById(id).lean();
+		return this.colorModel.findById(id).populate(populate).lean();
 	}
 
 	async create(props: CreateColorInput, user: User) {
-		const color = await this.colorModel.findOne({
-			name_internal: props.name_internal,
-		});
+		const color = await this.colorModel
+			.findOne({
+				name_internal: props.name_internal,
+			})
+			.populate(populate)
+			.lean();
 
 		if (color) {
 			throw new NotFoundException('El nombre del color ya existe');
@@ -101,18 +110,50 @@ export class ColorsService {
 		try {
 			const colorsMysql = await this.colorRepo.find();
 
-			const colorsMongo = colorsMysql.map((color) => {
-				const image = JSON.parse(color.image)?.imageSizes.thumbnail;
-				return {
-					name: color.name,
-					name_internal: color.name_internal,
-					html: color.html || '#fff',
-					id: color.id,
-					active: color.active,
-					image,
-				};
-			});
+			const colorsMongo = [];
 
+			for (let i = 0; i < colorsMysql.length; i++) {
+				const { image, name, name_internal, html, id, active } = colorsMysql[i];
+				let response = null;
+
+				if (image && image != 'null') {
+					const { imageSizes, path } = JSON.parse(image);
+					const { webp, jpg } = imageSizes;
+
+					const newImage = new this.imageModel({
+						name: path.split('/')[7],
+						user: {
+							name: 'Default',
+						},
+						urls: {
+							webp: {
+								small: webp?.S150x217.split('/')[7],
+								medium: webp?.S200x289.split('/')[7],
+								big: webp?.S900x1300.split('/')[7],
+							},
+							jpeg: {
+								small: jpg?.S150x217.split('/')[7],
+								medium: jpg?.S200x289.split('/')[7],
+								big: jpg?.S900x1300.split('/')[7],
+							},
+							original: jpg?.S400x578.split('/')[7],
+						},
+					});
+
+					response = await newImage.save();
+				}
+				colorsMongo.push({
+					name,
+					user: {
+						name: 'Default',
+					},
+					name_internal: name_internal,
+					html: html || '#fff',
+					id: id,
+					active: active,
+					image: response?._id,
+				});
+			}
 			await this.colorModel.create(colorsMongo);
 
 			return {

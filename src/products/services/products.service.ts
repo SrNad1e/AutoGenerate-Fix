@@ -388,7 +388,6 @@ export class ProductsService {
 					});
 				}
 
-				//crear imagenes
 				const imagesMysql = JSON.parse(product.images);
 
 				const images = [];
@@ -414,7 +413,7 @@ export class ProductsService {
 						},
 					});
 					const { _id } = await newImage.save();
-					images.push(new Types.ObjectId(_id));
+					images.push(_id);
 				}
 
 				productsMongo.push({

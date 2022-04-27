@@ -3,6 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { User } from 'src/users/entities/user.entity';
+import { Image } from 'src/staticfiles/entities/image.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Color del producto' })
@@ -22,12 +23,16 @@ export class Color extends Document {
 	@Prop({ type: String, default: '#fff' })
 	html: string;
 
-	@Field(() => String, {
-		description: 'Url relativo de la imagen',
+	@Field(() => Image, {
+		description: 'Imagen del color',
 		nullable: true,
 	})
-	@Prop({ type: String, default: '' })
-	image: string;
+	@Prop({
+		type: Types.ObjectId,
+		ref: Image.name,
+		autopopulate: true,
+	})
+	image: Types.ObjectId;
 
 	@Field(() => Boolean, { description: 'Estado del color' })
 	@Prop({ type: Boolean, default: true })
