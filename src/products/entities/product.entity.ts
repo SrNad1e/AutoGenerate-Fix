@@ -8,6 +8,7 @@ import { Size } from './size.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Reference } from './reference.entity';
+import { Image } from 'src/staticfiles/entities/image.entity';
 
 @ObjectType({ description: 'Inventario por bodegas del producto' })
 export class Stock {
@@ -56,6 +57,17 @@ export class Product extends Document {
 		required: true,
 	})
 	color: Types.ObjectId;
+
+	@Field(() => [Image], {
+		description: 'Imagenes del producto',
+	})
+	@Prop({
+		type: [SchemaMongo.Types.ObjectId],
+		ref: Image.name,
+		autopopulate: true,
+		default: [],
+	})
+	images: Types.ObjectId[];
 
 	@Field(() => Size, { description: 'Talla del producto' })
 	@Prop({

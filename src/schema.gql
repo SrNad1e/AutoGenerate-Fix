@@ -193,8 +193,8 @@ type Color {
   """Identificador del color mysql"""
   id: Float @deprecated(reason: "Campo para migración de mysql")
 
-  """Url relativo de la imagen"""
-  image: String
+  """Imagen del color"""
+  image: Image
 
   """Nombre del color"""
   name: String!
@@ -280,13 +280,16 @@ input CreateOrderInput {
 
 """Datos para crear un producto"""
 input CreateProductInput {
-  """Identificador del color"""
+  """Identificador del producto"""
   colorId: String!
+
+  """Identificador de las imagenes del producto"""
+  imagesId: [String!]
 
   """Identificador de la referencia"""
   referenceId: String!
 
-  """Identificador de la talla"""
+  """Identificador del producto"""
   sizeId: String!
 }
 
@@ -860,6 +863,21 @@ input FiltersCustomerInput {
   sort: SortCustomer
 }
 
+"""Filtros para la lista de imagenes"""
+input FiltersImagesInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín busqueda de la imagen"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortImage
+}
+
 input FiltersProductInput {
   """Identificador de mongo"""
   _id: String
@@ -1168,6 +1186,39 @@ input FiltersWarehousesInput {
 
   """Ordenamiento"""
   sort: SortWarehouse
+}
+
+"""Indexación de las imagenes"""
+type Image {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Nombre de la imagen"""
+  name: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Direccines de la imagen"""
+  urls: Urls!
+
+  """Usuario que creó o editó la imagen"""
+  user: User!
+}
+
+"""Enlaces de diferences tamaños"""
+type ImageTypes {
+  """Enlace de imagen grande"""
+  big: String!
+
+  """Enlace de imagen mediana"""
+  medium: String!
+
+  """Enlace de imagen pequeña"""
+  small: String!
 }
 
 """Factura"""
@@ -1610,6 +1661,9 @@ type Product {
   """Fecha de creación del producto"""
   createdAt: DateTime!
 
+  """Imagenes del producto"""
+  images: [Image!]!
+
   """Referencia del producto"""
   reference: Reference!
 
@@ -1656,6 +1710,12 @@ type Query {
     """Filtros para consultar el listado de clientes"""
     filtersCustomerInput: FiltersCustomerInput = {}
   ): ResponseCustomer!
+
+  """Listado de imagenes"""
+  images(
+    """Filtros para listar las imagenes"""
+    filtersImagesInput: FiltersImagesInput = {}
+  ): ResponseImages!
 
   """Obtiene la orden por el id"""
   orderId(
@@ -1989,6 +2049,39 @@ type ResponseColor {
 type ResponseCustomer {
   """Lista de clientes"""
   docs: [Customer!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de las imagenes"""
+type ResponseImages {
+  """Lista de imagenes"""
+  docs: [Image!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2486,6 +2579,11 @@ input SortCustomer {
   phone: Float!
 }
 
+"""Ordenamiento para el listado de imagenes"""
+input SortImage {
+  name: Float
+}
+
 """Ordenamiento para el listado de productos"""
 input SortProduct {
   barcode: Float
@@ -2941,6 +3039,9 @@ input UpdateProductInput {
   """Identificador del color"""
   colorId: String
 
+  """Identificador de las imagenes del producto"""
+  imagesId: [String!]
+
   """Identificador de la talla"""
   sizeId: String
 
@@ -3105,6 +3206,18 @@ input UpdateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Enlaces de diferences tipos"""
+type Urls {
+  """Enlaces de tipo jpeg"""
+  jpeg: ImageTypes!
+
+  """Enlaces de tipo webp"""
+  original: String!
+
+  """Enlaces de tipo webp"""
+  webp: ImageTypes!
 }
 
 """Usuario que manipula los datos de la aplicación"""

@@ -28,6 +28,7 @@ import { Reference } from '../entities/reference.entity';
 import { Size } from '../entities/size.entity';
 import { Color } from '../entities/color.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { Image } from 'src/staticfiles/entities/image.entity';
 
 const populate = [
 	{
@@ -42,6 +43,7 @@ const populate = [
 	{ path: 'color', model: Color.name },
 	{ path: 'size', model: Size.name },
 	{ path: 'reference', model: Reference.name },
+	{ path: 'images', model: Image.name },
 ];
 
 const statusTypes = ['active', 'inactive'];
@@ -51,6 +53,8 @@ export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
 		private readonly productModel: PaginateModel<Product>,
+		@InjectModel(Image.name)
+		private readonly imageModel: PaginateModel<Image>,
 		@InjectRepository(ProductMysql)
 		private readonly productRepo: Repository<ProductMysql>,
 		private readonly colorsService: ColorsService,
@@ -365,11 +369,11 @@ export class ProductsService {
 							changeable: product.changeable,
 							price: product.price,
 							cost: product.cost,
-							weight: product.shipping_weight,
-							width: product.shipping_width,
-							long: product.shipping_long,
-							height: product.shipping_height,
-							volume: product.shipping_volume,
+							weight: parseFloat(product?.shipping_weight?.toString() || '0'),
+							width: parseFloat(product.shipping_width?.toString() || '0'),
+							long: parseFloat(product.shipping_long?.toString() || '0'),
+							height: parseFloat(product.shipping_height?.toString() || '0'),
+							volume: parseFloat(product.shipping_volume?.toString() || '0'),
 							brandId: brand._id.toString(),
 							companyId: company._id.toString(),
 							categoryLevel1Id: '6267e450874de734057c37ff',
@@ -383,6 +387,35 @@ export class ProductsService {
 						name: product.reference,
 					});
 				}
+
+				const imagesMysql = JSON.parse(product.images);
+
+				const images = [];
+
+				for (let i = 0; i < imagesMysql.length; i++) {
+					const { imageSizes, alt } = imagesMysql[i];
+					const { webp, jpg } = imageSizes;
+					const newImage = new this.imageModel({
+						name: alt,
+						user: userDefault,
+						urls: {
+							webp: {
+								small: webp?.S150x217.split('/')[7],
+								medium: webp?.S200x289.split('/')[7],
+								big: webp?.S900x1300.split('/')[7],
+							},
+							jpeg: {
+								small: jpg?.S150x217.split('/')[7],
+								medium: jpg?.S200x289.split('/')[7],
+								big: jpg?.S900x1300.split('/')[7],
+							},
+							original: jpg?.S400x578.split('/')[7],
+						},
+					});
+					const { _id } = await newImage.save();
+					images.push(_id);
+				}
+
 				productsMongo.push({
 					reference: reference?._id,
 					barcode: product.barcode,
@@ -391,6 +424,7 @@ export class ProductsService {
 					status: product.state ? 'active' : 'inactive',
 					user: user,
 					stock,
+					images,
 				});
 			}
 

@@ -38,11 +38,13 @@ import { AttribsResolver } from './resolvers/attribs.resolver';
 import { BrandsResolver } from './resolvers/brands.resolver';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
 import { CategoriesService } from './services/categories.service';
+import { Image, ImageSchema } from 'src/staticfiles/entities/image.entity';
 
 @Module({
 	imports: [
 		MongooseModule.forFeature([
 			{ name: Color.name, schema: ColorSchema },
+			{ name: Image.name, schema: ImageSchema },
 			{ name: Size.name, schema: SizeSchema },
 			{ name: Brand.name, schema: BrandSchema },
 			{ name: Product.name, schema: ProductSchema },

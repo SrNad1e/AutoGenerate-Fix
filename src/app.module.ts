@@ -7,7 +7,6 @@ import * as Joi from 'joi';
 import config from './config';
 import { DatabasesModule } from './databases/databases.module';
 import { enviroments } from './enviroments';
-import { ImagesModule } from './images/images.module';
 import { InventoriesModule } from './inventories/inventories.module';
 import { ProductsModule } from './products/products.module';
 import { ShopsModule } from './shops/shops.module';
@@ -17,6 +16,8 @@ import { AppGateway } from './app.gateway';
 import { SalesModule } from './sales/sales.module';
 import { CrmModule } from './crm/crm.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
+import { StaticFilesModule } from './staticfiles/static-files.module';
+
 @Module({
 	imports: [
 		GraphQLModule.forRoot({
@@ -41,10 +42,14 @@ import { ConfigurationsModule } from './configurations/configurations.module';
 				MARIADB_PORT: Joi.number().required(),
 				MARIADB_HOST: Joi.string().required(),
 				SECRET_TOKEN: Joi.string().required(),
+				AWS_REGION: Joi.string().required(),
+				AWS_ACCESS_KEY_ID: Joi.string().required(),
+				AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+				AWS_PUBLIC_BUCKET_NAME: Joi.string().required(),
 			}),
 		}),
 		DatabasesModule,
-		ImagesModule,
+		StaticFilesModule,
 		InventoriesModule,
 		ProductsModule,
 		ShopsModule,
