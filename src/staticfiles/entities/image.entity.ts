@@ -38,7 +38,7 @@ export class Image {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Field(() => Urls, { description: 'Direccines de la imagen' })
+	@Field(() => Urls, { description: 'Direcciones de la imagen' })
 	@Prop({ type: Object, default: [] })
 	urls: Urls;
 
