@@ -860,6 +860,21 @@ input FiltersCustomerInput {
   sort: SortCustomer
 }
 
+"""Filtros para la lista de imagenes"""
+input FiltersImagesInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín busqueda de la imagen"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortImage
+}
+
 input FiltersProductInput {
   """Identificador de mongo"""
   _id: String
@@ -1168,6 +1183,27 @@ input FiltersWarehousesInput {
 
   """Ordenamiento"""
   sort: SortWarehouse
+}
+
+"""Indexación de las imagenes"""
+type Image {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Nombre de la imagen"""
+  name: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Direccines de la imagen"""
+  urls: Urls!
+
+  """Usuario que creó o editó la imagen"""
+  user: User!
 }
 
 """Enlaces de diferences tamaños"""
@@ -1669,6 +1705,12 @@ type Query {
     filtersCustomerInput: FiltersCustomerInput = {}
   ): ResponseCustomer!
 
+  """Listado de imagenes"""
+  images(
+    """Filtros para listar las imagenes"""
+    filtersImagesInput: FiltersImagesInput = {}
+  ): ResponseImages!
+
   """Obtiene la orden por el id"""
   orderId(
     """identificador del pedido"""
@@ -2001,6 +2043,39 @@ type ResponseColor {
 type ResponseCustomer {
   """Lista de clientes"""
   docs: [Customer!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de las imagenes"""
+type ResponseImages {
+  """Lista de imagenes"""
+  docs: [Image!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2496,6 +2571,11 @@ input SortCustomer {
 
   """ordernamiento por docuemnto"""
   phone: Float!
+}
+
+"""Ordenamiento para el listado de imagenes"""
+input SortImage {
+  name: Float
 }
 
 """Ordenamiento para el listado de productos"""

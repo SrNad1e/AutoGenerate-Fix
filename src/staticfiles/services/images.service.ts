@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel } from 'mongoose';
 
 import config from 'src/config';
 import { Image } from '../entities/image.entity';
 import { resizeImage, uploadFileAWS } from 'src/common/aws';
 import { User } from 'src/users/entities/user.entity';
+import { FiltersImagesInput } from '../dtos/filters-images.input';
 
 @Injectable()
 export class ImagesService {
@@ -15,6 +16,26 @@ export class ImagesService {
 		private readonly configService: ConfigType<typeof config>,
 		@InjectModel(Image.name) private readonly imageModel: PaginateModel<Image>,
 	) {}
+
+	async findAll({ name, sort, limit = 10, page = 1 }: FiltersImagesInput) {
+		const filters: FilterQuery<Image> = {};
+
+		if (name) {
+			filters.name = {
+				$regex: name,
+				$options: 'i',
+			};
+		}
+
+		const options = {
+			limit,
+			page,
+			lean: true,
+			sort,
+		};
+
+		return this.imageModel.paginate(filters, options);
+	}
 
 	async uploadImage(
 		{ buffer, mimetype, originalname }: Express.Multer.File,

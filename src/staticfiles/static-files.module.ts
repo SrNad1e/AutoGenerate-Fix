@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Image, ImageSchema } from './entities/image.entity';
 import { ImagesService } from './services/images.service';
 import { StaticfilesController } from './controllers/staticfiles.controller';
+import { ImagesResolver } from './resolvers/images.resolver';
 
 @Module({
 	imports: [
@@ -14,7 +15,7 @@ import { StaticfilesController } from './controllers/staticfiles.controller';
 			},
 		]),
 	],
-	providers: [ImagesService],
+	providers: [ImagesService, ImagesResolver],
 	controllers: [StaticfilesController],
 })
 export class StaticFilesModule {}
