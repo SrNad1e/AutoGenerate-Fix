@@ -21,6 +21,7 @@ import { Reference } from '../entities/reference.entity';
 import { Product } from '../entities/product.entity';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
+import { Image } from 'src/staticfiles/entities/image.entity';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -104,7 +105,21 @@ export class ReferencesService {
 					reference: reference?._id,
 					status: 'active',
 				})
-				.populate(['color', 'size']);
+				.populate([
+					'size',
+					{
+						path: 'color',
+						populate: {
+							path: 'image',
+							model: Image.name,
+						},
+					},
+					{
+						path: 'images',
+						model: Image.name,
+					},
+				]);
+
 			responseReferences.push({
 				...reference,
 				products,

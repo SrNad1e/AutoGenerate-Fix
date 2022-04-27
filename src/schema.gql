@@ -1202,7 +1202,7 @@ type Image {
   """Fecha de actualización"""
   updatedAt: DateTime!
 
-  """Direccines de la imagen"""
+  """Direcciones de la imagen"""
   urls: Urls!
 
   """Usuario que creó o editó la imagen"""

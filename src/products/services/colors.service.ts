@@ -118,7 +118,7 @@ export class ColorsService {
 
 				if (image && image != 'null') {
 					const { imageSizes, path } = JSON.parse(image);
-					const { webp, jpg } = imageSizes;
+					const { imgwebp, imgjpg } = imageSizes;
 
 					const newImage = new this.imageModel({
 						name: path.split('/')[7],
@@ -127,16 +127,16 @@ export class ColorsService {
 						},
 						urls: {
 							webp: {
-								small: webp?.S150x217.split('/')[7],
-								medium: webp?.S200x289.split('/')[7],
-								big: webp?.S900x1300.split('/')[7],
+								small: imgwebp.split('/')[7],
+								medium: imgwebp.split('/')[7],
+								big: imgwebp.split('/')[7],
 							},
 							jpeg: {
-								small: jpg?.S150x217.split('/')[7],
-								medium: jpg?.S200x289.split('/')[7],
-								big: jpg?.S900x1300.split('/')[7],
+								small: imgjpg.split('/')[7],
+								medium: imgjpg.split('/')[7],
+								big: imgjpg.split('/')[7],
 							},
-							original: jpg?.S400x578.split('/')[7],
+							original: imgjpg.split('/')[7],
 						},
 					});
 
