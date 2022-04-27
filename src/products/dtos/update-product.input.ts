@@ -25,4 +25,10 @@ export class UpdateProductInput {
 		nullable: true,
 	})
 	barcode: string;
+
+	@Field(() => [String], {
+		description: 'Identificador de las imagenes del producto',
+		nullable: true,
+	})
+	imagesId: string[];
 }

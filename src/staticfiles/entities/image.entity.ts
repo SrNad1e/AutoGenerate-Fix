@@ -10,10 +10,10 @@ export class ImageTypes {
 	small: string;
 
 	@Field(() => String, { description: 'Enlace de imagen mediana' })
-	big: string;
+	medium: string;
 
 	@Field(() => String, { description: 'Enlace de imagen grande' })
-	long: string;
+	big: string;
 }
 
 @ObjectType({ description: 'Enlaces de diferences tipos' })
@@ -39,7 +39,7 @@ export class Image {
 	name: string;
 
 	@Field(() => Urls, { description: 'Direccines de la imagen' })
-	@Prop({ type: Object, required: true })
+	@Prop({ type: Object, default: [] })
 	urls: Urls;
 
 	@Field(() => User, {

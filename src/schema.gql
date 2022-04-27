@@ -280,13 +280,16 @@ input CreateOrderInput {
 
 """Datos para crear un producto"""
 input CreateProductInput {
-  """Identificador del color"""
+  """Identificador del producto"""
   colorId: String!
+
+  """Identificador de las imagenes del producto"""
+  imagesId: [String!]
 
   """Identificador de la referencia"""
   referenceId: String!
 
-  """Identificador de la talla"""
+  """Identificador del producto"""
   sizeId: String!
 }
 
@@ -1208,11 +1211,11 @@ type Image {
 
 """Enlaces de diferences tamaños"""
 type ImageTypes {
-  """Enlace de imagen mediana"""
+  """Enlace de imagen grande"""
   big: String!
 
-  """Enlace de imagen grande"""
-  long: String!
+  """Enlace de imagen mediana"""
+  medium: String!
 
   """Enlace de imagen pequeña"""
   small: String!
@@ -1657,6 +1660,9 @@ type Product {
 
   """Fecha de creación del producto"""
   createdAt: DateTime!
+
+  """Imagenes del producto"""
+  images: [Image!]!
 
   """Referencia del producto"""
   reference: Reference!
@@ -3032,6 +3038,9 @@ input UpdateProductInput {
 
   """Identificador del color"""
   colorId: String
+
+  """Identificador de las imagenes del producto"""
+  imagesId: [String!]
 
   """Identificador de la talla"""
   sizeId: String

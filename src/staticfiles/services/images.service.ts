@@ -78,18 +78,18 @@ export class ImagesService {
 				webp: {
 					small: urlWebpSmall.Key,
 					medium: urlWebpMedium.Key,
-					Big: urlWebpBig.Key,
+					big: urlWebpBig.Key,
 				},
 				jpeg: {
 					small: urlJpegSmall.Key,
 					medium: urlJpegMedium.Key,
-					Big: urlJpegBig.Key,
+					big: urlJpegBig.Key,
 				},
 				original: urlOriginal.Key,
 			},
 			user,
 		});
-		const { urls } = await newImage.save();
-		return urls;
+		const { urls, _id } = await newImage.save();
+		return { _id, urls };
 	}
 }

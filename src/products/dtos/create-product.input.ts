@@ -5,9 +5,15 @@ export class CreateProductInput {
 	@Field(() => String, { description: 'Identificador de la referencia' })
 	referenceId: string;
 
-	@Field(() => String, { description: 'Identificador del color' })
+	@Field(() => String, { description: 'Identificador del producto' })
 	colorId: string;
 
-	@Field(() => String, { description: 'Identificador de la talla' })
+	@Field(() => String, { description: 'Identificador del producto' })
 	sizeId: string;
+
+	@Field(() => [String], {
+		description: 'Identificador de las imagenes del producto',
+		nullable: true,
+	})
+	imagesId: string[];
 }
