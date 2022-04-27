@@ -51,26 +51,24 @@ export class ImagesService {
 
 		const urlWebpBig = await uploadFileAWS(bufferBig.webp, 'webp', bucker);
 
-		const urls = {
-			webp: {
-				small: urlWebpSmall.Key,
-				medium: urlWebpMedium.Key,
-				Big: urlWebpBig.Key,
-			},
-			jpeg: {
-				small: urlJpegSmall.Key,
-				medium: urlJpegMedium.Key,
-				Big: urlJpegBig.Key,
-			},
-			original: urlOriginal.Key,
-		};
-
 		const newImage = new this.imageModel({
 			name: originalname,
-			urls,
+			urls: {
+				webp: {
+					small: urlWebpSmall.Key,
+					medium: urlWebpMedium.Key,
+					Big: urlWebpBig.Key,
+				},
+				jpeg: {
+					small: urlJpegSmall.Key,
+					medium: urlJpegMedium.Key,
+					Big: urlJpegBig.Key,
+				},
+				original: urlOriginal.Key,
+			},
 			user,
 		});
-
-		return newImage.save();
+		const { urls } = await newImage.save();
+		return urls;
 	}
 }
