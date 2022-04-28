@@ -431,33 +431,6 @@ input CreateStockTransferInput {
   warehouseOriginId: String!
 }
 
-"""Datos para la creación de un usuario"""
-input CreateUserInput {
-  """Identificador de la empresa a la que pertenece el usuario"""
-  companyId: String!
-
-  """Identificador del tipo de cliente"""
-  customerTypeId: String
-
-  """Nombre del usuario"""
-  name: String!
-
-  """Contraseña de usuario"""
-  password: String!
-
-  """Identificador del punto de venta asignado al usuario"""
-  pointOfSaleId: String
-
-  """Identificador del rol del usuario"""
-  role: String!
-
-  """Identificador de la tienda asignada al usuario"""
-  shopId: String!
-
-  """Usuario registrado"""
-  username: String!
-}
-
 """Cliente"""
 type Customer {
   """Identificador de mongo"""
@@ -1380,8 +1353,8 @@ type Mutation {
 
   """Se encarga de crear el usuario desde aplicaciones externas"""
   signup(
-    """Datos para la creación del usuario"""
-    createUserInput: CreateUserInput!
+    """Datos para la creación del usuario y cliente"""
+    signUpInput: SignUpInput!
   ): User!
 
   """Actualiza un atributo"""
@@ -2501,6 +2474,30 @@ type Shop {
 
   """Bodega de centro de distribución asignado"""
   warehouseMain: Warehouse
+}
+
+"""Datos para el registro de un usuario"""
+input SignUpInput {
+  """Fecha de cumpleaños del cliente"""
+  birthDate: String
+
+  """Documento de identidad del cliente"""
+  document: String!
+
+  """Correo del cliente"""
+  email: String!
+
+  """Nombres del cliente"""
+  firstName: String!
+
+  """Apellidos del cliente"""
+  lastName: String!
+
+  """Contraseña del cliente"""
+  password: String!
+
+  """Teléfono del cliente"""
+  phone: String
 }
 
 """Talla del producto"""
