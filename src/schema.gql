@@ -103,6 +103,9 @@ type CategoryLevel1 {
   """Identificador de mongo"""
   _id: String!
 
+  """Categorías inferiores"""
+  childs: [CategoryLevel2!]!
+
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
 
@@ -121,8 +124,8 @@ type CategoryLevel2 {
   """Identificador de mongo"""
   _id: String!
 
-  """Categoría padre"""
-  categoryParent: CategoryLevel1!
+  """Categorías inferiores"""
+  childs: [CategoryLevel3!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -141,9 +144,6 @@ type CategoryLevel2 {
 type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
-
-  """Categoría padre"""
-  categoryParent: CategoryLevel2!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -796,6 +796,15 @@ input FiltersBrandsInput {
 
   """Ordenamiento"""
   sort: SortBrand
+}
+
+"""Filtros para obtener la lista de categorías"""
+input FiltersCategoriesInput {
+  """Descripcion de la referencia"""
+  description: String
+
+  """Nombre de la referencia"""
+  name: String
 }
 
 """Filtros para la lista de colores"""
@@ -1666,6 +1675,12 @@ type Query {
     filtersBrandsInput: FiltersBrandsInput = {}
   ): ResponseBrands!
 
+  """Lista las categorías"""
+  categories(
+    """Filtros para obtener las categorías"""
+    filtersCategoriesInput: FiltersCategoriesInput = {}
+  ): ResponseCategories!
+
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
@@ -1953,6 +1968,39 @@ type ResponseAttribs {
 type ResponseBrands {
   """Lista de marcas"""
   docs: [Brand!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de las categorías"""
+type ResponseCategories {
+  """Lista de categorías"""
+  docs: [CategoryLevel1!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!

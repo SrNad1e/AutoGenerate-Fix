@@ -17,6 +17,8 @@ export class CategoriesService {
 		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3>,
 	) {}
 
+	async findAll({}: any) {}
+
 	async findById(_id: string, level: number) {
 		switch (level) {
 			case 1:

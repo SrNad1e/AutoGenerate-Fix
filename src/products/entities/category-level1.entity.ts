@@ -1,18 +1,28 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
+import { CategoryLevel2 } from './category-level2.entity';
 
 @ObjectType({ description: 'Categoría del producto nivel 1' })
 @Schema({ timestamps: true })
 export class CategoryLevel1 extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
-	_id: ObjectId;
+	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre de la categoría' })
 	@Prop({ type: String, required: true })
 	name: string;
+
+	@Field(() => [CategoryLevel2], { description: 'Categorías inferiores' })
+	@Prop({
+		type: [Types.ObjectId],
+		default: [],
+		ref: CategoryLevel2.name,
+		autopopulate: true,
+	})
+	childs: Types.ObjectId[];
 
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la categoría' })
