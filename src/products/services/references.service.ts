@@ -169,26 +169,45 @@ export class ReferencesService {
 		user: User,
 	) {
 		const brand = await this.brandsService.findById(brandId);
+
+		if (!brand) {
+			throw new NotFoundException('La marca no existe');
+		}
+
 		const categoryLevel1 = await this.categoriesService.findById(
 			categoryLevel1Id,
 			1,
 		);
+
+		if (!categoryLevel1) {
+			throw new NotFoundException('La categoría nivel 1 no existe');
+		}
+
 		const categoryLevel2 = await this.categoriesService.findById(
 			categoryLevel2Id,
 			2,
 		);
+
+		if (!categoryLevel2) {
+			throw new NotFoundException('La categoría nivel 2 no existe');
+		}
+
 		const categoryLevel3 = await this.categoriesService.findById(
 			categoryLevel3Id,
 			3,
 		);
 
+		if (!categoryLevel3) {
+			throw new NotFoundException('La categoría nivel 3 no existe');
+		}
+
 		const reference = new this.referenceModel({
 			...props,
 			user,
-			brand,
-			categoryLevel1,
-			categoryLevel2,
-			categoryLevel3,
+			brand: brand._id,
+			categoryLevel1: categoryLevel1._id,
+			categoryLevel2: categoryLevel2._id,
+			categoryLevel3: categoryLevel3._id,
 			shipping: {
 				weight,
 				width,
