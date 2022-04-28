@@ -62,78 +62,36 @@ export class CategoriesService {
 	}
 
 	async create(
-		{ name, categoryLevel1Id, categoryLevel2Id }: CreateCategoryInput,
+		{ name, level, parentCategoryId }: CreateCategoryInput,
 		user: Partial<User>,
 	) {
-		if (categoryLevel2Id) {
-			if (!categoryLevel1Id) {
+		if (level === 1) {
+			const category = await this.categoryLevel1Model.findOne({ name });
+			if (category) {
 				throw new NotFoundException(
-					'Debe seleccionar una categoŕia de nivel 1',
+					`El nombre ${name} ya ha sido asignado a una categoría`,
 				);
 			}
-
-			const categoryLevel1 = await this.findById(categoryLevel1Id, 1);
-
-			if (!categoryLevel1) {
-				throw new NotFoundException(
-					'La categoría nivel 1 seleccionada no existe',
-				);
-			}
-
-			const categoryLevel2 = await this.findById(categoryLevel2Id, 2);
-
-			if (!categoryLevel2) {
-				throw new NotFoundException(
-					'La categoría nivel 2 seleccionada no existe',
-				);
-			}
-
-			const categoryLevel3 = await this.categoryLevel3Model.findOne({ name });
-
-			if (
-				categoryLevel3 &&
-				categoryLevel2['childs']?.include[categoryLevel3._id]
-			) {
-				throw new NotFoundException(
-					`'El nombre "${name}" ya se encuentra asignado a una categoría`,
-				);
-			}
-
-			const newCategory = new this.categoryLevel3Model({
+			const newCategory = new this.categoryLevel1Model({
 				name,
 				user,
 			});
-
-			const response = await newCategory.save();
-
-			await this.categoryLevel2Model.findByIdAndUpdate(categoryLevel2Id, {
-				$set: {
-					childs: categoryLevel2['childs'].contat(response._id),
-				},
-			});
-
-			return this.categoryLevel1Model
-				.findById(categoryLevel1Id)
-				.populate(populate).lean;
+			return (await newCategory.save()).populate(populate);
 		}
 
-		if (categoryLevel1Id) {
-			const categoryLevel1 = await this.findById(categoryLevel1Id, 1);
+		if (level === 2) {
+			const categoryParent = await this.findById(parentCategoryId, 1);
 
-			if (!categoryLevel1) {
-				throw new NotFoundException(
-					'La categoría nivel 1 seleccionada no existe',
-				);
+			if (!categoryParent) {
+				throw new NotFoundException('La categoría padre no existe');
 			}
 
-			const categoryLevel2 = await this.categoryLevel2Model.findOne({ name });
+			const category = await this.categoryLevel2Model.findOne({ name });
+			const childs = categoryParent['childs'].map((child) => child.toString());
 
-			if (
-				categoryLevel2 &&
-				categoryLevel1['childs']?.include[categoryLevel2._id]
-			) {
+			if (category && childs.includes(category?._id.toString())) {
 				throw new NotFoundException(
-					`'El nombre "${name}" ya se encuentra asignado a una categoría`,
+					`El nombre ${name} ya ha sido asignado a una categoría`,
 				);
 			}
 
@@ -141,35 +99,54 @@ export class CategoriesService {
 				name,
 				user,
 			});
-
 			const response = await newCategory.save();
 
-			return this.categoryLevel1Model.findByIdAndUpdate(
-				categoryLevel1Id,
+			return this.update(
+				response._id.toString(),
 				{
-					$set: {
-						childs: categoryLevel1['childs'].contat(response._id),
-					},
+					level: 2,
+					parentCategoryId,
 				},
-				{
-					populate,
-					new: true,
-					lean: true,
-				},
+				user,
 			);
 		}
 
-		const newCategory = new this.categoryLevel1Model({
-			name,
-			user,
-		});
+		if (level === 3) {
+			const categoryParent = await this.findById(parentCategoryId, 2);
 
-		return (await newCategory.save()).populate(populate);
+			if (!categoryParent) {
+				throw new NotFoundException('La categoría padre no existe');
+			}
+
+			const category = await this.categoryLevel3Model.findOne({ name });
+			const childs = categoryParent['childs'].map((child) => child.toString());
+
+			if (category && childs.includes(category._id.toString())) {
+				throw new NotFoundException(
+					`El nombre ${name} ya ha sido asignado a una categoría`,
+				);
+			}
+
+			const newCategory = new this.categoryLevel3Model({
+				name,
+				user,
+			});
+			const response = await newCategory.save();
+
+			return this.update(
+				response._id.toString(),
+				{
+					level: 3,
+					parentCategoryId,
+				},
+				user,
+			);
+		}
 	}
 
 	async update(
 		id: string,
-		{ level, patentCategoryId, name }: UpdateCategoryInput,
+		{ level, parentCategoryId, name }: UpdateCategoryInput,
 		user: Partial<User>,
 	) {
 		if (level === 1) {
@@ -222,22 +199,25 @@ export class CategoriesService {
 				await this.categoryLevel2Model.findByIdAndUpdate(id, {
 					$set: {
 						name,
+						user,
 					},
 				});
 			}
 
-			if (patentCategoryId) {
-				const categoryParent = await this.findById(patentCategoryId, 1);
+			if (parentCategoryId) {
+				const categoryParent = await this.findById(parentCategoryId, 1);
 				if (!categoryParent) {
 					throw new NotFoundException(
 						'La categoría a la que piensa asiganarla no existe',
 					);
 				}
+
 				const categoryFind = await this.categoryLevel1Model.findOne({
 					childs: {
 						$in: new Types.ObjectId(id),
 					},
 				});
+
 				if (categoryFind) {
 					await this.categoryLevel1Model.findByIdAndUpdate(
 						categoryFind._id,
@@ -246,6 +226,7 @@ export class CategoriesService {
 								childs: categoryFind['childs'].filter(
 									(child) => child.toString() !== id,
 								),
+								user,
 							},
 						},
 						{
@@ -255,11 +236,13 @@ export class CategoriesService {
 						},
 					);
 				}
+
 				return this.categoryLevel1Model.findByIdAndUpdate(
-					patentCategoryId,
+					parentCategoryId,
 					{
 						$set: {
-							childs: categoryParent['childs'].include(new Types.ObjectId(id)),
+							childs: categoryParent['childs'].concat(new Types.ObjectId(id)),
+							user,
 						},
 					},
 					{
@@ -270,11 +253,14 @@ export class CategoriesService {
 				);
 			}
 
-			return this.categoryLevel1Model.findOne({
-				childs: {
-					$in: new Types.ObjectId(id),
-				},
-			});
+			return this.categoryLevel1Model
+				.findOne({
+					childs: {
+						$in: new Types.ObjectId(id),
+					},
+				})
+				.populate(populate)
+				.lean();
 		}
 
 		if (level === 3) {
@@ -296,12 +282,13 @@ export class CategoriesService {
 				await this.categoryLevel3Model.findByIdAndUpdate(id, {
 					$set: {
 						name,
+						user,
 					},
 				});
 			}
 
-			if (patentCategoryId) {
-				const categoryParent = await this.findById(patentCategoryId, 2);
+			if (parentCategoryId) {
+				const categoryParent = await this.findById(parentCategoryId, 2);
 
 				if (!categoryParent) {
 					throw new NotFoundException(
@@ -323,26 +310,26 @@ export class CategoriesService {
 								childs: categoryFind['childs'].filter(
 									(child) => child.toString() !== id,
 								),
+								user,
 							},
 						},
 						{
 							lean: true,
-							populate,
 							new: true,
 						},
 					);
 				}
 
 				await this.categoryLevel2Model.findByIdAndUpdate(
-					patentCategoryId,
+					parentCategoryId,
 					{
 						$set: {
-							childs: categoryParent['childs'].include(new Types.ObjectId(id)),
+							childs: categoryParent['childs'].concat(new Types.ObjectId(id)),
+							user,
 						},
 					},
 					{
 						lean: true,
-						populate,
 						new: true,
 					},
 				);
@@ -354,11 +341,14 @@ export class CategoriesService {
 				},
 			});
 
-			return this.categoryLevel1Model.findOne({
-				childs: {
-					$in: responseLevel2._id,
-				},
-			});
+			return this.categoryLevel1Model
+				.findOne({
+					childs: {
+						$in: responseLevel2._id,
+					},
+				})
+				.populate(populate)
+				.lean();
 		}
 
 		throw new NotFoundException(`Nivel ${level} no existe`);

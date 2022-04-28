@@ -5,11 +5,15 @@ export class UpdateCategoryInput {
 	@Field(() => Number, { description: 'Nivel de la categoría' })
 	level: number;
 
-	@Field(() => String, { description: 'Nombre de la categoría' })
+	@Field(() => String, {
+		description: 'Nombre de la categoría',
+		nullable: true,
+	})
 	name?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la categoría padre ',
+		nullable: true,
 	})
-	patentCategoryId?: string;
+	parentCategoryId?: string;
 }

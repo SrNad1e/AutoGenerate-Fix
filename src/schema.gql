@@ -259,14 +259,14 @@ input CreateBrandInput {
 
 """Datos para la creación de una categoría"""
 input CreateCategoryInput {
-  """Identificador de la categoría nivel 1"""
-  categoryLevel1Id: String
-
-  """Identificador de la categoría nivel 2"""
-  categoryLevel2Id: String
+  """Nivel de la categoría"""
+  level: Float
 
   """Nombre de la categoría"""
   name: String!
+
+  """Identificador de la categoría padre"""
+  parentCategoryId: String
 }
 
 """Datos para crear un color"""
@@ -3092,10 +3092,10 @@ input UpdateCategoryInput {
   level: Float!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre """
-  patentCategoryId: String!
+  parentCategoryId: String
 }
 
 """Datos para actualizar el color"""
