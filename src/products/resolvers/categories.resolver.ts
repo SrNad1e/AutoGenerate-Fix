@@ -1,9 +1,12 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import { CreateCategoryInput } from '../dtos/create-category.input';
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';
 import { ResponseCategories } from '../dtos/response-categories';
+import { UpdateCategoryInput } from '../dtos/update-category.input';
+import { CategoryLevel1 } from '../entities/category-level1.entity';
 import { CategoriesService } from '../services/categories.service';
 
 @Resolver()
@@ -27,36 +30,42 @@ export class CategoriesResolver {
 	) {
 		return this.categoriesService.findAll(context.req.body.variables.input);
 	}
-	/*
-	@Mutation(() => Color, { name: 'createColor', description: 'Crea un color' })
+	@Mutation(() => CategoryLevel1, {
+		name: 'createCategory',
+		description: 'Crea una categoría',
+	})
 	@UseGuards(JwtAuthGuard)
 	create(
-		@Args('createColorInput', { description: 'Datos para crear el color' })
-		_: CreateColorInput,
+		@Args('createCategoryInput', {
+			description: 'Datos para crear una categoría',
+		})
+		_: CreateCategoryInput,
 		@Context() context,
 	) {
-		return this.colorsService.create(
+		return this.categoriesService.create(
 			context.req.body.variables.input,
 			context.req.user,
 		);
 	}
 
-	@Mutation(() => Color, {
-		name: 'updateColor',
-		description: 'Actualiza el color',
+	@Mutation(() => CategoryLevel1, {
+		name: 'updateCategory',
+		description: 'Actualiza la categoría',
 	})
 	@UseGuards(JwtAuthGuard)
 	update(
-		@Args('id', { description: 'Identificador del color a actualizar' })
+		@Args('id', { description: 'Identificador de la categoría a actualizar' })
 		id: string,
-		@Args('updateColorInput', { description: 'Datos para actualizar un color' })
-		_: UpdateColorInput,
+		@Args('updateCategoryInput', {
+			description: 'Datos para actualizar una categoría',
+		})
+		_: UpdateCategoryInput,
 		@Context() context,
 	) {
-		return this.colorsService.update(
+		return this.categoriesService.update(
 			id,
 			context.req.body.variables.input,
 			context.req.user,
 		);
-	}*/
+	}
 }

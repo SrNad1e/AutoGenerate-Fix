@@ -104,7 +104,7 @@ type CategoryLevel1 {
   _id: String!
 
   """Categorías inferiores"""
-  childs: [CategoryLevel2!]!
+  childs: [CategoryLevel2!]
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -125,7 +125,7 @@ type CategoryLevel2 {
   _id: String!
 
   """Categorías inferiores"""
-  childs: [CategoryLevel3!]!
+  childs: [CategoryLevel3!]
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -254,6 +254,18 @@ input CreateAttribInput {
 """Datos para crear una marca"""
 input CreateBrandInput {
   """Nombre de la marca"""
+  name: String!
+}
+
+"""Datos para la creación de una categoría"""
+input CreateCategoryInput {
+  """Identificador de la categoría nivel 1"""
+  categoryLevel1Id: String
+
+  """Identificador de la categoría nivel 2"""
+  categoryLevel2Id: String
+
+  """Nombre de la categoría"""
   name: String!
 }
 
@@ -800,11 +812,17 @@ input FiltersBrandsInput {
 
 """Filtros para obtener la lista de categorías"""
 input FiltersCategoriesInput {
-  """Descripcion de la referencia"""
-  description: String
+  """Cantidad de registros"""
+  limit: Float
 
-  """Nombre de la referencia"""
+  """Nombre de la categoría de primer nivel"""
   name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortCategories
 }
 
 """Filtros para la lista de colores"""
@@ -1285,6 +1303,12 @@ type Mutation {
     createBrandInput: CreateBrandInput!
   ): Brand!
 
+  """Crea una categoría"""
+  createCategory(
+    """Datos para crear una categoría"""
+    createCategoryInput: CreateCategoryInput!
+  ): CategoryLevel1!
+
   """Crea un color"""
   createColor(
     """Datos para crear el color"""
@@ -1380,6 +1404,15 @@ type Mutation {
     """Datos a actualizar en la marca"""
     updateBrandInput: UpdateBrandInput!
   ): Brand!
+
+  """Actualiza la categoría"""
+  updateCategory(
+    """Identificador de la categoría a actualizar"""
+    id: String!
+
+    """Datos para actualizar una categoría"""
+    updateCategoryInput: UpdateCategoryInput!
+  ): CategoryLevel1!
 
   """Actualiza el color"""
   updateColor(
@@ -2585,6 +2618,13 @@ input SortBrand {
   updatedAt: Float
 }
 
+"""Ordenamiento para el listado de categorías"""
+input SortCategories {
+  createdAt: Float
+  name: Float
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de colores"""
 input SortColor {
   active: Float
@@ -3044,6 +3084,18 @@ input UpdateBrandInput {
 
   """Valor asignado a la marca"""
   name: String
+}
+
+"""Datos para actualizar la categoría"""
+input UpdateCategoryInput {
+  """Nivel de la categoría"""
+  level: Float!
+
+  """Nombre de la categoría"""
+  name: String!
+
+  """Identificador de la categoría padre """
+  patentCategoryId: String!
 }
 
 """Datos para actualizar el color"""

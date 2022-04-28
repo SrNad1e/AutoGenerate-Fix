@@ -67,7 +67,6 @@ export class ColorsService {
 			.findOne({
 				name_internal: props.name_internal,
 			})
-			.populate(populate)
 			.lean();
 
 		if (color) {
