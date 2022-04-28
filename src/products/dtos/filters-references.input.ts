@@ -68,9 +68,6 @@ export class FiltersReferencesInput {
 	})
 	categoryLevel3Id?: string;
 
-	@Field(() => String, { description: 'Tipo de descuento', nullable: true })
-	typeDiscount?: string;
-
 	@Field(() => Boolean, { description: 'Referencia activa', nullable: true })
 	active?: boolean;
 

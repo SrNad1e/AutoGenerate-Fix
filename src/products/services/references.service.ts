@@ -52,7 +52,6 @@ export class ReferencesService {
 			name,
 			sort,
 			price,
-			typeDiscount,
 			active,
 		}: FiltersReferencesInput,
 		user: Partial<User>,

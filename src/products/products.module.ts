@@ -58,7 +58,7 @@ import { Image, ImageSchema } from 'src/staticfiles/entities/image.entity';
 				name: Reference.name,
 				useFactory: () => {
 					const schema = ReferenceSchema;
-					schema.index({ name: 'text', description: 'text' }, { name: 'text' });
+					schema.index({ name: 'text', description: 'text' });
 					return schema;
 				},
 			},
