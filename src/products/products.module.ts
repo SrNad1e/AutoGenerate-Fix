@@ -39,6 +39,7 @@ import { BrandsResolver } from './resolvers/brands.resolver';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
 import { CategoriesService } from './services/categories.service';
 import { Image, ImageSchema } from 'src/staticfiles/entities/image.entity';
+import { CategoriesResolver } from './resolvers/categories.resolver';
 
 @Module({
 	imports: [
@@ -82,6 +83,7 @@ import { Image, ImageSchema } from 'src/staticfiles/entities/image.entity';
 		AttribsResolver,
 		BrandsResolver,
 		CategoriesService,
+		CategoriesResolver,
 	],
 	exports: [ProductsService],
 	controllers: [ProductsController],

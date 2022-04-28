@@ -103,6 +103,9 @@ type CategoryLevel1 {
   """Identificador de mongo"""
   _id: String!
 
+  """Categorías inferiores"""
+  childs: [CategoryLevel2!]
+
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
 
@@ -121,8 +124,8 @@ type CategoryLevel2 {
   """Identificador de mongo"""
   _id: String!
 
-  """Categoría padre"""
-  categoryParent: CategoryLevel1!
+  """Categorías inferiores"""
+  childs: [CategoryLevel3!]
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -141,9 +144,6 @@ type CategoryLevel2 {
 type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
-
-  """Categoría padre"""
-  categoryParent: CategoryLevel2!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -255,6 +255,18 @@ input CreateAttribInput {
 input CreateBrandInput {
   """Nombre de la marca"""
   name: String!
+}
+
+"""Datos para la creación de una categoría"""
+input CreateCategoryInput {
+  """Nivel de la categoría"""
+  level: Float
+
+  """Nombre de la categoría"""
+  name: String!
+
+  """Identificador de la categoría padre"""
+  parentCategoryId: String
 }
 
 """Datos para crear un color"""
@@ -798,6 +810,21 @@ input FiltersBrandsInput {
   sort: SortBrand
 }
 
+"""Filtros para obtener la lista de categorías"""
+input FiltersCategoriesInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la categoría de primer nivel"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortCategories
+}
+
 """Filtros para la lista de colores"""
 input FiltersColorInput {
   """Estado de la bodega"""
@@ -1276,6 +1303,12 @@ type Mutation {
     createBrandInput: CreateBrandInput!
   ): Brand!
 
+  """Crea una categoría"""
+  createCategory(
+    """Datos para crear una categoría"""
+    createCategoryInput: CreateCategoryInput!
+  ): CategoryLevel1!
+
   """Crea un color"""
   createColor(
     """Datos para crear el color"""
@@ -1371,6 +1404,15 @@ type Mutation {
     """Datos a actualizar en la marca"""
     updateBrandInput: UpdateBrandInput!
   ): Brand!
+
+  """Actualiza la categoría"""
+  updateCategory(
+    """Identificador de la categoría a actualizar"""
+    id: String!
+
+    """Datos para actualizar una categoría"""
+    updateCategoryInput: UpdateCategoryInput!
+  ): CategoryLevel1!
 
   """Actualiza el color"""
   updateColor(
@@ -1666,6 +1708,12 @@ type Query {
     filtersBrandsInput: FiltersBrandsInput = {}
   ): ResponseBrands!
 
+  """Lista las categorías"""
+  categories(
+    """Filtros para obtener las categorías"""
+    filtersCategoriesInput: FiltersCategoriesInput = {}
+  ): ResponseCategories!
+
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
@@ -1953,6 +2001,39 @@ type ResponseAttribs {
 type ResponseBrands {
   """Lista de marcas"""
   docs: [Brand!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de las categorías"""
+type ResponseCategories {
+  """Lista de categorías"""
+  docs: [CategoryLevel1!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2537,6 +2618,13 @@ input SortBrand {
   updatedAt: Float
 }
 
+"""Ordenamiento para el listado de categorías"""
+input SortCategories {
+  createdAt: Float
+  name: Float
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de colores"""
 input SortColor {
   active: Float
@@ -2996,6 +3084,18 @@ input UpdateBrandInput {
 
   """Valor asignado a la marca"""
   name: String
+}
+
+"""Datos para actualizar la categoría"""
+input UpdateCategoryInput {
+  """Nivel de la categoría"""
+  level: Float!
+
+  """Nombre de la categoría"""
+  name: String
+
+  """Identificador de la categoría padre """
+  parentCategoryId: String
 }
 
 """Datos para actualizar el color"""

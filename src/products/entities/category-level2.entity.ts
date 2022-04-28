@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
-import { CategoryLevel1 } from './category-level1.entity';
+import { CategoryLevel3 } from './category-level3.entity';
 
 @ObjectType({ description: 'Categoría del producto nivel 2' })
 @Schema({ timestamps: true })
@@ -15,9 +15,17 @@ export class CategoryLevel2 extends Document {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Prop({ type: Types.ObjectId })
-	@Field(() => CategoryLevel1, { description: 'Categoría padre' })
-	categoryParent: Types.ObjectId;
+	@Field(() => [CategoryLevel3], {
+		description: 'Categorías inferiores',
+		nullable: true,
+	})
+	@Prop({
+		type: [Types.ObjectId],
+		default: [],
+		ref: CategoryLevel3.name,
+		autopopulate: true,
+	})
+	childs: Types.ObjectId[];
 
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la categoría' })
