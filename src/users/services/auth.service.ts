@@ -90,7 +90,7 @@ export class AuthService {
 			throw new NotFoundException('La tienda Mayoristas no existe');
 		}
 
-		return await this.usersService.create({
+		return this.usersService.create({
 			name: `${firstName} ${lastName}`,
 			username: email,
 			password,
