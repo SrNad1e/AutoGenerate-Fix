@@ -452,7 +452,7 @@ type Customer {
   active: Boolean!
 
   """Direcciones del cliente"""
-  address: [Address!]
+  addresses: [Address!]
 
   """Fecha de nacimiento"""
   birthday: DateTime

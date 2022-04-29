@@ -83,7 +83,7 @@ export class Customer extends Document {
 		nullable: true,
 	})
 	@Prop({ type: Array, default: [] })
-	address: Address[];
+	addresses: Address[];
 
 	@Field(() => String, {
 		description: 'Número telefónico del cliente',
