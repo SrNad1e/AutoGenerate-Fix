@@ -45,7 +45,7 @@ import { PointOfSalesService } from './services/point-of-sales.service';
 			{
 				name: Invoice.name,
 				useFactory: async (connection: Connection) => {
-					const schema = PointOfSaleSchema;
+					const schema = InvoiceSchema;
 					const AutoIncrement = AutoIncrementFactory(connection);
 					schema.plugin(AutoIncrement, {
 						id: 'invoice_increment',
@@ -68,7 +68,12 @@ import { PointOfSalesService } from './services/point-of-sales.service';
 			},
 		]),
 	],
-	providers: [OrdersService, OrdersResolver, InvoicesService, PointOfSalesService],
-	exports: [OrdersService],
+	providers: [
+		OrdersService,
+		OrdersResolver,
+		InvoicesService,
+		PointOfSalesService,
+	],
+	exports: [OrdersService, PointOfSalesService],
 })
 export class SalesModule {}

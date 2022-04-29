@@ -12,13 +12,13 @@ export class CreateUserInput {
 	password: string;
 
 	@Field({ description: 'Identificador del rol del usuario' })
-	role: string;
+	roleId: string;
 
 	@Field(() => String, {
 		description: 'Identificador del tipo de cliente',
 		nullable: true,
 	})
-	customerTypeId: string;
+	customerTypeId?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la tienda asignada al usuario',
@@ -29,7 +29,7 @@ export class CreateUserInput {
 		description: 'Identificador del punto de venta asignado al usuario',
 		nullable: true,
 	})
-	pointOfSaleId: string;
+	pointOfSaleId?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la empresa a la que pertenece el usuario',

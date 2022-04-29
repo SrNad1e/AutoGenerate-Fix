@@ -44,7 +44,7 @@ export class AuthService {
 		};
 	}
 
-	async signup({ email, document, ...params }: SignUpInput) {
+	async signup({ email, document, companyId, ...params }: SignUpInput) {
 		const user = await this.usersService.findOne(email);
 
 		if (user) {
@@ -62,7 +62,9 @@ export class AuthService {
 				...params,
 			});
 		}
-		//const newUser = new this.usersService.create();
+		/*const newUser = new this.usersService.create({
+			companyId,
+		});*/
 	}
 
 	/**

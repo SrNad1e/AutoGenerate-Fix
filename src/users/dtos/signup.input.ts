@@ -36,4 +36,9 @@ export class SignUpInput {
 		description: 'Identificación de tipo de cliente',
 	})
 	customerTypeId: string;
+
+	@Field(() => String, {
+		description: 'Identificador de la compañia a la que pertenece',
+	})
+	companyId: string;
 }

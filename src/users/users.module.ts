@@ -22,6 +22,11 @@ import { Shop, ShopSchema } from 'src/shops/entities/shop.entity';
 import { UsersController } from './controllers/users.controller';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
 import { CrmModule } from 'src/crm/crm.module';
+import {
+	PointOfSale,
+	PointOfSaleSchema,
+} from 'src/sales/entities/pointOfSale.entity';
+import { RolesService } from './services/roles.service';
 
 @Module({
 	imports: [
@@ -50,6 +55,10 @@ import { CrmModule } from 'src/crm/crm.module';
 			{
 				name: Shop.name,
 				schema: ShopSchema,
+			},
+			{
+				name: PointOfSale.name,
+				schema: PointOfSaleSchema,
 			},
 		]),
 		MongooseModule.forFeatureAsync([
@@ -83,6 +92,7 @@ import { CrmModule } from 'src/crm/crm.module';
 		AuthResolver,
 		LocalStrategy,
 		JwtStrategy,
+		RolesService,
 	],
 	exports: [UsersService],
 	controllers: [UsersController],

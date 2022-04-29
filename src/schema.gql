@@ -2556,6 +2556,9 @@ input SignUpInput {
   """Fecha de cumpleaños del cliente"""
   birthDate: String
 
+  """Identificador de la compañia a la que pertenece"""
+  companyId: String!
+
   """Identificación de tipo de cliente"""
   customerTypeId: String!
 
@@ -3293,7 +3296,7 @@ input UpdateUserInput {
   pointOfSaleId: String
 
   """Identificador del rol del usuario"""
-  role: String
+  roleId: String
 
   """Identificador de la tienda asignada al usuario"""
   shopId: String

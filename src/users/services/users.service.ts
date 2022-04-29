@@ -18,6 +18,9 @@ import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../entities/permission.entity';
 import { CreateUserInput } from '../dtos/create-user.input';
+import { CompaniesService } from 'src/configurations/services/companies.service';
+import { CustomersService } from 'src/crm/services/customers.service';
+import { RolesService } from './roles.service';
 
 const populate = [
 	{ path: 'role', model: Role.name },
@@ -56,6 +59,11 @@ export class UsersService {
 		@InjectRepository(UserMysql)
 		private readonly userRepo: Repository<UserMysql>,
 		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
+		@InjectModel(PointOfSale.name)
+		private readonly pointOfSaleModel: PaginateModel<PointOfSale>,
+		private readonly companiesService: CompaniesService,
+		private readonly customersService: CustomersService,
+		private readonly rolesService: RolesService,
 	) {}
 
 	async findAll(
@@ -122,15 +130,63 @@ export class UsersService {
 		return user;
 	}
 
-	async create({ username }: CreateUserInput): Promise<User> {
-		//se valuda si el usuario existe
+	async create({
+		username,
+		shopId,
+		companyId,
+		pointOfSaleId,
+		customerTypeId,
+		roleId,
+		...params
+	}: CreateUserInput): Promise<User> {
+		const user = await this.findOne(username);
 
-		//valida si la tienda a la que se va a asignar existe
-		//valida el punto de venta
-		//valida el la compañia a la que se va a asignar
+		if (user) {
+			throw new NotFoundException(
+				`El usuario ${username} ya se encuentra registrado`,
+			);
+		}
+
+		const role = await this.rolesService.findById(roleId);
+
+		if (!role) {
+			throw new NotFoundException('El rol seleccionado no existe');
+		}
+
+		const shop = await this.shopModel.findById(shopId);
+
+		if (!shop || shop.company._id.toString() !== companyId) {
+			throw new NotFoundException('La tienda no se encuentra registrada');
+		}
+
+		const company = await this.companiesService.findById(companyId);
+
+		if (!company) {
+			throw new NotFoundException('La empresa no se encuentra registrada');
+		}
+
+		let pointOfSale;
+		if (pointOfSaleId) {
+			pointOfSale = await this.pointOfSaleModel.findById(pointOfSaleId).lean();
+			if (!pointOfSale || pointOfSale?.shop.toString() !== shopId) {
+				throw new NotFoundException(
+					'El punto de venta no existe o no esta asignado a la tienda',
+				);
+			}
+		}
+
+		let customerType;
+		if (customerTypeId) {
+			customerType = await this.customersService.findById(customerTypeId);
+			if (!customerType) {
+				throw new NotFoundException('El cliente no existe');
+			}
+		}
 
 		const newUser = new this.userModel({
-			//...user,
+			role: role._id,
+			customerType: customerType._id,
+			...params,
 		});
 		return (await newUser.save()).populate(populate);
 	}
