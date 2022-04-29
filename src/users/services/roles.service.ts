@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
+import { FiltersRolInput } from '../dtos/filters-rol.input';
 
 import { Role } from '../entities/role.entity';
 
@@ -12,5 +13,9 @@ export class RolesService {
 
 	async findById(id: string) {
 		return this.roleModel.findById(id).lean();
+	}
+
+	async findOne(filters: FiltersRolInput) {
+		return this.roleModel.findOne(filters).lean();
 	}
 }

@@ -5,23 +5,29 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
+import { PaginateModel } from 'mongoose';
 
 import { CompaniesService } from 'src/configurations/services/companies.service';
 import { CustomersService } from 'src/crm/services/customers.service';
+import { Shop } from 'src/shops/entities/shop.entity';
+import { ShopsService } from 'src/shops/services/shops.service';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
 import { SignUpInput } from '../dtos/signup.input';
 import { User } from '../entities/user.entity';
+import { RolesService } from './roles.service';
 import { UsersService } from './users.service';
 
 @Injectable()
 export class AuthService {
 	constructor(
+		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
-		private readonly companiesService: CompaniesService,
 		private readonly customersService: CustomersService,
+		private readonly rolesService: RolesService,
 	) {}
 
 	async login(
@@ -44,7 +50,15 @@ export class AuthService {
 		};
 	}
 
-	async signup({ email, document, companyId, ...params }: SignUpInput) {
+	async signup({
+		email,
+		document,
+		companyId,
+		firstName,
+		lastName,
+		password,
+		...params
+	}: SignUpInput) {
 		const user = await this.usersService.findOne(email);
 
 		if (user) {
@@ -58,13 +72,33 @@ export class AuthService {
 		if (!customer) {
 			customer = await this.customersService.create({
 				email,
+				firstName,
+				lastName,
 				document,
 				...params,
 			});
 		}
-		/*const newUser = new this.usersService.create({
+		const role = await this.rolesService.findOne({ name: 'Cliente' });
+
+		if (!role) {
+			throw new NotFoundException('El rol para cliente no existe');
+		}
+
+		const shop = await this.shopModel.findOne({ name: 'Mayoristas' }).lean();
+
+		if (!shop) {
+			throw new NotFoundException('La tienda Mayoristas no existe');
+		}
+
+		return await this.usersService.create({
+			name: `${firstName} ${lastName}`,
+			username: email,
+			password,
+			roleId: role._id.toString(),
+			customerTypeId: customer._id.toString(),
+			shopId: shop._id.toString(),
 			companyId,
-		});*/
+		});
 	}
 
 	/**

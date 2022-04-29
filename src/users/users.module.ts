@@ -27,6 +27,7 @@ import {
 	PointOfSaleSchema,
 } from 'src/sales/entities/pointOfSale.entity';
 import { RolesService } from './services/roles.service';
+import { ShopsModule } from 'src/shops/shops.module';
 
 @Module({
 	imports: [

@@ -6,6 +6,7 @@ import { CompaniesService } from 'src/configurations/services/companies.service'
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateShopInput } from '../dtos/create-shop.input';
+import { FiltersShopInput } from '../dtos/filters-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { UpdateShopInput } from '../dtos/update-shop.input';
 
@@ -63,6 +64,10 @@ export class ShopsService {
 
 	async findById(shopId: string) {
 		return this.shopModel.findById(shopId).populate(populate).lean();
+	}
+
+	async findOne(filters: FiltersShopInput) {
+		return this.shopModel.findOne(filters).lean();
 	}
 
 	async create(params: CreateShopInput) {
