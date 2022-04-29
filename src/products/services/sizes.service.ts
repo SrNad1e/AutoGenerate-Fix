@@ -6,8 +6,8 @@ import { Repository } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateSizeInput } from '../dtos/create-size.input';
-import { FiltersSizeInput } from '../dtos/filters-size.input';
-import { ResponseSize } from '../dtos/response-size';
+import { FiltersSizesInput } from '../dtos/filters-sizes.input';
+import { ResponseSizes } from '../dtos/response-sizes';
 import { UpdateSizeInput } from '../dtos/update-size.input';
 import { Size, SizeMysql } from '../entities/size.entity';
 
@@ -26,7 +26,7 @@ export class SizesService {
 		page = 1,
 		active,
 		sort,
-	}: FiltersSizeInput): Promise<Partial<ResponseSize>> {
+	}: FiltersSizesInput): Promise<Partial<ResponseSizes>> {
 		const filters: FilterQuery<Size> = {};
 
 		if (name) {

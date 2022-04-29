@@ -7,7 +7,7 @@ import {
 	FiltersProductInput,
 	FiltersProductsInput,
 } from '../dtos/filters-products.input';
-import { ResponseProduct } from '../dtos/response-product';
+import { ResponseProducts } from '../dtos/response-products';
 import { UpdateProductInput } from '../dtos/update-product.input';
 import { Product } from '../entities/product.entity';
 import { ProductsService } from '../services/products.service';
@@ -16,7 +16,7 @@ import { ProductsService } from '../services/products.service';
 export class ProductsResolver {
 	constructor(private readonly productsService: ProductsService) {}
 
-	@Query(() => ResponseProduct, {
+	@Query(() => ResponseProducts, {
 		name: 'products',
 		description: 'Lista los productos',
 	})

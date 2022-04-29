@@ -2,8 +2,8 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
-import { ResponseColor } from '../dtos/response-color';
-import { FiltersColorInput } from '../dtos/filters-colors.input';
+import { ResponseColors } from '../dtos/response-colors';
+import { FiltersColorsInput } from '../dtos/filters-colors.input';
 import { Color } from '../entities/color.entity';
 import { ColorsService } from '../services/colors.service';
 import { UpdateColorInput } from '../dtos/update-color.input';
@@ -13,7 +13,7 @@ import { CreateColorInput } from '../dtos/create-color.input';
 export class ColorsResolver {
 	constructor(private readonly colorsService: ColorsService) {}
 
-	@Query(() => ResponseColor, {
+	@Query(() => ResponseColors, {
 		name: 'colors',
 		description: 'Lista los colores',
 	})
@@ -25,7 +25,7 @@ export class ColorsResolver {
 			defaultValue: {},
 			description: 'Filtros para obtener los colores',
 		})
-		_: FiltersColorInput,
+		_: FiltersColorsInput,
 		@Context() context,
 	) {
 		return this.colorsService.findAll(context.req.body.variables.input);

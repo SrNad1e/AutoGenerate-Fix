@@ -823,7 +823,7 @@ input FiltersCategoriesInput {
 }
 
 """Filtros para la lista de colores"""
-input FiltersColorInput {
+input FiltersColorsInput {
   """Estado de la bodega"""
   active: Boolean
 
@@ -968,7 +968,7 @@ input FiltersReferencesInput {
 }
 
 """Filtros para la lista de tallas"""
-input FiltersSizeInput {
+input FiltersSizesInput {
   """Estado de la bodega"""
   active: Boolean
 
@@ -1714,8 +1714,8 @@ type Query {
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
-    filtersColorInput: FiltersColorInput = {}
-  ): ResponseColor!
+    filtersColorInput: FiltersColorsInput = {}
+  ): ResponseColors!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
@@ -1754,7 +1754,7 @@ type Query {
   products(
     """Filtros para consoltar los productos"""
     filtersProductsInput: FiltersProductsInput = {}
-  ): ResponseProduct!
+  ): ResponseProducts!
 
   """Obtiene la referencia por el identificador"""
   referenceId(
@@ -1771,8 +1771,8 @@ type Query {
   """Listar las tallas"""
   sizes(
     """Filtros para consultar las tallas"""
-    filtersSizeInput: FiltersSizeInput = {}
-  ): ResponseSize!
+    filtersSizesInput: FiltersSizesInput = {}
+  ): ResponseSizes!
 
   """Obtiene un ajuste de productos con base a su identificador"""
   stockAdjustmentId(
@@ -2061,7 +2061,7 @@ type ResponseCategories {
 }
 
 """Respuesta al listado de los colores"""
-type ResponseColor {
+type ResponseColors {
   """Lista de colores"""
   docs: [Color!]!
 
@@ -2160,7 +2160,7 @@ type ResponseImages {
 }
 
 """Respuesta al listado de los productos"""
-type ResponseProduct {
+type ResponseProducts {
   """Lista de productos"""
   docs: [Product!]!
 
@@ -2226,7 +2226,7 @@ type ResponseReferences {
 }
 
 """Respuesta al listado de las tallas"""
-type ResponseSize {
+type ResponseSizes {
   """Lista de tallas"""
   docs: [Size!]!
 
