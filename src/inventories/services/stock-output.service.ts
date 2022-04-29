@@ -12,7 +12,7 @@ import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
-import { FiltersStockOutputInput } from '../dtos/filters-stockOutput.input';
+import { FiltersStockOutputsInput } from '../dtos/filters-stockOutputs.input';
 import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockHistoryService } from './stock-history.service';
@@ -72,7 +72,7 @@ export class StockOutputService {
 			page = 1,
 			dateFinal,
 			dateInitial,
-		}: FiltersStockOutputInput,
+		}: FiltersStockOutputsInput,
 		user: Partial<User>,
 		companyId: string,
 	) {

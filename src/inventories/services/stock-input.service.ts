@@ -16,7 +16,7 @@ import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
-import { FiltersStockInputInput } from '../dtos/filters-stockInput.input';
+import { FiltersStockInputsInput } from '../dtos/filters-stockInputs.input';
 import { UpdateStockInputInput } from '../dtos/update-stockInput-input';
 import { StockInput } from '../entities/stock-input.entity';
 import { StockHistoryService } from './stock-history.service';
@@ -73,7 +73,7 @@ export class StockInputService {
 			page = 1,
 			dateFinal,
 			dateInitial,
-		}: FiltersStockInputInput,
+		}: FiltersStockInputsInput,
 		user: Partial<User>,
 		companyId: string,
 	) {

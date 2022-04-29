@@ -3,14 +3,14 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';
-import { ResponseCustomer } from '../dtos/response-customer';
+import { ResponseCustomers } from '../dtos/response-customers';
 import { CustomersService } from '../services/customers.service';
 
 @Resolver()
 export class CustomersResolver {
 	constructor(private readonly customersService: CustomersService) {}
 
-	@Query(() => ResponseCustomer, {
+	@Query(() => ResponseCustomers, {
 		name: 'customers',
 		description: 'Listado de clientes',
 	})

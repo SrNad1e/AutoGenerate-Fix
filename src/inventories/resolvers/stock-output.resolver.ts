@@ -3,8 +3,8 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
-import { FiltersStockOutputInput } from '../dtos/filters-stockOutput.input';
-import { ResponseStockOutput } from '../dtos/response-stockOutput';
+import { FiltersStockOutputsInput } from '../dtos/filters-stockOutputs.input';
+import { ResponseStockOutputs } from '../dtos/response-stockOutputs';
 import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockOutputService } from '../services/stock-output.service';
@@ -13,19 +13,19 @@ import { StockOutputService } from '../services/stock-output.service';
 export class StockOutputResolver {
 	constructor(private readonly stockOutputService: StockOutputService) {}
 
-	@Query(() => ResponseStockOutput, {
+	@Query(() => ResponseStockOutputs, {
 		name: 'stockOutputs',
 		description: 'Listado de salidas de productos',
 	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersStockOutputInput',
+			name: 'filtersStockOutputsInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros del listado de salidas de productos',
 		})
-		_: FiltersStockOutputInput,
+		_: FiltersStockOutputsInput,
 		@Context() context,
 	) {
 		return this.stockOutputService.findAll(

@@ -15,7 +15,7 @@ import { ShopsService } from 'src/shops/services/shops.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
-import { FiltersStockRequestInput } from '../dtos/filters-stockRequest.input';
+import { FiltersStockRequestsInput } from '../dtos/filters-stockRequests.input';
 import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
 import { StockRequest } from '../entities/stock-request.entity';
 
@@ -65,7 +65,7 @@ export class StockRequestService {
 		warehouseOriginId,
 		dateFinal,
 		dateInitial,
-	}: FiltersStockRequestInput) {
+	}: FiltersStockRequestsInput) {
 		const filters: FilterQuery<StockRequest> = {};
 		try {
 			if (number) {

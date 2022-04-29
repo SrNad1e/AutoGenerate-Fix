@@ -17,7 +17,7 @@ import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
-import { FiltersStockTransferInput } from '../dtos/filters-stockTransfer.input';
+import { FiltersStockTransfersInput } from '../dtos/filters-stockTransfers.input';
 import {
 	DetailStockTransferInput,
 	UpdateStockTransferInput,
@@ -82,7 +82,7 @@ export class StockTransferService {
 		warehouseOriginId,
 		dateInitial,
 		dateFinal,
-	}: FiltersStockTransferInput) {
+	}: FiltersStockTransfersInput) {
 		const filters: FilterQuery<StockTransfer> = {};
 
 		try {

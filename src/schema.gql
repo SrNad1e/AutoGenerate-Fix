@@ -986,7 +986,7 @@ input FiltersSizeInput {
 }
 
 """Filtros para el listado de ajsutes de productos"""
-input FiltersStockAdjustmentInput {
+input FiltersStockAdjustmentsInput {
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -1016,7 +1016,7 @@ input FiltersStockAdjustmentInput {
 }
 
 """Filtros para el listado de entradas de productos"""
-input FiltersStockInputInput {
+input FiltersStockInputsInput {
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -1046,7 +1046,7 @@ input FiltersStockInputInput {
 }
 
 """Filtros para el listado de salidas de productos"""
-input FiltersStockOutputInput {
+input FiltersStockOutputsInput {
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -1076,7 +1076,7 @@ input FiltersStockOutputInput {
 }
 
 """Filtros para el listado de solicitudes de productos"""
-input FiltersStockRequestInput {
+input FiltersStockRequestsInput {
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -1106,7 +1106,7 @@ input FiltersStockRequestInput {
 }
 
 """Filtros para el listado de traslados de productos"""
-input FiltersStockTransferInput {
+input FiltersStockTransfersInput {
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -1724,7 +1724,7 @@ type Query {
   customers(
     """Filtros para consultar el listado de clientes"""
     filtersCustomerInput: FiltersCustomersInput = {}
-  ): ResponseCustomer!
+  ): ResponseCustomers!
 
   """Listado de imagenes"""
   images(
@@ -1783,8 +1783,8 @@ type Query {
   """Lista de ajustes de productos"""
   stockAdjustments(
     """Filtros de lista de ajustes de productos"""
-    filtersStockAdjustmentInput: FiltersStockAdjustmentInput = {}
-  ): ResponseStockAdjustment!
+    filtersStockAdjustmentsInput: FiltersStockAdjustmentsInput = {}
+  ): ResponseStockAdjustments!
 
   """Obtiene una entrada de productos con base a su identificador"""
   stockInputId(
@@ -1795,8 +1795,8 @@ type Query {
   """Lista de entradas de productos"""
   stockInputs(
     """Filtros de lista de entradas de productos"""
-    filtersStockInputInput: FiltersStockInputInput = {}
-  ): ResponseStockInput!
+    filtersStockInputsInput: FiltersStockInputsInput = {}
+  ): ResponseStockInputs!
 
   """Obtiene una salida de productos con base al identificador"""
   stockOutputId(
@@ -1807,8 +1807,8 @@ type Query {
   """Listado de salidas de productos"""
   stockOutputs(
     """Filtros del listado de salidas de productos"""
-    filtersStockOutputInput: FiltersStockOutputInput = {}
-  ): ResponseStockOutput!
+    filtersStockOutputsInput: FiltersStockOutputsInput = {}
+  ): ResponseStockOutputs!
 
   """Obtiene una solicitud de productos por su identificador"""
   stockRequestId(
@@ -1819,8 +1819,8 @@ type Query {
   """Lista las solicitudes de productos"""
   stockRequests(
     """Filtros de las solicitudes de productos"""
-    filtersStockRequestInput: FiltersStockRequestInput = {}
-  ): ResponseStockRequest!
+    filtersStockRequestsInput: FiltersStockRequestsInput = {}
+  ): ResponseStockRequests!
 
   """Consulta el trasldo por el identificador"""
   stockTransferId(
@@ -1831,8 +1831,8 @@ type Query {
   """Obtiene listado de traslados de productos entre bodegas"""
   stockTransfers(
     """Filtros para listado de traslados de productos entre bodegas"""
-    filtersStockTransferInput: FiltersStockTransferInput = {}
-  ): ResponseStockTransfer!
+    filtersStockTransfersInput: FiltersStockTransfersInput = {}
+  ): ResponseStockTransfers!
 
   """Consulta todos los usuarios con base a los filtros"""
   users(
@@ -2094,7 +2094,7 @@ type ResponseColor {
 }
 
 """Respuesta del listado de clientes"""
-type ResponseCustomer {
+type ResponseCustomers {
   """Lista de clientes"""
   docs: [Customer!]!
 
@@ -2259,7 +2259,7 @@ type ResponseSize {
 }
 
 """Lista de ajustes de productos"""
-type ResponseStockAdjustment {
+type ResponseStockAdjustments {
   """Lista de ajustes"""
   docs: [StockAdjustment!]!
 
@@ -2292,7 +2292,7 @@ type ResponseStockAdjustment {
 }
 
 """Lista de entradas de productos"""
-type ResponseStockInput {
+type ResponseStockInputs {
   """Lista de entradas"""
   docs: [StockInput!]!
 
@@ -2325,7 +2325,7 @@ type ResponseStockInput {
 }
 
 """Lista de salidas de productos"""
-type ResponseStockOutput {
+type ResponseStockOutputs {
   """Lista de salidas"""
   docs: [StockOutput!]!
 
@@ -2358,7 +2358,7 @@ type ResponseStockOutput {
 }
 
 """Lista de solicitudes de productos"""
-type ResponseStockRequest {
+type ResponseStockRequests {
   """Lista de solicitudes"""
   docs: [StockRequest!]!
 
@@ -2391,7 +2391,7 @@ type ResponseStockRequest {
 }
 
 """Lista de traslados de productos"""
-type ResponseStockTransfer {
+type ResponseStockTransfers {
   """Lista de traslados"""
   docs: [StockTransfer!]!
 

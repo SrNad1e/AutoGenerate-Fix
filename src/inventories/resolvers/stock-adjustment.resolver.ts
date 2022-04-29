@@ -3,8 +3,8 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
-import { FiltersStockAdjustmentInput } from '../dtos/filters-stockAdjustment.input';
-import { ResponseStockAdjustment } from '../dtos/response-stockAdjustment';
+import { FiltersStockAdjustmentsInput } from '../dtos/filters-stockAdjustments.input';
+import { ResponseStockAdjustments } from '../dtos/response-stockAdjustments';
 import { UpdateStockAdjustmentInput } from '../dtos/update-stockAdjustment-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockAdjustmentService } from '../services/stock-adjustment.service';
@@ -15,19 +15,19 @@ export class StockAdjustmentResolver {
 		private readonly stockAdjustmentService: StockAdjustmentService,
 	) {}
 
-	@Query(() => ResponseStockAdjustment, {
+	@Query(() => ResponseStockAdjustments, {
 		name: 'stockAdjustments',
 		description: 'Lista de ajustes de productos',
 	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersStockAdjustmentInput',
+			name: 'filtersStockAdjustmentsInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros de lista de ajustes de productos',
 		})
-		_: FiltersStockAdjustmentInput,
+		_: FiltersStockAdjustmentsInput,
 		@Context() context,
 	) {
 		return this.stockAdjustmentService.findAll(
