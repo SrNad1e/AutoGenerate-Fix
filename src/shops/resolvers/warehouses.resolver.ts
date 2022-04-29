@@ -28,7 +28,8 @@ export class WarehousesResolver {
 	) {
 		return this.warehousesService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

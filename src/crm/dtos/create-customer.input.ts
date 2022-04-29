@@ -19,44 +19,37 @@ export class CreateCustomerInput {
 		description: 'Dirección del cliente',
 		nullable: true,
 	})
-	direction: Address;
+	direction?: Address;
 
 	@Field(() => String, {
 		description: 'Identificación de tipo de cliente',
-		nullable: true,
 	})
 	customerTypeId: string;
 
-	@Field(() => Number, { description: 'Número de teléfono', nullable: true })
-	phone: number;
+	@Field(() => String, { description: 'Número de teléfono', nullable: true })
+	phone?: string;
 
 	@Field(() => Boolean, {
 		description: 'El teléfono tiene whatsapp',
 		nullable: true,
 	})
-	isWhatsapp: boolean;
+	isWhatsapp?: boolean;
 
 	@Field(() => String, {
 		description: 'Correo del cliente',
 		nullable: true,
 	})
-	email: string;
+	email?: string;
 
 	@Field(() => Boolean, {
 		description: 'Es el cliente por defecto, solo debe existir uno',
 		nullable: true,
 	})
-	isDefault: boolean;
-
-	@Field(() => String, {
-		description: 'Id del usuario asignado',
-		nullable: true,
-	})
-	assigningUser: string;
+	isDefault?: boolean;
 
 	@Field(() => Date, {
 		description: 'Fecha de nacimiento',
 		nullable: true,
 	})
-	birthday: Date;
+	birthday?: Date;
 }

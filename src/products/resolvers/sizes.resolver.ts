@@ -40,7 +40,7 @@ export class SizesResolver {
 	) {
 		return this.sizesService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -59,7 +59,7 @@ export class SizesResolver {
 		return this.sizesService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

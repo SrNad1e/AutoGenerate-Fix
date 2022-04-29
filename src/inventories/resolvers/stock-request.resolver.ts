@@ -57,7 +57,7 @@ export class StockRequestResolver {
 	) {
 		return this.stockRequestService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -78,7 +78,7 @@ export class StockRequestResolver {
 		return this.stockRequestService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -92,6 +92,6 @@ export class StockRequestResolver {
 		shopId: string,
 		@Context() context,
 	) {
-		return this.stockRequestService.autogenerate(shopId, context.req.user);
+		return this.stockRequestService.autogenerate(shopId, context.req.user.user);
 	}
 }

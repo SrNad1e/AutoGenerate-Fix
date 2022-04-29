@@ -25,7 +25,7 @@ export class UsersResolver {
 	) {
 		return this.usersService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -36,7 +36,7 @@ export class UsersResolver {
 	})
 	@UseGuards(JwtAuthGuard)
 	getCurrent(@Context() context) {
-		return context.req.user;
+		return context.req.user.user;
 	}
 
 	@Mutation(() => User)
@@ -52,6 +52,6 @@ export class UsersResolver {
 		id: string,
 		@Context() context,
 	) {
-		return this.usersService.update(id, updateUserInput, context.req.user);
+		return this.usersService.update(id, updateUserInput, context.req.user.user);
 	}
 }

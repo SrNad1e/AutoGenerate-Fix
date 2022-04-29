@@ -17,13 +17,14 @@ import { User, UserMysql } from '../entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../entities/permission.entity';
+import { CreateUserInput } from '../dtos/create-user.input';
 
 const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
 	{ path: 'customerType', model: CustomerType.name },
-	{ path: 'company', model: Company.name },
+	{ path: 'companies', model: Company.name },
 	{
 		path: 'shop',
 		populate: {
@@ -86,8 +87,8 @@ export class UsersService {
 			filters.status = status;
 		}
 
-		if (user?.company['_id']) {
-			filters.company = new Types.ObjectId(user?.company['_id']);
+		if (user?.companies) {
+			filters.company = { $in: user?.companies };
 		}
 
 		const options: PaginateOptions = {
@@ -121,9 +122,15 @@ export class UsersService {
 		return user;
 	}
 
-	async create(user: Partial<User>): Promise<User> {
+	async create({ username }: CreateUserInput): Promise<User> {
+		//se valuda si el usuario existe
+
+		//valida si la tienda a la que se va a asignar existe
+		//valida el punto de venta
+		//valida el la compañia a la que se va a asignar
+
 		const newUser = new this.userModel({
-			...user,
+			//...user,
 		});
 		return (await newUser.save()).populate(populate);
 	}

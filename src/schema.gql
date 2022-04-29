@@ -454,14 +454,14 @@ type Customer {
   """Direcciones del cliente"""
   address: [Address!]
 
-  """Usuario asigando al cliente"""
-  assigningUser: User
-
   """Fecha de nacimiento"""
   birthday: DateTime
 
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Tipo de cliente"""
+  customerType: CustomerType!
 
   """Número de documento"""
   document: String!
@@ -484,11 +484,8 @@ type Customer {
   """Apellidos del cliente"""
   lastName: String!
 
-  """Número telefonico del cliente"""
-  phone: Float
-
-  """Tipo de cliente"""
-  type: CustomerType!
+  """Número telefónico del cliente"""
+  phone: String
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -844,7 +841,7 @@ input FiltersColorInput {
 }
 
 """Filtros de listado de clientes"""
-input FiltersCustomerInput {
+input FiltersCustomersInput {
   """Si el cliente se encuentra activo"""
   active: Boolean
 
@@ -1726,7 +1723,7 @@ type Query {
   """Listado de clientes"""
   customers(
     """Filtros para consultar el listado de clientes"""
-    filtersCustomerInput: FiltersCustomerInput = {}
+    filtersCustomerInput: FiltersCustomersInput = {}
   ): ResponseCustomer!
 
   """Listado de imagenes"""
@@ -2559,8 +2556,14 @@ input SignUpInput {
   """Fecha de cumpleaños del cliente"""
   birthDate: String
 
+  """Identificación de tipo de cliente"""
+  customerTypeId: String!
+
   """Documento de identidad del cliente"""
   document: String!
+
+  """Identificación del tipo de documento de identidad del cliente"""
+  documentTypeId: String!
 
   """Correo del cliente"""
   email: String!
@@ -3319,11 +3322,14 @@ type User {
   """Identificador de mongo"""
   _id: String!
 
-  """Empresa a la que pertenece el usuario"""
-  company: Company!
+  """Empresas a la que pertenece el usuario"""
+  companies: [Company!]!
 
   """Nombre de usuario"""
   createdAt: DateTime!
+
+  """Cliente asignado"""
+  customer: Customer
 
   """Tipo de cliente"""
   customerType: CustomerType

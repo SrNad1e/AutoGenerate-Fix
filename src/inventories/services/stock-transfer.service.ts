@@ -168,6 +168,7 @@ export class StockTransferService {
 			...options
 		}: CreateStockTransferInput,
 		userOrigin: Partial<User>,
+		companyId: string,
 	) {
 		try {
 			if (options.status) {
@@ -265,6 +266,7 @@ export class StockTransferService {
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					userOrigin,
+					companyId,
 				);
 			}
 
@@ -283,6 +285,7 @@ export class StockTransferService {
 			...options
 		}: UpdateStockTransferInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		try {
 			const stockTransfer = await this.stockTransferModel.findById(id).lean();
@@ -414,6 +417,7 @@ export class StockTransferService {
 					await this.stockHistoryService.deleteStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 
@@ -441,6 +445,7 @@ export class StockTransferService {
 					await this.stockHistoryService.addStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 
@@ -476,6 +481,7 @@ export class StockTransferService {
 					await this.stockHistoryService.deleteStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 
@@ -494,6 +500,7 @@ export class StockTransferService {
 					await this.stockHistoryService.addStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 

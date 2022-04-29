@@ -44,7 +44,7 @@ export class CategoriesResolver {
 	) {
 		return this.categoriesService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -65,7 +65,7 @@ export class CategoriesResolver {
 		return this.categoriesService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

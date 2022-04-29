@@ -30,7 +30,8 @@ export class StockOutputResolver {
 	) {
 		return this.stockOutputService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -44,7 +45,11 @@ export class StockOutputResolver {
 		id: string,
 		@Context() context,
 	) {
-		return this.stockOutputService.findById(id, context.req.user);
+		return this.stockOutputService.findById(
+			id,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Mutation(() => StockOutput, {
@@ -61,7 +66,8 @@ export class StockOutputResolver {
 	) {
 		return this.stockOutputService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -84,7 +90,8 @@ export class StockOutputResolver {
 		return this.stockOutputService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

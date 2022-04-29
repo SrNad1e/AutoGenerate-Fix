@@ -33,7 +33,8 @@ export class ProductsResolver {
 	) {
 		return this.productsService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -64,7 +65,8 @@ export class ProductsResolver {
 	) {
 		return this.productsService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -85,7 +87,7 @@ export class ProductsResolver {
 		return this.productsService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

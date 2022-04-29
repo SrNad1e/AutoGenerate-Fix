@@ -32,7 +32,8 @@ export class StockAdjustmentResolver {
 	) {
 		return this.stockAdjustmentService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -46,7 +47,11 @@ export class StockAdjustmentResolver {
 		id: string,
 		@Context() context,
 	) {
-		return this.stockAdjustmentService.findById(id, context.req.user);
+		return this.stockAdjustmentService.findById(
+			id,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Mutation(() => StockAdjustment, {
@@ -63,7 +68,8 @@ export class StockAdjustmentResolver {
 	) {
 		return this.stockAdjustmentService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -85,6 +91,7 @@ export class StockAdjustmentResolver {
 			id,
 			context.req.body.variables.input,
 			context.req.user,
+			context.req.companyId,
 		);
 	}
 }

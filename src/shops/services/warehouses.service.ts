@@ -29,11 +29,12 @@ export class WarehousesService {
 			isMain,
 		}: FiltersWarehousesInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<Warehouse> = {};
 
 		if (user.username !== 'admin') {
-			filters.company = new Types.ObjectId(user.company._id);
+			filters.company = new Types.ObjectId(companyId);
 		}
 
 		if (name) {

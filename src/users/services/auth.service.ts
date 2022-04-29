@@ -8,8 +8,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 import { CompaniesService } from 'src/configurations/services/companies.service';
+import { CustomersService } from 'src/crm/services/customers.service';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
+import { SignUpInput } from '../dtos/signup.input';
 import { User } from '../entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -19,16 +21,15 @@ export class AuthService {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly companiesService: CompaniesService,
+		private readonly customersService: CustomersService,
 	) {}
 
 	async login(
 		user: User,
 		{ companyId }: LoginUserInput,
 	): Promise<LoginResponse> {
-		if (
-			user.username !== 'admin' &&
-			user.company._id.toString() !== companyId
-		) {
+		const companies = user.companies?.map((company) => company.toString());
+		if (user.username !== 'admin' && !companies.includes(companyId)) {
 			throw new UnauthorizedException(
 				`El usuario no tiene acceso a la compañia`,
 			);
@@ -36,27 +37,32 @@ export class AuthService {
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
-				company: user.company._id,
+				companyId,
 				sub: user._id,
 			}),
 			user,
 		};
 	}
 
-	async signup(userCreate: Partial<User>): Promise<User> {
-		const user = await this.usersService.findOne(userCreate?.username);
-		const company = await this.companiesService.findById(userCreate.id);
-
-		if (!company) {
-			throw new NotFoundException('La empresa no existe');
-		}
+	async signup({ email, document, ...params }: SignUpInput) {
+		const user = await this.usersService.findOne(email);
 
 		if (user) {
 			throw new NotFoundException(
-				`El usuario ${userCreate.username} ya existe`,
+				`El correo ${email} ya está siendo usado por otro cliente`,
 			);
 		}
-		return this.usersService.create(userCreate);
+
+		let customer = await this.customersService.findOne({ document });
+
+		if (!customer) {
+			customer = await this.customersService.create({
+				email,
+				document,
+				...params,
+			});
+		}
+		//const newUser = new this.usersService.create();
 	}
 
 	/**

@@ -75,11 +75,12 @@ export class StockInputService {
 			dateInitial,
 		}: FiltersStockInputInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<StockInput> = {};
 
 		if (user.username !== 'admin') {
-			filters.company === user.company._id;
+			filters.company = companyId;
 		}
 		if (number) {
 			filters.number = number;
@@ -126,11 +127,11 @@ export class StockInputService {
 		return this.stockInputModel.paginate(filters, options);
 	}
 
-	async findById(_id: string, user: Partial<User>) {
+	async findById(_id: string, user: Partial<User>, companyId: string) {
 		const filters: FilterQuery<StockInput> = { _id };
 
 		if (user.username !== 'admin') {
-			filters.company === user.company._id;
+			filters.company = companyId;
 		}
 
 		const response = await this.stockInputModel
@@ -146,6 +147,7 @@ export class StockInputService {
 	async create(
 		{ details, warehouseId, ...options }: CreateStockInputInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		if (!(details?.length > 0)) {
 			throw new BadRequestException('La entrada no puede estar vacía');
@@ -195,7 +197,7 @@ export class StockInputService {
 		);
 
 		const stockInput = await this.stockInputModel
-			.findOne({ 'company._id': user.company._id })
+			.findOne({ 'company._id': new Types.ObjectId(companyId) })
 			.sort({ _id: -1 });
 
 		const newStockInput = new this.stockInputModel({
@@ -203,7 +205,9 @@ export class StockInputService {
 			details: detailsInput,
 			total,
 			user,
-			company: user.company,
+			company: user.companies.find(
+				(company) => company._id.toString() === companyId,
+			),
 			number: (stockInput?.number || 0) + 1,
 			...options,
 		});
@@ -222,7 +226,11 @@ export class StockInputService {
 				documentId: response._id.toString(),
 				documentType: 'input',
 			};
-			await this.stockHistoryService.addStock(addStockHistoryInput, user);
+			await this.stockHistoryService.addStock(
+				addStockHistoryInput,
+				user,
+				companyId,
+			);
 		}
 		return response;
 	}
@@ -231,12 +239,13 @@ export class StockInputService {
 		id: string,
 		{ details, ...options }: UpdateStockInputInput,
 		user: User,
+		companyId: string,
 	) {
 		const stockInput = await this.stockInputModel.findById(id).lean();
 
 		if (
 			user.username !== 'admin' &&
-			stockInput.company._id !== user.company._id
+			stockInput.company._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(
 				`El usuario no se encuentra autorizado para hacer cambios en la entrada`,
@@ -348,7 +357,11 @@ export class StockInputService {
 					documentId: response._id.toString(),
 					documentType: 'input',
 				};
-				await this.stockHistoryService.addStock(addStockHistoryInput, user);
+				await this.stockHistoryService.addStock(
+					addStockHistoryInput,
+					user,
+					companyId,
+				);
 			}
 
 			return response;
@@ -377,7 +390,11 @@ export class StockInputService {
 					documentId: response._id.toString(),
 					documentType: 'input',
 				};
-				await this.stockHistoryService.addStock(addStockHistoryInput, user);
+				await this.stockHistoryService.addStock(
+					addStockHistoryInput,
+					user,
+					companyId,
+				);
 			}
 
 			return response;

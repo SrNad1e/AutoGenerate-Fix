@@ -50,7 +50,7 @@ export class OrdersResolver {
 	) {
 		return this.ordersService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -89,6 +89,7 @@ export class OrdersResolver {
 		return this.ordersService.addProducts(
 			context.req.body.variables.input,
 			context.req.user,
+			context.req.companyId,
 		);
 	}
 

@@ -79,11 +79,12 @@ export class StockAdjustmentService {
 			dateInitial,
 		}: FiltersStockAdjustmentInput,
 		user: User,
+		companyId: string,
 	) {
 		const filters: FilterQuery<StockAdjustment> = {};
 
 		if (user.username !== 'admin') {
-			filters.company === user.company._id;
+			filters.company = new Types.ObjectId(companyId);
 		}
 
 		if (number) {
@@ -132,11 +133,11 @@ export class StockAdjustmentService {
 		return this.stockAdjustmetnModel.paginate(filters, options);
 	}
 
-	async findById(_id: string, user: User) {
+	async findById(_id: string, user: User, companyId: string) {
 		const filters: FilterQuery<StockAdjustment> = { _id };
 
 		if (user.username !== 'admin') {
-			filters.company === user.company._id;
+			filters.company = new Types.ObjectId(companyId);
 		}
 
 		const response = await this.stockAdjustmetnModel
@@ -152,6 +153,7 @@ export class StockAdjustmentService {
 	async create(
 		{ details, warehouseId, ...options }: CreateStockAdjustmentInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		if (!(details?.length > 0)) {
 			throw new BadRequestException('El ajuste no puede estar vacía');
@@ -201,7 +203,7 @@ export class StockAdjustmentService {
 		);
 
 		const stockAdjustment = await this.stockAdjustmetnModel
-			.findOne({ 'company._id': user.company._id })
+			.findOne({ 'company._id': new Types.ObjectId(companyId) })
 			.sort({ _id: -1 });
 
 		const newStockInput = new this.stockAdjustmetnModel({
@@ -209,7 +211,9 @@ export class StockAdjustmentService {
 			details: detailsAdjustment,
 			total,
 			user,
-			company: user.company,
+			company: user.companies.find(
+				(company) => company._id.toString() === companyId,
+			),
 			number: (stockAdjustment?.number || 0) + 1,
 			...options,
 		});
@@ -244,8 +248,16 @@ export class StockAdjustmentService {
 				documentId: response._id.toString(),
 				documentType: 'adjustment',
 			};
-			await this.stockHistoryService.deleteStock(deleteStockHistoryInput, user);
-			await this.stockHistoryService.addStock(addStockHistoryInput, user);
+			await this.stockHistoryService.deleteStock(
+				deleteStockHistoryInput,
+				user,
+				companyId,
+			);
+			await this.stockHistoryService.addStock(
+				addStockHistoryInput,
+				user,
+				companyId,
+			);
 		}
 		return response;
 	}
@@ -254,12 +266,13 @@ export class StockAdjustmentService {
 		id: string,
 		{ details, ...options }: UpdateStockAdjustmentInput,
 		user: User,
+		companyId: string,
 	) {
 		const stockAdjustment = await this.stockAdjustmetnModel.findById(id).lean();
 
 		if (
 			user.username !== 'admin' &&
-			stockAdjustment.company._id !== user.company._id
+			stockAdjustment.company._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(
 				`El usuario no se encuentra autorizado para hacer cambios en el ajuste`,
@@ -393,8 +406,13 @@ export class StockAdjustmentService {
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					user,
+					companyId,
 				);
-				await this.stockHistoryService.addStock(addStockHistoryInput, user);
+				await this.stockHistoryService.addStock(
+					addStockHistoryInput,
+					user,
+					companyId,
+				);
 			}
 
 			return response;
@@ -446,8 +464,13 @@ export class StockAdjustmentService {
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					user,
+					companyId,
 				);
-				await this.stockHistoryService.addStock(addStockHistoryInput, user);
+				await this.stockHistoryService.addStock(
+					addStockHistoryInput,
+					user,
+					companyId,
+				);
 			}
 
 			return response;

@@ -58,6 +58,7 @@ export class StockTransferResolver {
 		return this.stockTransferService.create(
 			context.req.body.variables.input,
 			context.req.user,
+			context.req.companyId,
 		);
 	}
 
@@ -79,6 +80,7 @@ export class StockTransferResolver {
 			id,
 			context.req.body.variables.input,
 			context.req.user,
+			context.req.companyId,
 		);
 	}
 }

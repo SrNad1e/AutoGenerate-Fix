@@ -28,7 +28,7 @@ export class SortCustomer {
 }
 
 @InputType({ description: 'Filtros de listado de clientes' })
-export class FiltersCustomerInput {
+export class FiltersCustomersInput {
 	@Field(() => String, {
 		description:
 			'comodin para la busque de documento, nombre, apellido, teléfono, correo, ',

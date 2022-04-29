@@ -40,7 +40,7 @@ export class BrandsResolver {
 	) {
 		return this.brandsService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -59,7 +59,7 @@ export class BrandsResolver {
 		return this.brandsService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

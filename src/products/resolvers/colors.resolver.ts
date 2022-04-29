@@ -40,7 +40,7 @@ export class ColorsResolver {
 	) {
 		return this.colorsService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -59,7 +59,7 @@ export class ColorsResolver {
 		return this.colorsService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

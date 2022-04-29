@@ -21,11 +21,13 @@ import { JwtStrategy } from './libs/jwt.strategy';
 import { Shop, ShopSchema } from 'src/shops/entities/shop.entity';
 import { UsersController } from './controllers/users.controller';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import { CrmModule } from 'src/crm/crm.module';
 
 @Module({
 	imports: [
 		PassportModule,
 		ConfigurationsModule,
+		CrmModule,
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;

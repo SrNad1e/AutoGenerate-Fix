@@ -55,6 +55,7 @@ export class ReferencesService {
 			active,
 		}: FiltersReferencesInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<Reference> = {};
 
@@ -80,8 +81,8 @@ export class ReferencesService {
 			};
 		}
 
-		if (user?.company['_id']) {
-			filters.companies = new Types.ObjectId(user?.company['_id']);
+		if (user.username !== 'admin') {
+			filters.companies = { $in: new Types.ObjectId(companyId) };
 		}
 
 		const options = {
@@ -131,11 +132,11 @@ export class ReferencesService {
 		};
 	}
 
-	async findById(_id: string, user: User) {
+	async findById(_id: string, user: User, companyId: string) {
 		const filters: FilterQuery<Reference> = { _id };
 
 		if (user.username !== 'admin') {
-			filters.companies === user.company._id;
+			filters.companies = { $in: new Types.ObjectId(companyId) };
 		}
 
 		const response = await this.referenceModel
@@ -163,9 +164,11 @@ export class ReferencesService {
 			categoryLevel1Id,
 			categoryLevel2Id,
 			categoryLevel3Id,
+			companyId,
 			...props
 		}: CreateReferenceInput,
 		user: User,
+		companyIdUser: string,
 	) {
 		const brand = await this.brandsService.findById(brandId);
 
@@ -214,22 +217,27 @@ export class ReferencesService {
 				volume,
 				height,
 			},
+			companies: [companyIdUser],
 		});
 
 		return (await reference.save()).populate(populate);
 	}
 
-	async update(id: string, params: UpdateReferenceInput, user: User) {
+	async update(
+		id: string,
+		params: UpdateReferenceInput,
+		user: User,
+		companyId: string,
+	) {
 		const reference = await this.referenceModel.findById(id).lean();
 
 		if (!reference) {
 			throw new NotFoundException('La referencia no existe');
 		}
 
-		if (
-			user.username !== 'admin' &&
-			!reference.companies.includes(user.company._id)
-		) {
+		const companies = reference.companies.map((company) => company.toString());
+
+		if (user.username !== 'admin' && !companies.includes(companyId)) {
 			throw new UnauthorizedException(
 				'La referencia no está habilitada para la sucursal del usuario',
 			);

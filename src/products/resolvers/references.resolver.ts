@@ -29,7 +29,8 @@ export class ReferencesResolver {
 	) {
 		return this.referencesService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -42,7 +43,11 @@ export class ReferencesResolver {
 		@Args('id', { description: 'Identificador de la referencia' }) id: string,
 		@Context() context,
 	) {
-		return this.referencesService.findById(id, context.req.user);
+		return this.referencesService.findById(
+			id,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Mutation(() => Reference, {
@@ -59,7 +64,8 @@ export class ReferencesResolver {
 	) {
 		return this.referencesService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -82,7 +88,8 @@ export class ReferencesResolver {
 		return this.referencesService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

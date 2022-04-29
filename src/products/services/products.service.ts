@@ -80,6 +80,7 @@ export class ProductsService {
 			referenceId,
 		}: FiltersProductsInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<Product> = {};
 
@@ -107,6 +108,7 @@ export class ProductsService {
 					name,
 				},
 				user,
+				companyId,
 			);
 
 			filters.reference = {
@@ -214,10 +216,11 @@ export class ProductsService {
 		}
 	}
 
-	async create(props: CreateProductInput, user: User) {
+	async create(props: CreateProductInput, user: User, companyId: string) {
 		const reference = await this.referencesService.findById(
 			props.referenceId,
 			user,
+			companyId,
 		);
 		if (!reference) {
 			throw new NotFoundException('La referencia no existe');
@@ -247,7 +250,7 @@ export class ProductsService {
 			throw new NotFoundException('La talla no existe');
 		}
 
-		const products = await this.findAll({}, user);
+		const products = await this.findAll({}, user, companyId);
 		const total = () => {
 			const totalData = products.totalDocs + 1;
 			if (totalData < 10) {
@@ -323,6 +326,7 @@ export class ProductsService {
 				{
 					username: 'admin',
 				},
+				'',
 			);
 
 			const productsMongo = [];
@@ -381,6 +385,7 @@ export class ProductsService {
 							categoryLevel3Id: '6267e497874de734057c3801',
 						},
 						userDefault,
+						company._id.toString(),
 					);
 
 					reference = await this.referencesService.findOne({

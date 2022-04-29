@@ -35,6 +35,7 @@ export class StockHistoryService {
 	async addStock(
 		{ details, documentId, documentType, warehouseId }: CreateStockHistoryInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		let item;
 		try {
@@ -82,6 +83,7 @@ export class StockHistoryService {
 					limit: -1,
 				},
 				user,
+				companyId,
 			);
 			if (totalDocs !== products.length) {
 				throw new BadRequestException(
@@ -121,6 +123,7 @@ export class StockHistoryService {
 	async deleteStock(
 		{ details, documentId, documentType, warehouseId }: CreateStockHistoryInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		let item;
 
@@ -168,6 +171,7 @@ export class StockHistoryService {
 					limit: -1,
 				},
 				user,
+				companyId,
 			);
 
 			if (totalDocs !== products.length) {

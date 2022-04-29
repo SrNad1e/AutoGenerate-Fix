@@ -57,8 +57,8 @@ export class Customer extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => DocumentType, { description: 'Tipo de documento' })
-	@Prop({ type: String, required: true })
-	documentType: DocumentType;
+	@Prop({ type: Types.ObjectId, ref: DocumentType.name, required: true })
+	documentType: Types.ObjectId;
 
 	@Field(() => String, { description: 'Número de documento' })
 	@Prop({ type: String, unique: true, required: true })
@@ -75,22 +75,22 @@ export class Customer extends Document {
 	@Field(() => CustomerType, {
 		description: 'Tipo de cliente',
 	})
-	@Prop({ type: Types.ObjectId, ref: 'CustomerType' })
-	type: Types.ObjectId;
+	@Prop({ type: Types.ObjectId, ref: CustomerType.name })
+	customerType: Types.ObjectId;
 
 	@Field(() => [Address], {
 		description: 'Direcciones del cliente',
 		nullable: true,
 	})
-	@Prop({ type: Array })
+	@Prop({ type: Array, default: [] })
 	address: Address[];
 
-	@Field(() => Number, {
-		description: 'Número telefonico del cliente',
+	@Field(() => String, {
+		description: 'Número telefónico del cliente',
 		nullable: true,
 	})
-	@Prop({ type: Number })
-	phone: number;
+	@Prop({ type: String })
+	phone: string;
 
 	@Field(() => Boolean, {
 		description: 'Número telefonico tiene whatsapp',
@@ -129,13 +129,6 @@ export class Customer extends Document {
 	})
 	@Prop({ type: Object })
 	user: User;
-
-	@Field(() => User, {
-		description: 'Usuario asigando al cliente',
-		nullable: true,
-	})
-	@Prop({ type: Types.ObjectId, ref: User.name, autopopulate: true })
-	assigningUser: Types.ObjectId;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;
