@@ -860,6 +860,12 @@ input FiltersCustomersInput {
   sort: SortCustomer
 }
 
+"""Filtros para los tipos de documento"""
+input FiltersDocumentTypesInput {
+  """Nombre del tipo de documento"""
+  name: String!
+}
+
 """Filtros para la lista de imagenes"""
 input FiltersImagesInput {
   """Cantidad de registros"""
@@ -1725,6 +1731,12 @@ type Query {
     """Filtros para consultar el listado de clientes"""
     filtersCustomerInput: FiltersCustomersInput = {}
   ): ResponseCustomers!
+
+  """Listado de tipos de documento"""
+  documentTypes(
+    """Filtros para consultar el listado de tipos de documento"""
+    filtersDocumentTypesInput: FiltersDocumentTypesInput = {}
+  ): [DocumentType!]!
 
   """Listado de imagenes"""
   images(
