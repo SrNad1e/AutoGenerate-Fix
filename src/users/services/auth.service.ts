@@ -58,7 +58,7 @@ export class AuthService {
 		customerTypeId,
 		...params
 	}: SignUpInput) {
-		const user = await this.usersService.findOne(email);
+		const user = await this.usersService.findOne({ username: email });
 
 		if (user) {
 			throw new NotFoundException(
@@ -77,7 +77,18 @@ export class AuthService {
 				customerTypeId,
 				...params,
 			});
+		} else {
+			const userCustomer = await this.usersService.findOne({
+				customerId: customer._id.toString(),
+			});
+
+			if (userCustomer) {
+				throw new NotFoundException(
+					`El cliente con documento ${document} ya está asignado a un usuario`,
+				);
+			}
 		}
+
 		const role = await this.rolesService.findOne({ name: 'Cliente' });
 
 		if (!role) {
@@ -120,7 +131,7 @@ export class AuthService {
 		username: string,
 		passwordOld: string,
 	): Promise<Partial<User>> {
-		const user = await this.usersService.findOne(username);
+		const user = await this.usersService.findOne({ username });
 		if (!user) {
 			throw new UnauthorizedException(`Usuario no existe`);
 		}

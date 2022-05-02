@@ -20,12 +20,15 @@ import { CreateUserInput } from '../dtos/create-user.input';
 import { CompaniesService } from 'src/configurations/services/companies.service';
 import { RolesService } from './roles.service';
 import { CustomersService } from 'src/crm/services/customers.service';
+import { FiltersUserInput } from '../dtos/filters-user.input';
+import { Customer } from 'src/crm/entities/customer.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
 	{ path: 'companies', model: Company.name },
+	{ path: 'customer', model: Customer.name },
 	{
 		path: 'shop',
 		populate: {
@@ -108,8 +111,17 @@ export class UsersService {
 		return this.userModel.paginate(filters, options);
 	}
 
-	async findOne(username: string): Promise<User> {
-		return this.userModel.findOne({ username }).populate(populate).lean();
+	async findOne({ username, customerId }: FiltersUserInput): Promise<User> {
+		const filters: FilterQuery<User> = {};
+		if (username) {
+			filters.username = username;
+		}
+
+		if (customerId) {
+			filters.customer = new Types.ObjectId(customerId);
+		}
+
+		return this.userModel.findOne(filters).populate(populate).lean();
 	}
 
 	async findById(id: string): Promise<Partial<User>> {
@@ -137,7 +149,7 @@ export class UsersService {
 		customerId,
 		...params
 	}: CreateUserInput): Promise<User> {
-		const user = await this.findOne(username);
+		const user = await this.findOne({ username });
 
 		if (user) {
 			throw new NotFoundException(

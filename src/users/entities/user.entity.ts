@@ -77,7 +77,7 @@ export class User extends Document {
 	})
 	companies: Types.ObjectId[];
 
-	@Prop({ type: String })
+	@Prop({ type: String, default: 'active' })
 	@Field(() => String, {
 		description: 'Estado del usuario (active, inactive, suspend)',
 	})

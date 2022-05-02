@@ -335,7 +335,9 @@ export class ProductsService {
 				quantity: 100,
 			}));
 
-			const userDefault = await this.usersService.findOne('admin');
+			const userDefault = await this.usersService.findOne({
+				username: 'admin',
+			});
 
 			for (let i = 0; i < productsMysql.length; i++) {
 				const product = productsMysql[i];
