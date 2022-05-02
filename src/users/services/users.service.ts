@@ -7,7 +7,6 @@ import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { Company } from 'src/configurations/entities/company.entity';
-import { CustomerType } from 'src/crm/entities/customerType.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
@@ -19,14 +18,13 @@ import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../entities/permission.entity';
 import { CreateUserInput } from '../dtos/create-user.input';
 import { CompaniesService } from 'src/configurations/services/companies.service';
-import { CustomersService } from 'src/crm/services/customers.service';
 import { RolesService } from './roles.service';
+import { CustomersService } from 'src/crm/services/customers.service';
 
 const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
-	{ path: 'customerType', model: CustomerType.name },
 	{ path: 'companies', model: Company.name },
 	{
 		path: 'shop',
@@ -62,8 +60,8 @@ export class UsersService {
 		@InjectModel(PointOfSale.name)
 		private readonly pointOfSaleModel: PaginateModel<PointOfSale>,
 		private readonly companiesService: CompaniesService,
-		private readonly customersService: CustomersService,
 		private readonly rolesService: RolesService,
+		private readonly customersService: CustomersService,
 	) {}
 
 	async findAll(
@@ -135,8 +133,8 @@ export class UsersService {
 		shopId,
 		companyId,
 		pointOfSaleId,
-		customerTypeId,
 		roleId,
+		customerId,
 		...params
 	}: CreateUserInput): Promise<User> {
 		const user = await this.findOne(username);
@@ -155,7 +153,7 @@ export class UsersService {
 
 		const shop = await this.shopModel.findById(shopId);
 
-		if (!shop || shop.company._id.toString() !== companyId) {
+		if (!shop || shop?.company?.toString() !== companyId) {
 			throw new NotFoundException('La tienda no se encuentra registrada');
 		}
 
@@ -175,17 +173,19 @@ export class UsersService {
 			}
 		}
 
-		let customerType;
-		if (customerTypeId) {
-			customerType = await this.customersService.findById(customerTypeId);
-			if (!customerType) {
+		let customer;
+		if (customerId) {
+			customer = await this.customersService.findById(customerId);
+			if (!customer) {
 				throw new NotFoundException('El cliente no existe');
 			}
 		}
 
 		const newUser = new this.userModel({
+			username,
 			role: role._id,
-			customerType: customerType._id,
+			shop: shop._id,
+			customer: customer._id,
 			...params,
 		});
 		return (await newUser.save()).populate(populate);

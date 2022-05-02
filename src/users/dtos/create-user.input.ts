@@ -15,15 +15,15 @@ export class CreateUserInput {
 	roleId: string;
 
 	@Field(() => String, {
-		description: 'Identificador del tipo de cliente',
-		nullable: true,
-	})
-	customerTypeId?: string;
-
-	@Field(() => String, {
 		description: 'Identificador de la tienda asignada al usuario',
 	})
 	shopId: string;
+
+	@Field(() => String, {
+		description: 'Identificador del cliente asignado al usuario',
+		nullable: true,
+	})
+	customerId?: string;
 
 	@Field(() => String, {
 		description: 'Identificador del punto de venta asignado al usuario',

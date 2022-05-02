@@ -29,7 +29,7 @@ export class AuthResolver {
 		);
 	}
 
-	@Mutation(() => User, {
+	@Mutation(() => LoginResponse, {
 		description: 'Se encarga de crear el usuario desde aplicaciones externas',
 	})
 	async signup(

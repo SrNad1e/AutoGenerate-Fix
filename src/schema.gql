@@ -1382,7 +1382,7 @@ type Mutation {
   signup(
     """Datos para la creación del usuario y cliente"""
     signUpInput: SignUpInput!
-  ): User!
+  ): LoginResponse!
 
   """Actualiza un atributo"""
   updateAttrib(
@@ -3283,8 +3283,8 @@ input UpdateUserInput {
   """Identificador de la empresa a la que pertenece el usuario"""
   companyId: String
 
-  """Identificador del tipo de cliente"""
-  customerTypeId: String
+  """Identificador del cliente asignado al usuario"""
+  customerId: String
 
   """Nombre del usuario"""
   name: String
@@ -3333,9 +3333,6 @@ type User {
 
   """Cliente asignado"""
   customer: Customer
-
-  """Tipo de cliente"""
-  customerType: CustomerType
 
   """Nombre de para mostrar del usuario"""
   name: String!

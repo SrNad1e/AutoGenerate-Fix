@@ -9,10 +9,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { PaginateModel } from 'mongoose';
 
-import { CompaniesService } from 'src/configurations/services/companies.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { Shop } from 'src/shops/entities/shop.entity';
-import { ShopsService } from 'src/shops/services/shops.service';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
 import { SignUpInput } from '../dtos/signup.input';
@@ -57,6 +55,7 @@ export class AuthService {
 		firstName,
 		lastName,
 		password,
+		customerTypeId,
 		...params
 	}: SignUpInput) {
 		const user = await this.usersService.findOne(email);
@@ -75,6 +74,7 @@ export class AuthService {
 				firstName,
 				lastName,
 				document,
+				customerTypeId,
 				...params,
 			});
 		}
@@ -90,15 +90,24 @@ export class AuthService {
 			throw new NotFoundException('La tienda Mayoristas no existe');
 		}
 
-		return this.usersService.create({
+		const newUser = await this.usersService.create({
 			name: `${firstName} ${lastName}`,
 			username: email,
 			password,
 			roleId: role._id.toString(),
-			customerTypeId: customer._id.toString(),
 			shopId: shop._id.toString(),
 			companyId,
+			customerId: customer._id.toString(),
 		});
+
+		return {
+			user: newUser,
+			access_token: this.jwtService.sign({
+				username: newUser.username,
+				companyId,
+				sub: newUser._id,
+			}),
+		};
 	}
 
 	/**

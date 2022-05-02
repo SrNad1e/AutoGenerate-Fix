@@ -6,7 +6,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
-import { CustomerType } from 'src/crm/entities/customerType.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
 
@@ -40,13 +39,6 @@ export class User extends Document {
 		required: true,
 	})
 	role: Types.ObjectId;
-
-	@Field(() => CustomerType, {
-		description: 'Tipo de cliente',
-		nullable: true,
-	})
-	@Prop({ type: Types.ObjectId, ref: 'CustomerType' })
-	customerType: Types.ObjectId;
 
 	@Field(() => Shop, {
 		description: 'Tienda a la que se encuentra asiganado el usuario',
