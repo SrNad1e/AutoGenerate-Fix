@@ -1764,6 +1764,9 @@ type Query {
 
   """Listado de las referencias"""
   references(
+    """Identificador de la sucursal"""
+    companyId: String!
+
     """Filtros para las referencias"""
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!

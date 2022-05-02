@@ -107,7 +107,6 @@ export class ProductsService {
 				{
 					name,
 				},
-				user,
 				companyId,
 			);
 

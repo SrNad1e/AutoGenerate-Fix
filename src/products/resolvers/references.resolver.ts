@@ -19,6 +19,11 @@ export class ReferencesResolver {
 	})
 	findAll(
 		@Args({
+			name: 'companyId',
+			description: 'Identificador de la sucursal',
+		})
+		companyId: string,
+		@Args({
 			name: 'filtersReferencesInput',
 			nullable: true,
 			defaultValue: {},
@@ -29,8 +34,7 @@ export class ReferencesResolver {
 	) {
 		return this.referencesService.findAll(
 			context.req.body.variables.input,
-			context.req.user.user,
-			context.req.user.companyId,
+			companyId,
 		);
 	}
 

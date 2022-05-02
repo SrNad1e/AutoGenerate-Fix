@@ -54,8 +54,8 @@ export class ReferencesService {
 			price,
 			active,
 		}: FiltersReferencesInput,
-		user: Partial<User>,
-		companyId: string,
+		companyId?: string,
+		user?: Partial<User>,
 	) {
 		const filters: FilterQuery<Reference> = {};
 
@@ -81,7 +81,7 @@ export class ReferencesService {
 			};
 		}
 
-		if (user.username !== 'admin') {
+		if (user?.username !== 'admin' || companyId) {
 			filters.companies = { $in: new Types.ObjectId(companyId) };
 		}
 
