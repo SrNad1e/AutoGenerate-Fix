@@ -20,7 +20,7 @@ export class ColorsResolver {
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersColorInput',
+			name: 'filtersColorsInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros para obtener los colores',

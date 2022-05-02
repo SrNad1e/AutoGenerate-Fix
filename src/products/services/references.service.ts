@@ -249,4 +249,21 @@ export class ReferencesService {
 			},
 		});
 	}
+
+	/**
+	 * @description se encarga de obtener todas las referencias sin paginación
+	 * @param filters filtros para obtener las referencias
+	 * @returns referencias
+	 */
+	async getReferences({ name }: FiltersReferenceInput) {
+		const filters: FilterQuery<Reference> = {};
+
+		if (name) {
+			filters.$text = {
+				$search: `${name}`,
+			};
+		}
+
+		return this.referenceModel.find(filters).lean();
+	}
 }

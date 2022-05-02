@@ -592,7 +592,7 @@ export class ProductsService {
 	 */
 	async getProducts(params: FiltersProductsInput) {
 		const filters: FilterQuery<Product> = {};
-		const { colorId, name = '', sizeId, status, ids } = params;
+		const { colorId, name, sizeId, status, ids } = params;
 
 		if (ids) {
 			filters._id = {
@@ -611,15 +611,17 @@ export class ProductsService {
 		if (status) {
 			filters.status = status;
 		}
-		return this.productModel
-			.find({
-				...filters,
-				$or: [
-					{ barcode: name },
-					{ description: { $regex: name, $options: 'i' } },
-					{ reference: { $regex: name, $options: 'i' } },
-				],
-			})
-			.lean();
+
+		const response = await this.referencesService.getReferences({ name });
+
+		const references = response?.map((reference) => reference._id);
+
+		if (references) {
+			filters.reference = {
+				$in: references,
+			};
+		}
+
+		return this.productModel.find(filters).lean();
 	}
 }

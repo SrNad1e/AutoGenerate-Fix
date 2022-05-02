@@ -1720,7 +1720,7 @@ type Query {
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
-    filtersColorInput: FiltersColorsInput = {}
+    filtersColorsInput: FiltersColorsInput = {}
   ): ResponseColors!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""

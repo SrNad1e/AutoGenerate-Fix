@@ -415,9 +415,11 @@ export class StockRequestService {
 
 	async autogenerate(shopId: string, user: User) {
 		const shop = await this.shopsService.findById(shopId);
+
 		const warehouse = await this.warehousesService.findById(
-			shop.defaultWarehouse.toString(),
+			shop.defaultWarehouse._id.toString(),
 		);
+
 		const products = await this.productsService.getProducts({
 			status: 'active',
 		});
@@ -430,7 +432,7 @@ export class StockRequestService {
 
 				return { ...product, stock };
 			})
-			.filter((product) => product.stock.quantity < warehouse.min);
+			.filter((product) => product?.stock?.quantity < warehouse?.min);
 
 		const details = [];
 
