@@ -90,8 +90,8 @@ export class StockAdjustmentResolver {
 		return this.stockAdjustmentService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
-			context.req.companyId,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

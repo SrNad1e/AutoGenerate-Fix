@@ -269,7 +269,6 @@ export class StockAdjustmentService {
 		companyId: string,
 	) {
 		const stockAdjustment = await this.stockAdjustmetnModel.findById(id).lean();
-
 		if (
 			user.username !== 'admin' &&
 			stockAdjustment.company._id.toString() !== companyId

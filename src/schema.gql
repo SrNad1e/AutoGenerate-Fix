@@ -1855,10 +1855,16 @@ type Query {
     filtersUsersInput: FiltersUsersInput!
   ): [User!]!
 
+  """Se encarga de traer bodega por identificador"""
+  warehouseId(
+    """Identificador de la bodega"""
+    warehouseId: String!
+  ): Warehouse!
+
   """Se encarga de listar las bodegas"""
   warehouses(
     """Filtros para consultar las bodegas"""
-    filtersWarehouseInput: FiltersWarehousesInput = {}
+    filtersWarehousesInput: FiltersWarehousesInput = {}
   ): ResponseWarehouses!
 }
 
