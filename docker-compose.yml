@@ -47,7 +47,7 @@ services:
     image: mariadb:latest
     environment:
      - MARIADB_DATABASE=pos_qa
-     - MARIADB_ROOT_PASSWORD=1234
+     - MYSQL_ROOT_PASSWORD=1234
     ports:
       - "3306:3306"
     volumes:
