@@ -128,7 +128,6 @@ export class UsersService {
 		if (customerId) {
 			filters.customer = new Types.ObjectId(customerId);
 		}
-
 		return this.userModel.findOne(filters).populate(populate).lean();
 	}
 

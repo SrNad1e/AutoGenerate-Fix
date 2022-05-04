@@ -90,7 +90,7 @@
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
 	"role": {
 		"name": "Administrador",
-		"permissions": [],
+		"permissions": ["Sacar de la base de datos"],
 		"user": {
 			"name": "Administrador del Sistema",
 			"username": "admin"
@@ -111,9 +111,9 @@
 			"username": "admin"
 		}
 	},
-	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION migrateWarehouses
+	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION /shops/migrateWarehouses
 	//ELIMINAR LA COLECCION DE SHOPS
-	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION migrateShops
+	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION /shops/migrateShops
 	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y asginar esa bodega como bodega principal isMain
 	//CREAR USUARIO ADMIN, SE DEBE OBTENER EL ROL CREADO
 	"defaultUser": {
@@ -129,4 +129,8 @@
 		"role": "Sacar de base de datos",
 		"shop": "Sacar de base da datos"
 	}
+	//MIGRAR COLORES /products/migrate/colors
+	//MIGRAR TALLAS /products/migrate/sizes
+	//PENDIENTE MIGRACION DE CATEGORIAS
+	//MIGRAR PRODUCTOS /products/migrate
 }

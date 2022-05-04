@@ -122,7 +122,8 @@ export class ColorsService {
 					const newImage = new this.imageModel({
 						name: path.split('/')[7],
 						user: {
-							name: 'Default',
+							name: 'Administrador del Sistema',
+							username: 'admin',
 						},
 						urls: {
 							webp: {

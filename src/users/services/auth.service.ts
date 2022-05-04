@@ -132,6 +132,7 @@ export class AuthService {
 		passwordOld: string,
 	): Promise<Partial<User>> {
 		const user = await this.usersService.findOne({ username });
+
 		if (!user) {
 			throw new UnauthorizedException(`Usuario no existe`);
 		}
@@ -141,6 +142,7 @@ export class AuthService {
 		}
 
 		const { password, ...userSent } = user;
+
 		return userSent;
 	}
 }

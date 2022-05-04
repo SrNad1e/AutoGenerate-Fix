@@ -95,6 +95,10 @@ export class SizesService {
 				value: size.value,
 				active: size.active,
 				id: size.id,
+				user: {
+					name: 'Administrador del Sistema',
+					username: 'admin',
+				},
 			}));
 
 			await this.sizeModel.create(sizesMongo);
