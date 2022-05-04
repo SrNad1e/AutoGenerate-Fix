@@ -25,6 +25,18 @@ services:
       MARIADB_HOST: mysql
       SECRET_TOKEN: prueba
       EXPIRE_TOKEN: 24h
+      # Nodemailer
+      NODEMAILER_HOST: toulouse.com.co
+      NODEMAILER_PORT: 465
+      NODEMAILER_SECURE: true
+      NODEMAILER_USER: no-responder@toulouse.com.co
+      NODEMAILER_PASSWORD: 4l1vgR%3
+
+      # Amazon AWS
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: AKIA5MNQTDPXCZ3Y225G
+      AWS_SECRET_ACCESS_KEY: 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
+      AWS_PUBLIC_BUCKET_NAME: admin-z1bt76x1jqpz961o43xt3ik7pzhd6use1a-s3alias
     ports:
       - "8080:8080"
     volumes:
