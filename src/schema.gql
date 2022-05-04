@@ -2536,7 +2536,7 @@ type Shop {
   _id: String!
 
   """Dirección de la tienda"""
-  address: String!
+  address: String
 
   """Empresa que usa la tienda"""
   company: Warehouse!

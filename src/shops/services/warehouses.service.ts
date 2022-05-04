@@ -2,12 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { CompaniesService } from 'src/configurations/services/companies.service';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { Warehouse, WarehouseMysql } from '../entities/warehouse.entity';
-import { ShopsService } from './shops.service';
 
 @Injectable()
 export class WarehousesService {
@@ -16,7 +16,7 @@ export class WarehousesService {
 		private readonly warehouseModel: PaginateModel<Warehouse>,
 		@InjectRepository(WarehouseMysql)
 		private readonly warehouseRepo: Repository<WarehouseMysql>,
-		private readonly shopsService: ShopsService,
+		private readonly companiesService: CompaniesService,
 	) {}
 
 	async findAll(
@@ -79,20 +79,18 @@ export class WarehousesService {
 	async migrate() {
 		try {
 			const warehousesMysql = await this.warehouseRepo.find();
+			const companyDefault = await this.companiesService.findOne('Cirotex');
 			const warehousesMongo = [];
 			for (let i = 0; i < warehousesMysql.length; i++) {
-				const { shop_id, id, name } = warehousesMysql[i];
-				const shop = await this.shopsService.getByIdMysql(shop_id);
+				const { name } = warehousesMysql[i];
 				warehousesMongo.push({
-					id,
 					name,
-					shop,
 					max: 100,
 					min: 10,
+					company: companyDefault?._id,
 					user: {
-						id: 0,
-						name: 'Usuario de migración',
-						username: 'migrate',
+						name: 'Administrador del Sistema',
+						username: 'admin',
 					},
 				});
 			}

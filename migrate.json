@@ -1,0 +1,132 @@
+//MIGRACIÓN
+//CREAR PERMISOS DE USUARIO
+{
+	"permissions": [
+		{
+			"module": "inventory",
+			"option": "adjustment",
+			"name": "Ver",
+			"description": "Permite ver el ajuste",
+			"action": "see"
+		},
+		{
+			"module": "inventory",
+			"option": "adjustment",
+			"name": "Actualizar",
+			"description": "Permite actualizar los ajustes",
+			"action": "update"
+		},
+		{
+			"module": "inventory",
+			"option": "adjustment",
+			"name": "Crear",
+			"description": "Permite crear el ajuste",
+			"action": "create"
+		},
+		{
+			"module": "inventory",
+			"option": "adjustment",
+			"name": "Listar",
+			"description": "Permite listar los ajustes",
+			"action": "list"
+		},
+		{
+			"module": "inventory",
+			"option": "output",
+			"name": "Ver",
+			"description": "Permite ver la salida",
+			"action": "see"
+		},
+		{
+			"module": "inventory",
+			"option": "output",
+			"name": "Actualizar",
+			"description": "Permite actualizar las salidas",
+			"action": "update"
+		},
+		{
+			"module": "inventory",
+			"option": "output",
+			"name": "Crear",
+			"description": "Permite crear la salida",
+			"action": "create"
+		},
+		{
+			"module": "inventory",
+			"option": "output",
+			"name": "Listar",
+			"description": "Permite listar las salidas",
+			"action": "list"
+		},
+		{
+			"module": "inventory",
+			"option": "input",
+			"name": "Ver",
+			"description": "Permite ver la entrada",
+			"action": "see"
+		},
+		{
+			"module": "inventory",
+			"option": "input",
+			"name": "Actualizar",
+			"description": "Permite actualizar las entradas",
+			"action": "update"
+		},
+		{
+			"module": "inventory",
+			"option": "input",
+			"name": "Crear",
+			"description": "Permite crear la entrada",
+			"action": "create"
+		},
+		{
+			"module": "inventory",
+			"option": "input",
+			"name": "Listar",
+			"description": "Permite listar las entradas",
+			"action": "list"
+		}
+	],
+	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
+	"role": {
+		"name": "Administrador",
+		"permissions": [],
+		"user": {
+			"name": "Administrador del Sistema",
+			"username": "admin"
+		},
+		"changeWarehouse": true,
+		"active": true
+	},
+	//CREAR LA COMPAÑIA
+	"company": {
+		"name": "Cirotex",
+		"document": "123456789",
+		"regimentSimplify": true,
+		"address": "Cr 64",
+		"phone": "5781820",
+		"logo": "logo.png",
+		"user": {
+			"name": "Administrador del Sistema",
+			"username": "admin"
+		}
+	},
+	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION migrateWarehouses
+	//ELIMINAR LA COLECCION DE SHOPS
+	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION migrateShops
+	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y asginar esa bodega como bodega principal isMain
+	//CREAR USUARIO ADMIN, SE DEBE OBTENER EL ROL CREADO
+	"defaultUser": {
+		"name": "Administrador del Sistema",
+		"username": "admin",
+		"password": "$2a$10$npZLFrWgjEM/VwdUkzIQQ.rhgi38vEx86jFiPwlOUSR8TZU25RRcm",
+		"user": {
+			"name": "Administrador del Sistema",
+			"username": "admin"
+		},
+		"status": "active",
+		"companies": "Sacar de base de datos",
+		"role": "Sacar de base de datos",
+		"shop": "Sacar de base da datos"
+	}
+}

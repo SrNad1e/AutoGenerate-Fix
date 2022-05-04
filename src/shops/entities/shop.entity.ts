@@ -23,8 +23,11 @@ export class Shop extends Document {
 	@Prop({ type: String, default: 'active' })
 	status: string;
 
-	@Field(() => String, { description: 'Dirección de la tienda' })
-	@Prop({ type: String, required: true })
+	@Field(() => String, {
+		description: 'Dirección de la tienda',
+		nullable: true,
+	})
+	@Prop({ type: String })
 	address: string;
 
 	@Field(() => String, { description: 'Teléfono de la tienda', nullable: true })

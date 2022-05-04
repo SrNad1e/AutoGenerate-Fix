@@ -151,6 +151,7 @@ export class ShopsService {
 	async migrate() {
 		try {
 			const shopsMysql = await this.shopMysqlRepo.find();
+			const companyDefault = await this.companiesService.findOne('Cirotex');
 
 			for (let i = 0; i < shopsMysql.length; i++) {
 				const shopMysql = shopsMysql[i];
@@ -160,19 +161,22 @@ export class ShopsService {
 						name: shopMysql.name,
 					})
 					.lean();
-
-				const newShop = new this.shopModel({
-					name: shopMysql.name,
-					address: shopMysql.address,
-					phone: shopMysql.phone,
-					shopId: shopMysql.id,
-					defaultWarehouse: defaultWarehouse?._id,
-					createdAt: shopMysql.created_at,
-					user: {
-						name: 'Migración',
-					},
-				});
-				await newShop.save();
+				if (defaultWarehouse) {
+					const newShop = new this.shopModel({
+						name: shopMysql.name,
+						address: shopMysql.address,
+						phone: shopMysql.phone,
+						shopId: shopMysql.id,
+						defaultWarehouse: defaultWarehouse?._id,
+						company: companyDefault._id,
+						createdAt: shopMysql.created_at,
+						user: {
+							name: 'Administrador del Sistema',
+							username: 'admin',
+						},
+					});
+					await newShop.save();
+				}
 			}
 
 			return {
