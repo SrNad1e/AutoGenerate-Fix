@@ -190,6 +190,7 @@ export class ProductsService {
 			.findById(id)
 			.populate(populate)
 			.lean();
+
 		if (productQuery) {
 			const { stock, ...product } = productQuery;
 			if (warehouseId) {
@@ -575,7 +576,7 @@ export class ProductsService {
 
 			if (product?.stock[0]?.quantity < quantity) {
 				throw new BadRequestException(
-					`El producto ${product?.reference}/${product?.barcode} no tiene suficientes unidades, stock: ${product?.stock[0].quantity}`,
+					`El producto ${product?.reference['name']}/${product?.barcode} no tiene suficientes unidades, stock: ${product?.stock[0].quantity}`,
 				);
 			}
 
