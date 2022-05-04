@@ -28,8 +28,8 @@ services:
       # Nodemailer
       NODEMAILER_HOST: toulouse.com.co
       NODEMAILER_PORT: 465
-      NODEMAILER_SECURE: true
-      NODEMAILER_USER: "no-responder@toulouse.com.co"
+      NODEMAILER_SECURE: "true"
+      NODEMAILER_USER: no-responder@toulouse.com.co
       NODEMAILER_PASSWORD: 4l1vgR%3
 
       # Amazon AWS
