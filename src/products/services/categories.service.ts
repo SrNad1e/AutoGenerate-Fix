@@ -214,7 +214,7 @@ export class CategoriesService {
 
 				const categoryFind = await this.categoryLevel1Model.findOne({
 					childs: {
-						$in: new Types.ObjectId(id),
+						$elemMatch: { $eq: new Types.ObjectId(id) },
 					},
 				});
 
@@ -256,7 +256,7 @@ export class CategoriesService {
 			return this.categoryLevel1Model
 				.findOne({
 					childs: {
-						$in: new Types.ObjectId(id),
+						$elemMatch: { $eq: new Types.ObjectId(id) },
 					},
 				})
 				.populate(populate)
@@ -298,7 +298,7 @@ export class CategoriesService {
 
 				const categoryFind = await this.categoryLevel2Model.findOne({
 					childs: {
-						$in: new Types.ObjectId(id),
+						$elemMatch: { $eq: new Types.ObjectId(id) },
 					},
 				});
 
@@ -337,14 +337,14 @@ export class CategoriesService {
 
 			const responseLevel2 = await this.categoryLevel2Model.findOne({
 				childs: {
-					$in: new Types.ObjectId(id),
+					$elemMatch: { $eq: new Types.ObjectId(id) },
 				},
 			});
 
 			return this.categoryLevel1Model
 				.findOne({
 					childs: {
-						$in: responseLevel2._id,
+						$elemMatch: { $eq: responseLevel2._id },
 					},
 				})
 				.populate(populate)

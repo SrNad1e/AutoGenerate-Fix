@@ -1203,7 +1203,7 @@ type Image {
   updatedAt: DateTime!
 
   """Direcciones de la imagen"""
-  urls: Urls!
+  urls: Urls
 
   """Usuario que creó o editó la imagen"""
   user: User!
@@ -3332,13 +3332,13 @@ input UpdateUserInput {
 """Enlaces de diferences tipos"""
 type Urls {
   """Enlaces de tipo jpeg"""
-  jpeg: ImageTypes!
+  jpeg: ImageTypes
 
   """Enlaces de tipo webp"""
-  original: String!
+  original: String
 
   """Enlaces de tipo webp"""
-  webp: ImageTypes!
+  webp: ImageTypes
 }
 
 """Usuario que manipula los datos de la aplicación"""

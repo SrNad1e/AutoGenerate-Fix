@@ -107,6 +107,7 @@ export class ProductsService {
 				{
 					name,
 				},
+				false,
 				companyId,
 			);
 			filters.reference = {
