@@ -14,6 +14,7 @@ import {
 	DocumentType,
 	DocumentTypeSchema,
 } from './entities/documentType.entity';
+import { DocumentTypesResolver } from './resolvers/document-types.resolver';
 
 @Module({
 	imports: [
@@ -37,6 +38,7 @@ import {
 		CustomerTypeService,
 		CustomersResolver,
 		DocumentTypesService,
+		DocumentTypesResolver,
 	],
 	exports: [CustomersService, CustomerTypeService],
 })

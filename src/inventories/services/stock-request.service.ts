@@ -15,7 +15,7 @@ import { ShopsService } from 'src/shops/services/shops.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
-import { FiltersStockRequestInput } from '../dtos/filters-stockRequest.input';
+import { FiltersStockRequestsInput } from '../dtos/filters-stockRequests.input';
 import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
 import { StockRequest } from '../entities/stock-request.entity';
 
@@ -65,7 +65,7 @@ export class StockRequestService {
 		warehouseOriginId,
 		dateFinal,
 		dateInitial,
-	}: FiltersStockRequestInput) {
+	}: FiltersStockRequestsInput) {
 		const filters: FilterQuery<StockRequest> = {};
 		try {
 			if (number) {
@@ -415,9 +415,11 @@ export class StockRequestService {
 
 	async autogenerate(shopId: string, user: User) {
 		const shop = await this.shopsService.findById(shopId);
+
 		const warehouse = await this.warehousesService.findById(
-			shop.defaultWarehouse.toString(),
+			shop.defaultWarehouse._id.toString(),
 		);
+
 		const products = await this.productsService.getProducts({
 			status: 'active',
 		});
@@ -430,7 +432,7 @@ export class StockRequestService {
 
 				return { ...product, stock };
 			})
-			.filter((product) => product.stock.quantity < warehouse.min);
+			.filter((product) => product?.stock?.quantity < warehouse?.min);
 
 		const details = [];
 
@@ -439,7 +441,7 @@ export class StockRequestService {
 
 			const product = await this.productsService.findById(
 				detail._id.toString(),
-				shop.warehouseMain.toString(),
+				shop?.warehouseMain?._id?.toString(),
 			);
 
 			const total = warehouse.min - detail.stock.quantity;
@@ -465,8 +467,8 @@ export class StockRequestService {
 
 		return this.create(
 			{
-				warehouseDestinationId: shop.warehouseMain.toString(),
-				warehouseOriginId: shop.defaultWarehouse.toString(),
+				warehouseDestinationId: shop?.warehouseMain?._id?.toString(),
+				warehouseOriginId: shop?.defaultWarehouse?._id?.toString(),
 				details,
 			},
 			user,

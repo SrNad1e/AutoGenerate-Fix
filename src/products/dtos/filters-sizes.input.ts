@@ -16,7 +16,7 @@ export class SortSize {
 }
 
 @InputType({ description: 'Filtros para la lista de tallas' })
-export class FiltersSizeInput {
+export class FiltersSizesInput {
 	@Field({ description: 'Comodín busqueda de la talla', nullable: true })
 	name?: string;
 

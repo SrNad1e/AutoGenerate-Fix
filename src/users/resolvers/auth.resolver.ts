@@ -1,13 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
-import { CreateUserInput } from '../dtos/create-user.input';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
 import { SignUpInput } from '../dtos/signup.input';
-import { User } from '../entities/user.entity';
 import { GqlAuthGuard } from '../guards/gql-auth.guard';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from '../services/auth.service';
 
 @Resolver()
@@ -31,7 +28,7 @@ export class AuthResolver {
 		);
 	}
 
-	@Mutation(() => User, {
+	@Mutation(() => LoginResponse, {
 		description: 'Se encarga de crear el usuario desde aplicaciones externas',
 	})
 	async signup(
@@ -40,10 +37,9 @@ export class AuthResolver {
 		})
 		_: SignUpInput,
 		@Context() context,
-	): Promise<User> {
+	) {
 		return this.authService.signup({
 			...context.req.body.variables.input,
-			user: context.req.user,
 		});
 	}
 }

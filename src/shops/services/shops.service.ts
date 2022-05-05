@@ -6,6 +6,7 @@ import { CompaniesService } from 'src/configurations/services/companies.service'
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateShopInput } from '../dtos/create-shop.input';
+import { FiltersShopInput } from '../dtos/filters-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { UpdateShopInput } from '../dtos/update-shop.input';
 
@@ -34,12 +35,12 @@ export class ShopsService {
 		private readonly companiesService: CompaniesService,
 	) {}
 
-	async getAll(params: FiltersShopsInput, user: User) {
+	async getAll(params: FiltersShopsInput, user: User, companyId: string) {
 		const filters: FilterQuery<Shop> = {};
 		const { limit = 20, page = 1, name, status, sort } = params;
 
 		if (user.username !== 'admin') {
-			filters.company = new Types.ObjectId(user.company._id);
+			filters.company = new Types.ObjectId(companyId);
 		}
 
 		if (name) {
@@ -63,6 +64,10 @@ export class ShopsService {
 
 	async findById(shopId: string) {
 		return this.shopModel.findById(shopId).populate(populate).lean();
+	}
+
+	async findOne(filters: FiltersShopInput) {
+		return this.shopModel.findOne(filters).lean();
 	}
 
 	async create(params: CreateShopInput) {
@@ -146,6 +151,7 @@ export class ShopsService {
 	async migrate() {
 		try {
 			const shopsMysql = await this.shopMysqlRepo.find();
+			const companyDefault = await this.companiesService.findOne('Cirotex');
 
 			for (let i = 0; i < shopsMysql.length; i++) {
 				const shopMysql = shopsMysql[i];
@@ -155,19 +161,22 @@ export class ShopsService {
 						name: shopMysql.name,
 					})
 					.lean();
-
-				const newShop = new this.shopModel({
-					name: shopMysql.name,
-					address: shopMysql.address,
-					phone: shopMysql.phone,
-					shopId: shopMysql.id,
-					defaultWarehouse: defaultWarehouse?._id,
-					createdAt: shopMysql.created_at,
-					user: {
-						name: 'Migración',
-					},
-				});
-				await newShop.save();
+				if (defaultWarehouse) {
+					const newShop = new this.shopModel({
+						name: shopMysql.name,
+						address: shopMysql.address,
+						phone: shopMysql.phone,
+						shopId: shopMysql.id,
+						defaultWarehouse: defaultWarehouse?._id,
+						company: companyDefault._id,
+						createdAt: shopMysql.created_at,
+						user: {
+							name: 'Administrador del Sistema',
+							username: 'admin',
+						},
+					});
+					await newShop.save();
+				}
 			}
 
 			return {

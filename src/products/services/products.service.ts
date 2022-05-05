@@ -80,6 +80,7 @@ export class ProductsService {
 			referenceId,
 		}: FiltersProductsInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<Product> = {};
 
@@ -106,7 +107,7 @@ export class ProductsService {
 				{
 					name,
 				},
-				user,
+				companyId,
 			);
 
 			filters.reference = {
@@ -189,6 +190,7 @@ export class ProductsService {
 			.findById(id)
 			.populate(populate)
 			.lean();
+
 		if (productQuery) {
 			const { stock, ...product } = productQuery;
 			if (warehouseId) {
@@ -214,10 +216,11 @@ export class ProductsService {
 		}
 	}
 
-	async create(props: CreateProductInput, user: User) {
+	async create(props: CreateProductInput, user: User, companyId: string) {
 		const reference = await this.referencesService.findById(
 			props.referenceId,
 			user,
+			companyId,
 		);
 		if (!reference) {
 			throw new NotFoundException('La referencia no existe');
@@ -247,7 +250,7 @@ export class ProductsService {
 			throw new NotFoundException('La talla no existe');
 		}
 
-		const products = await this.findAll({}, user);
+		const products = await this.findAll({}, user, companyId);
 		const total = () => {
 			const totalData = products.totalDocs + 1;
 			if (totalData < 10) {
@@ -323,6 +326,7 @@ export class ProductsService {
 				{
 					username: 'admin',
 				},
+				'',
 			);
 
 			const productsMongo = [];
@@ -332,7 +336,9 @@ export class ProductsService {
 				quantity: 100,
 			}));
 
-			const userDefault = await this.usersService.findOne('admin');
+			const userDefault = await this.usersService.findOne({
+				username: 'admin',
+			});
 
 			for (let i = 0; i < productsMysql.length; i++) {
 				const product = productsMysql[i];
@@ -376,11 +382,12 @@ export class ProductsService {
 							volume: parseFloat(product.shipping_volume?.toString() || '0'),
 							brandId: brand._id.toString(),
 							companyId: company._id.toString(),
-							categoryLevel1Id: '6267e450874de734057c37ff',
-							categoryLevel2Id: '6267e47e874de734057c3800',
-							categoryLevel3Id: '6267e497874de734057c3801',
+							categoryLevel1Id: '6272c1764ff755e555d5f1ea',
+							categoryLevel2Id: '6272c18c4ff755e555d5f1f3',
+							categoryLevel3Id: '6272c1944ff755e555d5f201',
 						},
 						userDefault,
+						company._id.toString(),
 					);
 
 					reference = await this.referencesService.findOne({
@@ -569,7 +576,7 @@ export class ProductsService {
 
 			if (product?.stock[0]?.quantity < quantity) {
 				throw new BadRequestException(
-					`El producto ${product?.reference}/${product?.barcode} no tiene suficientes unidades, stock: ${product?.stock[0].quantity}`,
+					`El producto ${product?.reference['name']}/${product?.barcode} no tiene suficientes unidades, stock: ${product?.stock[0].quantity}`,
 				);
 			}
 
@@ -586,7 +593,7 @@ export class ProductsService {
 	 */
 	async getProducts(params: FiltersProductsInput) {
 		const filters: FilterQuery<Product> = {};
-		const { colorId, name = '', sizeId, status, ids } = params;
+		const { colorId, name, sizeId, status, ids } = params;
 
 		if (ids) {
 			filters._id = {
@@ -605,15 +612,17 @@ export class ProductsService {
 		if (status) {
 			filters.status = status;
 		}
-		return this.productModel
-			.find({
-				...filters,
-				$or: [
-					{ barcode: name },
-					{ description: { $regex: name, $options: 'i' } },
-					{ reference: { $regex: name, $options: 'i' } },
-				],
-			})
-			.lean();
+
+		const response = await this.referencesService.getReferences({ name });
+
+		const references = response?.map((reference) => reference._id);
+
+		if (references) {
+			filters.reference = {
+				$in: references,
+			};
+		}
+
+		return this.productModel.find(filters).lean();
 	}
 }

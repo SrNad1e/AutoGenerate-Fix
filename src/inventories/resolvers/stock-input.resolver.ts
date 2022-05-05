@@ -3,8 +3,8 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
-import { FiltersStockInputInput } from '../dtos/filters-stockInput.input';
-import { ResponseStockInput } from '../dtos/response-stockInput';
+import { FiltersStockInputsInput } from '../dtos/filters-stockInputs.input';
+import { ResponseStockInputs } from '../dtos/response-stockInputs';
 import { UpdateStockInputInput } from '../dtos/update-stockInput-input';
 import { StockInput } from '../entities/stock-input.entity';
 import { StockInputService } from '../services/stock-input.service';
@@ -13,24 +13,25 @@ import { StockInputService } from '../services/stock-input.service';
 export class StockInputResolver {
 	constructor(private readonly stockInputService: StockInputService) {}
 
-	@Query(() => ResponseStockInput, {
+	@Query(() => ResponseStockInputs, {
 		name: 'stockInputs',
 		description: 'Lista de entradas de productos',
 	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersStockInputInput',
+			name: 'filtersStockInputsInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros de lista de entradas de productos',
 		})
-		_: FiltersStockInputInput,
+		_: FiltersStockInputsInput,
 		@Context() context,
 	) {
 		return this.stockInputService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -44,7 +45,11 @@ export class StockInputResolver {
 		id: string,
 		@Context() context,
 	) {
-		return this.stockInputService.findById(id, context.req.user);
+		return this.stockInputService.findById(
+			id,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Mutation(() => StockInput, {
@@ -61,7 +66,8 @@ export class StockInputResolver {
 	) {
 		return this.stockInputService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -84,7 +90,8 @@ export class StockInputResolver {
 		return this.stockInputService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

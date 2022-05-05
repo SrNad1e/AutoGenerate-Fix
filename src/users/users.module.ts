@@ -19,13 +19,19 @@ import { LocalStrategy } from './libs/local.strategy';
 import config from 'src/config';
 import { JwtStrategy } from './libs/jwt.strategy';
 import { Shop, ShopSchema } from 'src/shops/entities/shop.entity';
-import { UsersController } from './controllers/users.controller';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import { CrmModule } from 'src/crm/crm.module';
+import {
+	PointOfSale,
+	PointOfSaleSchema,
+} from 'src/sales/entities/pointOfSale.entity';
+import { RolesService } from './services/roles.service';
 
 @Module({
 	imports: [
 		PassportModule,
 		ConfigurationsModule,
+		CrmModule,
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;
@@ -48,6 +54,10 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 			{
 				name: Shop.name,
 				schema: ShopSchema,
+			},
+			{
+				name: PointOfSale.name,
+				schema: PointOfSaleSchema,
 			},
 		]),
 		MongooseModule.forFeatureAsync([
@@ -81,8 +91,8 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 		AuthResolver,
 		LocalStrategy,
 		JwtStrategy,
+		RolesService,
 	],
 	exports: [UsersService],
-	controllers: [UsersController],
 })
 export class UsersModule {}

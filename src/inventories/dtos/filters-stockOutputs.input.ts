@@ -40,7 +40,7 @@ export class SortStockOutput {
 }
 
 @InputType({ description: 'Filtros para el listado de salidas de productos' })
-export class FiltersStockOutputInput {
+export class FiltersStockOutputsInput {
 	@Field(() => Number, {
 		description: 'Número consecutivo asignado a la salida',
 		nullable: true,

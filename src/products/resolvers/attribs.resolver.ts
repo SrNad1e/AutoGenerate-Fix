@@ -43,7 +43,7 @@ export class AttribsResolver {
 	) {
 		return this.attribsService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -64,7 +64,7 @@ export class AttribsResolver {
 		return this.attribsService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

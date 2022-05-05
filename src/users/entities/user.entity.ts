@@ -6,8 +6,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
-import { CustomerType } from 'src/crm/entities/customerType.entity';
 import { Company } from 'src/configurations/entities/company.entity';
+import { Customer } from 'src/crm/entities/customer.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Usuario que manipula los datos de la aplicación' })
@@ -40,13 +40,6 @@ export class User extends Document {
 	})
 	role: Types.ObjectId;
 
-	@Field(() => CustomerType, {
-		description: 'Tipo de cliente',
-		nullable: true,
-	})
-	@Prop({ type: Types.ObjectId, ref: 'CustomerType' })
-	customerType: Types.ObjectId;
-
 	@Field(() => Shop, {
 		description: 'Tienda a la que se encuentra asiganado el usuario',
 	})
@@ -57,6 +50,10 @@ export class User extends Document {
 		required: true,
 	})
 	shop: Types.ObjectId;
+
+	@Field(() => Customer, { description: 'Cliente asignado', nullable: true })
+	@Prop({ type: Types.ObjectId })
+	customer: Types.ObjectId;
 
 	@Prop({
 		type: Types.ObjectId,
@@ -70,17 +67,17 @@ export class User extends Document {
 	pointOfSale: Types.ObjectId;
 
 	@Prop({
-		type: Types.ObjectId,
+		type: [Types.ObjectId],
 		ref: Company.name,
 		autopopulate: true,
 		required: true,
 	})
-	@Field(() => Company, {
-		description: 'Empresa a la que pertenece el usuario',
+	@Field(() => [Company], {
+		description: 'Empresas a la que pertenece el usuario',
 	})
-	company: Types.ObjectId;
+	companies: Types.ObjectId[];
 
-	@Prop({ type: String })
+	@Prop({ type: String, default: 'active' })
 	@Field(() => String, {
 		description: 'Estado del usuario (active, inactive, suspend)',
 	})

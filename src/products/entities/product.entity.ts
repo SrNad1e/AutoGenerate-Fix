@@ -45,7 +45,7 @@ export class Product extends Document {
 	@Field(() => Reference, { description: 'Referencia del producto' })
 	reference: Types.ObjectId;
 
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, unique: true })
 	@Field(() => String, { description: 'Código de barras del producto' })
 	barcode: string;
 

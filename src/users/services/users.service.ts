@@ -7,7 +7,6 @@ import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { Company } from 'src/configurations/entities/company.entity';
-import { CustomerType } from 'src/crm/entities/customerType.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
@@ -17,13 +16,27 @@ import { User, UserMysql } from '../entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../entities/permission.entity';
+import { CreateUserInput } from '../dtos/create-user.input';
+import { CompaniesService } from 'src/configurations/services/companies.service';
+import { RolesService } from './roles.service';
+import { CustomersService } from 'src/crm/services/customers.service';
+import { FiltersUserInput } from '../dtos/filters-user.input';
+import { Customer } from 'src/crm/entities/customer.entity';
+import { CustomerType } from 'src/crm/entities/customerType.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
-	{ path: 'customerType', model: CustomerType.name },
-	{ path: 'company', model: Company.name },
+	{ path: 'companies', model: Company.name },
+	{ path: 'customer', model: Customer.name },
+	{
+		path: 'customer',
+		populate: {
+			path: 'customerType',
+			model: CustomerType.name,
+		},
+	},
 	{
 		path: 'shop',
 		populate: {
@@ -55,6 +68,11 @@ export class UsersService {
 		@InjectRepository(UserMysql)
 		private readonly userRepo: Repository<UserMysql>,
 		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
+		@InjectModel(PointOfSale.name)
+		private readonly pointOfSaleModel: PaginateModel<PointOfSale>,
+		private readonly companiesService: CompaniesService,
+		private readonly rolesService: RolesService,
+		private readonly customersService: CustomersService,
 	) {}
 
 	async findAll(
@@ -86,8 +104,8 @@ export class UsersService {
 			filters.status = status;
 		}
 
-		if (user?.company['_id']) {
-			filters.company = new Types.ObjectId(user?.company['_id']);
+		if (user?.companies) {
+			filters.company = { $in: user?.companies };
 		}
 
 		const options: PaginateOptions = {
@@ -101,8 +119,16 @@ export class UsersService {
 		return this.userModel.paginate(filters, options);
 	}
 
-	async findOne(username: string): Promise<User> {
-		return this.userModel.findOne({ username }).populate(populate).lean();
+	async findOne({ username, customerId }: FiltersUserInput): Promise<User> {
+		const filters: FilterQuery<User> = {};
+		if (username) {
+			filters.username = username;
+		}
+
+		if (customerId) {
+			filters.customer = new Types.ObjectId(customerId);
+		}
+		return this.userModel.findOne(filters).populate(populate).lean();
 	}
 
 	async findById(id: string): Promise<Partial<User>> {
@@ -121,9 +147,65 @@ export class UsersService {
 		return user;
 	}
 
-	async create(user: Partial<User>): Promise<User> {
+	async create({
+		username,
+		shopId,
+		companyId,
+		pointOfSaleId,
+		roleId,
+		customerId,
+		...params
+	}: CreateUserInput): Promise<User> {
+		const user = await this.findOne({ username });
+
+		if (user) {
+			throw new NotFoundException(
+				`El usuario ${username} ya se encuentra registrado`,
+			);
+		}
+
+		const role = await this.rolesService.findById(roleId);
+
+		if (!role) {
+			throw new NotFoundException('El rol seleccionado no existe');
+		}
+
+		const shop = await this.shopModel.findById(shopId);
+
+		if (!shop || shop?.company?.toString() !== companyId) {
+			throw new NotFoundException('La tienda no se encuentra registrada');
+		}
+
+		const company = await this.companiesService.findById(companyId);
+
+		if (!company) {
+			throw new NotFoundException('La empresa no se encuentra registrada');
+		}
+
+		let pointOfSale;
+		if (pointOfSaleId) {
+			pointOfSale = await this.pointOfSaleModel.findById(pointOfSaleId).lean();
+			if (!pointOfSale || pointOfSale?.shop.toString() !== shopId) {
+				throw new NotFoundException(
+					'El punto de venta no existe o no esta asignado a la tienda',
+				);
+			}
+		}
+
+		let customer;
+		if (customerId) {
+			customer = await this.customersService.findById(customerId);
+			if (!customer) {
+				throw new NotFoundException('El cliente no existe');
+			}
+		}
+
 		const newUser = new this.userModel({
-			...user,
+			username,
+			role: role._id,
+			shop: shop._id,
+			customer: customer._id,
+			...params,
 		});
 		return (await newUser.save()).populate(populate);
 	}
@@ -167,52 +249,5 @@ export class UsersService {
 	 */
 	async getByIdMysql(id: number) {
 		return this.userModel.findOne({ id }).populate(populate).lean();
-	}
-
-	async migration() {
-		try {
-			const usersMysql = await this.userRepo.find();
-
-			const usersMongo = [];
-
-			for (let i = 0; i < usersMysql.length; i++) {
-				const user = usersMysql[i];
-				const shop = await this.shopModel.findOne({ id: user.shop_id }).lean();
-				usersMongo.push({
-					name: user.name,
-					username: user.user,
-					password: user.password,
-					shop: shop._id,
-					user: {
-						id: 0,
-						name: 'Usuario de migración',
-						username: 'migrate',
-					},
-					id: user.id,
-				});
-			}
-			const shop = await this.shopModel.findOne({ id: 1 }).lean();
-
-			usersMongo.push({
-				name: 'Usuario de migración',
-				username: 'migrate',
-				password: '1234',
-				shop: shop._id,
-				user: {
-					id: 0,
-					name: 'migrate',
-					username: 'Usuario de migración',
-				},
-				id: 0,
-			});
-
-			await this.userModel.create(usersMongo);
-
-			return {
-				message: 'Migración Completa',
-			};
-		} catch (e) {
-			throw new NotFoundException(`Error al migrar los usuario ${e}`);
-		}
 	}
 }

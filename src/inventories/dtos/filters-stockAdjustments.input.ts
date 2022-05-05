@@ -1,8 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Types } from 'mongoose';
 
-@InputType({ description: 'Ordenamiento del solicitudes de productos' })
-export class SortStockRequest {
+@InputType({ description: 'Ordenamiento del ajuste de productos' })
+export class SortStockAdjustment {
 	@Field(() => Number, {
 		description: 'Ordenamiento por número',
 		nullable: true,
@@ -16,16 +15,16 @@ export class SortStockRequest {
 	status: number;
 
 	@Field(() => Number, {
-		description: 'Ordenamiento por bodega de destino',
+		description: 'Ordenamiento por bodega',
 		nullable: true,
 	})
-	warehouseDestination: number;
+	warehouse: number;
 
 	@Field(() => Number, {
-		description: 'Ordenamiento por bodega de origen',
+		description: 'Ordenamiento por total',
 		nullable: true,
 	})
-	warehouseOrigin: number;
+	total: number;
 
 	@Field(() => Number, {
 		description: 'Ordenamiento por fecha de creación',
@@ -40,39 +39,37 @@ export class SortStockRequest {
 	updatedAt: number;
 }
 
-@InputType({
-	description: 'Filtros para el listado de solicitudes de productos',
-})
-export class FiltersStockRequestInput {
+@InputType({ description: 'Filtros para el listado de ajsutes de productos' })
+export class FiltersStockAdjustmentsInput {
 	@Field(() => Number, {
-		description: 'Número consecutivo asignado al traslado',
+		description: 'Número consecutivo asignado al ajuste',
 		nullable: true,
 	})
 	number: number;
 
 	@Field(() => String, {
-		description: 'Estado de la solicitud (open, pending, cancelled, used)',
+		description: 'Estado del ajuste (open, confirmed, cancelled)',
 		nullable: true,
 	})
 	status: string;
 
 	@Field(() => String, {
-		description: 'Id de la bodega de origen',
+		description: 'Id de la bodega',
 		nullable: true,
 	})
-	warehouseOriginId: Types.ObjectId;
+	warehouseId: string;
 
-	@Field(() => String, {
-		description: 'Id de la bodega de destino',
-		nullable: true,
-	})
-	warehouseDestinationId: Types.ObjectId;
-
-	@Field(() => SortStockRequest, {
+	@Field(() => SortStockAdjustment, {
 		description: 'Ordenamiento (1 es ascendente, -1 es descendente)',
 		nullable: true,
 	})
-	sort: SortStockRequest;
+	sort: SortStockAdjustment;
+
+	@Field(() => Number, {
+		description: 'Valor total de la entrada',
+		nullable: true,
+	})
+	total: number;
 
 	@Field(() => String, {
 		description: 'Fecha inicial para la busqueda',

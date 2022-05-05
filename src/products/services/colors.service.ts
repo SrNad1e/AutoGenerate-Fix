@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel } from 'mongoose';
 import { Repository } from 'typeorm';
 
-import { ResponseColor } from '../dtos/response-color';
-import { FiltersColorInput } from '../dtos/filters-colors.input';
+import { ResponseColors } from '../dtos/response-colors';
+import { FiltersColorsInput } from '../dtos/filters-colors.input';
 import { Color, ColorMysql } from '../entities/color.entity';
 import { CreateColorInput } from '../dtos/create-color.input';
 import { User } from 'src/users/entities/user.entity';
@@ -31,7 +31,7 @@ export class ColorsService {
 		page = 1,
 		active,
 		sort,
-	}: FiltersColorInput): Promise<Partial<ResponseColor>> {
+	}: FiltersColorsInput): Promise<Partial<ResponseColors>> {
 		const filters: FilterQuery<Color> = {};
 
 		if (active !== undefined) {
@@ -122,7 +122,8 @@ export class ColorsService {
 					const newImage = new this.imageModel({
 						name: path.split('/')[7],
 						user: {
-							name: 'Default',
+							name: 'Administrador del Sistema',
+							username: 'admin',
 						},
 						urls: {
 							webp: {

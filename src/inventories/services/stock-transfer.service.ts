@@ -17,7 +17,7 @@ import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
-import { FiltersStockTransferInput } from '../dtos/filters-stockTransfer.input';
+import { FiltersStockTransfersInput } from '../dtos/filters-stockTransfers.input';
 import {
 	DetailStockTransferInput,
 	UpdateStockTransferInput,
@@ -82,7 +82,7 @@ export class StockTransferService {
 		warehouseOriginId,
 		dateInitial,
 		dateFinal,
-	}: FiltersStockTransferInput) {
+	}: FiltersStockTransfersInput) {
 		const filters: FilterQuery<StockTransfer> = {};
 
 		try {
@@ -168,6 +168,7 @@ export class StockTransferService {
 			...options
 		}: CreateStockTransferInput,
 		userOrigin: Partial<User>,
+		companyId: string,
 	) {
 		try {
 			if (options.status) {
@@ -265,6 +266,7 @@ export class StockTransferService {
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					userOrigin,
+					companyId,
 				);
 			}
 
@@ -283,6 +285,7 @@ export class StockTransferService {
 			...options
 		}: UpdateStockTransferInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		try {
 			const stockTransfer = await this.stockTransferModel.findById(id).lean();
@@ -414,6 +417,7 @@ export class StockTransferService {
 					await this.stockHistoryService.deleteStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 
@@ -441,6 +445,7 @@ export class StockTransferService {
 					await this.stockHistoryService.addStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 
@@ -476,6 +481,7 @@ export class StockTransferService {
 					await this.stockHistoryService.deleteStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 
@@ -494,6 +500,7 @@ export class StockTransferService {
 					await this.stockHistoryService.addStock(
 						deleteStockHistoryInput,
 						user,
+						companyId,
 					);
 				}
 

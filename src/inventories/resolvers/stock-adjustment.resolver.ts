@@ -3,8 +3,8 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
-import { FiltersStockAdjustmentInput } from '../dtos/filters-stockAdjustment.input';
-import { ResponseStockAdjustment } from '../dtos/response-stockAdjustment';
+import { FiltersStockAdjustmentsInput } from '../dtos/filters-stockAdjustments.input';
+import { ResponseStockAdjustments } from '../dtos/response-stockAdjustments';
 import { UpdateStockAdjustmentInput } from '../dtos/update-stockAdjustment-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockAdjustmentService } from '../services/stock-adjustment.service';
@@ -15,24 +15,25 @@ export class StockAdjustmentResolver {
 		private readonly stockAdjustmentService: StockAdjustmentService,
 	) {}
 
-	@Query(() => ResponseStockAdjustment, {
+	@Query(() => ResponseStockAdjustments, {
 		name: 'stockAdjustments',
 		description: 'Lista de ajustes de productos',
 	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersStockAdjustmentInput',
+			name: 'filtersStockAdjustmentsInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros de lista de ajustes de productos',
 		})
-		_: FiltersStockAdjustmentInput,
+		_: FiltersStockAdjustmentsInput,
 		@Context() context,
 	) {
 		return this.stockAdjustmentService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -46,7 +47,11 @@ export class StockAdjustmentResolver {
 		id: string,
 		@Context() context,
 	) {
-		return this.stockAdjustmentService.findById(id, context.req.user);
+		return this.stockAdjustmentService.findById(
+			id,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Mutation(() => StockAdjustment, {
@@ -63,7 +68,8 @@ export class StockAdjustmentResolver {
 	) {
 		return this.stockAdjustmentService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -84,7 +90,8 @@ export class StockAdjustmentResolver {
 		return this.stockAdjustmentService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

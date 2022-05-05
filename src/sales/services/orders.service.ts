@@ -99,11 +99,14 @@ export class OrdersService {
 
 			dataUpdate['customer'] = customer;
 
-			if (customer.type._id.toString() !== order.customer.type._id.toString()) {
+			if (
+				customer.customerType._id.toString() !==
+				order.customer.customerType._id.toString()
+			) {
 				const newDetails = order.details.map((detail) => ({
 					...detail,
 					discount:
-						(customer?.type['discount'] / 100) *
+						(customer?.customerType['discount'] / 100) *
 						detail?.product?.reference['price'],
 					updatedAt: new Date(),
 				}));
@@ -216,7 +219,11 @@ export class OrdersService {
 		return this.orderModel.find({ pointOfSale: idPointOfSale }).lean();
 	}
 
-	async addProducts({ orderId, details }: AddProductsOrderInput, user: User) {
+	async addProducts(
+		{ orderId, details }: AddProductsOrderInput,
+		user: User,
+		companyId: string,
+	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
 		if (!order) {
@@ -260,7 +267,7 @@ export class OrdersService {
 		const productsUpdate = details?.filter((item) => item.action === 'update');
 
 		const customerType = await this.customerTypesService.findById(
-			order.customer.type._id.toString(),
+			order.customer.customerType._id.toString(),
 		);
 
 		if (productsUpdate) {
@@ -349,6 +356,7 @@ export class OrdersService {
 				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
 			},
 			user,
+			companyId,
 		);
 
 		await this.stockHistoryService.deleteStock(
@@ -359,6 +367,7 @@ export class OrdersService {
 				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
 			},
 			user,
+			companyId,
 		);
 
 		const subtotal = newDetails.reduce(

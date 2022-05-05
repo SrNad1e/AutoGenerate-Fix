@@ -12,7 +12,7 @@ import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
-import { FiltersStockOutputInput } from '../dtos/filters-stockOutput.input';
+import { FiltersStockOutputsInput } from '../dtos/filters-stockOutputs.input';
 import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockHistoryService } from './stock-history.service';
@@ -72,13 +72,14 @@ export class StockOutputService {
 			page = 1,
 			dateFinal,
 			dateInitial,
-		}: FiltersStockOutputInput,
+		}: FiltersStockOutputsInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<StockOutput> = {};
 
 		if (user.username !== 'admin') {
-			filters.company === user.company._id;
+			filters.company = companyId;
 		}
 
 		if (number) {
@@ -124,10 +125,10 @@ export class StockOutputService {
 		return this.stockOutputModel.paginate(filters, options);
 	}
 
-	async findById(_id: string, user: Partial<User>) {
+	async findById(_id: string, user: Partial<User>, companyId: string) {
 		const filters: FilterQuery<StockOutput> = { _id };
 		if (user.username !== 'admin') {
-			filters.company === user.company._id;
+			filters.company = companyId;
 		}
 		const response = await this.stockOutputModel
 			.findById(filters)
@@ -142,6 +143,7 @@ export class StockOutputService {
 	async create(
 		{ details, warehouseId, ...options }: CreateStockOutputInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		if (!(details?.length > 0)) {
 			throw new BadRequestException('La salida no puede estar vacía');
@@ -193,7 +195,7 @@ export class StockOutputService {
 		);
 
 		const stockOutput = await this.stockOutputModel
-			.findOne({ 'company._id': user.company._id })
+			.findOne({ 'company._id': new Types.ObjectId(companyId) })
 			.sort({ _id: -1 });
 
 		const newStockInput = new this.stockOutputModel({
@@ -201,7 +203,9 @@ export class StockOutputService {
 			details: detailsInput,
 			total,
 			user,
-			company: user.company,
+			company: user.companies.find(
+				(company) => company._id.toString() === companyId,
+			),
 			number: (stockOutput?.number || 0) + 1,
 			...options,
 		});
@@ -220,7 +224,11 @@ export class StockOutputService {
 				documentId: response._id.toString(),
 				documentType: 'output',
 			};
-			await this.stockHistoryService.deleteStock(deleteStockHistoryInput, user);
+			await this.stockHistoryService.deleteStock(
+				deleteStockHistoryInput,
+				user,
+				companyId,
+			);
 		}
 		return response;
 	}
@@ -229,12 +237,13 @@ export class StockOutputService {
 		id: string,
 		{ details, ...options }: UpdateStockOutputInput,
 		user: User,
+		companyId: string,
 	) {
 		const stockOutput = await this.stockOutputModel.findById(id).lean();
 
 		if (
 			user.username !== 'admin' &&
-			stockOutput.company._id !== user.company._id
+			stockOutput.company._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(
 				`El usuario no se encuentra autorizado para hacer cambios en la salida`,
@@ -352,6 +361,7 @@ export class StockOutputService {
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					user,
+					companyId,
 				);
 			}
 
@@ -384,6 +394,7 @@ export class StockOutputService {
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					user,
+					companyId,
 				);
 			}
 

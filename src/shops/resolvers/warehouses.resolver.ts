@@ -18,7 +18,7 @@ export class WarehousesResolver {
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersWarehouseInput',
+			name: 'filtersWarehousesInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros para consultar las bodegas',
@@ -28,7 +28,23 @@ export class WarehousesResolver {
 	) {
 		return this.warehousesService.findAll(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
+	}
+
+	@Query(() => Warehouse, {
+		name: 'warehouseId',
+		description: 'Se encarga de traer bodega por identificador',
+	})
+	@UseGuards(JwtAuthGuard)
+	findById(
+		@Args({
+			name: 'warehouseId',
+			description: 'Identificador de la bodega',
+		})
+		id: string,
+	) {
+		return this.warehousesService.findById(id);
 	}
 }

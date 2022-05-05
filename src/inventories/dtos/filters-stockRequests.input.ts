@@ -1,8 +1,8 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Types } from 'mongoose';
 
-@InputType({ description: 'Ordenamiento del traslado de productos' })
-export class SortStockTransfer {
+@InputType({ description: 'Ordenamiento del solicitudes de productos' })
+export class SortStockRequest {
 	@Field(() => Number, {
 		description: 'Ordenamiento por número',
 		nullable: true,
@@ -40,8 +40,10 @@ export class SortStockTransfer {
 	updatedAt: number;
 }
 
-@InputType({ description: 'Filtros para el listado de traslados de productos' })
-export class FiltersStockTransferInput {
+@InputType({
+	description: 'Filtros para el listado de solicitudes de productos',
+})
+export class FiltersStockRequestsInput {
 	@Field(() => Number, {
 		description: 'Número consecutivo asignado al traslado',
 		nullable: true,
@@ -49,8 +51,7 @@ export class FiltersStockTransferInput {
 	number: number;
 
 	@Field(() => String, {
-		description:
-			'Estado del traslado (open, sent, confirmed, incomplete, cancelled)',
+		description: 'Estado de la solicitud (open, pending, cancelled, used)',
 		nullable: true,
 	})
 	status: string;
@@ -67,11 +68,11 @@ export class FiltersStockTransferInput {
 	})
 	warehouseDestinationId: Types.ObjectId;
 
-	@Field(() => SortStockTransfer, {
+	@Field(() => SortStockRequest, {
 		description: 'Ordenamiento (1 es ascendente, -1 es descendente)',
 		nullable: true,
 	})
-	sort: SortStockTransfer;
+	sort: SortStockRequest;
 
 	@Field(() => String, {
 		description: 'Fecha inicial para la busqueda',

@@ -3,8 +3,8 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
-import { FiltersStockRequestInput } from '../dtos/filters-stockRequest.input';
-import { ResponseStockRequest } from '../dtos/response-stockRequest';
+import { FiltersStockRequestsInput } from '../dtos/filters-stockRequests.input';
+import { ResponseStockRequests } from '../dtos/response-stockRequests';
 import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
 import { StockRequest } from '../entities/stock-request.entity';
 import { StockRequestService } from '../services/stock-request.service';
@@ -13,19 +13,19 @@ import { StockRequestService } from '../services/stock-request.service';
 export class StockRequestResolver {
 	constructor(private readonly stockRequestService: StockRequestService) {}
 
-	@Query(() => ResponseStockRequest, {
+	@Query(() => ResponseStockRequests, {
 		name: 'stockRequests',
 		description: 'Lista las solicitudes de productos',
 	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersStockRequestInput',
+			name: 'filtersStockRequestsInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros de las solicitudes de productos',
 		})
-		_: FiltersStockRequestInput,
+		_: FiltersStockRequestsInput,
 		@Context() context,
 	) {
 		return this.stockRequestService.findAll(context.req.body.variables.input);
@@ -57,7 +57,7 @@ export class StockRequestResolver {
 	) {
 		return this.stockRequestService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -78,7 +78,7 @@ export class StockRequestResolver {
 		return this.stockRequestService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -92,6 +92,6 @@ export class StockRequestResolver {
 		shopId: string,
 		@Context() context,
 	) {
-		return this.stockRequestService.autogenerate(shopId, context.req.user);
+		return this.stockRequestService.autogenerate(shopId, context.req.user.user);
 	}
 }
