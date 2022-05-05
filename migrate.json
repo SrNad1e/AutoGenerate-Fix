@@ -88,16 +88,28 @@
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
-	"role": {
-		"name": "Administrador",
-		"permissions": ["Sacar de la base de datos"],
-		"user": {
-			"name": "Administrador del Sistema",
-			"username": "admin"
+	"roles": [
+		{
+			"name": "Administrador",
+			"permissions": ["Sacar de la base de datos"],
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
+			"changeWarehouse": true,
+			"active": true
 		},
-		"changeWarehouse": true,
-		"active": true
-	},
+		{
+			"name": "Cliente",
+			"permissions": ["Sacar de la base de datos"],
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
+			"changeWarehouse": false,
+			"active": true
+		}
+	],
 	//CREAR LA COMPAÑIA
 	"company": {
 		"name": "Cirotex",
@@ -128,9 +140,47 @@
 		"companies": "Sacar de base de datos",
 		"role": "Sacar de base de datos",
 		"shop": "Sacar de base da datos"
-	}
+	},
 	//MIGRAR COLORES /products/migrate/colors
 	//MIGRAR TALLAS /products/migrate/sizes
 	//PENDIENTE MIGRACION DE CATEGORIAS
 	//MIGRAR PRODUCTOS /products/migrate
+	//CREAR LOS TIPOS DE DOCUMENTO
+	"documentTypes": [
+		{
+			"name": "Cédula de Ciudadanía",
+			"abbreviation": "C.C.",
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	],
+	//CREAR LOS TIPOS DE CLIENTE
+	"customerTypes": [
+		{
+			"name": "Cliente",
+			"discount": 0,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		},
+		{
+			"name": "Mayorista",
+			"discount": 0,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		},
+		{
+			"name": "Distribuidor",
+			"discount": 0,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	]
 }

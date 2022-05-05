@@ -109,7 +109,6 @@ export class ProductsService {
 				},
 				companyId,
 			);
-
 			filters.reference = {
 				$in: references.docs.map((item) => item._id),
 			};

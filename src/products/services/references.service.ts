@@ -77,12 +77,14 @@ export class ReferencesService {
 
 		if (name) {
 			filters.$text = {
-				$search: `${name}`,
+				$search: name,
 			};
 		}
 
 		if (user?.username !== 'admin' || companyId) {
-			filters.companies = { $in: new Types.ObjectId(companyId) };
+			filters.companies = {
+				$elemMatch: { $eq: new Types.ObjectId(companyId) },
+			};
 		}
 
 		const options = {
