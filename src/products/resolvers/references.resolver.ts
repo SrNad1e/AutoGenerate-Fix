@@ -34,6 +34,7 @@ export class ReferencesResolver {
 	) {
 		return this.referencesService.findAll(
 			context.req.body.variables.input,
+			true,
 			companyId,
 		);
 	}
