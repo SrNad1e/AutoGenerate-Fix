@@ -54,6 +54,7 @@ export class ReferencesService {
 			price,
 			active,
 		}: FiltersReferencesInput,
+		products: boolean,
 		companyId?: string,
 		user?: Partial<User>,
 	) {
@@ -96,36 +97,39 @@ export class ReferencesService {
 		};
 
 		const references = await this.referenceModel.paginate(filters, options);
-		const responseReferences = [];
+		let responseReferences = [];
 
 		//TODO: falta agregar precio de descuento
-
-		for (let i = 0; i < references?.docs?.length; i++) {
-			const reference = references?.docs[i];
-			const products = await this.productModel
-				.find({
-					reference: reference?._id,
-					status: 'active',
-				})
-				.populate([
-					'size',
-					{
-						path: 'color',
-						populate: {
-							path: 'image',
+		if (products) {
+			for (let i = 0; i < references?.docs?.length; i++) {
+				const reference = references?.docs[i];
+				const products = await this.productModel
+					.find({
+						reference: reference?._id,
+						status: 'active',
+					})
+					.populate([
+						'size',
+						{
+							path: 'color',
+							populate: {
+								path: 'image',
+								model: Image.name,
+							},
+						},
+						{
+							path: 'images',
 							model: Image.name,
 						},
-					},
-					{
-						path: 'images',
-						model: Image.name,
-					},
-				]);
+					]);
 
-			responseReferences.push({
-				...reference,
-				products,
-			});
+				responseReferences.push({
+					...reference,
+					products,
+				});
+			}
+		} else {
+			responseReferences = references?.docs;
 		}
 
 		return {

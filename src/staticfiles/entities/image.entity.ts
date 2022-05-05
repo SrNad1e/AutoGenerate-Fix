@@ -18,14 +18,20 @@ export class ImageTypes {
 
 @ObjectType({ description: 'Enlaces de diferences tipos' })
 export class Urls {
-	@Field(() => ImageTypes, { description: 'Enlaces de tipo webp' })
-	webp: ImageTypes;
+	@Field(() => ImageTypes, {
+		description: 'Enlaces de tipo webp',
+		nullable: true,
+	})
+	webp?: ImageTypes;
 
-	@Field(() => ImageTypes, { description: 'Enlaces de tipo jpeg' })
-	jpeg: ImageTypes;
+	@Field(() => ImageTypes, {
+		description: 'Enlaces de tipo jpeg',
+		nullable: true,
+	})
+	jpeg?: ImageTypes;
 
-	@Field(() => String, { description: 'Enlaces de tipo webp' })
-	original: string;
+	@Field(() => String, { description: 'Enlaces de tipo webp', nullable: true })
+	original?: string;
 }
 
 @ObjectType({ description: 'Indexación de las imagenes' })
@@ -38,9 +44,12 @@ export class Image {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Field(() => Urls, { description: 'Direcciones de la imagen' })
+	@Field(() => Urls, {
+		description: 'Direcciones de la imagen',
+		nullable: true,
+	})
 	@Prop({ type: Object, default: {} })
-	urls: Urls;
+	urls?: Urls;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la imagen',
