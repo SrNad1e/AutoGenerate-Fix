@@ -22,8 +22,8 @@ export const resizeImage = async (buffer: Buffer, percent: number) => {
 	const image = await sharp(buffer);
 	const { width, height } = await image.metadata();
 
-	const newWidth = width * (percent / 100);
-	const newHeight = height * (percent / 100);
+	const newWidth = Math.ceil(width * (percent / 100));
+	const newHeight = Math.ceil(height * (percent / 100));
 
 	const newImage = image.resize(newWidth, newHeight, {
 		fit: 'contain',
