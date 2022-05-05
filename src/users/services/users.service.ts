@@ -30,13 +30,13 @@ const populate = [
 	{ path: 'pointOfSale', model: PointOfSale.name },
 	{ path: 'companies', model: Company.name },
 	{ path: 'customer', model: Customer.name },
-	{
+	/*{
 		path: 'customer',
 		populate: {
 			path: 'customerType',
 			model: CustomerType.name,
 		},
-	},
+	},*/
 	{
 		path: 'shop',
 		populate: {
@@ -205,6 +205,7 @@ export class UsersService {
 			role: role._id,
 			shop: shop._id,
 			customer: customer._id,
+			companies: [company._id],
 			...params,
 		});
 		return (await newUser.save()).populate(populate);
