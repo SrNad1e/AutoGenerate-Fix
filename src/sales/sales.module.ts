@@ -32,12 +32,7 @@ import { PointOfSalesService } from './services/point-of-sales.service';
 				name: Order.name,
 				useFactory: async (connection: Connection) => {
 					const schema = OrderSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'order_increment',
-						inc_field: 'number',
-						//	start_seq: 1888,
-					});
+					schema.index({ number: 1, company: -1 }, { unique: true });
 					return schema;
 				},
 				inject: [getConnectionToken('')],

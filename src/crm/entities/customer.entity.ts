@@ -61,7 +61,7 @@ export class Customer extends Document {
 	documentType: Types.ObjectId;
 
 	@Field(() => String, { description: 'Número de documento' })
-	@Prop({ type: String, unique: true, required: true })
+	@Prop({ type: String, unique: true })
 	document: string;
 
 	@Field(() => String, { description: 'Nombres del cliente' })

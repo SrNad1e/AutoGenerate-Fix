@@ -1520,6 +1520,9 @@ type Order {
   """Identificador de mongo"""
   _id: String!
 
+  """Empresa a la que perteneces el pedido"""
+  company: Company!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
