@@ -24,8 +24,8 @@ export class UpdateColorInput {
 	html?: string;
 
 	@Field(() => String, {
-		description: 'Imagen asignada al color',
+		description: 'Identificador de la imagen del color',
 		nullable: true,
 	})
-	image?: string;
+	imageId?: string;
 }

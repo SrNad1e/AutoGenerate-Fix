@@ -62,7 +62,7 @@ export class ColorsService {
 		return this.colorModel.findById(id).populate(populate).lean();
 	}
 
-	async create(props: CreateColorInput, user: User) {
+	async create({ imageId, ...props }: CreateColorInput, user: User) {
 		const color = await this.colorModel
 			.findOne({
 				name_internal: props.name_internal,
@@ -73,12 +73,23 @@ export class ColorsService {
 			throw new NotFoundException('El nombre del color ya existe');
 		}
 
-		const newColor = new this.colorModel({ ...props, user });
+		if (imageId) {
+			const image = await this.imageModel.findById(imageId);
+			if (!image) {
+				throw new NotFoundException('La imagen no existe');
+			}
+		}
+
+		const newColor = new this.colorModel({ ...props, image: imageId, user });
 
 		return newColor.save();
 	}
 
-	async update(id: string, props: UpdateColorInput, user: User) {
+	async update(
+		id: string,
+		{ imageId, ...props }: UpdateColorInput,
+		user: User,
+	) {
 		const color = await this.findById(id);
 
 		if (!color) {
@@ -92,7 +103,19 @@ export class ColorsService {
 		if (colorName && colorName._id.toString() !== id) {
 			throw new NotFoundException('El nombre del color ya existe');
 		}
-		return this.colorModel.findByIdAndUpdate(id, { ...props, user });
+
+		if (imageId) {
+			const image = await this.imageModel.findById(imageId);
+			if (!image) {
+				throw new NotFoundException('La imagen no existe');
+			}
+		}
+
+		return this.colorModel.findByIdAndUpdate(id, {
+			...props,
+			image: imageId,
+			user,
+		});
 	}
 
 	/**
