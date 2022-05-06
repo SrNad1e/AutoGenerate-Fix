@@ -274,8 +274,8 @@ input CreateColorInput {
   """Url asignado al color"""
   html: String!
 
-  """Imagen asignada al color"""
-  image: String
+  """Identificador de la imagen asignada al color"""
+  imageId: String
 
   """Nombre asignado al color"""
   name: String!
@@ -3133,8 +3133,8 @@ input UpdateColorInput {
   """Url asignado al color"""
   html: String
 
-  """Imagen asignada al color"""
-  image: String
+  """Identificador de la imagen del color"""
+  imageId: String
 
   """Nombre asignado al color"""
   name: String

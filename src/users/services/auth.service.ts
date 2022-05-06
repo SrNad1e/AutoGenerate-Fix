@@ -32,7 +32,8 @@ export class AuthService {
 		user: User,
 		{ companyId }: LoginUserInput,
 	): Promise<LoginResponse> {
-		const companies = user.companies?.map((company) => company.toString());
+		const companies = user.companies?.map((company) => company._id.toString());
+
 		if (user.username !== 'admin' && !companies.includes(companyId)) {
 			throw new UnauthorizedException(
 				`El usuario no tiene acceso a la compañia`,

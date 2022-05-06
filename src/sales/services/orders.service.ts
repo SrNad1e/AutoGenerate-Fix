@@ -64,17 +64,17 @@ export class OrdersService {
 			});
 		}
 
-		const customer = await this.customersService.getCustomerAssigning(
-			user._id.toString(),
-		);
 		const shop = await this.shopsService.getShopWholesale();
-		if (customer) {
-			return this.orderModel.create({ customer, shop, user });
-		} else {
-			throw new NotFoundException(
-				`El usuario no pertenece a un cliente, favor valide el usuario`,
-			);
+
+		if (!user.customer) {
+			throw new BadRequestException('El usuario no pertenece a un cliente');
 		}
+		return this.orderModel.create({
+			customer: user.customer,
+			shop,
+			user,
+			status,
+		});
 	}
 
 	async update(
@@ -232,7 +232,7 @@ export class OrdersService {
 			);
 		}
 
-		if (order?.status !== 'open') {
+		if (!['open', 'pending'].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} no se encuentra abierto`,
 			);
