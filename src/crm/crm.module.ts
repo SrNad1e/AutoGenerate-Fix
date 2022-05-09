@@ -18,6 +18,7 @@ import { DocumentTypesResolver } from './resolvers/document-types.resolver';
 import { City, CitySchema } from './entities/city.entity';
 import { CitiesResolver } from './resolvers/cities.resolver';
 import { CitiesService } from './services/cities.service';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 
 @Module({
 	imports: [
@@ -27,6 +28,14 @@ import { CitiesService } from './services/cities.service';
 				useFactory: () => {
 					const schema = CitySchema;
 					schema.index({ name: 1, state: -1, country: -1 }, { unique: true });
+					return schema;
+				},
+			},
+			{
+				name: Order.name,
+				useFactory: () => {
+					const schema = OrderSchema;
+					schema.index({ number: 1, company: -1 }, { unique: true });
 					return schema;
 				},
 			},

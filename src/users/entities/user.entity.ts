@@ -41,7 +41,7 @@ export class User extends Document {
 	role: Types.ObjectId;
 
 	@Field(() => Shop, {
-		description: 'Tienda a la que se encuentra asiganado el usuario',
+		description: 'Tienda a la que se encuentra asignado el usuario',
 	})
 	@Prop({
 		type: Types.ObjectId,

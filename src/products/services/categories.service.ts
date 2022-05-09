@@ -97,7 +97,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel2Model({
 				name,
-				parentId: category._id,
+				parentId: categoryParent._id,
 				user,
 			});
 			const response = await newCategory.save();
@@ -130,7 +130,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel3Model({
 				name,
-				parentId: category._id,
+				parentId: categoryParent._id,
 				user,
 			});
 			const response = await newCategory.save();
@@ -162,7 +162,7 @@ export class CategoriesService {
 				const categoryName = await this.categoryLevel1Model.findOne({ name });
 				if (categoryName && categoryLevel1._id !== categoryName._id) {
 					throw new NotFoundException(
-						'El nombre ya esta asiganado a una categoría',
+						'El nombre ya esta asignado a una categoría',
 					);
 				}
 				return this.categoryLevel1Model.findByIdAndUpdate(
@@ -205,7 +205,7 @@ export class CategoriesService {
 				const categoryName = await this.categoryLevel2Model.findOne({ name });
 				if (categoryName && categoryLevel2._id !== categoryName._id) {
 					throw new NotFoundException(
-						'El nombre ya esta asiganado a una categoría',
+						'El nombre ya esta asignado a una categoría',
 					);
 				}
 
@@ -292,7 +292,7 @@ export class CategoriesService {
 
 				if (categoryName && categoryLevel3._id !== categoryName._id) {
 					throw new NotFoundException(
-						'El nombre ya esta asiganado a una categoría',
+						'El nombre ya esta asignado a una categoría',
 					);
 				}
 
