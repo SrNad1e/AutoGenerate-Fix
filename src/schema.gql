@@ -25,6 +25,9 @@ type Address {
   """Ciudad a la que pertenece"""
   city: City!
 
+  """Contacto para el envío"""
+  contact: String!
+
   """Datos extra de la dirección"""
   extra: String
 
@@ -48,6 +51,9 @@ type Address {
 
   """Número del field2"""
   number2: Float!
+
+  """Teléfono del contacto"""
+  phone: String!
 }
 
 """Atributo del producto"""
@@ -834,13 +840,13 @@ input FiltersCategoriesInput {
 """Filtros para obtener las ciudades"""
 input FiltersCitiesInput {
   """Nombre del país"""
-  country: String!
+  country: String
 
   """Cantidad de registros"""
   limit: Float
 
   """Nombre de la ciudad"""
-  name: String!
+  name: String
 
   """Desde donde arranca la página"""
   page: Float
@@ -849,7 +855,7 @@ input FiltersCitiesInput {
   sort: SortCity
 
   """Nombre del departamento"""
-  state: String!
+  state: String
 }
 
 """Filtros para la lista de colores"""
@@ -868,6 +874,26 @@ input FiltersColorsInput {
 
   """Ordenamiento"""
   sort: SortColor
+}
+
+"""Filtros de listado de clientes"""
+input FiltersCustomersInput {
+  """Si el cliente se encuentra activo"""
+  active: Boolean
+
+  """
+  comodin para la busque de documento, nombre, apellido, teléfono, correo, 
+  """
+  dato: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCustomer
 }
 
 """Filtros para los tipos de documento"""
@@ -1733,6 +1759,12 @@ type Query {
     filtersCategoriesInput: FiltersCategoriesInput = {}
   ): ResponseCategories!
 
+  """Listado de ciudades"""
+  cities(
+    """Filtros para consultar el listado de clientes"""
+    filtersCitiesInput: FiltersCitiesInput = {}
+  ): ResponseCities!
+
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
@@ -1742,11 +1774,11 @@ type Query {
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
 
-  """Listado de ciudades"""
+  """Listado de clientes"""
   customers(
     """Filtros para consultar el listado de clientes"""
-    filtersCustomerInput: FiltersCitiesInput = {}
-  ): ResponseCities!
+    filtersCustomerInput: FiltersCustomersInput = {}
+  ): ResponseCustomers!
 
   """Listado de tipos de documento"""
   documentTypes(
@@ -2704,19 +2736,19 @@ input SortCategories {
 """Ordenamiento de la ciudad"""
 input SortCity {
   """ordernamiento por país"""
-  country: Float!
+  country: Float
 
   """ordernamiento por fecha de creación"""
-  createdAt: Float!
+  createdAt: Float
 
   """ordernamiento por documento"""
-  name: Float!
+  name: Float
 
   """ordernamiento por estado"""
-  state: Float!
+  state: Float
 
   """ordernamiento por fecha de actualización"""
-  updatedAt: Float!
+  updatedAt: Float
 }
 
 """Ordenamiento para el listado de colores"""
@@ -2726,6 +2758,33 @@ input SortColor {
   name: Float
   name_internal: Float
   updatedAt: Float
+}
+
+"""Ordenamiento del cliente"""
+input SortCustomer {
+  """ordernamiento por estado del cliente"""
+  active: Float!
+
+  """ordernamiento por documento"""
+  document: Float!
+
+  """ordernamiento por correo"""
+  email: Float!
+
+  """ordernamiento por nombre"""
+  firstName: Float!
+
+  """ordernamiento por si es por defecto"""
+  isDefault: Float!
+
+  """ordernamiento por si tiene whatsapp"""
+  isWhatsapp: Float!
+
+  """ordernamiento por apellido"""
+  lastName: Float!
+
+  """ordernamiento por teléfono"""
+  phone: Float!
 }
 
 """Ordenamiento para el listado de imagenes"""

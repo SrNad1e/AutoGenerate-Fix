@@ -49,6 +49,14 @@ export class Address {
 	@Field(() => City, { description: 'Ciudad a la que pertenece' })
 	city: City;
 
+	@Field(() => String, { description: 'Contacto para el envío' })
+	@Prop({ type: String })
+	contact: string;
+
+	@Field(() => String, { description: 'Teléfono del contacto' })
+	@Prop({ type: String })
+	phone: string;
+
 	@Field(() => Boolean, {
 		description: 'Define si la dirección es la principal',
 		nullable: true,

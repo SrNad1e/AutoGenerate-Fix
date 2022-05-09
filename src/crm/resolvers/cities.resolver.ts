@@ -10,13 +10,13 @@ export class CitiesResolver {
 	constructor(private readonly citiesService: CitiesService) {}
 
 	@Query(() => ResponseCities, {
-		name: 'customers',
+		name: 'cities',
 		description: 'Listado de ciudades',
 	})
 	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
-			name: 'filtersCustomerInput',
+			name: 'filtersCitiesInput',
 			nullable: true,
 			defaultValue: {},
 			description: 'Filtros para consultar el listado de clientes',
