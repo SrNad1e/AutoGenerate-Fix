@@ -11,6 +11,7 @@ import { UpdateCustomerInput } from '../dtos/update-customer.input';
 import { Customer } from '../entities/customer.entity';
 import { CustomerType } from '../entities/customerType.entity';
 import { DocumentType } from '../entities/documentType.entity';
+import { CitiesService } from './cities.service';
 import { CustomerTypeService } from './customer-type.service';
 import { DocumentTypesService } from './document-types.service';
 
@@ -32,6 +33,7 @@ export class CustomersService {
 		private readonly customerModel: PaginateModel<Customer>,
 		private readonly documentTypesService: DocumentTypesService,
 		private readonly customerTypeService: CustomerTypeService,
+		private readonly citiesService: CitiesService,
 		@InjectModel(Order.name)
 		private readonly orderModel: PaginateModel<Order>,
 	) {}
@@ -146,6 +148,7 @@ export class CustomersService {
 			customerTypeId,
 			document,
 			documentTypeId,
+			addresses,
 			...params
 		}: UpdateCustomerInput,
 		user: User,
@@ -180,20 +183,50 @@ export class CustomersService {
 				throw new NotFoundException('El tipo de documento no existe');
 			}
 		}
-		const newCustomer = await this.customerModel.create({
-			customerTypeId,
-			document,
-			documentTypeId,
-			user,
-			...params,
-		});
+
+		const newAddresses = [];
+
+		if (addresses) {
+			for (let i = 0; i < addresses.length; i++) {
+				const { cityId, ...params } = addresses[i];
+				const city = await this.citiesService.findById(cityId);
+				if (!city) {
+					throw new NotFoundException('Una de las ciudades no existe');
+				}
+				newAddresses.push({
+					...params,
+					city,
+				});
+			}
+		}
+
+		const newCustomer = await this.customerModel.findByIdAndUpdate(
+			{ _id: id },
+			{
+				$set: {
+					customerTypeId,
+					document,
+					documentTypeId,
+					user,
+					addresses: newAddresses.length > 0 ? newAddresses : undefined,
+					...params,
+				},
+			},
+			{
+				new: true,
+				populate,
+				lean: true,
+			},
+		);
 
 		if (newCustomer) {
 			await this.orderModel.updateMany(
 				{
-					customer: id,
-					status: {
-						$in: ['open', 'pending'],
+					$set: {
+						customer: id,
+						status: {
+							$in: ['open', 'pending'],
+						},
 					},
 				},
 				{
