@@ -212,7 +212,7 @@ export class CategoriesService {
 				await this.categoryLevel2Model.findByIdAndUpdate(id, {
 					$set: {
 						name,
-						parentId: categoryParent._id,
+						parentId: categoryParent?._id,
 						user,
 					},
 				});
@@ -299,7 +299,7 @@ export class CategoriesService {
 				await this.categoryLevel3Model.findByIdAndUpdate(id, {
 					$set: {
 						name,
-						parentId: categoryParent._id,
+						parentId: categoryParent?._id,
 						user,
 					},
 				});
