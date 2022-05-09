@@ -15,16 +15,13 @@ export class CategoryLevel1 extends Document {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Field(() => [CategoryLevel2], {
-		description: 'Categorías inferiores',
-		nullable: true,
-	})
 	@Prop({
 		type: [Types.ObjectId],
 		default: [],
 		ref: CategoryLevel2.name,
 		autopopulate: true,
 	})
+	@Field(() => [CategoryLevel2], { description: 'Nombre de la categoría' })
 	childs: Types.ObjectId[];
 
 	@Prop({ type: Object, required: true })

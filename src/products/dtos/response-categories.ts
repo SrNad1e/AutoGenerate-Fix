@@ -1,5 +1,4 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-
 import { CategoryLevel1 } from '../entities/category-level1.entity';
 
 @ObjectType({ description: 'Respuesta al listado de las categorías' })

@@ -34,9 +34,6 @@ type Address {
   """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
   field1: String!
 
-  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
-  field2: String
-
   """Define si la dirección es la principal"""
   isMain: Boolean
 
@@ -47,10 +44,10 @@ type Address {
   neighborhood: String!
 
   """Número del field1"""
-  number1: Float!
+  number1: String!
 
   """Número del field2"""
-  number2: Float!
+  number2: String!
 
   """Teléfono del contacto"""
   phone: String!
@@ -112,8 +109,8 @@ type CategoryLevel1 {
   """Identificador de mongo"""
   _id: String!
 
-  """Categorías inferiores"""
-  childs: [CategoryLevel2!]
+  """Nombre de la categoría"""
+  childs: [CategoryLevel2!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -142,6 +139,9 @@ type CategoryLevel2 {
   """Nombre de la categoría"""
   name: String!
 
+  """Identificador de la categoría padre"""
+  parentId: String
+
   """Fecha de actualización de la categoría"""
   updatedAt: DateTime!
 
@@ -159,6 +159,9 @@ type CategoryLevel3 {
 
   """Nombre de la categoría"""
   name: String!
+
+  """Identificador de la categoría padre"""
+  parentId: String
 
   """Fecha de actualización de la categoría"""
   updatedAt: DateTime!
@@ -275,7 +278,7 @@ input CreateBrandInput {
 """Datos para la creación de una categoría"""
 input CreateCategoryInput {
   """Nivel de la categoría"""
-  level: Float
+  level: Float!
 
   """Nombre de la categoría"""
   name: String!

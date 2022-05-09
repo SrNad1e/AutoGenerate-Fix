@@ -14,21 +14,15 @@ export class Address {
 	})
 	field1: string;
 
-	@Field(() => Number, {
+	@Field(() => String, {
 		description: 'Número del field1',
 	})
-	number1: number;
+	number1: string;
 
 	@Field(() => String, {
-		description: 'Tipo de ubicación (Calle, Avenida, Manzana, Etc)',
-		nullable: true,
-	})
-	field2?: string;
-
-	@Field(() => Number, {
 		description: 'Número del field2',
 	})
-	number2: number;
+	number2: string;
 
 	@Field(() => Number, {
 		description: 'Número de la casa',
