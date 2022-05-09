@@ -143,7 +143,7 @@ export class ShopsService {
 	 */
 	async getShopWholesale() {
 		return this.shopModel
-			.findOne({ isWholesale: true })
+			.findOne({ name: 'Mayoristas' })
 			.populate(populate)
 			.lean();
 	}

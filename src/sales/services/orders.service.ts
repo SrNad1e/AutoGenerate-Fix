@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import { PaginateModel, Types } from 'mongoose';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
@@ -46,7 +46,7 @@ export class OrdersService {
 		return this.orderModel.findById(id).lean();
 	}
 
-	async create({ status }: CreateOrderInput, user: User) {
+	async create({ status }: CreateOrderInput, user: User, companyId: string) {
 		if (!['open', 'pending'].includes(status)) {
 			throw new BadRequestException('El estado del pedido no es correcto');
 		}
@@ -69,11 +69,34 @@ export class OrdersService {
 		if (!user.customer) {
 			throw new BadRequestException('El usuario no pertenece a un cliente');
 		}
+
+		let number = 1;
+		const lastOrder = await this.orderModel
+			.findOne({
+				company: new Types.ObjectId(companyId),
+			})
+			.sort({
+				_id: -1,
+			})
+			.lean();
+
+		if (lastOrder) {
+			number = lastOrder.number + 1;
+		}
+
+		const address =
+			user?.customer['addresses'] > 0
+				? user?.customer['addresses'].find((address) => address?.isMain)
+				: undefined;
+
 		return this.orderModel.create({
 			customer: user.customer,
+			address,
 			shop,
 			user,
+			number,
 			status,
+			company: new Types.ObjectId(companyId),
 		});
 	}
 

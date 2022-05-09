@@ -25,14 +25,14 @@ type Address {
   """Ciudad a la que pertenece"""
   city: City!
 
+  """Contacto para el envío"""
+  contact: String!
+
   """Datos extra de la dirección"""
   extra: String
 
   """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
   field1: String!
-
-  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
-  field2: String!
 
   """Define si la dirección es la principal"""
   isMain: Boolean
@@ -40,11 +40,17 @@ type Address {
   """Número de la casa"""
   loteNumber: Float!
 
+  """Barrio"""
+  neighborhood: String!
+
   """Número del field1"""
-  number1: Float!
+  number1: String!
 
   """Número del field2"""
-  number2: Float!
+  number2: String!
+
+  """Teléfono del contacto"""
+  phone: String!
 }
 
 """Atributo del producto"""
@@ -103,8 +109,8 @@ type CategoryLevel1 {
   """Identificador de mongo"""
   _id: String!
 
-  """Categorías inferiores"""
-  childs: [CategoryLevel2!]
+  """Nombre de la categoría"""
+  childs: [CategoryLevel2!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -133,6 +139,9 @@ type CategoryLevel2 {
   """Nombre de la categoría"""
   name: String!
 
+  """Identificador de la categoría padre"""
+  parentId: String
+
   """Fecha de actualización de la categoría"""
   updatedAt: DateTime!
 
@@ -151,6 +160,9 @@ type CategoryLevel3 {
   """Nombre de la categoría"""
   name: String!
 
+  """Identificador de la categoría padre"""
+  parentId: String
+
   """Fecha de actualización de la categoría"""
   updatedAt: DateTime!
 
@@ -163,11 +175,17 @@ type City {
   """Identificador de mongo"""
   _id: String!
 
+  """País"""
+  country: String!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
   """Nombre de la ciudad"""
   name: String!
+
+  """Departamento"""
+  state: String!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -260,7 +278,7 @@ input CreateBrandInput {
 """Datos para la creación de una categoría"""
 input CreateCategoryInput {
   """Nivel de la categoría"""
-  level: Float
+  level: Float!
 
   """Nombre de la categoría"""
   name: String!
@@ -820,6 +838,27 @@ input FiltersCategoriesInput {
 
   """Ordenamiento"""
   sort: SortCategories
+}
+
+"""Filtros para obtener las ciudades"""
+input FiltersCitiesInput {
+  """Nombre del país"""
+  country: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la ciudad"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCity
+
+  """Nombre del departamento"""
+  state: String
 }
 
 """Filtros para la lista de colores"""
@@ -1520,6 +1559,12 @@ type Order {
   """Identificador de mongo"""
   _id: String!
 
+  """Usuario que creó o editó el pedido"""
+  address: Address
+
+  """Empresa a la que perteneces el pedido"""
+  company: Company!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
@@ -1716,6 +1761,12 @@ type Query {
     """Filtros para obtener las categorías"""
     filtersCategoriesInput: FiltersCategoriesInput = {}
   ): ResponseCategories!
+
+  """Listado de ciudades"""
+  cities(
+    """Filtros para consultar el listado de clientes"""
+    filtersCitiesInput: FiltersCitiesInput = {}
+  ): ResponseCities!
 
   """Lista los colores"""
   colors(
@@ -2081,6 +2132,39 @@ type ResponseCategories {
   totalPages: Float!
 }
 
+"""Respuesta del listado de ciudades"""
+type ResponseCities {
+  """Lista de ciudades"""
+  docs: [City!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de los colores"""
 type ResponseColors {
   """Lista de colores"""
@@ -2125,7 +2209,7 @@ type ResponseCustomers {
   """¿Encuentra página anterior?"""
   hasPrevPage: Boolean!
 
-  """Total de docuementos solicitados"""
+  """Total de documentos solicitados"""
   limit: Float!
 
   """Página siguente"""
@@ -2652,6 +2736,24 @@ input SortCategories {
   updatedAt: Float
 }
 
+"""Ordenamiento de la ciudad"""
+input SortCity {
+  """ordernamiento por país"""
+  country: Float
+
+  """ordernamiento por fecha de creación"""
+  createdAt: Float
+
+  """ordernamiento por documento"""
+  name: Float
+
+  """ordernamiento por estado"""
+  state: Float
+
+  """ordernamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de colores"""
 input SortColor {
   active: Float
@@ -2663,28 +2765,28 @@ input SortColor {
 
 """Ordenamiento del cliente"""
 input SortCustomer {
-  """ordernamiento por docuemnto"""
+  """ordernamiento por estado del cliente"""
   active: Float!
 
   """ordernamiento por documento"""
   document: Float!
 
-  """ordernamiento por docuemnto"""
+  """ordernamiento por correo"""
   email: Float!
 
   """ordernamiento por nombre"""
   firstName: Float!
 
-  """ordernamiento por docuemnto"""
+  """ordernamiento por si es por defecto"""
   isDefault: Float!
 
-  """ordernamiento por docuemnto"""
+  """ordernamiento por si tiene whatsapp"""
   isWhatsapp: Float!
 
   """ordernamiento por apellido"""
   lastName: Float!
 
-  """ordernamiento por docuemnto"""
+  """ordernamiento por teléfono"""
   phone: Float!
 }
 

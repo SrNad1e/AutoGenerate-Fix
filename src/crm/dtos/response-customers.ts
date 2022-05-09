@@ -10,7 +10,7 @@ export class ResponseCustomers {
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;
 
-	@Field(() => Number, { description: 'Total de docuementos solicitados' })
+	@Field(() => Number, { description: 'Total de documentos solicitados' })
 	limit: number;
 
 	@Field(() => Number, { description: 'Total de páginas' })

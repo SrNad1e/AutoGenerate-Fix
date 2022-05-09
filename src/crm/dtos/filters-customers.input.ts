@@ -11,19 +11,19 @@ export class SortCustomer {
 	@Field(() => Number, { description: 'ordernamiento por apellido' })
 	lastName: number;
 
-	@Field(() => Number, { description: 'ordernamiento por docuemnto' })
+	@Field(() => Number, { description: 'ordernamiento por teléfono' })
 	phone: number;
 
-	@Field(() => Number, { description: 'ordernamiento por docuemnto' })
+	@Field(() => Number, { description: 'ordernamiento por si tiene whatsapp' })
 	isWhatsapp: number;
 
-	@Field(() => Number, { description: 'ordernamiento por docuemnto' })
+	@Field(() => Number, { description: 'ordernamiento por correo' })
 	email: number;
 
-	@Field(() => Number, { description: 'ordernamiento por docuemnto' })
+	@Field(() => Number, { description: 'ordernamiento por si es por defecto' })
 	isDefault: number;
 
-	@Field(() => Number, { description: 'ordernamiento por docuemnto' })
+	@Field(() => Number, { description: 'ordernamiento por estado del cliente' })
 	active: number;
 }
 

@@ -1,12 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Customer } from '../../crm/entities/customer.entity';
+import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
 
@@ -85,7 +86,7 @@ export class Order extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Número de pedido' })
-	@Prop({ type: Number, default: 0 })
+	@Prop({ type: Number, required: true })
 	number: number;
 
 	@Field(() => Customer, { description: 'Cliente que solicita el pedido' })
@@ -156,16 +157,33 @@ export class Order extends Document {
 	@Field(() => PointOfSale, { description: 'Punto de venta asigando' })
 	@Prop({
 		type: Types.ObjectId,
-		ref: 'PointOfSale',
+		ref: PointOfSale.name,
 		autopopulate: true,
 	})
 	pointOfSale: Types.ObjectId;
+
+	@Field(() => Company, {
+		description: 'Empresa a la que perteneces el pedido',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: Company.name,
+		autopopulate: true,
+	})
+	company: Types.ObjectId;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el pedido',
 	})
 	@Prop({ type: Object, required: true })
 	user: User;
+
+	@Field(() => Address, {
+		description: 'Usuario que creó o editó el pedido',
+		nullable: true,
+	})
+	@Prop({ type: Object })
+	address?: Address;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

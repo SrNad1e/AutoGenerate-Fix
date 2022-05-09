@@ -7,7 +7,6 @@ export class CreateCategoryInput {
 
 	@Field(() => Number, {
 		description: 'Nivel de la categoría',
-		nullable: true,
 	})
 	level: number;
 
