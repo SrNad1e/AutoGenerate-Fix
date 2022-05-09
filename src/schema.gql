@@ -32,13 +32,16 @@ type Address {
   field1: String!
 
   """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
-  field2: String!
+  field2: String
 
   """Define si la dirección es la principal"""
   isMain: Boolean
 
   """Número de la casa"""
   loteNumber: Float!
+
+  """Barrio"""
+  neighborhood: String!
 
   """Número del field1"""
   number1: Float!
@@ -163,11 +166,17 @@ type City {
   """Identificador de mongo"""
   _id: String!
 
+  """País"""
+  country: String!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
   """Nombre de la ciudad"""
   name: String!
+
+  """Departamento"""
+  state: String!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -822,6 +831,27 @@ input FiltersCategoriesInput {
   sort: SortCategories
 }
 
+"""Filtros para obtener las ciudades"""
+input FiltersCitiesInput {
+  """Nombre del país"""
+  country: String!
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCity
+
+  """Nombre del departamento"""
+  state: String!
+}
+
 """Filtros para la lista de colores"""
 input FiltersColorsInput {
   """Estado de la bodega"""
@@ -838,26 +868,6 @@ input FiltersColorsInput {
 
   """Ordenamiento"""
   sort: SortColor
-}
-
-"""Filtros de listado de clientes"""
-input FiltersCustomersInput {
-  """Si el cliente se encuentra activo"""
-  active: Boolean
-
-  """
-  comodin para la busque de documento, nombre, apellido, teléfono, correo, 
-  """
-  dato: String
-
-  """Cantidad de registros"""
-  limit: Float
-
-  """Desde donde arranca la página"""
-  page: Float
-
-  """Ordenamiento (1 es ascendente, -1 es descendente)"""
-  sort: SortCustomer
 }
 
 """Filtros para los tipos de documento"""
@@ -1520,6 +1530,9 @@ type Order {
   """Identificador de mongo"""
   _id: String!
 
+  """Usuario que creó o editó el pedido"""
+  address: Address
+
   """Empresa a la que perteneces el pedido"""
   company: Company!
 
@@ -1729,11 +1742,11 @@ type Query {
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
 
-  """Listado de clientes"""
+  """Listado de ciudades"""
   customers(
     """Filtros para consultar el listado de clientes"""
-    filtersCustomerInput: FiltersCustomersInput = {}
-  ): ResponseCustomers!
+    filtersCustomerInput: FiltersCitiesInput = {}
+  ): ResponseCities!
 
   """Listado de tipos de documento"""
   documentTypes(
@@ -2084,6 +2097,39 @@ type ResponseCategories {
   totalPages: Float!
 }
 
+"""Respuesta del listado de ciudades"""
+type ResponseCities {
+  """Lista de ciudades"""
+  docs: [City!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de los colores"""
 type ResponseColors {
   """Lista de colores"""
@@ -2128,7 +2174,7 @@ type ResponseCustomers {
   """¿Encuentra página anterior?"""
   hasPrevPage: Boolean!
 
-  """Total de docuementos solicitados"""
+  """Total de documentos solicitados"""
   limit: Float!
 
   """Página siguente"""
@@ -2655,6 +2701,24 @@ input SortCategories {
   updatedAt: Float
 }
 
+"""Ordenamiento de la ciudad"""
+input SortCity {
+  """ordernamiento por país"""
+  country: Float!
+
+  """ordernamiento por fecha de creación"""
+  createdAt: Float!
+
+  """ordernamiento por documento"""
+  name: Float!
+
+  """ordernamiento por estado"""
+  state: Float!
+
+  """ordernamiento por fecha de actualización"""
+  updatedAt: Float!
+}
+
 """Ordenamiento para el listado de colores"""
 input SortColor {
   active: Float
@@ -2662,33 +2726,6 @@ input SortColor {
   name: Float
   name_internal: Float
   updatedAt: Float
-}
-
-"""Ordenamiento del cliente"""
-input SortCustomer {
-  """ordernamiento por docuemnto"""
-  active: Float!
-
-  """ordernamiento por documento"""
-  document: Float!
-
-  """ordernamiento por docuemnto"""
-  email: Float!
-
-  """ordernamiento por nombre"""
-  firstName: Float!
-
-  """ordernamiento por docuemnto"""
-  isDefault: Float!
-
-  """ordernamiento por docuemnto"""
-  isWhatsapp: Float!
-
-  """ordernamiento por apellido"""
-  lastName: Float!
-
-  """ordernamiento por docuemnto"""
-  phone: Float!
 }
 
 """Ordenamiento para el listado de imagenes"""

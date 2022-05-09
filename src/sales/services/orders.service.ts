@@ -84,8 +84,14 @@ export class OrdersService {
 			number = lastOrder.number + 1;
 		}
 
+		const address =
+			user?.customer['addresses'] > 0
+				? user?.customer['addresses'].find((address) => address?.isMain)
+				: undefined;
+
 		return this.orderModel.create({
 			customer: user.customer,
+			address,
 			shop,
 			user,
 			number,

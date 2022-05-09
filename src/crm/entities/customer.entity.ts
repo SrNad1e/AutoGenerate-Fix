@@ -21,8 +21,9 @@ export class Address {
 
 	@Field(() => String, {
 		description: 'Tipo de ubicación (Calle, Avenida, Manzana, Etc)',
+		nullable: true,
 	})
-	field2: string;
+	field2?: string;
 
 	@Field(() => Number, {
 		description: 'Número del field2',
@@ -38,7 +39,12 @@ export class Address {
 		description: 'Datos extra de la dirección',
 		nullable: true,
 	})
-	extra: string;
+	extra?: string;
+
+	@Field(() => String, {
+		description: 'Barrio',
+	})
+	neighborhood: string;
 
 	@Field(() => City, { description: 'Ciudad a la que pertenece' })
 	city: City;

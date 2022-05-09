@@ -7,7 +7,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Customer } from '../../crm/entities/customer.entity';
+import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
 
@@ -177,6 +177,13 @@ export class Order extends Document {
 	})
 	@Prop({ type: Object, required: true })
 	user: User;
+
+	@Field(() => Address, {
+		description: 'Usuario que creó o editó el pedido',
+		nullable: true,
+	})
+	@Prop({ type: Object })
+	address?: Address;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

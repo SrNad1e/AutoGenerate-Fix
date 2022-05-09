@@ -30,12 +30,11 @@ import { PointOfSalesService } from './services/point-of-sales.service';
 		MongooseModule.forFeatureAsync([
 			{
 				name: Order.name,
-				useFactory: async (connection: Connection) => {
+				useFactory: () => {
 					const schema = OrderSchema;
 					schema.index({ number: 1, company: -1 }, { unique: true });
 					return schema;
 				},
-				inject: [getConnectionToken('')],
 			},
 			{
 				name: Invoice.name,

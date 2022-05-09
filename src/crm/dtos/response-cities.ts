@@ -1,16 +1,16 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { Customer } from '../entities/customer.entity';
+import { City } from '../entities/city.entity';
 
-@ObjectType({ description: 'Respuesta del listado de clientes' })
-export class ResponseCustomers {
-	@Field(() => [Customer], { description: 'Lista de clientes' })
-	docs: Customer[];
+@ObjectType({ description: 'Respuesta del listado de ciudades' })
+export class ResponseCities {
+	@Field(() => [City], { description: 'Lista de ciudades' })
+	docs: City[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;
 
-	@Field(() => Number, { description: 'Total de documentos solicitados' })
+	@Field(() => Number, { description: 'Total de docuementos solicitados' })
 	limit: number;
 
 	@Field(() => Number, { description: 'Total de páginas' })
