@@ -53,6 +53,39 @@ type Address {
   phone: String!
 }
 
+"""Dirección del cliente"""
+input AddressInput {
+  """Identificador de la ciudad"""
+  cityId: String!
+
+  """Contacto para el envío"""
+  contact: String!
+
+  """Datos extra de la dirección"""
+  extra: String
+
+  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
+  field1: String!
+
+  """Define si la dirección es la principal"""
+  isMain: Boolean
+
+  """Número de la casa"""
+  loteNumber: Float!
+
+  """Barrio"""
+  neighborhood: String!
+
+  """Número del field1"""
+  number1: String!
+
+  """Número del field2"""
+  number2: String!
+
+  """Teléfono del contacto"""
+  phone: String!
+}
+
 """Atributo del producto"""
 type Attrib {
   """Identificador de mongo"""
@@ -1465,6 +1498,15 @@ type Mutation {
     updateColorInput: UpdateColorInput!
   ): Color!
 
+  """Se encarga actualizar un cliente"""
+  updateCustomer(
+    """Identificador del cliente"""
+    id: String!
+
+    """Parámetros para actualizar el cliente"""
+    updateCustomerInput: UpdateCustomerInput!
+  ): Customer!
+
   """Se encarga actualizar un pedido"""
   updateOrder(
     """Identificador del pedido"""
@@ -2575,7 +2617,7 @@ type Role {
   """Fecha de creación del rol"""
   createdAt: DateTime!
 
-  """Nombre asiganado al rol"""
+  """Nombre asignado al rol"""
   name: String!
 
   """Permisos al los quie tiene el rol"""
@@ -3245,6 +3287,42 @@ input UpdateColorInput {
   name_internal: String
 }
 
+"""Datos para actualizar un cliente"""
+input UpdateCustomerInput {
+  """Direcciones del cliente"""
+  addresses: [AddressInput!]
+
+  """Fecha de nacimiento"""
+  birthday: DateTime
+
+  """Identificación de tipo de cliente"""
+  customerTypeId: String
+
+  """Número de documento"""
+  document: String
+
+  """Identificación del tipo de documento"""
+  documentTypeId: String
+
+  """Correo del cliente"""
+  email: String
+
+  """Nombres del cliente"""
+  firstName: String
+
+  """Es el cliente por defecto, solo debe existir uno"""
+  isDefault: Boolean
+
+  """El teléfono tiene whatsapp"""
+  isWhatsapp: Boolean
+
+  """Apellidos del cliente"""
+  lastName: String
+
+  """Número de teléfono"""
+  phone: String
+}
+
 """Datos para actualizar el pedido"""
 input UpdateOrderInput {
   """Identificación del cliente"""
@@ -3469,7 +3547,7 @@ type User {
   """Rol que ocupa el usuario"""
   role: Role!
 
-  """Tienda a la que se encuentra asiganado el usuario"""
+  """Tienda a la que se encuentra asignado el usuario"""
   shop: Shop!
 
   """Estado del usuario (active, inactive, suspend)"""

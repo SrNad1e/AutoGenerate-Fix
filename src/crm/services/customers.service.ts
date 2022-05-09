@@ -2,9 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
+import { Order } from 'src/sales/entities/order.entity';
+import { User } from 'src/users/entities/user.entity';
 import { CreateCustomerInput } from '../dtos/create-customer.input';
 import { FiltersCustomerInput } from '../dtos/filters-customer.input';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';
+import { UpdateCustomerInput } from '../dtos/update-customer.input';
 import { Customer } from '../entities/customer.entity';
 import { CustomerType } from '../entities/customerType.entity';
 import { DocumentType } from '../entities/documentType.entity';
@@ -29,6 +32,8 @@ export class CustomersService {
 		private readonly customerModel: PaginateModel<Customer>,
 		private readonly documentTypesService: DocumentTypesService,
 		private readonly customerTypeService: CustomerTypeService,
+		@InjectModel(Order.name)
+		private readonly orderModel: PaginateModel<Order>,
 	) {}
 
 	async findAll({
@@ -133,6 +138,72 @@ export class CustomersService {
 		});
 
 		return (await newCustomer.save()).populate(populate);
+	}
+
+	async update(
+		id: string,
+		{
+			customerTypeId,
+			document,
+			documentTypeId,
+			...params
+		}: UpdateCustomerInput,
+		user: User,
+	) {
+		const customer = await this.findById(id);
+
+		if (!customer) {
+			throw new NotFoundException('El cliente no existe');
+		}
+		if (customerTypeId) {
+			const customerType = this.customerTypeService.findById(customerTypeId);
+
+			if (!customerType) {
+				throw new NotFoundException('El tipo de cliente no existe');
+			}
+		}
+
+		if (document) {
+			const customerDocument = await this.findOne({ document });
+
+			if (customerDocument && customerDocument._id.toString() !== id) {
+				throw new NotFoundException('Documento pertenece a otro cliente');
+			}
+		}
+
+		if (documentTypeId) {
+			const documentType = await this.documentTypesService.findById(
+				documentTypeId,
+			);
+
+			if (!documentType) {
+				throw new NotFoundException('El tipo de documento no existe');
+			}
+		}
+		const newCustomer = await this.customerModel.create({
+			customerTypeId,
+			document,
+			documentTypeId,
+			user,
+			...params,
+		});
+
+		if (newCustomer) {
+			await this.orderModel.updateMany(
+				{
+					customer: id,
+					status: {
+						$in: ['open', 'pending'],
+					},
+				},
+				{
+					customer: newCustomer,
+					user,
+				},
+			);
+		}
+
+		return newCustomer;
 	}
 
 	/**

@@ -1,5 +1,53 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Address } from '../entities/customer.entity';
+
+@InputType({ description: 'Dirección del cliente' })
+export class AddressInput {
+	@Field(() => String, {
+		description: 'Tipo de ubicación (Calle, Avenida, Manzana, Etc)',
+	})
+	field1: string;
+
+	@Field(() => String, {
+		description: 'Número del field1',
+	})
+	number1: string;
+
+	@Field(() => String, {
+		description: 'Número del field2',
+	})
+	number2: string;
+
+	@Field(() => Number, {
+		description: 'Número de la casa',
+	})
+	loteNumber: number;
+
+	@Field(() => String, {
+		description: 'Datos extra de la dirección',
+		nullable: true,
+	})
+	extra?: string;
+
+	@Field(() => String, {
+		description: 'Barrio',
+	})
+	neighborhood: string;
+
+	@Field(() => String, { description: 'Identificador de la ciudad' })
+	cityId: string;
+
+	@Field(() => String, { description: 'Contacto para el envío' })
+	contact: string;
+
+	@Field(() => String, { description: 'Teléfono del contacto' })
+	phone: string;
+
+	@Field(() => Boolean, {
+		description: 'Define si la dirección es la principal',
+		nullable: true,
+	})
+	isMain: boolean;
+}
 
 @InputType({ description: 'Datos para crear un cliente' })
 export class CreateCustomerInput {
@@ -15,11 +63,11 @@ export class CreateCustomerInput {
 	@Field(() => String, { description: 'Apellidos del cliente' })
 	lastName: string;
 
-	@Field(() => Address, {
-		description: 'Dirección del cliente',
+	@Field(() => [AddressInput], {
+		description: 'Direcciones del cliente',
 		nullable: true,
 	})
-	direction?: Address;
+	addresses?: AddressInput[];
 
 	@Field(() => String, {
 		description: 'Identificación de tipo de cliente',
