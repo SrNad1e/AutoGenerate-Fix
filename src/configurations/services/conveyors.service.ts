@@ -2,8 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
+import { Image } from 'src/staticfiles/entities/image.entity';
 import { FiltersConveyorsInput } from '../dtos/filters-conveyors.input';
 import { Conveyor } from '../entities/conveyor.entity';
+
+const populate = [
+	{
+		path: 'logo',
+		model: Image.name,
+	},
+];
 
 @Injectable()
 export class ConveyorsService {
@@ -26,6 +34,7 @@ export class ConveyorsService {
 			limit,
 			page,
 			lean: true,
+			populate,
 		};
 		return this.conveyorModel.paginate(filters, options);
 	}
