@@ -14,20 +14,15 @@ export class Address {
 	})
 	field1: string;
 
-	@Field(() => Number, {
+	@Field(() => String, {
 		description: 'Número del field1',
 	})
-	number1: number;
+	number1: string;
 
 	@Field(() => String, {
-		description: 'Tipo de ubicación (Calle, Avenida, Manzana, Etc)',
-	})
-	field2: string;
-
-	@Field(() => Number, {
 		description: 'Número del field2',
 	})
-	number2: number;
+	number2: string;
 
 	@Field(() => Number, {
 		description: 'Número de la casa',
@@ -38,10 +33,23 @@ export class Address {
 		description: 'Datos extra de la dirección',
 		nullable: true,
 	})
-	extra: string;
+	extra?: string;
+
+	@Field(() => String, {
+		description: 'Barrio',
+	})
+	neighborhood: string;
 
 	@Field(() => City, { description: 'Ciudad a la que pertenece' })
 	city: City;
+
+	@Field(() => String, { description: 'Contacto para el envío' })
+	@Prop({ type: String })
+	contact: string;
+
+	@Field(() => String, { description: 'Teléfono del contacto' })
+	@Prop({ type: String })
+	phone: string;
 
 	@Field(() => Boolean, {
 		description: 'Define si la dirección es la principal',
@@ -61,7 +69,7 @@ export class Customer extends Document {
 	documentType: Types.ObjectId;
 
 	@Field(() => String, { description: 'Número de documento' })
-	@Prop({ type: String, unique: true, required: true })
+	@Prop({ type: String, unique: true })
 	document: string;
 
 	@Field(() => String, { description: 'Nombres del cliente' })

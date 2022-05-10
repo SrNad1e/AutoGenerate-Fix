@@ -51,6 +51,7 @@ export class OrdersResolver {
 		return this.ordersService.create(
 			context.req.body.variables.input,
 			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 

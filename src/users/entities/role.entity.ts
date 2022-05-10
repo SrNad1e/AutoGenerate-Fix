@@ -11,7 +11,7 @@ export class Role {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
-	@Field({ description: 'Nombre asiganado al rol' })
+	@Field({ description: 'Nombre asignado al rol' })
 	@Prop({ type: String, required: true })
 	name: string;
 

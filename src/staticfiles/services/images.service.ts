@@ -89,7 +89,6 @@ export class ImagesService {
 			},
 			user,
 		});
-		const { urls, _id } = await newImage.save();
-		return { _id, urls };
+		return newImage.save();
 	}
 }

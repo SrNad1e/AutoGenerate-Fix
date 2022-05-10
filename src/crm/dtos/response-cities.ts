@@ -1,10 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { CategoryLevel1 } from '../entities/category-level1.entity';
 
-@ObjectType({ description: 'Respuesta al listado de las categorías' })
-export class ResponseCategories {
-	@Field(() => [CategoryLevel1], { description: 'Lista de categorías' })
-	docs: CategoryLevel1[];
+import { City } from '../entities/city.entity';
+
+@ObjectType({ description: 'Respuesta del listado de ciudades' })
+export class ResponseCities {
+	@Field(() => [City], { description: 'Lista de ciudades' })
+	docs: City[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;
