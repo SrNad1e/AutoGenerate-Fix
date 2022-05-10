@@ -14,7 +14,7 @@ import { ConveyorsResolver } from './resolvers/conveyors.resolver';
 			{ name: Conveyor.name, schema: ConveyorSchema },
 		]),
 	],
-	providers: [CompaniesService,  ConveyorsService, ConveyorsResolver],
-	exports: [CompaniesService],
+	providers: [CompaniesService, ConveyorsService, ConveyorsResolver],
+	exports: [CompaniesService, ConveyorsService],
 })
 export class ConfigurationsModule {}

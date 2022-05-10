@@ -38,4 +38,8 @@ export class ConveyorsService {
 		};
 		return this.conveyorModel.paginate(filters, options);
 	}
+
+	async findById(id: string) {
+		return this.conveyorModel.findById(id).populate(populate).lean();
+	}
 }

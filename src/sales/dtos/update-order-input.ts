@@ -85,6 +85,12 @@ export class UpdateOrderInput {
 	})
 	customerId?: string;
 
+	@Field(() => String, {
+		description: 'Identificación de la transportadora',
+		nullable: true,
+	})
+	conveyorId?: string;
+
 	@Field(() => AddressInputOrder, {
 		description: 'Dirección de envío para el pedido',
 		nullable: true,

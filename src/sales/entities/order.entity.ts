@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Company } from 'src/configurations/entities/company.entity';
+import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
@@ -184,6 +185,13 @@ export class Order extends Document {
 	})
 	@Prop({ type: Object })
 	address?: Address;
+
+	@Field(() => Conveyor, {
+		description: 'Trasportadora',
+		nullable: true,
+	})
+	@Prop({ type: Object })
+	conveyor?: Conveyor;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

@@ -1697,6 +1697,9 @@ type Order {
   """Empresa a la que perteneces el pedido"""
   company: Company!
 
+  """Trasportadora"""
+  conveyor: Conveyor
+
   """Fecha de creación"""
   createdAt: DateTime!
 
@@ -3468,6 +3471,9 @@ input UpdateCustomerInput {
 input UpdateOrderInput {
   """Dirección de envío para el pedido"""
   address: AddressInputOrder
+
+  """Identificación de la transportadora"""
+  conveyorId: String
 
   """Identificación del cliente"""
   customerId: String

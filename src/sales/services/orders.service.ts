@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
+import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
@@ -40,6 +41,7 @@ export class OrdersService {
 		private readonly paymentsService: PaymentsService,
 		private readonly invoicesService: InvoicesService,
 		private readonly customerTypesService: CustomerTypeService,
+		private readonly conveyorsService: ConveyorsService,
 	) {}
 
 	async findById(id: string) {
@@ -104,7 +106,7 @@ export class OrdersService {
 
 	async update(
 		orderId: string,
-		{ status, customerId, address }: UpdateOrderInput,
+		{ status, customerId, address, conveyorId }: UpdateOrderInput,
 		user: User,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
@@ -223,10 +225,18 @@ export class OrdersService {
 			dataUpdate['status'] = status;
 		}
 
+		let conveyor;
+		if (conveyorId) {
+			conveyor = await this.conveyorsService.findById(conveyorId);
+			if (!conveyor) {
+				throw new NotFoundException('El transportista no existe');
+			}
+		}
+
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
-				$set: { ...dataUpdate, user, invoice },
+				$set: { ...dataUpdate, user, invoice, conveyor },
 			},
 			{
 				new: true,
