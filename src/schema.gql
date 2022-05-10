@@ -38,7 +38,7 @@ type Address {
   isMain: Boolean
 
   """Número de la casa"""
-  loteNumber: Float!
+  loteNumber: String!
 
   """Barrio"""
   neighborhood: String!
@@ -71,7 +71,40 @@ input AddressInput {
   isMain: Boolean
 
   """Número de la casa"""
-  loteNumber: Float!
+  loteNumber: String!
+
+  """Barrio"""
+  neighborhood: String!
+
+  """Número del field1"""
+  number1: String!
+
+  """Número del field2"""
+  number2: String!
+
+  """Teléfono del contacto"""
+  phone: String!
+}
+
+"""Dirección del cliente"""
+input AddressInputOrder {
+  """Ciudad de envío"""
+  city: CityInput!
+
+  """Contacto para el envío"""
+  contact: String!
+
+  """Datos extra de la dirección"""
+  extra: String
+
+  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
+  field1: String!
+
+  """Define si la dirección es la principal"""
+  isMain: Boolean
+
+  """Número de la casa"""
+  loteNumber: String!
 
   """Barrio"""
   neighborhood: String!
@@ -225,6 +258,27 @@ type City {
 
   """Usuario que creó o editó la ciudad"""
   user: User!
+}
+
+"""Ciudad entrada"""
+input CityInput {
+  """Identificador de mongo"""
+  _id: String!
+
+  """País"""
+  country: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Departamento"""
+  state: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime
 }
 
 """Color del producto"""
@@ -3325,6 +3379,9 @@ input UpdateCustomerInput {
 
 """Datos para actualizar el pedido"""
 input UpdateOrderInput {
+  """Dirección de envío para el pedido"""
+  address: AddressInputOrder
+
   """Identificación del cliente"""
   customerId: String
 

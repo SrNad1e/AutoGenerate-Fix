@@ -84,8 +84,10 @@ export class OrdersService {
 			number = lastOrder.number + 1;
 		}
 
+		console.log(user?.customer);
+
 		const address =
-			user?.customer['addresses'] > 0
+			user?.customer['addresses'].length > 0
 				? user?.customer['addresses'].find((address) => address?.isMain)
 				: undefined;
 
@@ -102,7 +104,7 @@ export class OrdersService {
 
 	async update(
 		orderId: string,
-		{ status, customerId }: UpdateOrderInput,
+		{ status, customerId, address }: UpdateOrderInput,
 		user: User,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
@@ -112,7 +114,7 @@ export class OrdersService {
 				'El pedido que intenta actualizar no existe',
 			);
 		}
-		const dataUpdate = {};
+		const dataUpdate = { address };
 
 		if (customerId) {
 			const customer = await this.customersService.findById(customerId);

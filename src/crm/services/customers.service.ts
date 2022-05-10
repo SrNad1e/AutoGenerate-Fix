@@ -200,6 +200,8 @@ export class CustomersService {
 			}
 		}
 
+		console.log(newAddresses);
+
 		const newCustomer = await this.customerModel.findByIdAndUpdate(
 			{ _id: id },
 			{
