@@ -350,6 +350,27 @@ type Company {
   user: User!
 }
 
+"""Modelo para la transportadora"""
+type Conveyor {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación de la transportadora"""
+  createdAt: DateTime!
+
+  """Logo de la tranportadora"""
+  logo: Image!
+
+  """Nombre de la transportadora"""
+  name: String!
+
+  """Fecha de actualización de la transportadora"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la transportadora"""
+  user: User!
+}
+
 """Datos para crear un atributo"""
 input CreateAttribInput {
   """Nombre del atributo"""
@@ -964,6 +985,21 @@ input FiltersColorsInput {
 
   """Ordenamiento"""
   sort: SortColor
+}
+
+"""Filtros para obtener listado de transportadoras"""
+input FiltersConveyorsInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la transportadora"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortConveyor
 }
 
 """Filtros de listado de clientes"""
@@ -1870,6 +1906,12 @@ type Query {
     filtersColorsInput: FiltersColorsInput = {}
   ): ResponseColors!
 
+  """Lista de ajustes de productos"""
+  conveyors(
+    """Filtros de lista de las trasnportadoras"""
+    filtersConveyorsInput: FiltersConveyorsInput = {}
+  ): ResponseConveyors!
+
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
 
@@ -2265,6 +2307,39 @@ type ResponseCities {
 type ResponseColors {
   """Lista de colores"""
   docs: [Color!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de traslados de transportadoras"""
+type ResponseConveyors {
+  """Lista de transportadoras"""
+  docs: [Conveyor!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2856,6 +2931,18 @@ input SortColor {
   createdAt: Float
   name: Float
   name_internal: Float
+  updatedAt: Float
+}
+
+"""Ordenamiento de la trasnportadora"""
+input SortConveyor {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por nombre"""
+  name: Float
+
+  """Ordenamiento por fecha de creación"""
   updatedAt: Float
 }
 
