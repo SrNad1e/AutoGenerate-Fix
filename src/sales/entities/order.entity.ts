@@ -143,7 +143,7 @@ export class Order extends Document {
 			subtotal: 0,
 			tax: 0,
 			change: 0,
-			totalOPaid: 0,
+			totalPaid: 0,
 		},
 	})
 	summary: SummaryOrder;
