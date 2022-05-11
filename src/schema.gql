@@ -392,7 +392,7 @@ input CreateCategoryInput {
   name: String!
 
   """Identificador de la categoría padre"""
-  parentCategoryId: String
+  parentId: String
 }
 
 """Datos para crear un color"""
@@ -3503,7 +3503,7 @@ input UpdateCategoryInput {
   name: String
 
   """Identificador de la categoría padre """
-  parentCategoryId: String
+  parentId: String
 }
 
 """Datos para actualizar el color"""
