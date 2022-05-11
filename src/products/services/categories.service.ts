@@ -77,6 +77,7 @@ export class CategoriesService {
 	async findAllLevel({
 		level,
 		name,
+		parentId,
 		sort,
 		limit = 10,
 		page = 1,
@@ -101,9 +102,25 @@ export class CategoriesService {
 			case 1:
 				return this.categoryLevel1Model.paginate(filters, options);
 			case 2:
-				return this.categoryLevel2Model.paginate(filters, options);
+				if (!parentId) {
+					throw new NotFoundException(
+						'El nivel de categoría padre es obligatorio',
+					);
+				}
+				return this.categoryLevel2Model.paginate(
+					{ ...filters, parentId },
+					options,
+				);
 			case 3:
-				return this.categoryLevel3Model.paginate(filters, options);
+				if (!parentId) {
+					throw new NotFoundException(
+						'El nivel de categoría padre es obligatorio',
+					);
+				}
+				return this.categoryLevel3Model.paginate(
+					{ ...filters, parentId },
+					options,
+				);
 			default:
 				throw new NotFoundException('El nivel de categoría no existe');
 		}

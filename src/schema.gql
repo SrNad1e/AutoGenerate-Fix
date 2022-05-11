@@ -962,6 +962,9 @@ input FiltersCategoriesLevelInput {
   """Página"""
   page: Float
 
+  """Identificador de la categoría padre"""
+  parentId: String
+
   """Ordenamiento"""
   sort: SortCategories
 }
