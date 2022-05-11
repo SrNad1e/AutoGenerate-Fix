@@ -21,4 +21,8 @@ export class CitiesService {
 
 		return this.cityModel.paginate(params, options);
 	}
+
+	async findById(id: string) {
+		return this.cityModel.findById(id).lean();
+	}
 }

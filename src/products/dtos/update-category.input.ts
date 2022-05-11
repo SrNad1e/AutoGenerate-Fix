@@ -15,5 +15,5 @@ export class UpdateCategoryInput {
 		description: 'Identificador de la categoría padre ',
 		nullable: true,
 	})
-	parentCategoryId?: string;
+	parentId?: string;
 }

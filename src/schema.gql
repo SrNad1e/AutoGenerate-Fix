@@ -38,7 +38,7 @@ type Address {
   isMain: Boolean
 
   """Número de la casa"""
-  loteNumber: Float!
+  loteNumber: String!
 
   """Barrio"""
   neighborhood: String!
@@ -71,7 +71,40 @@ input AddressInput {
   isMain: Boolean
 
   """Número de la casa"""
-  loteNumber: Float!
+  loteNumber: String!
+
+  """Barrio"""
+  neighborhood: String!
+
+  """Número del field1"""
+  number1: String!
+
+  """Número del field2"""
+  number2: String!
+
+  """Teléfono del contacto"""
+  phone: String!
+}
+
+"""Dirección del cliente"""
+input AddressInputOrder {
+  """Ciudad de envío"""
+  city: CityInput!
+
+  """Contacto para el envío"""
+  contact: String!
+
+  """Datos extra de la dirección"""
+  extra: String
+
+  """Tipo de ubicación (Calle, Avenida, Manzana, Etc)"""
+  field1: String!
+
+  """Define si la dirección es la principal"""
+  isMain: Boolean
+
+  """Número de la casa"""
+  loteNumber: String!
 
   """Barrio"""
   neighborhood: String!
@@ -143,7 +176,7 @@ type CategoryLevel1 {
   _id: String!
 
   """Nombre de la categoría"""
-  childs: [CategoryLevel2!]!
+  childs: [CategoryLevel2!]
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -227,6 +260,27 @@ type City {
   user: User!
 }
 
+"""Ciudad entrada"""
+input CityInput {
+  """Identificador de mongo"""
+  _id: String!
+
+  """País"""
+  country: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Departamento"""
+  state: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime
+}
+
 """Color del producto"""
 type Color {
   """Identificador de mongo"""
@@ -296,6 +350,27 @@ type Company {
   user: User!
 }
 
+"""Modelo para la transportadora"""
+type Conveyor {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación de la transportadora"""
+  createdAt: DateTime!
+
+  """Logo de la tranportadora"""
+  logo: Image!
+
+  """Nombre de la transportadora"""
+  name: String!
+
+  """Fecha de actualización de la transportadora"""
+  updatedAt: DateTime!
+
+  """Usuario que crea la transportadora"""
+  user: User!
+}
+
 """Datos para crear un atributo"""
 input CreateAttribInput {
   """Nombre del atributo"""
@@ -317,7 +392,7 @@ input CreateCategoryInput {
   name: String!
 
   """Identificador de la categoría padre"""
-  parentCategoryId: String
+  parentId: String
 }
 
 """Datos para crear un color"""
@@ -863,11 +938,32 @@ input FiltersCategoriesInput {
   """Cantidad de registros"""
   limit: Float
 
-  """Nombre de la categoría de primer nivel"""
+  """Nombre de la categoría"""
   name: String
 
   """Página"""
   page: Float
+
+  """Ordenamiento"""
+  sort: SortCategories
+}
+
+"""Filtros para obtener la lista de categorías"""
+input FiltersCategoriesLevelInput {
+  """Nivel de categoria"""
+  level: Float!
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la categoría"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Identificador de la categoría padre"""
+  parentId: String
 
   """Ordenamiento"""
   sort: SortCategories
@@ -912,6 +1008,21 @@ input FiltersColorsInput {
   sort: SortColor
 }
 
+"""Filtros para obtener listado de transportadoras"""
+input FiltersConveyorsInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la transportadora"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortConveyor
+}
+
 """Filtros de listado de clientes"""
 input FiltersCustomersInput {
   """Si el cliente se encuentra activo"""
@@ -951,6 +1062,27 @@ input FiltersImagesInput {
 
   """Ordenamiento"""
   sort: SortImage
+}
+
+"""Filtros para obtener el listado de tipos de medios de pago"""
+input FiltersPaymentsInput {
+  """Estado del tipo de los médios de pago"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre del medio de pago"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortPayment
+
+  """Tipo de medio de pago (cash, bank, credit, bonus)"""
+  type: String
 }
 
 input FiltersProductInput {
@@ -1607,6 +1739,9 @@ type Order {
   """Empresa a la que perteneces el pedido"""
   company: Company!
 
+  """Trasportadora"""
+  conveyor: Conveyor
+
   """Fecha de creación"""
   createdAt: DateTime!
 
@@ -1804,6 +1939,12 @@ type Query {
     filtersCategoriesInput: FiltersCategoriesInput = {}
   ): ResponseCategories!
 
+  """Lista las categorías por level"""
+  categoriesLevel(
+    """Filtros para obtener las categorías"""
+    filtersCategoriesLevelInput: FiltersCategoriesLevelInput = {}
+  ): ResponseCategories!
+
   """Listado de ciudades"""
   cities(
     """Filtros para consultar el listado de clientes"""
@@ -1815,6 +1956,12 @@ type Query {
     """Filtros para obtener los colores"""
     filtersColorsInput: FiltersColorsInput = {}
   ): ResponseColors!
+
+  """Lista de ajustes de productos"""
+  conveyors(
+    """Filtros de lista de las trasnportadoras"""
+    filtersConveyorsInput: FiltersConveyorsInput = {}
+  ): ResponseConveyors!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
@@ -1848,6 +1995,12 @@ type Query {
     """Identificador del punto de venta"""
     idPointOfSale: String!
   ): [Order!]!
+
+  """Se encarga de listar los metodos de pago"""
+  payments(
+    """Filtros para consultar los metodos de pagos"""
+    filtersPaymentsInput: FiltersPaymentsInput = {}
+  ): ResponsePayments!
 
   """Obtiene un producto"""
   product(
@@ -2240,6 +2393,39 @@ type ResponseColors {
   totalPages: Float!
 }
 
+"""Lista de traslados de transportadoras"""
+type ResponseConveyors {
+  """Lista de transportadoras"""
+  docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta del listado de clientes"""
 type ResponseCustomers {
   """Lista de clientes"""
@@ -2277,6 +2463,39 @@ type ResponseCustomers {
 type ResponseImages {
   """Lista de imagenes"""
   docs: [Image!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de metodos de pago"""
+type ResponsePayments {
+  """Lista de metodos de pago"""
+  docs: [Payment!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2805,6 +3024,18 @@ input SortColor {
   updatedAt: Float
 }
 
+"""Ordenamiento de la trasnportadora"""
+input SortConveyor {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por nombre"""
+  name: Float
+
+  """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
 """Ordenamiento del cliente"""
 input SortCustomer {
   """ordernamiento por estado del cliente"""
@@ -2835,6 +3066,15 @@ input SortCustomer {
 """Ordenamiento para el listado de imagenes"""
 input SortImage {
   name: Float
+}
+
+"""Ordenamiento de la teinda"""
+input SortPayment {
+  active: Float
+  createdAt: Float
+  name: Float
+  type: Float
+  updatedAt: Float
 }
 
 """Ordenamiento para el listado de productos"""
@@ -3266,7 +3506,7 @@ input UpdateCategoryInput {
   name: String
 
   """Identificador de la categoría padre """
-  parentCategoryId: String
+  parentId: String
 }
 
 """Datos para actualizar el color"""
@@ -3325,6 +3565,12 @@ input UpdateCustomerInput {
 
 """Datos para actualizar el pedido"""
 input UpdateOrderInput {
+  """Dirección de envío para el pedido"""
+  address: AddressInputOrder
+
+  """Identificación de la transportadora"""
+  conveyorId: String
+
   """Identificación del cliente"""
   customerId: String
 

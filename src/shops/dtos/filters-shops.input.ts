@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType({ description: 'Ordenamiento de la teinda' })
+@InputType({ description: 'Ordenamiento de la tienda' })
 export class SortShop {
 	@Field(() => Number, { nullable: true })
 	name?: number;
