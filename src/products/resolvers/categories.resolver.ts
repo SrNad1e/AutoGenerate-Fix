@@ -3,6 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateCategoryInput } from '../dtos/create-category.input';
+import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.input';
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';
 import { ResponseCategories } from '../dtos/response-categories';
 import { UpdateCategoryInput } from '../dtos/update-category.input';
@@ -30,6 +31,27 @@ export class CategoriesResolver {
 	) {
 		return this.categoriesService.findAll(context.req.body.variables.input);
 	}
+
+	@Query(() => ResponseCategories, {
+		name: 'categoriesLevel',
+		description: 'Lista las categorías por level',
+	})
+	@UseGuards(JwtAuthGuard)
+	findAllLevel(
+		@Args({
+			name: 'filtersCategoriesLevelInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Filtros para obtener las categorías',
+		})
+		_: FiltersCategoriesLevelInput,
+		@Context() context,
+	) {
+		return this.categoriesService.findAllLevel(
+			context.req.body.variables.input,
+		);
+	}
+
 	@Mutation(() => CategoryLevel1, {
 		name: 'createCategory',
 		description: 'Crea una categoría',

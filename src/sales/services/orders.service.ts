@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
+import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
@@ -40,6 +41,7 @@ export class OrdersService {
 		private readonly paymentsService: PaymentsService,
 		private readonly invoicesService: InvoicesService,
 		private readonly customerTypesService: CustomerTypeService,
+		private readonly conveyorsService: ConveyorsService,
 	) {}
 
 	async findById(id: string) {
@@ -85,7 +87,7 @@ export class OrdersService {
 		}
 
 		const address =
-			user?.customer['addresses'] > 0
+			user?.customer['addresses'].length > 0
 				? user?.customer['addresses'].find((address) => address?.isMain)
 				: undefined;
 
@@ -102,7 +104,7 @@ export class OrdersService {
 
 	async update(
 		orderId: string,
-		{ status, customerId }: UpdateOrderInput,
+		{ status, customerId, address, conveyorId }: UpdateOrderInput,
 		user: User,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
@@ -112,7 +114,7 @@ export class OrdersService {
 				'El pedido que intenta actualizar no existe',
 			);
 		}
-		const dataUpdate = {};
+		const dataUpdate = { address };
 
 		if (customerId) {
 			const customer = await this.customersService.findById(customerId);
@@ -221,10 +223,18 @@ export class OrdersService {
 			dataUpdate['status'] = status;
 		}
 
+		let conveyor;
+		if (conveyorId) {
+			conveyor = await this.conveyorsService.findById(conveyorId);
+			if (!conveyor) {
+				throw new NotFoundException('El transportista no existe');
+			}
+		}
+
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
-				$set: { ...dataUpdate, user, invoice },
+				$set: { ...dataUpdate, user, invoice, conveyor },
 			},
 			{
 				new: true,

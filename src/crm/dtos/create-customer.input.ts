@@ -17,10 +17,10 @@ export class AddressInput {
 	})
 	number2: string;
 
-	@Field(() => Number, {
+	@Field(() => String, {
 		description: 'Número de la casa',
 	})
-	loteNumber: number;
+	loteNumber: string;
 
 	@Field(() => String, {
 		description: 'Datos extra de la dirección',

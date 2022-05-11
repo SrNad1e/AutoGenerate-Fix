@@ -1,24 +1,23 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType({ description: 'Ordenamiento para el listado de categorías' })
-export class SortCategories {
-	@Field({ nullable: true })
-	name?: number;
-
-	@Field({ nullable: true })
-	createdAt?: number;
-
-	@Field({ nullable: true })
-	updatedAt?: number;
-}
+import { SortCategories } from './filters-categories.input';
 
 @InputType({ description: 'Filtros para obtener la lista de categorías' })
-export class FiltersCategoriesInput {
+export class FiltersCategoriesLevelInput {
 	@Field(() => String, {
 		description: 'Nombre de la categoría',
 		nullable: true,
 	})
 	name?: string;
+
+	@Field(() => String, {
+		description: 'Identificador de la categoría padre',
+		nullable: true,
+	})
+	parentId?: string;
+
+	@Field({ description: 'Nivel de categoria' })
+	level: number;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;

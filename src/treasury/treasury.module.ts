@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { Payment, PaymentSchema } from './entities/payment.entity';
 import { PaymentsService } from './services/payments.service';
+import { PaymentsResolver } from './resolvers/payments.resolver';
 
 @Module({
 	imports: [
@@ -13,7 +14,7 @@ import { PaymentsService } from './services/payments.service';
 			},
 		]),
 	],
-	providers: [PaymentsService],
+	providers: [PaymentsService, PaymentsResolver],
 	exports: [PaymentsService],
 })
 export class TreasuryModule {}

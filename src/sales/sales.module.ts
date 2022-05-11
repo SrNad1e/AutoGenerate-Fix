@@ -19,6 +19,7 @@ import {
 	AuthorizationDianSchema,
 } from './entities/authorization.entity';
 import { PointOfSalesService } from './services/point-of-sales.service';
+import { ConfigurationsModule } from 'src/configurations/configurations.module';
 
 @Module({
 	imports: [
@@ -27,6 +28,7 @@ import { PointOfSalesService } from './services/point-of-sales.service';
 		ShopsModule,
 		ProductsModule,
 		TreasuryModule,
+		ConfigurationsModule,
 		MongooseModule.forFeatureAsync([
 			{
 				name: Order.name,
