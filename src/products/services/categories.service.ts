@@ -4,6 +4,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateCategoryInput } from '../dtos/create-category.input';
+import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.input';
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';
 import { UpdateCategoryInput } from '../dtos/update-category.input';
 import { CategoryLevel1 } from '../entities/category-level1.entity';
@@ -71,6 +72,42 @@ export class CategoriesService {
 		};
 
 		return this.categoryLevel1Model.paginate(filters, options);
+	}
+
+	async findAllLevel({
+		level,
+		name,
+		sort,
+		limit,
+		page,
+	}: FiltersCategoriesLevelInput) {
+		const filters: FilterQuery<CategoryLevel1> = {};
+
+		if (name) {
+			filters.name = {
+				$regex: name,
+				$options: 'i',
+			};
+		}
+
+		const options = {
+			limit,
+			page,
+			lean: true,
+			sort,
+			populate,
+		};
+
+		switch (level) {
+			case 1:
+				return this.categoryLevel1Model.paginate(filters, options);
+			case 2:
+				return this.categoryLevel2Model.paginate(filters, options);
+			case 3:
+				return this.categoryLevel3Model.paginate(filters, options);
+			default:
+				throw new NotFoundException('El nivel de categoría no existe');
+		}
 	}
 
 	async findById(_id: string, level: number) {

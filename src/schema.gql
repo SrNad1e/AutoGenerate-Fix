@@ -176,7 +176,7 @@ type CategoryLevel1 {
   _id: String!
 
   """Nombre de la categoría"""
-  childs: [CategoryLevel2!]!
+  childs: [CategoryLevel2!]
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -938,7 +938,25 @@ input FiltersCategoriesInput {
   """Cantidad de registros"""
   limit: Float
 
-  """Nombre de la categoría de primer nivel"""
+  """Nombre de la categoría"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortCategories
+}
+
+"""Filtros para obtener la lista de categorías"""
+input FiltersCategoriesLevelInput {
+  """Nivel de categoria"""
+  level: Float!
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la categoría"""
   name: String
 
   """Página"""
@@ -1916,6 +1934,12 @@ type Query {
   categories(
     """Filtros para obtener las categorías"""
     filtersCategoriesInput: FiltersCategoriesInput = {}
+  ): ResponseCategories!
+
+  """Lista las categorías por level"""
+  categoriesLevel(
+    """Filtros para obtener las categorías"""
+    filtersCategoriesLevelInput: FiltersCategoriesLevelInput = {}
   ): ResponseCategories!
 
   """Listado de ciudades"""

@@ -21,8 +21,11 @@ export class CategoryLevel1 extends Document {
 		ref: CategoryLevel2.name,
 		autopopulate: true,
 	})
-	@Field(() => [CategoryLevel2], { description: 'Nombre de la categoría' })
-	childs: Types.ObjectId[];
+	@Field(() => [CategoryLevel2], {
+		description: 'Nombre de la categoría',
+		nullable: true,
+	})
+	childs?: Types.ObjectId[];
 
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la categoría' })
