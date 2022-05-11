@@ -102,25 +102,9 @@ export class CategoriesService {
 			case 1:
 				return this.categoryLevel1Model.paginate(filters, options);
 			case 2:
-				if (!parentId) {
-					throw new NotFoundException(
-						'El nivel de categoría padre es obligatorio',
-					);
-				}
-				return this.categoryLevel2Model.paginate(
-					{ ...filters, parentId: new Types.ObjectId(parentId) },
-					options,
-				);
+				return this.categoryLevel2Model.paginate({ ...filters }, options);
 			case 3:
-				if (!parentId) {
-					throw new NotFoundException(
-						'El nivel de categoría padre es obligatorio',
-					);
-				}
-				return this.categoryLevel3Model.paginate(
-					{ ...filters, parentId: new Types.ObjectId(parentId) },
-					options,
-				);
+				return this.categoryLevel3Model.paginate({ ...filters }, options);
 			default:
 				throw new NotFoundException('El nivel de categoría no existe');
 		}
@@ -311,11 +295,14 @@ export class CategoriesService {
 
 				if (changeParent) {
 					if (categoryLevel2['parentId']) {
+						const categoryParent = await this.categoryLevel1Model.findById(
+							categoryLevel2['parentId'],
+						);
 						await this.categoryLevel1Model.findByIdAndUpdate(
 							categoryLevel2['parentId'],
 							{
 								$set: {
-									childs: categoryLevel2['childs'].filter(
+									childs: categoryParent['childs'].filter(
 										(item) => item._id.toString() !== id,
 									),
 									user,
@@ -381,7 +368,11 @@ export class CategoriesService {
 			if (name) {
 				const categoryName = await this.categoryLevel3Model.findOne({ name });
 
-				if (categoryName && categoryLevel3._id !== categoryName._id) {
+				if (
+					categoryName &&
+					categoryLevel3._id !== categoryName._id &&
+					parentId === categoryName?.parentId?.toString()
+				) {
 					throw new NotFoundException(
 						'El nombre ya esta asignado a una categoría',
 					);
@@ -403,13 +394,17 @@ export class CategoriesService {
 
 				if (changeParent) {
 					if (categoryLevel3['parentId']) {
+						const categoryParent = await this.categoryLevel2Model.findById(
+							categoryLevel3['parentId'],
+						);
 						await this.categoryLevel2Model.findByIdAndUpdate(
 							categoryLevel3['parentId'],
 							{
 								$set: {
-									childs: categoryLevel3['childs'].filter(
-										(item) => item._id.toString() !== id,
-									),
+									childs:
+										categoryParent['childs']?.filter(
+											(item) => item._id.toString() !== id,
+										) || [],
 									user,
 								},
 							},
