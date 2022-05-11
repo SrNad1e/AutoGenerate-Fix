@@ -20,11 +20,10 @@ export class CategoryLevel3 extends Document {
 	})
 	@Prop({
 		type: Types.ObjectId,
-		default: [],
 		ref: 'CategoryLevel2',
 		autopopulate: true,
 	})
-	parentId: Types.ObjectId[];
+	parentId: Types.ObjectId;
 
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea la categoría' })

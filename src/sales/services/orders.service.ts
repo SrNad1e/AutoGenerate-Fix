@@ -86,8 +86,6 @@ export class OrdersService {
 			number = lastOrder.number + 1;
 		}
 
-		console.log(user?.customer);
-
 		const address =
 			user?.customer['addresses'].length > 0
 				? user?.customer['addresses'].find((address) => address?.isMain)
