@@ -22,8 +22,14 @@ export class CreateReferenceInput {
 	@Field(() => String, { description: 'Descripción de la referencia' })
 	description: string;
 
-	@Field(() => Boolean, { description: 'Se puede cambiar' })
-	changeable: boolean;
+	@Field(() => Boolean, { description: 'Se puede cambiar', nullable: true })
+	changeable?: boolean;
+
+	@Field(() => Boolean, {
+		description: 'Estado de la referencia',
+		nullable: true,
+	})
+	active?: boolean;
 
 	@Field(() => Number, { description: 'Precio de la referencia' })
 	price: number;
@@ -58,8 +64,14 @@ export class CreateReferenceInput {
 	@Field(() => String, { description: 'Categoría nivel 3 de la referencia' })
 	categoryLevel3Id: string;
 
-	@Field(() => CombinationInput, {
+	@Field(() => [CombinationInput], {
 		description: 'Combinaciones de talla y color para crear los productos',
+		nullable: true,
 	})
-	combinations: CombinationInput[];
+	combinations?: CombinationInput[];
+
+	@Field(() => [String], {
+		description: 'Atributos de la referencia',
+	})
+	attribIds: string[];
 }

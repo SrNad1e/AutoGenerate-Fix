@@ -60,6 +60,7 @@ export class Product extends Document {
 
 	@Field(() => [Image], {
 		description: 'Imagenes del producto',
+		nullable: true,
 	})
 	@Prop({
 		type: [SchemaMongo.Types.ObjectId],

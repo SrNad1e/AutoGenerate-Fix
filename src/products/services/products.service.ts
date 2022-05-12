@@ -385,7 +385,7 @@ export class ProductsService {
 							categoryLevel1Id: '6272c1764ff755e555d5f1ea',
 							categoryLevel2Id: '6272c18c4ff755e555d5f1f3',
 							categoryLevel3Id: '6272c1944ff755e555d5f201',
-							combinations: [] as CombinationInput[],
+							attribIds: [],
 						},
 						userDefault,
 						company._id.toString(),

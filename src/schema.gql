@@ -445,6 +445,12 @@ input CreateProductInput {
 
 """Datos para crear una referencia"""
 input CreateReferenceInput {
+  """Estado de la referencia"""
+  active: Boolean
+
+  """Atributos de la referencia"""
+  attribIds: [String!]!
+
   """Marca de la referencia"""
   brandId: String!
 
@@ -458,10 +464,10 @@ input CreateReferenceInput {
   categoryLevel3Id: String!
 
   """Se puede cambiar"""
-  changeable: Boolean!
+  changeable: Boolean
 
   """Combinaciones de talla y color para crear los productos"""
-  combinations: CombinationInput!
+  combinations: [CombinationInput!]
 
   """Costo de la referencia"""
   cost: Float!
@@ -1911,7 +1917,7 @@ type Product {
   createdAt: DateTime!
 
   """Imagenes del producto"""
-  images: [Image!]!
+  images: [Image!]
 
   """Referencia del producto"""
   reference: Reference!
@@ -2135,19 +2141,19 @@ type Reference {
   active: Boolean!
 
   """Atributos de la referencia"""
-  attribs: [Attrib!]!
+  attribs: [Attrib!]
 
   """Marca de la referencia"""
   brand: Brand!
 
   """Categoría Nivel 1 de la referencia"""
-  categoryLevel1: CategoryLevel1!
+  categoryLevel1: CategoryLevel1
 
   """Categoría Nivel 2 de la referencia"""
-  categoryLevel2: CategoryLevel2!
+  categoryLevel2: CategoryLevel2
 
   """Categoría Nivel 3 de la referencia"""
-  categoryLevel3: CategoryLevel3!
+  categoryLevel3: CategoryLevel3
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!
@@ -2189,19 +2195,19 @@ type ReferenceData {
   active: Boolean!
 
   """Atributos de la referencia"""
-  attribs: [Attrib!]!
+  attribs: [Attrib!]
 
   """Marca de la referencia"""
   brand: Brand!
 
   """Categoría Nivel 1 de la referencia"""
-  categoryLevel1: CategoryLevel1!
+  categoryLevel1: CategoryLevel1
 
   """Categoría Nivel 2 de la referencia"""
-  categoryLevel2: CategoryLevel2!
+  categoryLevel2: CategoryLevel2
 
   """Categoría Nivel 3 de la referencia"""
-  categoryLevel3: CategoryLevel3!
+  categoryLevel3: CategoryLevel3
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!

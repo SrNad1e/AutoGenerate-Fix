@@ -71,27 +71,31 @@ export class Reference extends Document {
 	@Field(() => Brand, { description: 'Marca de la referencia' })
 	brand: Types.ObjectId;
 
-	@Prop({ type: Types.ObjectId, ref: CategoryLevel1.name, required: true })
+	@Prop({ type: Types.ObjectId, ref: CategoryLevel1.name })
 	@Field(() => CategoryLevel1, {
 		description: 'Categoría Nivel 1 de la referencia',
+		nullable: true,
 	})
-	categoryLevel1: Types.ObjectId;
+	categoryLevel1?: Types.ObjectId;
 
-	@Prop({ type: Types.ObjectId, ref: CategoryLevel2.name, required: true })
+	@Prop({ type: Types.ObjectId, ref: CategoryLevel2.name })
 	@Field(() => CategoryLevel2, {
 		description: 'Categoría Nivel 2 de la referencia',
+		nullable: true,
 	})
-	categoryLevel2: Types.ObjectId;
+	categoryLevel2?: Types.ObjectId;
 
-	@Prop({ type: Types.ObjectId, ref: CategoryLevel3.name, required: true })
+	@Prop({ type: Types.ObjectId, ref: CategoryLevel3.name })
 	@Field(() => CategoryLevel3, {
 		description: 'Categoría Nivel 3 de la referencia',
+		nullable: true,
 	})
-	categoryLevel3: Types.ObjectId;
+	categoryLevel3?: Types.ObjectId;
 
-	@Prop({ type: [Types.ObjectId], ref: Attrib.name, required: true })
+	@Prop({ type: [Types.ObjectId], ref: Attrib.name })
 	@Field(() => [Attrib], {
 		description: 'Atributos de la referencia',
+		nullable: true,
 	})
 	attribs: Types.ObjectId[];
 

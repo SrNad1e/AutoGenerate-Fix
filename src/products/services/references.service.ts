@@ -25,6 +25,7 @@ import { Image } from 'src/staticfiles/entities/image.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
+import { AttribsService } from './attribs.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -47,6 +48,7 @@ export class ReferencesService {
 		private readonly warehousesService: WarehousesService,
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
+		private readonly attribsService: AttribsService,
 	) {}
 
 	async findAll(
@@ -176,6 +178,7 @@ export class ReferencesService {
 			categoryLevel1Id,
 			categoryLevel2Id,
 			categoryLevel3Id,
+			attribIds,
 			combinations,
 			...props
 		}: CreateReferenceInput,
@@ -188,40 +191,60 @@ export class ReferencesService {
 			throw new NotFoundException('La marca no existe');
 		}
 
-		const categoryLevel1 = await this.categoriesService.findById(
-			categoryLevel1Id,
-			1,
-		);
+		let categoryLevel1;
+		if (categoryLevel1Id) {
+			categoryLevel1 = await this.categoriesService.findById(
+				categoryLevel1Id,
+				1,
+			);
 
-		if (!categoryLevel1) {
-			throw new NotFoundException('La categoría nivel 1 no existe');
+			if (!categoryLevel1) {
+				throw new NotFoundException('La categoría nivel 1 no existe');
+			}
+		}
+		let categoryLevel2;
+		if (categoryLevel2Id) {
+			categoryLevel2 = await this.categoriesService.findById(
+				categoryLevel2Id,
+				2,
+			);
+
+			if (!categoryLevel2) {
+				throw new NotFoundException('La categoría nivel 2 no existe');
+			}
 		}
 
-		const categoryLevel2 = await this.categoriesService.findById(
-			categoryLevel2Id,
-			2,
-		);
+		let categoryLevel3;
+		if (categoryLevel3Id) {
+			categoryLevel3 = await this.categoriesService.findById(
+				categoryLevel3Id,
+				3,
+			);
 
-		if (!categoryLevel2) {
-			throw new NotFoundException('La categoría nivel 2 no existe');
+			if (!categoryLevel3) {
+				throw new NotFoundException('La categoría nivel 3 no existe');
+			}
 		}
 
-		const categoryLevel3 = await this.categoriesService.findById(
-			categoryLevel3Id,
-			3,
-		);
+		const attribs = [];
 
-		if (!categoryLevel3) {
-			throw new NotFoundException('La categoría nivel 3 no existe');
+		for (let i = 0; i < attribIds.length; i++) {
+			const attribId = attribIds[i];
+			const attrib = await this.attribsService.findById(attribId);
+			if (!attrib) {
+				throw new NotFoundException('Atributo no existe');
+			}
+			attribs.push(attrib._id);
 		}
 
 		const reference = new this.referenceModel({
 			...props,
 			user,
 			brand: brand._id,
-			categoryLevel1: categoryLevel1._id,
-			categoryLevel2: categoryLevel2._id,
-			categoryLevel3: categoryLevel3._id,
+			categoryLevel1: categoryLevel1?._id,
+			categoryLevel2: categoryLevel2?._id,
+			categoryLevel3: categoryLevel3?._id,
+			attribs,
 			shipping: {
 				weight,
 				width,
