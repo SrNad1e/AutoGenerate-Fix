@@ -314,6 +314,18 @@ type Color {
   user: User!
 }
 
+"""Combinaciones de color y talla"""
+input CombinationInput {
+  """Identificador del color"""
+  colorId: String!
+
+  """Identificadores de las imagenes"""
+  imageIds: [String!]
+
+  """Identificador de la talla"""
+  sizeId: String!
+}
+
 """Empresa"""
 type Company {
   """Identificador de mongo"""
@@ -448,8 +460,8 @@ input CreateReferenceInput {
   """Se puede cambiar"""
   changeable: Boolean!
 
-  """Compañía de la referencia"""
-  companyId: String!
+  """Combinaciones de talla y color para crear los productos"""
+  combinations: CombinationInput!
 
   """Costo de la referencia"""
   cost: Float!

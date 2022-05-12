@@ -29,6 +29,7 @@ import { Size } from '../entities/size.entity';
 import { Color } from '../entities/color.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Image } from 'src/staticfiles/entities/image.entity';
+import { CombinationInput } from '../dtos/create-reference.input';
 
 const populate = [
 	{
@@ -381,10 +382,10 @@ export class ProductsService {
 							height: parseFloat(product.shipping_height?.toString() || '0'),
 							volume: parseFloat(product.shipping_volume?.toString() || '0'),
 							brandId: brand._id.toString(),
-							companyId: company._id.toString(),
 							categoryLevel1Id: '6272c1764ff755e555d5f1ea',
 							categoryLevel2Id: '6272c18c4ff755e555d5f1f3',
 							categoryLevel3Id: '6272c1944ff755e555d5f201',
+							combinations: [] as CombinationInput[],
 						},
 						userDefault,
 						company._id.toString(),

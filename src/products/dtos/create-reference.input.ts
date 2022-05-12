@@ -1,4 +1,18 @@
 import { Field, InputType } from '@nestjs/graphql';
+@InputType({ description: 'Combinaciones de color y talla' })
+export class CombinationInput {
+	@Field(() => String, { description: 'Identificador del color' })
+	colorId: string;
+
+	@Field(() => String, { description: 'Identificador de la talla' })
+	sizeId: string;
+
+	@Field(() => [String], {
+		description: 'Identificadores de las imagenes',
+		nullable: true,
+	})
+	imageIds?: string[];
+}
 
 @InputType({ description: 'Datos para crear una referencia' })
 export class CreateReferenceInput {
@@ -35,9 +49,6 @@ export class CreateReferenceInput {
 	@Field(() => String, { description: 'Marca de la referencia' })
 	brandId: string;
 
-	@Field(() => String, { description: 'Compañía de la referencia' })
-	companyId: string;
-
 	@Field(() => String, { description: 'Categoría nivel 1 de la referencia' })
 	categoryLevel1Id: string;
 
@@ -46,4 +57,9 @@ export class CreateReferenceInput {
 
 	@Field(() => String, { description: 'Categoría nivel 3 de la referencia' })
 	categoryLevel3Id: string;
+
+	@Field(() => CombinationInput, {
+		description: 'Combinaciones de talla y color para crear los productos',
+	})
+	combinations: CombinationInput[];
 }

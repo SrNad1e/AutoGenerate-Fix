@@ -22,6 +22,9 @@ import { Product } from '../entities/product.entity';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
 import { Image } from 'src/staticfiles/entities/image.entity';
+import { WarehousesService } from 'src/shops/services/warehouses.service';
+import { ColorsService } from './colors.service';
+import { SizesService } from './sizes.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -41,6 +44,9 @@ export class ReferencesService {
 		private readonly productModel: PaginateModel<Product>,
 		private readonly brandsService: BrandsService,
 		private readonly categoriesService: CategoriesService,
+		private readonly warehousesService: WarehousesService,
+		private readonly colorsService: ColorsService,
+		private readonly sizesService: SizesService,
 	) {}
 
 	async findAll(
@@ -170,11 +176,11 @@ export class ReferencesService {
 			categoryLevel1Id,
 			categoryLevel2Id,
 			categoryLevel3Id,
-			companyId,
+			combinations,
 			...props
 		}: CreateReferenceInput,
 		user: User,
-		companyIdUser: string,
+		companyId: string,
 	) {
 		const brand = await this.brandsService.findById(brandId);
 
@@ -223,10 +229,81 @@ export class ReferencesService {
 				volume,
 				height,
 			},
-			companies: [companyIdUser],
+			companies: [new Types.ObjectId(companyId)],
 		});
+		const responseReference = await reference.save();
 
-		return (await reference.save()).populate(populate);
+		if (responseReference && combinations.length > 0) {
+			const newProducts = [];
+			const warehouses = await this.warehousesService.getAll();
+			const stock = warehouses.map((warehouse) => ({
+				warehouse: warehouse._id,
+				quantity: 0,
+				user,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			}));
+			const products = await this.productModel.paginate({}, { limit: 0 });
+
+			for (let i = 0; i < combinations.length; i++) {
+				const { colorId, sizeId, imageIds } = combinations[i];
+				const color = await this.colorsService.findById(colorId);
+				if (!color) {
+					throw new NotFoundException(
+						'La referencia fue creada pero algunos productos tienen un color que no existe',
+					);
+				}
+				const size = await this.sizesService.findById(sizeId);
+				if (!size) {
+					throw new NotFoundException(
+						'La referencia fue creada pero algunos productos tienen una talla que no existe',
+					);
+				}
+
+				const total = () => {
+					const totalData = products.totalDocs + i;
+					if (totalData < 10) {
+						return `00000${totalData}`;
+					}
+
+					if (totalData < 100) {
+						return `0000${totalData}`;
+					}
+
+					if (totalData < 1000) {
+						return `000${totalData}`;
+					}
+
+					if (totalData < 10000) {
+						return `00${totalData}`;
+					}
+
+					if (totalData < 100000) {
+						return `0${totalData}`;
+					}
+
+					if (totalData < 1000000) {
+						return `${totalData}`;
+					}
+				};
+				const barcode = `7700000${total()}`;
+				newProducts.push({
+					reference: responseReference._id,
+					barcode,
+					color: color._id,
+					size: size._id,
+					images: imageIds?.map((id) => new Types.ObjectId(id)),
+					user,
+					stock,
+				});
+			}
+
+			if (newProducts.length > 0) {
+				this.productModel.insertMany(products);
+			}
+		}
+
+		return responseReference;
 	}
 
 	async update(
