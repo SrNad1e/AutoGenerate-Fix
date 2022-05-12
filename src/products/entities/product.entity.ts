@@ -89,9 +89,12 @@ export class Product extends Document {
 	@Field(() => User, { description: 'Usuario que crea el producto' })
 	user: User;
 
-	@Prop({ type: Array })
-	@Field(() => [Stock], { description: 'Inventario del producto por bodegas' })
-	stock: Stock[];
+	@Prop({ type: Array, default: [] })
+	@Field(() => [Stock], {
+		description: 'Inventario del producto por bodegas',
+		nullable: true,
+	})
+	stock?: Stock[];
 
 	@Field(() => Date, { description: 'Fecha de creación del producto' })
 	createdAt: Date;

@@ -257,8 +257,8 @@ export class ReferencesService {
 		const responseReference = await reference.save();
 
 		if (responseReference && combinations.length > 0) {
-			const newProducts = [];
 			const warehouses = await this.warehousesService.getAll();
+
 			const stock = warehouses.map((warehouse) => ({
 				warehouse: warehouse._id,
 				quantity: 0,
@@ -266,6 +266,7 @@ export class ReferencesService {
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			}));
+
 			const products = await this.productModel.paginate({}, { limit: 0 });
 
 			for (let i = 0; i < combinations.length; i++) {
@@ -309,20 +310,20 @@ export class ReferencesService {
 						return `${totalData}`;
 					}
 				};
+
 				const barcode = `7700000${total()}`;
-				newProducts.push({
+
+				const newProduct = new this.productModel({
 					reference: responseReference._id,
 					barcode,
 					color: color._id,
 					size: size._id,
-					images: imageIds?.map((id) => new Types.ObjectId(id)),
+					images: imageIds?.map((id) => new Types.ObjectId(id)) || [],
 					user,
 					stock,
 				});
-			}
 
-			if (newProducts.length > 0) {
-				this.productModel.insertMany(products);
+				await newProduct.save();
 			}
 		}
 

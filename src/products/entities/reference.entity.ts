@@ -46,7 +46,7 @@ export class Reference extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre de la referencia' })
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, unique: true })
 	name: string;
 
 	@Prop({ type: String, required: true })
@@ -96,7 +96,7 @@ export class Reference extends Document {
 		description: 'Atributos de la referencia',
 		nullable: true,
 	})
-	attribs: Types.ObjectId[];
+	attribs?: Types.ObjectId[];
 
 	@Prop({ type: [Types.ObjectId], ref: Company.name, required: true })
 	@Field(() => [Company], {

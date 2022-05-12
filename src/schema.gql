@@ -1929,7 +1929,7 @@ type Product {
   status: String!
 
   """Inventario del producto por bodegas"""
-  stock: [Stock!]!
+  stock: [Stock!]
 
   """Fecha de actualización del producto"""
   updatedAt: DateTime!
