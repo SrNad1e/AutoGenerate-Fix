@@ -74,9 +74,8 @@ export class Reference extends Document {
 	@Prop({ type: Types.ObjectId, ref: CategoryLevel1.name })
 	@Field(() => CategoryLevel1, {
 		description: 'Categoría Nivel 1 de la referencia',
-		nullable: true,
 	})
-	categoryLevel1?: Types.ObjectId;
+	categoryLevel1: Types.ObjectId;
 
 	@Prop({ type: Types.ObjectId, ref: CategoryLevel2.name })
 	@Field(() => CategoryLevel2, {

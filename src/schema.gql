@@ -458,10 +458,10 @@ input CreateReferenceInput {
   categoryLevel1Id: String!
 
   """Categoría nivel 2 de la referencia"""
-  categoryLevel2Id: String!
+  categoryLevel2Id: String
 
   """Categoría nivel 3 de la referencia"""
-  categoryLevel3Id: String!
+  categoryLevel3Id: String
 
   """Se puede cambiar"""
   changeable: Boolean
@@ -2147,7 +2147,7 @@ type Reference {
   brand: Brand!
 
   """Categoría Nivel 1 de la referencia"""
-  categoryLevel1: CategoryLevel1
+  categoryLevel1: CategoryLevel1!
 
   """Categoría Nivel 2 de la referencia"""
   categoryLevel2: CategoryLevel2
@@ -2201,7 +2201,7 @@ type ReferenceData {
   brand: Brand!
 
   """Categoría Nivel 1 de la referencia"""
-  categoryLevel1: CategoryLevel1
+  categoryLevel1: CategoryLevel1!
 
   """Categoría Nivel 2 de la referencia"""
   categoryLevel2: CategoryLevel2

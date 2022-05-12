@@ -58,11 +58,17 @@ export class CreateReferenceInput {
 	@Field(() => String, { description: 'Categoría nivel 1 de la referencia' })
 	categoryLevel1Id: string;
 
-	@Field(() => String, { description: 'Categoría nivel 2 de la referencia' })
-	categoryLevel2Id: string;
+	@Field(() => String, {
+		description: 'Categoría nivel 2 de la referencia',
+		nullable: true,
+	})
+	categoryLevel2Id?: string;
 
-	@Field(() => String, { description: 'Categoría nivel 3 de la referencia' })
-	categoryLevel3Id: string;
+	@Field(() => String, {
+		description: 'Categoría nivel 3 de la referencia',
+		nullable: true,
+	})
+	categoryLevel3Id?: string;
 
 	@Field(() => [CombinationInput], {
 		description: 'Combinaciones de talla y color para crear los productos',
