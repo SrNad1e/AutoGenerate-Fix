@@ -10,7 +10,10 @@ export class CategoryLevel3 extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
-	@Field(() => String, { description: 'Nombre de la categoría' })
+	@Field(() => String, {
+		description: 'Nombre de la categoría',
+		nullable: true,
+	})
 	@Prop({ type: String, required: true })
 	name: string;
 

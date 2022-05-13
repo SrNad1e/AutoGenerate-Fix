@@ -292,7 +292,7 @@ export class ProductsService {
 				reference: reference?._id,
 				color: color?._id,
 				size: size?._id,
-				images: imagesId.map((id) => new Types.ObjectId(id)),
+				images: imagesId?.map((id) => new Types.ObjectId(id)),
 				barcode,
 				user,
 			})

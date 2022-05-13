@@ -376,11 +376,19 @@ export class ReferencesService {
 			);
 		}
 
-		return this.referenceModel.findByIdAndUpdate(id, {
-			$set: {
-				...params,
+		return this.referenceModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					...params,
+				},
 			},
-		});
+			{
+				lean: true,
+				populate,
+				new: true,
+			},
+		);
 	}
 
 	/**

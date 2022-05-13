@@ -203,7 +203,7 @@ type CategoryLevel2 {
   createdAt: DateTime!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre"""
   parentId: String
@@ -224,7 +224,7 @@ type CategoryLevel3 {
   createdAt: DateTime!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre"""
   parentId: String
