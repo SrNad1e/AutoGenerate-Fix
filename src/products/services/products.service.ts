@@ -163,7 +163,10 @@ export class ProductsService {
 	}
 
 	async findOne({ warehouseId, ...params }: FiltersProductInput) {
-		const product = await this.productModel.findOne(params).populate(populate);
+		const product = await this.productModel
+			.findOne(params)
+			.lean()
+			.populate(populate);
 
 		if (warehouseId) {
 			if (warehouseId === 'all') {
@@ -181,7 +184,7 @@ export class ProductsService {
 		}
 
 		return {
-			...product['_doc'],
+			...product,
 			stock: [],
 		};
 	}
@@ -217,9 +220,13 @@ export class ProductsService {
 		}
 	}
 
-	async create(props: CreateProductInput, user: User, companyId: string) {
+	async create(
+		{ referenceId, colorId, sizeId, imagesId }: CreateProductInput,
+		user: User,
+		companyId: string,
+	) {
 		const reference = await this.referencesService.findById(
-			props.referenceId,
+			referenceId,
 			user,
 			companyId,
 		);
@@ -228,24 +235,24 @@ export class ProductsService {
 		}
 
 		const product = await this.findOne({
-			size: props.sizeId,
-			color: props.colorId,
-			reference: props.referenceId,
+			size: sizeId,
+			color: colorId,
+			reference: referenceId,
 		});
 
-		if (product) {
+		if (product?._id) {
 			throw new NotFoundException(
 				`La combianción de talla y color ya existe para la referencia ${reference.name}`,
 			);
 		}
 
-		const color = await this.colorsService.findById(props.colorId);
+		const color = await this.colorsService.findById(colorId);
 
 		if (!color) {
 			throw new NotFoundException('El color no existe');
 		}
 
-		const size = await this.sizesService.findById(props.colorId);
+		const size = await this.sizesService.findById(sizeId);
 
 		if (!size) {
 			throw new NotFoundException('La talla no existe');
@@ -279,9 +286,17 @@ export class ProductsService {
 			}
 		};
 		const barcode = `7700000${total()}`;
-		const newProduct = new this.productModel({ ...props, barcode, user });
 
-		return (await newProduct.save()).populate(populate);
+		return (
+			await this.productModel.create({
+				reference: reference?._id,
+				color: color?._id,
+				size: size?._id,
+				images: imagesId.map((id) => new Types.ObjectId(id)),
+				barcode,
+				user,
+			})
+		).populate(populate);
 	}
 
 	async update(
@@ -329,16 +344,24 @@ export class ProductsService {
 			}
 		}
 
-		return this.productModel.findByIdAndUpdate(id, {
-			$set: {
-				colorId: color?._id,
-				sizeId: size?._id,
-				status,
-				barcode,
-				imagesId: imagesId.map((item) => new Types.ObjectId(item)),
-				user,
+		return this.productModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					color: color?._id,
+					size: size?._id,
+					status,
+					barcode,
+					images: imagesId.map((item) => new Types.ObjectId(item)),
+					user,
+				},
 			},
-		});
+			{
+				lean: true,
+				new: true,
+				populate,
+			},
+		);
 	}
 
 	async migration() {
