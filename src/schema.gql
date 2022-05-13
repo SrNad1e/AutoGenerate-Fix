@@ -2036,7 +2036,7 @@ type Query {
   referenceId(
     """Identificador de la referencia"""
     id: String!
-  ): Reference!
+  ): ReferenceData!
 
   """Listado de las referencias"""
   references(

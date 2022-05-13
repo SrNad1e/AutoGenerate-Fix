@@ -6,29 +6,29 @@ export class UpdateProductInput {
 		description: 'Identificador del color',
 		nullable: true,
 	})
-	colorId: string;
+	colorId?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la talla',
 		nullable: true,
 	})
-	sizeId: string;
+	sizeId?: string;
 
 	@Field(() => String, {
 		description: 'Estado del producto (active, inactive)',
 		nullable: true,
 	})
-	status: string;
+	status?: string;
 
 	@Field(() => String, {
 		description: 'Código de barras del producto',
 		nullable: true,
 	})
-	barcode: string;
+	barcode?: string;
 
 	@Field(() => [String], {
 		description: 'Identificador de las imagenes del producto',
 		nullable: true,
 	})
-	imagesId: string[];
+	imagesId?: string[];
 }

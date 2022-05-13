@@ -4,7 +4,7 @@ import { Product } from '../entities/product.entity';
 import { Reference } from '../entities/reference.entity';
 
 @ObjectType({ description: 'Respuesta de la referencias' })
-class ReferenceData extends Reference {
+export class ReferenceData extends Reference {
 	@Field(() => [Product], { description: 'Productos de la referencia' })
 	products: Product[];
 

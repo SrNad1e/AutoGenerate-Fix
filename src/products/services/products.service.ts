@@ -284,38 +284,60 @@ export class ProductsService {
 		return (await newProduct.save()).populate(populate);
 	}
 
-	async update(id: string, props: UpdateProductInput, user: User) {
+	async update(
+		id: string,
+		{ colorId, sizeId, status, barcode, imagesId }: UpdateProductInput,
+		user: User,
+	) {
 		const product = await this.productModel.findById(id).lean();
 
 		if (!product) {
 			throw new NotFoundException('El producto no existe');
 		}
-		const color = await this.colorsService.findById(props.colorId);
 
-		if (!color) {
-			throw new NotFoundException('El color no existe');
+		let color;
+		if (colorId) {
+			color = await this.colorsService.findById(colorId);
+
+			if (!color) {
+				throw new NotFoundException('El color no existe');
+			}
 		}
 
-		const size = await this.sizesService.findById(props.colorId);
+		let size;
+		if (sizeId) {
+			size = await this.sizesService.findById(sizeId);
 
-		if (!size) {
-			throw new NotFoundException('La talla no existe');
+			if (!size) {
+				throw new NotFoundException('La talla no existe');
+			}
 		}
 
-		if (!statusTypes.includes(props.status)) {
-			throw new NotFoundException(`El estado ${props.status} no es válido`);
+		if (status) {
+			if (!statusTypes.includes(status)) {
+				throw new NotFoundException(`El estado ${status} no es válido`);
+			}
 		}
 
-		const productCodeBar = await this.findOne({ barcode: props.barcode });
+		if (barcode) {
+			const productCodeBar = await this.findOne({ barcode });
 
-		if (productCodeBar) {
-			throw new NotFoundException(
-				`El código de barras ${props.barcode}, está asignada al producto ${productCodeBar.reference.name} / ${productCodeBar.color.name} - ${productCodeBar.size.value}  `,
-			);
+			if (productCodeBar) {
+				throw new NotFoundException(
+					`El código de barras ${barcode}, está asignada al producto ${productCodeBar.reference.name} / ${productCodeBar.color.name} - ${productCodeBar.size.value}  `,
+				);
+			}
 		}
 
 		return this.productModel.findByIdAndUpdate(id, {
-			$set: { ...props, user },
+			$set: {
+				colorId: color?._id,
+				sizeId: size?._id,
+				status,
+				barcode,
+				imagesId: imagesId.map((item) => new Types.ObjectId(item)),
+				user,
+			},
 		});
 	}
 

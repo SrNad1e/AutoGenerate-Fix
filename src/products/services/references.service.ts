@@ -153,14 +153,38 @@ export class ReferencesService {
 			filters.companies = { $in: new Types.ObjectId(companyId) };
 		}
 
-		const response = await this.referenceModel
+		const reference = await this.referenceModel
 			.findOne(filters)
 			.populate(populate)
 			.lean();
-		if (response) {
-			return response;
+		if (!reference) {
+			throw new NotFoundException('La referencia no existe');
 		}
-		throw new NotFoundException('La referencia no existe');
+
+		const products = await this.productModel
+			.find({
+				reference: reference?._id,
+				status: 'active',
+			})
+			.populate([
+				'size',
+				{
+					path: 'color',
+					populate: {
+						path: 'image',
+						model: Image.name,
+					},
+				},
+				{
+					path: 'images',
+					model: Image.name,
+				},
+			]);
+
+		return {
+			...reference,
+			products,
+		};
 	}
 
 	async findOne(params: FiltersReferenceInput) {
@@ -251,6 +275,8 @@ export class ReferencesService {
 				long,
 				volume,
 				height,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			},
 			companies: [new Types.ObjectId(companyId)],
 		});
