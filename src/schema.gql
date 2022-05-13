@@ -203,7 +203,7 @@ type CategoryLevel2 {
   createdAt: DateTime!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre"""
   parentId: String
@@ -224,7 +224,7 @@ type CategoryLevel3 {
   createdAt: DateTime!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre"""
   parentId: String
@@ -312,6 +312,18 @@ type Color {
 
   """Usuario que crea el color"""
   user: User!
+}
+
+"""Combinaciones de color y talla"""
+input CombinationInput {
+  """Identificador del color"""
+  colorId: String!
+
+  """Identificadores de las imagenes"""
+  imageIds: [String!]
+
+  """Identificador de la talla"""
+  sizeId: String!
 }
 
 """Empresa"""
@@ -433,6 +445,12 @@ input CreateProductInput {
 
 """Datos para crear una referencia"""
 input CreateReferenceInput {
+  """Estado de la referencia"""
+  active: Boolean
+
+  """Atributos de la referencia"""
+  attribIds: [String!]!
+
   """Marca de la referencia"""
   brandId: String!
 
@@ -440,16 +458,16 @@ input CreateReferenceInput {
   categoryLevel1Id: String!
 
   """Categoría nivel 2 de la referencia"""
-  categoryLevel2Id: String!
+  categoryLevel2Id: String
 
   """Categoría nivel 3 de la referencia"""
-  categoryLevel3Id: String!
+  categoryLevel3Id: String
 
   """Se puede cambiar"""
-  changeable: Boolean!
+  changeable: Boolean
 
-  """Compañía de la referencia"""
-  companyId: String!
+  """Combinaciones de talla y color para crear los productos"""
+  combinations: [CombinationInput!]
 
   """Costo de la referencia"""
   cost: Float!
@@ -1899,7 +1917,7 @@ type Product {
   createdAt: DateTime!
 
   """Imagenes del producto"""
-  images: [Image!]!
+  images: [Image!]
 
   """Referencia del producto"""
   reference: Reference!
@@ -1911,7 +1929,7 @@ type Product {
   status: String!
 
   """Inventario del producto por bodegas"""
-  stock: [Stock!]!
+  stock: [Stock!]
 
   """Fecha de actualización del producto"""
   updatedAt: DateTime!
@@ -2018,7 +2036,7 @@ type Query {
   referenceId(
     """Identificador de la referencia"""
     id: String!
-  ): Reference!
+  ): ReferenceData!
 
   """Listado de las referencias"""
   references(
@@ -2123,7 +2141,7 @@ type Reference {
   active: Boolean!
 
   """Atributos de la referencia"""
-  attribs: [Attrib!]!
+  attribs: [Attrib!]
 
   """Marca de la referencia"""
   brand: Brand!
@@ -2132,10 +2150,10 @@ type Reference {
   categoryLevel1: CategoryLevel1!
 
   """Categoría Nivel 2 de la referencia"""
-  categoryLevel2: CategoryLevel2!
+  categoryLevel2: CategoryLevel2
 
   """Categoría Nivel 3 de la referencia"""
-  categoryLevel3: CategoryLevel3!
+  categoryLevel3: CategoryLevel3
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!
@@ -2177,7 +2195,7 @@ type ReferenceData {
   active: Boolean!
 
   """Atributos de la referencia"""
-  attribs: [Attrib!]!
+  attribs: [Attrib!]
 
   """Marca de la referencia"""
   brand: Brand!
@@ -2186,10 +2204,10 @@ type ReferenceData {
   categoryLevel1: CategoryLevel1!
 
   """Categoría Nivel 2 de la referencia"""
-  categoryLevel2: CategoryLevel2!
+  categoryLevel2: CategoryLevel2
 
   """Categoría Nivel 3 de la referencia"""
-  categoryLevel3: CategoryLevel3!
+  categoryLevel3: CategoryLevel3
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!

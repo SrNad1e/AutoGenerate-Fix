@@ -59,6 +59,10 @@ export class WarehousesService {
 		return this.warehouseModel.paginate(filters, options);
 	}
 
+	async getAll() {
+		return this.warehouseModel.find().lean();
+	}
+
 	async findOne(params: FiltersWarehousesInput) {
 		return this.warehouseModel.findOne(params).lean();
 	}

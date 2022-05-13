@@ -29,6 +29,7 @@ import { Size } from '../entities/size.entity';
 import { Color } from '../entities/color.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Image } from 'src/staticfiles/entities/image.entity';
+import { CombinationInput } from '../dtos/create-reference.input';
 
 const populate = [
 	{
@@ -162,7 +163,10 @@ export class ProductsService {
 	}
 
 	async findOne({ warehouseId, ...params }: FiltersProductInput) {
-		const product = await this.productModel.findOne(params).populate(populate);
+		const product = await this.productModel
+			.findOne(params)
+			.lean()
+			.populate(populate);
 
 		if (warehouseId) {
 			if (warehouseId === 'all') {
@@ -180,7 +184,7 @@ export class ProductsService {
 		}
 
 		return {
-			...product['_doc'],
+			...product,
 			stock: [],
 		};
 	}
@@ -216,9 +220,13 @@ export class ProductsService {
 		}
 	}
 
-	async create(props: CreateProductInput, user: User, companyId: string) {
+	async create(
+		{ referenceId, colorId, sizeId, imagesId }: CreateProductInput,
+		user: User,
+		companyId: string,
+	) {
 		const reference = await this.referencesService.findById(
-			props.referenceId,
+			referenceId,
 			user,
 			companyId,
 		);
@@ -227,24 +235,24 @@ export class ProductsService {
 		}
 
 		const product = await this.findOne({
-			size: props.sizeId,
-			color: props.colorId,
-			reference: props.referenceId,
+			size: sizeId,
+			color: colorId,
+			reference: referenceId,
 		});
 
-		if (product) {
+		if (product?._id) {
 			throw new NotFoundException(
 				`La combianción de talla y color ya existe para la referencia ${reference.name}`,
 			);
 		}
 
-		const color = await this.colorsService.findById(props.colorId);
+		const color = await this.colorsService.findById(colorId);
 
 		if (!color) {
 			throw new NotFoundException('El color no existe');
 		}
 
-		const size = await this.sizesService.findById(props.colorId);
+		const size = await this.sizesService.findById(sizeId);
 
 		if (!size) {
 			throw new NotFoundException('La talla no existe');
@@ -278,44 +286,82 @@ export class ProductsService {
 			}
 		};
 		const barcode = `7700000${total()}`;
-		const newProduct = new this.productModel({ ...props, barcode, user });
 
-		return (await newProduct.save()).populate(populate);
+		return (
+			await this.productModel.create({
+				reference: reference?._id,
+				color: color?._id,
+				size: size?._id,
+				images: imagesId?.map((id) => new Types.ObjectId(id)),
+				barcode,
+				user,
+			})
+		).populate(populate);
 	}
 
-	async update(id: string, props: UpdateProductInput, user: User) {
+	async update(
+		id: string,
+		{ colorId, sizeId, status, barcode, imagesId }: UpdateProductInput,
+		user: User,
+	) {
 		const product = await this.productModel.findById(id).lean();
 
 		if (!product) {
 			throw new NotFoundException('El producto no existe');
 		}
-		const color = await this.colorsService.findById(props.colorId);
 
-		if (!color) {
-			throw new NotFoundException('El color no existe');
+		let color;
+		if (colorId) {
+			color = await this.colorsService.findById(colorId);
+
+			if (!color) {
+				throw new NotFoundException('El color no existe');
+			}
 		}
 
-		const size = await this.sizesService.findById(props.colorId);
+		let size;
+		if (sizeId) {
+			size = await this.sizesService.findById(sizeId);
 
-		if (!size) {
-			throw new NotFoundException('La talla no existe');
+			if (!size) {
+				throw new NotFoundException('La talla no existe');
+			}
 		}
 
-		if (!statusTypes.includes(props.status)) {
-			throw new NotFoundException(`El estado ${props.status} no es válido`);
+		if (status) {
+			if (!statusTypes.includes(status)) {
+				throw new NotFoundException(`El estado ${status} no es válido`);
+			}
 		}
 
-		const productCodeBar = await this.findOne({ barcode: props.barcode });
+		if (barcode) {
+			const productCodeBar = await this.findOne({ barcode });
 
-		if (productCodeBar) {
-			throw new NotFoundException(
-				`El código de barras ${props.barcode}, está asignada al producto ${productCodeBar.reference.name} / ${productCodeBar.color.name} - ${productCodeBar.size.value}  `,
-			);
+			if (productCodeBar) {
+				throw new NotFoundException(
+					`El código de barras ${barcode}, está asignada al producto ${productCodeBar.reference.name} / ${productCodeBar.color.name} - ${productCodeBar.size.value}  `,
+				);
+			}
 		}
 
-		return this.productModel.findByIdAndUpdate(id, {
-			$set: { ...props, user },
-		});
+		return this.productModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					color: color?._id,
+					size: size?._id,
+					status,
+					barcode,
+					images: imagesId.map((item) => new Types.ObjectId(item)),
+					user,
+				},
+			},
+			{
+				lean: true,
+				new: true,
+				populate,
+			},
+		);
 	}
 
 	async migration() {
@@ -381,10 +427,10 @@ export class ProductsService {
 							height: parseFloat(product.shipping_height?.toString() || '0'),
 							volume: parseFloat(product.shipping_volume?.toString() || '0'),
 							brandId: brand._id.toString(),
-							companyId: company._id.toString(),
 							categoryLevel1Id: '6272c1764ff755e555d5f1ea',
 							categoryLevel2Id: '6272c18c4ff755e555d5f1f3',
 							categoryLevel3Id: '6272c1944ff755e555d5f201',
+							attribIds: [],
 						},
 						userDefault,
 						company._id.toString(),
