@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateBrandInput } from '../dtos/create-brand.input';
@@ -15,6 +15,7 @@ export class BrandsService {
 	) {}
 
 	async findAll({
+		_id,
 		active,
 		limit = 10,
 		page = 1,
@@ -32,6 +33,10 @@ export class BrandsService {
 				$regex: name,
 				$options: 'i',
 			};
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {

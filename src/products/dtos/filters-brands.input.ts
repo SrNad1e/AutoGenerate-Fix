@@ -17,6 +17,9 @@ export class SortBrand {
 
 @InputType({ description: 'Filtros para la lista de marcas' })
 export class FiltersBrandsInput {
+	@Field({ description: 'Identificador de las marcas', nullable: true })
+	_id?: string;
+
 	@Field(() => String, { description: 'Nombre del atributo', nullable: true })
 	name?: string;
 

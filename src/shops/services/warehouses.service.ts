@@ -21,6 +21,7 @@ export class WarehousesService {
 
 	async findAll(
 		{
+			_id,
 			name,
 			limit = 10,
 			page = 1,
@@ -47,6 +48,10 @@ export class WarehousesService {
 
 		if (isMain !== undefined) {
 			filters.isMain = isMain;
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {
