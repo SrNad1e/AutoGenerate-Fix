@@ -58,19 +58,34 @@ export class OrdersService {
 			const shop = await this.shopsService.findById(
 				user.pointOfSale['shop'].toString(),
 			);
+
+			let number = 1;
+			const lastOrder = await this.orderModel
+				.findOne({
+					company: new Types.ObjectId(companyId),
+				})
+				.sort({
+					_id: -1,
+				})
+				.lean();
+
+			if (lastOrder) {
+				number = lastOrder.number + 1;
+			}
 			return this.orderModel.create({
 				customer,
 				shop,
+				number,
 				user,
 				pointOfSale: user.pointOfSale._id,
 			});
+		} else {
+			if (!user.customer) {
+				throw new BadRequestException('El usuario no pertenece a un cliente');
+			}
 		}
 
 		const shop = await this.shopsService.getShopWholesale();
-
-		if (!user.customer) {
-			throw new BadRequestException('El usuario no pertenece a un cliente');
-		}
 
 		let number = 1;
 		const lastOrder = await this.orderModel
@@ -90,6 +105,8 @@ export class OrdersService {
 			user?.customer['addresses'].length > 0
 				? user?.customer['addresses'].find((address) => address?.isMain)
 				: undefined;
+
+		console.log(number);
 
 		return this.orderModel.create({
 			customer: user.customer,
