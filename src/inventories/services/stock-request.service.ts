@@ -469,8 +469,6 @@ export class StockRequestService {
 			}
 		}
 
-		console.log(details);
-
 		if (details.length === 0) {
 			throw new BadRequestException(
 				'No se encontraron productos para realizar la solicitud',
