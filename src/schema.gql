@@ -917,8 +917,8 @@ type DocumentType {
 
 """Filtros para la lista de atributos"""
 input FiltersAttribsInput {
-  """Identificador del atributo"""
-  _id: String
+  """Identificadores de los atributos"""
+  _ids: [String!]
 
   """Estado del atributo"""
   active: Boolean
@@ -938,7 +938,7 @@ input FiltersAttribsInput {
 
 """Filtros para la lista de marcas"""
 input FiltersBrandsInput {
-  """Identificador de las marcas"""
+  """Identificador de la marcas"""
   _id: String
 
   """Estado del atributo"""

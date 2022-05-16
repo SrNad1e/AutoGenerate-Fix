@@ -16,7 +16,7 @@ export class AttribsService {
 	) {}
 
 	async findAll({
-		_id,
+		_ids,
 		active,
 		limit = 10,
 		page = 1,
@@ -36,8 +36,10 @@ export class AttribsService {
 			};
 		}
 
-		if (_id) {
-			filters._id = new Types.ObjectId(_id);
+		if (_ids) {
+			filters._id = {
+				$in: _ids.map((id) => new Types.ObjectId(id)),
+			};
 		}
 
 		const options = {

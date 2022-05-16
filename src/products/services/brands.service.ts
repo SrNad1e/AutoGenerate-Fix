@@ -4,7 +4,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateBrandInput } from '../dtos/create-brand.input';
-import { FiltersAttribsInput } from '../dtos/filters-attribs.input';
+import { FiltersBrandsInput } from '../dtos/filters-brands.input';
 import { UpdateBrandInput } from '../dtos/update-brand.input';
 import { Brand } from '../entities/brand.entity';
 
@@ -21,7 +21,7 @@ export class BrandsService {
 		page = 1,
 		sort,
 		name,
-	}: FiltersAttribsInput) {
+	}: FiltersBrandsInput) {
 		const filters: FilterQuery<Brand> = {};
 
 		if (active !== undefined) {
