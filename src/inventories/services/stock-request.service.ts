@@ -447,10 +447,12 @@ export class StockRequestService {
 			const total = warehouse.min - detail.stock.quantity;
 
 			if (product.stock[0].quantity < total) {
-				details.push({
-					productId: detail._id.toString(),
-					quantity: product.stock[0].quantity,
-				});
+				if (product.stock[0].quantity > 0) {
+					details.push({
+						productId: detail._id.toString(),
+						quantity: product.stock[0].quantity,
+					});
+				}
 			} else {
 				details.push({
 					productId: detail._id.toString(),
