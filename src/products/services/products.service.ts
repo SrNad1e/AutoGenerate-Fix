@@ -178,7 +178,7 @@ export class ProductsService {
 			);
 
 			return {
-				...product['_doc'],
+				...(product as Product),
 				stock,
 			};
 		}
@@ -339,7 +339,7 @@ export class ProductsService {
 
 			if (productCodeBar) {
 				throw new NotFoundException(
-					`El código de barras ${barcode}, está asignada al producto ${productCodeBar.reference.name} / ${productCodeBar.color.name} - ${productCodeBar.size.value}  `,
+					`El código de barras ${barcode}, está asignada al producto ${productCodeBar?.reference['name']} / ${productCodeBar?.color['name']} - ${productCodeBar?.size['name']}  `,
 				);
 			}
 		}

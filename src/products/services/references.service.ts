@@ -358,7 +358,19 @@ export class ReferencesService {
 
 	async update(
 		id: string,
-		params: UpdateReferenceInput,
+		{
+			categoryLevel1Id,
+			attribIds,
+			categoryLevel2Id,
+			categoryLevel3Id,
+			brandId,
+			height,
+			long,
+			volume,
+			weight,
+			width,
+			...params
+		}: UpdateReferenceInput,
 		user: User,
 		companyId: string,
 	) {
@@ -376,10 +388,74 @@ export class ReferencesService {
 			);
 		}
 
+		let categoryLevel1;
+		if (categoryLevel1Id) {
+			categoryLevel1 = await this.categoriesService.findById(
+				categoryLevel1Id,
+				1,
+			);
+
+			if (!categoryLevel1) {
+				throw new NotFoundException('La categoría nivel 1 no existe');
+			}
+		}
+
+		let categoryLevel2;
+		if (categoryLevel2Id) {
+			categoryLevel2 = await this.categoriesService.findById(
+				categoryLevel2Id,
+				2,
+			);
+
+			if (!categoryLevel2) {
+				throw new NotFoundException('La categoría nivel 2 no existe');
+			}
+		}
+
+		let categoryLevel3;
+		if (categoryLevel3Id) {
+			categoryLevel3 = await this.categoriesService.findById(
+				categoryLevel3Id,
+				3,
+			);
+
+			if (!categoryLevel3) {
+				throw new NotFoundException('La categoría nivel 3 no existe');
+			}
+		}
+
+		const attribs: any = [];
+		if (attribIds) {
+			for (let i = 0; i < attribIds.length; i++) {
+				const attribId = attribIds[i];
+
+				const attrib = await this.attribsService.findById(attribId);
+
+				if (!attrib) {
+					throw new NotFoundException('Uno de los atributos no existe');
+				}
+
+				attribs.push(attrib._id);
+			}
+		}
+
+		let brand;
+		if (brandId) {
+			brand = await this.brandsService.findById(brandId);
+			if (!brand) {
+				throw new NotFoundException('La marca no existe');
+			}
+		}
+
 		return this.referenceModel.findByIdAndUpdate(
 			id,
 			{
 				$set: {
+					categoryLevel1,
+					categoryLevel2,
+					categoryLevel3,
+					attribs,
+					brand,
 					...params,
 				},
 			},

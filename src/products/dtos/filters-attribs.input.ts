@@ -17,6 +17,12 @@ export class SortAttrib {
 
 @InputType({ description: 'Filtros para la lista de atributos' })
 export class FiltersAttribsInput {
+	@Field(() => [String], {
+		description: 'Identificadores de los atributos',
+		nullable: true,
+	})
+	_ids?: string[];
+
 	@Field(() => String, { description: 'Nombre del atributo', nullable: true })
 	name?: string;
 

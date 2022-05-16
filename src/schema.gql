@@ -917,6 +917,9 @@ type DocumentType {
 
 """Filtros para la lista de atributos"""
 input FiltersAttribsInput {
+  """Identificadores de los atributos"""
+  _ids: [String!]
+
   """Estado del atributo"""
   active: Boolean
 
@@ -935,6 +938,9 @@ input FiltersAttribsInput {
 
 """Filtros para la lista de marcas"""
 input FiltersBrandsInput {
+  """Identificador de la marcas"""
+  _id: String
+
   """Estado del atributo"""
   active: Boolean
 
@@ -1010,6 +1016,9 @@ input FiltersCitiesInput {
 
 """Filtros para la lista de colores"""
 input FiltersColorsInput {
+  """Identificador del color"""
+  _id: String
+
   """Estado de la bodega"""
   active: Boolean
 
@@ -1197,6 +1206,9 @@ input FiltersReferencesInput {
 
 """Filtros para la lista de tallas"""
 input FiltersSizesInput {
+  """Identificador de la talla"""
+  _id: String
+
   """Estado de la bodega"""
   active: Boolean
 
@@ -1391,6 +1403,9 @@ input FiltersUsersInput {
 
 """Filtros de las bodegas"""
 input FiltersWarehousesInput {
+  """Identificador de la bodega"""
+  _id: String
+
   """Estado de la bodega"""
   active: Boolean
 

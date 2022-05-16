@@ -17,6 +17,9 @@ export class SortSize {
 
 @InputType({ description: 'Filtros para la lista de tallas' })
 export class FiltersSizesInput {
+	@Field({ description: 'Identificador de la talla', nullable: true })
+	_id?: string;
+
 	@Field({ description: 'Comodín busqueda de la talla', nullable: true })
 	name?: string;
 
