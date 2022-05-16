@@ -416,9 +416,17 @@ export class StockRequestService {
 	async autogenerate(shopId: string, user: User) {
 		const shop = await this.shopsService.findById(shopId);
 
+		if (!shop) {
+			throw new NotFoundException('La tienda no existe');
+		}
+
 		const warehouse = await this.warehousesService.findById(
 			shop.defaultWarehouse._id.toString(),
 		);
+
+		if (!warehouse) {
+			throw new NotFoundException('La tienda no tiene bodega predeterminada');
+		}
 
 		const products = await this.productsService.getProducts({
 			status: 'active',
@@ -444,7 +452,7 @@ export class StockRequestService {
 				shop?.warehouseMain?._id?.toString(),
 			);
 
-			const total = warehouse.min - detail.stock.quantity;
+			const total = warehouse.min - (detail.stock.quantity || 0);
 
 			if (product.stock[0].quantity < total) {
 				if (product.stock[0].quantity > 0) {
@@ -461,6 +469,8 @@ export class StockRequestService {
 			}
 		}
 
+		console.log(details);
+
 		if (details.length === 0) {
 			throw new BadRequestException(
 				'No se encontraron productos para realizar la solicitud',
@@ -469,8 +479,8 @@ export class StockRequestService {
 
 		return this.create(
 			{
-				warehouseDestinationId: shop?.warehouseMain?._id?.toString(),
-				warehouseOriginId: shop?.defaultWarehouse?._id?.toString(),
+				warehouseDestinationId: shop?.defaultWarehouse?._id?.toString(),
+				warehouseOriginId: shop?.warehouseMain?._id?.toString(),
 				details,
 			},
 			user,
