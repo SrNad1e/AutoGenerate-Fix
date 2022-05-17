@@ -1865,8 +1865,14 @@ type Payment {
   """Estado del tipo de los médios de pago"""
   active: Boolean!
 
+  """Color del medio de pago"""
+  color: String
+
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Logo para el medio de pago"""
+  logo: Image
 
   """Nombre del medio de pago"""
   name: String!
