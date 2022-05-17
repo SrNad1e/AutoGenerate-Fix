@@ -124,7 +124,6 @@ export class ProductsService {
 		if (referenceId) {
 			filters.reference = new Types.ObjectId(referenceId);
 		}
-		console.log(filters);
 
 		const options = {
 			limit,

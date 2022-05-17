@@ -106,8 +106,6 @@ export class OrdersService {
 				? user?.customer['addresses'].find((address) => address?.isMain)
 				: undefined;
 
-		console.log(number);
-
 		return this.orderModel.create({
 			customer: user.customer,
 			address,
