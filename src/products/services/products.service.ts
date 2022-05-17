@@ -111,14 +111,20 @@ export class ProductsService {
 				false,
 				companyId,
 			);
-			filters.reference = {
-				$in: references.docs.map((item) => item._id),
-			};
+
+			if (references.totalDocs > 0) {
+				filters.reference = {
+					$in: references.docs.map((item) => item._id),
+				};
+			} else {
+				filters.barcode = name;
+			}
 		}
 
 		if (referenceId) {
 			filters.reference = new Types.ObjectId(referenceId);
 		}
+		console.log(filters);
 
 		const options = {
 			limit,

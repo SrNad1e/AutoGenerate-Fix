@@ -266,7 +266,9 @@ export class OrdersService {
 	 * @returns pedidos del punto de venta
 	 */
 	async getByPointOfSales(idPointOfSale: string) {
-		return this.orderModel.find({ pointOfSale: idPointOfSale }).lean();
+		return this.orderModel
+			.find({ pointOfSale: new Types.ObjectId(idPointOfSale) })
+			.lean();
 	}
 
 	async addProducts(
