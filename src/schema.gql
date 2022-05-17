@@ -422,6 +422,42 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear un cliente"""
+input CreateCustomerInput {
+  """Direcciones del cliente"""
+  addresses: [AddressInput!]
+
+  """Fecha de nacimiento"""
+  birthday: DateTime
+
+  """Identificación de tipo de cliente"""
+  customerTypeId: String
+
+  """Número de documento"""
+  document: String!
+
+  """Identificación del tipo de documento"""
+  documentTypeId: String!
+
+  """Correo del cliente"""
+  email: String
+
+  """Nombres del cliente"""
+  firstName: String!
+
+  """Es el cliente por defecto, solo debe existir uno"""
+  isDefault: Boolean
+
+  """El teléfono tiene whatsapp"""
+  isWhatsapp: Boolean
+
+  """Apellidos del cliente"""
+  lastName: String!
+
+  """Número de teléfono"""
+  phone: String
+}
+
 """Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
@@ -1072,8 +1108,11 @@ input FiltersCustomersInput {
 
 """Filtros para los tipos de documento"""
 input FiltersDocumentTypesInput {
+  """Estado activo del documento"""
+  active: Boolean
+
   """Nombre del tipo de documento"""
-  name: String!
+  name: String
 }
 
 """Filtros para la lista de imagenes"""
@@ -1554,6 +1593,12 @@ type Mutation {
     """Datos para crear el color"""
     createColorInput: CreateColorInput!
   ): Color!
+
+  """Se encarga crear un cliente"""
+  createCustomer(
+    """Parámetros para actualizar el cliente"""
+    createCustomerInput: CreateCustomerInput!
+  ): Customer!
 
   """Se encarga de crear el pedido"""
   createOrder(

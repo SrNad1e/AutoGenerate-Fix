@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import { CreateCustomerInput } from '../dtos/create-customer.input';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';
 import { ResponseCustomers } from '../dtos/response-customers';
 import { UpdateCustomerInput } from '../dtos/update-customer.input';
@@ -28,6 +29,24 @@ export class CustomersResolver {
 		@Context() context,
 	) {
 		return this.customersService.findAll(context.req.body.variables.input);
+	}
+
+	@Mutation(() => Customer, {
+		name: 'createCustomer',
+		description: 'Se encarga crear un cliente',
+	})
+	@UseGuards(JwtAuthGuard)
+	create(
+		@Args('createCustomerInput', {
+			description: 'Parámetros para actualizar el cliente',
+		})
+		_: CreateCustomerInput,
+		@Context() context,
+	) {
+		return this.customersService.create(
+			context.req.body.variables.input,
+			context.req.user,
+		);
 	}
 
 	@Mutation(() => Customer, {

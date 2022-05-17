@@ -183,4 +183,7 @@
 			}
 		}
 	]
+	//AGREGAR EL TIPO DE CLIENTE A LOS CLIENTES ACTUALES
+	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES
+	//ACTUALIZAR CAMPO IDENTIFICATION db.customers.update({}, {$rename:{"identification":"document"}}, false, true);
 }
