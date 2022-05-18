@@ -9,6 +9,7 @@ import { ConveyorsService } from 'src/configurations/services/conveyors.service'
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
+import { DetailHistory } from 'src/inventories/dtos/create-stockHistory-input';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
@@ -18,8 +19,16 @@ import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
+import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { InvoicesService } from './invoices.service';
+
+const populate = [
+	{
+		path: 'invoice',
+		model: Invoice.name,
+	},
+];
 
 const statuTypes = [
 	'open',
@@ -45,7 +54,7 @@ export class OrdersService {
 	) {}
 
 	async findById(id: string) {
-		return this.orderModel.findById(id).lean();
+		return this.orderModel.findById(id).populate(populate).lean();
 	}
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
@@ -58,19 +67,34 @@ export class OrdersService {
 			const shop = await this.shopsService.findById(
 				user.pointOfSale['shop'].toString(),
 			);
+
+			let number = 1;
+			const lastOrder = await this.orderModel
+				.findOne({
+					company: new Types.ObjectId(companyId),
+				})
+				.sort({
+					_id: -1,
+				})
+				.lean();
+
+			if (lastOrder) {
+				number = lastOrder.number + 1;
+			}
 			return this.orderModel.create({
 				customer,
 				shop,
+				number,
 				user,
 				pointOfSale: user.pointOfSale._id,
 			});
+		} else {
+			if (!user.customer) {
+				throw new BadRequestException('El usuario no pertenece a un cliente');
+			}
 		}
 
 		const shop = await this.shopsService.getShopWholesale();
-
-		if (!user.customer) {
-			throw new BadRequestException('El usuario no pertenece a un cliente');
-		}
 
 		let number = 1;
 		const lastOrder = await this.orderModel
@@ -106,6 +130,7 @@ export class OrdersService {
 		orderId: string,
 		{ status, customerId, address, conveyorId }: UpdateOrderInput,
 		user: User,
+		companyId: string,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
@@ -203,7 +228,7 @@ export class OrdersService {
 			) {
 				const result = await this.invoicesService.create(
 					{
-						customerId,
+						customerId: customerId || order?.customer?._id.toString(),
 						details: order.details.map((item) => ({
 							productId: item.product._id.toString(),
 							quantity: item.quantity,
@@ -231,12 +256,31 @@ export class OrdersService {
 			}
 		}
 
+		if (status === 'cancelled') {
+			const details = order?.details?.map((detail) => ({
+				productId: detail?.product?._id.toString(),
+				quantity: detail?.quantity,
+			}));
+			const response = await this.stockHistoryService.addStock(
+				{
+					details,
+					warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
+					documentId: order?._id.toString(),
+					documentType: 'order',
+				},
+				user,
+				companyId,
+			);
+			console.log(response);
+		}
+
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
 				$set: { ...dataUpdate, user, invoice, conveyor },
 			},
 			{
+				populate,
 				new: true,
 				lean: true,
 			},
@@ -249,7 +293,10 @@ export class OrdersService {
 	 * @returns pedidos del punto de venta
 	 */
 	async getByPointOfSales(idPointOfSale: string) {
-		return this.orderModel.find({ pointOfSale: idPointOfSale }).lean();
+		return this.orderModel
+			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
+			.populate(populate)
+			.lean();
 	}
 
 	async addProducts(
@@ -435,6 +482,7 @@ export class OrdersService {
 				},
 			},
 			{
+				populate,
 				new: true,
 				lean: true,
 			},
@@ -556,12 +604,20 @@ export class OrdersService {
 			change,
 		};
 
-		return this.orderModel.findByIdAndUpdate(orderId, {
-			$set: {
-				payments: newPayments,
-				user,
-				summary,
+		return this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					payments: newPayments,
+					user,
+					summary,
+				},
 			},
-		});
+			{
+				populate,
+				lean: true,
+				new: true,
+			},
+		);
 	}
 }

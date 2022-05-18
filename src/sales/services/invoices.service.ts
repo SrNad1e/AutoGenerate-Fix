@@ -31,7 +31,7 @@ export class InvoicesService {
 			);
 		}
 		const pointOfSale = await this.pointOfSalesService.findById(
-			user.pointOfSale.toString(),
+			user.pointOfSale._id.toString(),
 		);
 
 		if (!pointOfSale) {
@@ -80,6 +80,8 @@ export class InvoicesService {
 			newDetails.push({
 				product,
 				quantity: item.quantity,
+				price: item?.price,
+				discount: item?.discount,
 			});
 		}
 
@@ -104,8 +106,8 @@ export class InvoicesService {
 			change: summary.totalPaid - summary.subtotal - summary.discount,
 		};
 
-		return this.invoiceModel.create({
-			authorization: pointOfSale.authorization,
+		const newInvoice = new this.invoiceModel({
+			authorization: { ...pointOfSale?.authorization },
 			customer,
 			shop: user.shop,
 			payments: newPayments,
@@ -113,5 +115,7 @@ export class InvoicesService {
 			details: newDetails,
 			user,
 		});
+
+		return newInvoice.save();
 	}
 }

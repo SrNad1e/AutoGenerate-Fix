@@ -13,4 +13,8 @@ export class CustomerTypeService {
 	async findById(id: string) {
 		return this.customerTypeModel.findById(id).lean();
 	}
+
+	async findOne(name: string) {
+		return this.customerTypeModel.findOne({ name }).lean();
+	}
 }

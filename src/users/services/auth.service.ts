@@ -70,14 +70,20 @@ export class AuthService {
 		let customer = await this.customersService.findOne({ document });
 
 		if (!customer) {
-			customer = await this.customersService.create({
-				email,
-				firstName,
-				lastName,
-				document,
-				customerTypeId,
-				...params,
-			});
+			customer = await this.customersService.create(
+				{
+					email,
+					firstName,
+					lastName,
+					document,
+					customerTypeId,
+
+					...params,
+				},
+				{
+					username: 'admin',
+				} as User,
+			);
 		} else {
 			const userCustomer = await this.usersService.findOne({
 				customerId: customer._id.toString(),

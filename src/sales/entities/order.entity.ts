@@ -110,6 +110,7 @@ export class Order extends Document {
 	})
 	@Prop({
 		type: Object,
+		default: [],
 	})
 	payments: PaymentOrder[];
 

@@ -16,6 +16,12 @@ export class DetailInvoice {
 
 	@Field(() => Number, { description: 'Cantidad de productos en la factura' })
 	quantity: number;
+
+	@Field(() => Number, { description: 'Descuento del producto en la factura' })
+	discount: number;
+
+	@Field(() => Number, { description: 'Precio del producto en la factura' })
+	price: number;
 }
 
 @ObjectType({ description: 'Medios de pago de la factura' })
@@ -57,7 +63,7 @@ export class Invoice extends Document {
 	@Field(() => AuthorizationDian, {
 		description: 'Autorización de facturación',
 	})
-	@Prop({ type: Number, required: true })
+	@Prop({ type: Object, required: true })
 	authorization: AuthorizationDian;
 
 	@Field(() => Number, { description: 'Número de factura' })

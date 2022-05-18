@@ -422,6 +422,42 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear un cliente"""
+input CreateCustomerInput {
+  """Direcciones del cliente"""
+  addresses: [AddressInput!]
+
+  """Fecha de nacimiento"""
+  birthday: DateTime
+
+  """Identificación de tipo de cliente"""
+  customerTypeId: String
+
+  """Número de documento"""
+  document: String!
+
+  """Identificación del tipo de documento"""
+  documentTypeId: String!
+
+  """Correo del cliente"""
+  email: String
+
+  """Nombres del cliente"""
+  firstName: String!
+
+  """Es el cliente por defecto, solo debe existir uno"""
+  isDefault: Boolean
+
+  """El teléfono tiene whatsapp"""
+  isWhatsapp: Boolean
+
+  """Apellidos del cliente"""
+  lastName: String!
+
+  """Número de teléfono"""
+  phone: String
+}
+
 """Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
@@ -708,6 +744,12 @@ type DetailInput {
 
 """Productos de la factura"""
 type DetailInvoice {
+  """Descuento del producto en la factura"""
+  discount: Float!
+
+  """Precio del producto en la factura"""
+  price: Float!
+
   """Producto agregado a la factura"""
   product: Product!
 
@@ -1072,8 +1114,11 @@ input FiltersCustomersInput {
 
 """Filtros para los tipos de documento"""
 input FiltersDocumentTypesInput {
+  """Estado activo del documento"""
+  active: Boolean
+
   """Nombre del tipo de documento"""
-  name: String!
+  name: String
 }
 
 """Filtros para la lista de imagenes"""
@@ -1166,6 +1211,9 @@ input FiltersProductsInput {
 
   """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
+
+  """Se usa para seleccionar solo los productos que tengan inventario"""
+  withStock: Boolean
 }
 
 """Filtros para la lista de referencias"""
@@ -1555,6 +1603,12 @@ type Mutation {
     createColorInput: CreateColorInput!
   ): Color!
 
+  """Se encarga crear un cliente"""
+  createCustomer(
+    """Parámetros para actualizar el cliente"""
+    createCustomerInput: CreateCustomerInput!
+  ): Customer!
+
   """Se encarga de crear el pedido"""
   createOrder(
     """Parámetros para la creación del pedido"""
@@ -1820,8 +1874,14 @@ type Payment {
   """Estado del tipo de los médios de pago"""
   active: Boolean!
 
+  """Color del medio de pago"""
+  color: String
+
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Logo para el medio de pago"""
+  logo: Image
 
   """Nombre del medio de pago"""
   name: String!

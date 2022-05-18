@@ -203,6 +203,7 @@ export class StockHistoryService {
 				}
 			}
 		} catch (error) {
+
 			if (item) {
 				//TODO: pendiente planear el reversar
 			}
