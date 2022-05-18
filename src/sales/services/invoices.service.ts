@@ -31,7 +31,7 @@ export class InvoicesService {
 			);
 		}
 		const pointOfSale = await this.pointOfSalesService.findById(
-			user.pointOfSale.toString(),
+			user.pointOfSale._id.toString(),
 		);
 
 		if (!pointOfSale) {
@@ -105,7 +105,7 @@ export class InvoicesService {
 		};
 
 		return this.invoiceModel.create({
-			authorization: pointOfSale.authorization,
+			authorization: pointOfSale?.authorization,
 			customer,
 			shop: user.shop,
 			payments: newPayments,

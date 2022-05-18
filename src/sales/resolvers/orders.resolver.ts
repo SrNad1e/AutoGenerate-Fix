@@ -71,7 +71,7 @@ export class OrdersResolver {
 		return this.ordersService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -89,7 +89,7 @@ export class OrdersResolver {
 	) {
 		return this.ordersService.addProducts(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 			context.req.companyId,
 		);
 	}
@@ -108,7 +108,7 @@ export class OrdersResolver {
 	) {
 		return this.ordersService.addPayments(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }

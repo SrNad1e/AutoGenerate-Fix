@@ -57,7 +57,7 @@ export class Invoice extends Document {
 	@Field(() => AuthorizationDian, {
 		description: 'Autorización de facturación',
 	})
-	@Prop({ type: Number, required: true })
+	@Prop({ type: Object, required: true })
 	authorization: AuthorizationDian;
 
 	@Field(() => Number, { description: 'Número de factura' })

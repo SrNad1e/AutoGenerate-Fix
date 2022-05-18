@@ -218,7 +218,7 @@ export class OrdersService {
 			) {
 				const result = await this.invoicesService.create(
 					{
-						customerId,
+						customerId: customerId || order?.customer?._id.toString(),
 						details: order.details.map((item) => ({
 							productId: item.product._id.toString(),
 							quantity: item.quantity,
