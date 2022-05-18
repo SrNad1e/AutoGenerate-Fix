@@ -9,6 +9,7 @@ import { ConveyorsService } from 'src/configurations/services/conveyors.service'
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
+import { DetailHistory } from 'src/inventories/dtos/create-stockHistory-input';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
@@ -129,6 +130,7 @@ export class OrdersService {
 		orderId: string,
 		{ status, customerId, address, conveyorId }: UpdateOrderInput,
 		user: User,
+		companyId: string,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
@@ -252,6 +254,24 @@ export class OrdersService {
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+		}
+
+		if (status === 'cancelled') {
+			const details = order?.details?.map((detail) => ({
+				productId: detail?.product?._id.toString(),
+				quantity: detail?.quantity,
+			}));
+			const response = await this.stockHistoryService.addStock(
+				{
+					details,
+					warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
+					documentId: order?._id.toString(),
+					documentType: 'order',
+				},
+				user,
+				companyId,
+			);
+			console.log(response);
 		}
 
 		return this.orderModel.findByIdAndUpdate(

@@ -72,6 +72,7 @@ export class OrdersResolver {
 			id,
 			context.req.body.variables.input,
 			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
