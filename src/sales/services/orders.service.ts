@@ -265,7 +265,7 @@ export class OrdersService {
 	 */
 	async getByPointOfSales(idPointOfSale: string) {
 		return this.orderModel
-			.find({ pointOfSale: new Types.ObjectId(idPointOfSale) })
+			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
 			.lean();
 	}
 
