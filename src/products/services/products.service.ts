@@ -29,7 +29,6 @@ import { Size } from '../entities/size.entity';
 import { Color } from '../entities/color.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Image } from 'src/staticfiles/entities/image.entity';
-import { CombinationInput } from '../dtos/create-reference.input';
 
 const populate = [
 	{
@@ -79,6 +78,7 @@ export class ProductsService {
 			ids,
 			warehouseId,
 			referenceId,
+			withStock = false,
 		}: FiltersProductsInput,
 		user: Partial<User>,
 		companyId: string,
@@ -125,6 +125,13 @@ export class ProductsService {
 			filters.reference = new Types.ObjectId(referenceId);
 		}
 
+		if (withStock && warehouseId) {
+			filters['stock.warehouse'] = new Types.ObjectId(warehouseId);
+			filters['stock.quantity'] = {
+				$gt: 0,
+			};
+		}
+
 		const options = {
 			limit,
 			page,
@@ -147,7 +154,7 @@ export class ProductsService {
 				}
 
 				const stock = doc.stock?.filter(
-					(item) => item.warehouse._id.toString() === warehouseId,
+					(item) => item?.warehouse?._id?.toString() === warehouseId,
 				);
 
 				return {

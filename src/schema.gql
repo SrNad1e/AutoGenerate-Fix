@@ -1205,6 +1205,9 @@ input FiltersProductsInput {
 
   """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
+
+  """Se usa para seleccionar solo los productos que tengan inventario"""
+  withStock: Boolean
 }
 
 """Filtros para la lista de referencias"""
