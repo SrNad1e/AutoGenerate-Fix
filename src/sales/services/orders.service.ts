@@ -18,8 +18,16 @@ import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
+import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { InvoicesService } from './invoices.service';
+
+const populate = [
+	{
+		path: 'invoice',
+		model: Invoice.name,
+	},
+];
 
 const statuTypes = [
 	'open',
@@ -45,7 +53,7 @@ export class OrdersService {
 	) {}
 
 	async findById(id: string) {
-		return this.orderModel.findById(id).lean();
+		return this.orderModel.findById(id).populate(populate).lean();
 	}
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
@@ -252,6 +260,7 @@ export class OrdersService {
 				$set: { ...dataUpdate, user, invoice, conveyor },
 			},
 			{
+				populate,
 				new: true,
 				lean: true,
 			},
@@ -266,6 +275,7 @@ export class OrdersService {
 	async getByPointOfSales(idPointOfSale: string) {
 		return this.orderModel
 			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
+			.populate(populate)
 			.lean();
 	}
 
@@ -452,6 +462,7 @@ export class OrdersService {
 				},
 			},
 			{
+				populate,
 				new: true,
 				lean: true,
 			},
@@ -573,12 +584,20 @@ export class OrdersService {
 			change,
 		};
 
-		return this.orderModel.findByIdAndUpdate(orderId, {
-			$set: {
-				payments: newPayments,
-				user,
-				summary,
+		return this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					payments: newPayments,
+					user,
+					summary,
+				},
 			},
-		});
+			{
+				populate,
+				lean: true,
+				new: true,
+			},
+		);
 	}
 }

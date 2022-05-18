@@ -744,6 +744,12 @@ type DetailInput {
 
 """Productos de la factura"""
 type DetailInvoice {
+  """Descuento del producto en la factura"""
+  discount: Float!
+
+  """Precio del producto en la factura"""
+  price: Float!
+
   """Producto agregado a la factura"""
   product: Product!
 
