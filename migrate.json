@@ -123,6 +123,7 @@
 			"username": "admin"
 		}
 	},
+	//AGREGAR ID DE LA COMPAÑIA EN LAS VARIABLES GLOBALES DEL FRONTEND
 	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION /shops/migrateWarehouses
 	//ELIMINAR LA COLECCION DE SHOPS
 	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION /shops/migrateShops
@@ -144,6 +145,7 @@
 	//MIGRAR COLORES /products/migrate/colors
 	//MIGRAR TALLAS /products/migrate/sizes
 	//PENDIENTE MIGRACION DE CATEGORIAS
+	//ELIMINAR LA COLECCION PRODUCTOS
 	//MIGRAR PRODUCTOS /products/migrate
 	//CREAR LOS TIPOS DE DOCUMENTO
 	"documentTypes": [
@@ -182,8 +184,33 @@
 				"username": "admin"
 			}
 		}
-	]
+	],
 	//AGREGAR EL TIPO DE CLIENTE A LOS CLIENTES ACTUALES
 	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES
+	//ELIMINAR EL INDEX DE IDENTIFICATION
 	//ACTUALIZAR CAMPO IDENTIFICATION db.customers.update({}, {$rename:{"identification":"document"}}, false, true);
+	//CREAR LAS AUTORIZACIONES DE FACTURACION
+	//CREAR LOS PUNTOS DE VENTA
+	//ASIGANR EL PUNTO DE VENTA A LOS USUARIOS
+	//CREAR EL CLIENT POR DEFECTO
+	"customers": [
+		{
+			"documentType":"Sacar de la base de datos",
+			"document": 0,
+			"firstName": "Cliente",
+			"lastName": "Ocacional",
+			"customerType": "Sacar de la base de datos",
+			"addresses": [],
+			"isWhatsapp": false,
+			"isDefault": true,
+			"active":true,
+			"user": {
+						"name": "Administrador del Sistema",
+						"username": "admin"
+					},
+			"createdAt": "new Date()",
+			"updatedAt": "new Date()"
+		}
+	]
+
 }

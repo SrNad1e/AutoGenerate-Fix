@@ -28,7 +28,7 @@ export class CategoryLevel2 extends Document {
 		ref: CategoryLevel3.name,
 		autopopulate: true,
 	})
-	childs: Types.ObjectId[];
+	childs?: Types.ObjectId[];
 
 	@Field(() => String, {
 		description: 'Identificador de la categoría padre',
