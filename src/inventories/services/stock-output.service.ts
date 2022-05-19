@@ -175,6 +175,10 @@ export class StockOutputService {
 
 		for (let i = 0; i < details.length; i++) {
 			const { quantity, productId } = details[i];
+			if (quantity <= 0) {
+				throw new BadRequestException('Los productos no pueden estar en 0');
+			}
+
 			const product = await this.productsService.validateStock(
 				productId,
 				quantity,
@@ -310,6 +314,9 @@ export class StockOutputService {
 				);
 
 				if (action === 'create') {
+					if (quantity <= 0) {
+						throw new BadRequestException('Los productos no pueden estar en 0');
+					}
 					const productFind = stockOutput.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);

@@ -179,6 +179,11 @@ export class StockInputService {
 
 		for (let i = 0; i < details.length; i++) {
 			const { quantity, productId } = details[i];
+
+			if (quantity <= 0) {
+				throw new BadRequestException('Los productos no pueden estar en 0');
+			}
+
 			const product = await this.productsService.findById(
 				productId,
 				warehouseId,
@@ -318,6 +323,10 @@ export class StockInputService {
 						productId,
 						stockInput.warehouse._id.toString(),
 					);
+
+					if (quantity <= 0) {
+						throw new BadRequestException('Los productos no pueden estar en 0');
+					}
 					newDetails.push({
 						product,
 						quantity,
