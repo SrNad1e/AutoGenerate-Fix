@@ -92,6 +92,9 @@ export class FiltersProductInput {
 	@Field({ description: 'talla del producto', nullable: true })
 	size?: string;
 
+	@Field({ description: 'Estado del producto', nullable: true })
+	status?: string;
+
 	@Field(() => String, {
 		description: 'Referencia del producto',
 		nullable: true,

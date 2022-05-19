@@ -22,7 +22,6 @@ import { RolesService } from './roles.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { FiltersUserInput } from '../dtos/filters-user.input';
 import { Customer } from 'src/crm/entities/customer.entity';
-import { CustomerType } from 'src/crm/entities/customerType.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },

@@ -9,7 +9,6 @@ import { ConveyorsService } from 'src/configurations/services/conveyors.service'
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 import { CustomersService } from 'src/crm/services/customers.service';
-import { DetailHistory } from 'src/inventories/dtos/create-stockHistory-input';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
@@ -372,6 +371,16 @@ export class OrdersService {
 					order?.shop?.defaultWarehouse.toString(),
 				);
 
+				if (!product) {
+					throw new BadRequestException('Uno de los productos no existe');
+				}
+
+				if (product?.status !== 'active') {
+					throw new BadRequestException(
+						`El producto ${product?.barcode} no se encuentra activo`,
+					);
+				}
+
 				newDetails[index] = {
 					...newDetails[index],
 					product,
@@ -403,6 +412,16 @@ export class OrdersService {
 					quantity,
 					order?.shop?.defaultWarehouse.toString(),
 				);
+
+				if (!product) {
+					throw new BadRequestException('Uno de los productos no existe');
+				}
+
+				if (product?.status !== 'active') {
+					throw new BadRequestException(
+						`El producto ${product?.barcode} no se encuentra activo`,
+					);
+				}
 
 				newDetails.push({
 					product,
