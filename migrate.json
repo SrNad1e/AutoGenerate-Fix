@@ -195,7 +195,7 @@
 	//CREAR EL CLIENT POR DEFECTO
 	"customers": [
 		{
-			"documentType":"Sacar de la base de datos",
+			"documentType": "Sacar de la base de datos",
 			"document": 0,
 			"firstName": "Cliente",
 			"lastName": "Ocacional",
@@ -203,14 +203,65 @@
 			"addresses": [],
 			"isWhatsapp": false,
 			"isDefault": true,
-			"active":true,
+			"active": true,
 			"user": {
-						"name": "Administrador del Sistema",
-						"username": "admin"
-					},
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
+			"createdAt": "new Date()",
+			"updatedAt": "new Date()"
+		}
+	],
+	//CREAR LOS MEDIOS DE PAGO
+	"payments": [
+		{
+			"name": "Efectivo",
+			"type": "cash",
+			"color": "#71E405",
+			"active": true,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
+			"createdAt": "new Date()",
+			"updatedAt": "new Date()"
+		},
+		{
+			"name": "Crédito",
+			"type": "credit",
+			"color": "#A24403",
+			"active": true,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
+			"createdAt": "new Date()",
+			"updatedAt": "new Date()"
+		},
+		{
+			"name": "Bancolombia",
+			"type": "bank",
+			"color": "#04B6BC",
+			"active": true,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
+			"createdAt": "new Date()",
+			"updatedAt": "new Date()"
+		},
+		{
+			"name": "Bono",
+			"type": "bonus",
+			"color": "#C903BA",
+			"active": true,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			},
 			"createdAt": "new Date()",
 			"updatedAt": "new Date()"
 		}
 	]
-
+	//ELIMINAR INDEX CODE EN ORDERS
 }
