@@ -209,6 +209,10 @@ export class StockRequestService {
 			for (let i = 0; i < details.length; i++) {
 				const { quantity, productId } = details[i];
 
+				if (quantity <= 0) {
+					throw new BadRequestException('Los productos no pueden estar en 0');
+				}
+
 				const product = await this.productsService.validateStock(
 					productId,
 					quantity,
@@ -328,6 +332,13 @@ export class StockRequestService {
 								`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
 							);
 						}
+
+						if (quantity <= 0) {
+							throw new BadRequestException(
+								'Los productos no pueden estar en 0',
+							);
+						}
+
 						const product = await this.productsService.validateStock(
 							productId,
 							quantity,
@@ -357,6 +368,12 @@ export class StockRequestService {
 							);
 						}
 						const productFind = newDetails[detailFindIndex];
+
+						if (quantity <= 0) {
+							throw new BadRequestException(
+								'Los productos no pueden estar en 0',
+							);
+						}
 
 						newDetails[detailFindIndex] = {
 							...productFind,

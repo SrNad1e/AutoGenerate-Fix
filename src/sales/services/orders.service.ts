@@ -77,7 +77,6 @@ export class OrdersService {
 					_id: -1,
 				})
 				.lean();
-			console.log(companyId);
 
 			if (lastOrder) {
 				number = lastOrder.number + 1;
@@ -263,7 +262,7 @@ export class OrdersService {
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
-			const response = await this.stockHistoryService.addStock(
+			await this.stockHistoryService.addStock(
 				{
 					details,
 					warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
@@ -273,7 +272,6 @@ export class OrdersService {
 				user,
 				companyId,
 			);
-			console.log(response);
 		}
 
 		return this.orderModel.findByIdAndUpdate(
