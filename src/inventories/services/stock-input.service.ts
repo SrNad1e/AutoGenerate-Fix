@@ -189,6 +189,16 @@ export class StockInputService {
 				warehouseId,
 			);
 
+			if (!product) {
+				throw new BadRequestException('Uno de los productos no existe');
+			}
+
+			if (product?.status !== 'active') {
+				throw new BadRequestException(
+					`El producto ${product?.barcode} no se encuentra activo`,
+				);
+			}
+
 			detailsInput.push({
 				product,
 				quantity,
@@ -326,6 +336,16 @@ export class StockInputService {
 
 					if (quantity <= 0) {
 						throw new BadRequestException('Los productos no pueden estar en 0');
+					}
+
+					if (!product) {
+						throw new BadRequestException('Uno de los productos no existe');
+					}
+
+					if (product?.status !== 'active') {
+						throw new BadRequestException(
+							`El producto ${product?.barcode} no se encuentra activo`,
+						);
 					}
 					newDetails.push({
 						product,

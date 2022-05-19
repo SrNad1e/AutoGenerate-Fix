@@ -1176,6 +1176,9 @@ input FiltersProductInput {
   """talla del producto"""
   size: String
 
+  """Estado del producto"""
+  status: String
+
   """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
 }

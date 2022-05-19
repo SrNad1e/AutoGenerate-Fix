@@ -189,6 +189,17 @@ export class StockAdjustmentService {
 				productId,
 				warehouseId,
 			);
+
+			if (!product) {
+				throw new BadRequestException('Uno de los productos no existe');
+			}
+
+			if (product?.status !== 'active') {
+				throw new BadRequestException(
+					`El producto ${product?.barcode} no se encuentra activo`,
+				);
+			}
+
 			detailsAdjustment.push({
 				product,
 				quantity,
@@ -343,6 +354,15 @@ export class StockAdjustmentService {
 						productId,
 						stockAdjustment.warehouse._id.toString(),
 					);
+					if (!product) {
+						throw new BadRequestException('Uno de los productos no existe');
+					}
+
+					if (product?.status !== 'active') {
+						throw new BadRequestException(
+							`El producto ${product?.barcode} no se encuentra activo`,
+						);
+					}
 					newDetails.push({
 						product,
 						quantity,

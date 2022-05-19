@@ -218,6 +218,16 @@ export class StockRequestService {
 					quantity,
 					warehouseOriginId.toString(),
 				);
+				if (!product) {
+					throw new BadRequestException('Uno de los productos no existe');
+				}
+
+				if (product?.status !== 'active') {
+					throw new BadRequestException(
+						`El producto ${product?.barcode} no se encuentra activo`,
+					);
+				}
+
 				detailsRequest.push({
 					product,
 					quantity: quantity,
@@ -344,6 +354,16 @@ export class StockRequestService {
 							quantity,
 							stockRequest.warehouseOrigin._id.toString(),
 						);
+
+						if (!product) {
+							throw new BadRequestException('Uno de los productos no existe');
+						}
+
+						if (product?.status !== 'active') {
+							throw new BadRequestException(
+								`El producto ${product?.barcode} no se encuentra activo`,
+							);
+						}
 
 						newDetails.push({
 							product,
