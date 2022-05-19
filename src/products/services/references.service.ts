@@ -252,7 +252,7 @@ export class ReferencesService {
 
 		const attribs = [];
 
-		for (let i = 0; i < attribIds.length; i++) {
+		for (let i = 0; i < attribIds?.length; i++) {
 			const attribId = attribIds[i];
 			const attrib = await this.attribsService.findById(attribId);
 			if (!attrib) {
@@ -282,7 +282,7 @@ export class ReferencesService {
 		});
 		const responseReference = await reference.save();
 
-		if (responseReference && combinations.length > 0) {
+		if (responseReference && combinations?.length > 0) {
 			const warehouses = await this.warehousesService.getAll();
 
 			const stock = warehouses.map((warehouse) => ({
@@ -295,7 +295,7 @@ export class ReferencesService {
 
 			const products = await this.productModel.paginate({}, { limit: 0 });
 
-			for (let i = 0; i < combinations.length; i++) {
+			for (let i = 0; i < combinations?.length; i++) {
 				const { colorId, sizeId, imageIds } = combinations[i];
 				const color = await this.colorsService.findById(colorId);
 				if (!color) {
@@ -426,7 +426,7 @@ export class ReferencesService {
 
 		const attribs: any = [];
 		if (attribIds) {
-			for (let i = 0; i < attribIds.length; i++) {
+			for (let i = 0; i < attribIds?.length; i++) {
 				const attribId = attribIds[i];
 
 				const attrib = await this.attribsService.findById(attribId);

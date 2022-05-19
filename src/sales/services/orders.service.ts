@@ -77,6 +77,7 @@ export class OrdersService {
 					_id: -1,
 				})
 				.lean();
+			console.log(companyId);
 
 			if (lastOrder) {
 				number = lastOrder.number + 1;
@@ -85,6 +86,7 @@ export class OrdersService {
 				customer,
 				shop,
 				number,
+				company: new Types.ObjectId(companyId),
 				user,
 				pointOfSale: user.pointOfSale._id,
 			});

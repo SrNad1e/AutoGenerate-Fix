@@ -112,7 +112,7 @@ export class ProductsService {
 				companyId,
 			);
 
-			if (references.totalDocs > 0) {
+			if (references?.totalDocs > 0) {
 				filters.reference = {
 					$in: references.docs.map((item) => item._id),
 				};
@@ -380,7 +380,9 @@ export class ProductsService {
 		try {
 			const productsMysql = await this.productRepo.find();
 			const warehouses = await this.warehousesService.findAll(
-				{},
+				{
+					limit: 100,
+				},
 				{
 					username: 'admin',
 				},
@@ -398,7 +400,7 @@ export class ProductsService {
 				username: 'admin',
 			});
 
-			for (let i = 0; i < productsMysql.length; i++) {
+			for (let i = 0; i < productsMysql?.length; i++) {
 				const product = productsMysql[i];
 				const color = await this.colorsService.getByIdMysql(product.color_id);
 				const size = await this.sizesService.getByIdMysql(product.size_id);
@@ -439,9 +441,9 @@ export class ProductsService {
 							height: parseFloat(product.shipping_height?.toString() || '0'),
 							volume: parseFloat(product.shipping_volume?.toString() || '0'),
 							brandId: brand._id.toString(),
-							categoryLevel1Id: '6272c1764ff755e555d5f1ea',
-							categoryLevel2Id: '6272c18c4ff755e555d5f1f3',
-							categoryLevel3Id: '6272c1944ff755e555d5f201',
+							categoryLevel1Id: '6286361d8a91abf6053e6e27',
+							categoryLevel2Id: '628636888a91abf6053e6e28',
+							categoryLevel3Id: '628636b78a91abf6053e6e29',
 							attribIds: [],
 						},
 						userDefault,
@@ -457,28 +459,30 @@ export class ProductsService {
 
 				const images = [];
 
-				for (let i = 0; i < imagesMysql.length; i++) {
-					const { imageSizes, alt } = imagesMysql[i];
-					const { webp, jpg } = imageSizes;
-					const newImage = new this.imageModel({
-						name: alt,
-						user: userDefault,
-						urls: {
-							webp: {
-								small: webp?.S150x217.split('/')[7],
-								medium: webp?.S200x289.split('/')[7],
-								big: webp?.S900x1300.split('/')[7],
+				if (imagesMysql) {
+					for (let i = 0; i < imagesMysql?.length; i++) {
+						const { imageSizes, alt } = imagesMysql[i];
+						const { webp, jpg } = imageSizes;
+						const newImage = new this.imageModel({
+							name: alt,
+							user: userDefault,
+							urls: {
+								webp: {
+									small: webp?.S150x217.split('/')[7],
+									medium: webp?.S200x289.split('/')[7],
+									big: webp?.S900x1300.split('/')[7],
+								},
+								jpeg: {
+									small: jpg?.S150x217.split('/')[7],
+									medium: jpg?.S200x289.split('/')[7],
+									big: jpg?.S900x1300.split('/')[7],
+								},
+								original: jpg?.S400x578.split('/')[7],
 							},
-							jpeg: {
-								small: jpg?.S150x217.split('/')[7],
-								medium: jpg?.S200x289.split('/')[7],
-								big: jpg?.S900x1300.split('/')[7],
-							},
-							original: jpg?.S400x578.split('/')[7],
-						},
-					});
-					const { _id } = await newImage.save();
-					images.push(_id);
+						});
+						const { _id } = await newImage.save();
+						images.push(_id);
+					}
 				}
 
 				productsMongo.push({
