@@ -326,7 +326,7 @@ export class StockInputService {
 				if (action === 'create') {
 					if (productFind) {
 						throw new BadRequestException(
-							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
+							`El producto ${productFind.product.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
 					const product = await this.productsService.findById(

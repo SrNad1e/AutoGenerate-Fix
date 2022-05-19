@@ -339,7 +339,7 @@ export class StockRequestService {
 						);
 						if (productFind) {
 							throw new BadRequestException(
-								`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
+								`El producto ${productFind.product.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
 							);
 						}
 
