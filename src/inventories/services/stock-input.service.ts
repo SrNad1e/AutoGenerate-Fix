@@ -80,8 +80,9 @@ export class StockInputService {
 		const filters: FilterQuery<StockInput> = {};
 
 		if (user.username !== 'admin') {
-			filters.company = companyId;
+			filters.company = new Types.ObjectId(companyId);
 		}
+
 		if (number) {
 			filters.number = number;
 		}
@@ -257,6 +258,9 @@ export class StockInputService {
 		companyId: string,
 	) {
 		const stockInput = await this.stockInputModel.findById(id).lean();
+		if (!stockInput) {
+			throw new NotFoundException('La entrada no existe');
+		}
 
 		if (
 			user.username !== 'admin' &&

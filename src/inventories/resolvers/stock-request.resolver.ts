@@ -28,7 +28,11 @@ export class StockRequestResolver {
 		_: FiltersStockRequestsInput,
 		@Context() context,
 	) {
-		return this.stockRequestService.findAll(context.req.body.variables.input);
+		return this.stockRequestService.findAll(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Query(() => StockRequest, {
@@ -58,6 +62,7 @@ export class StockRequestResolver {
 		return this.stockRequestService.create(
 			context.req.body.variables.input,
 			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -79,6 +84,7 @@ export class StockRequestResolver {
 			id,
 			context.req.body.variables.input,
 			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -92,6 +98,10 @@ export class StockRequestResolver {
 		shopId: string,
 		@Context() context,
 	) {
-		return this.stockRequestService.autogenerate(shopId, context.req.user.user);
+		return this.stockRequestService.autogenerate(
+			shopId,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 }

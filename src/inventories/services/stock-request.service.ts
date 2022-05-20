@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -55,19 +56,27 @@ export class StockRequestService {
 		private readonly productsService: ProductsService,
 	) {}
 
-	async findAll({
-		limit = 20,
-		page = 1,
-		number,
-		sort,
-		status,
-		warehouseDestinationId,
-		warehouseOriginId,
-		dateFinal,
-		dateInitial,
-	}: FiltersStockRequestsInput) {
+	async findAll(
+		{
+			limit = 20,
+			page = 1,
+			number,
+			sort,
+			status,
+			warehouseDestinationId,
+			warehouseOriginId,
+			dateFinal,
+			dateInitial,
+		}: FiltersStockRequestsInput,
+		user: Partial<User>,
+		companyId: string,
+	) {
 		const filters: FilterQuery<StockRequest> = {};
 		try {
+			if (user.username !== 'admin') {
+				filters.company = new Types.ObjectId(companyId);
+			}
+
 			if (number) {
 				filters.number = number;
 			}
@@ -163,102 +172,115 @@ export class StockRequestService {
 			...options
 		}: CreateStockRequestInput,
 		user: User,
+		companyId: string,
 	): Promise<StockRequest> {
-		try {
-			if (!(details?.length > 0)) {
-				throw new BadRequestException('La solicitud no puede estar vacía');
+		if (!(details?.length > 0)) {
+			throw new BadRequestException('La solicitud no puede estar vacía');
+		}
+
+		if (options.status) {
+			if (!['open', 'cancelled', 'used', 'pending'].includes(options.status)) {
+				throw new BadRequestException(
+					`Es estado ${options.status} no es un estado válido`,
+				);
+			}
+			if (['cancelled', 'used'].includes(options.status)) {
+				throw new BadRequestException(
+					'La solicitud no puede ser creada, valide el estado de la solicitud',
+				);
+			}
+		}
+
+		const warehouseOrigin = await this.warehousesService.findById(
+			warehouseOriginId.toString(),
+		);
+
+		const warehouseDestination = await this.warehousesService.findById(
+			warehouseDestinationId.toString(),
+		);
+
+		if (!warehouseOrigin?.active) {
+			throw new BadRequestException(
+				'La bodega de origen no existe o se encuentra inactiva',
+			);
+		}
+
+		if (!warehouseDestination?.active) {
+			throw new BadRequestException(
+				'La bodega de destino no existe o se encuentra inactiva',
+			);
+		}
+
+		const detailsRequest = [];
+
+		for (let i = 0; i < details.length; i++) {
+			const { quantity, productId } = details[i];
+
+			if (quantity <= 0) {
+				throw new BadRequestException('Los productos no pueden estar en 0');
 			}
 
-			if (options.status) {
-				if (
-					!['open', 'cancelled', 'used', 'pending'].includes(options.status)
-				) {
-					throw new BadRequestException(
-						`Es estado ${options.status} no es un estado válido`,
-					);
-				}
-				if (['cancelled', 'used'].includes(options.status)) {
-					throw new BadRequestException(
-						'La solicitud no puede ser creada, valide el estado de la solicitud',
-					);
-				}
-			}
-
-			const warehouseOrigin = await this.warehousesService.findById(
+			const product = await this.productsService.validateStock(
+				productId,
+				quantity,
 				warehouseOriginId.toString(),
 			);
+			if (!product) {
+				throw new BadRequestException('Uno de los productos no existe');
+			}
 
-			const warehouseDestination = await this.warehousesService.findById(
-				warehouseDestinationId.toString(),
-			);
-
-			if (!warehouseOrigin?.active) {
+			if (product?.status !== 'active') {
 				throw new BadRequestException(
-					'La bodega de origen no existe o se encuentra inactiva',
+					`El producto ${product?.barcode} no se encuentra activo`,
 				);
 			}
 
-			if (!warehouseDestination?.active) {
-				throw new BadRequestException(
-					'La bodega de destino no existe o se encuentra inactiva',
-				);
-			}
-
-			const detailsRequest = [];
-
-			for (let i = 0; i < details.length; i++) {
-				const { quantity, productId } = details[i];
-
-				if (quantity <= 0) {
-					throw new BadRequestException('Los productos no pueden estar en 0');
-				}
-
-				const product = await this.productsService.validateStock(
-					productId,
-					quantity,
-					warehouseOriginId.toString(),
-				);
-				if (!product) {
-					throw new BadRequestException('Uno de los productos no existe');
-				}
-
-				if (product?.status !== 'active') {
-					throw new BadRequestException(
-						`El producto ${product?.barcode} no se encuentra activo`,
-					);
-				}
-
-				detailsRequest.push({
-					product,
-					quantity: quantity,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				});
-			}
-
-			const newStockRequest = new this.stockRequestModel({
-				warehouseOrigin,
-				warehouseDestination,
-				details: detailsRequest,
-				user,
-				...options,
+			detailsRequest.push({
+				product,
+				quantity: quantity,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			});
-			return (await newStockRequest.save()).populate(populate);
-		} catch (error) {
-			return error;
 		}
+
+		const stockRequest = await this.stockRequestModel
+			.findOne({ 'company._id': new Types.ObjectId(companyId) })
+			.sort({ _id: -1 });
+
+		const newStockRequest = new this.stockRequestModel({
+			warehouseOrigin,
+			warehouseDestination,
+			details: detailsRequest,
+			company: user.companies.find(
+				(company) => company._id.toString() === companyId,
+			),
+			number: (stockRequest?.number || 0) + 1,
+			user,
+			...options,
+		});
+		return (await newStockRequest.save()).populate(populate);
 	}
 
 	async update(
 		id: string,
 		{ details, ...options }: UpdateStockRequestInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		try {
 			const stockRequest = await this.stockRequestModel.findById(id).lean();
 
 			if (!stockRequest) {
 				throw new NotFoundException('La solicitud no existe');
+			}
+
+			if (
+				user.username !== 'admin' &&
+				stockRequest.company._id.toString() !== companyId
+			) {
+				throw new UnauthorizedException(
+					`El usuario no se encuentra autorizado para hacer cambios en la solicitud`,
+				);
 			}
 
 			if (options.status) {
@@ -440,8 +462,6 @@ export class StockRequestService {
 		requests: string[];
 		status: string;
 	}) {
-		//validar antes de actualizar
-
 		return this.stockRequestModel.updateMany(
 			{ _id: { $in: requests } },
 			{
@@ -450,7 +470,7 @@ export class StockRequestService {
 		);
 	}
 
-	async autogenerate(shopId: string, user: User) {
+	async autogenerate(shopId: string, user: User, companyId: string) {
 		const shop = await this.shopsService.findById(shopId);
 
 		if (!shop) {
@@ -519,6 +539,7 @@ export class StockRequestService {
 				details,
 			},
 			user,
+			companyId,
 		);
 	}
 }

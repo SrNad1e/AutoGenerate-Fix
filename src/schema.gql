@@ -3458,6 +3458,9 @@ type StockRequest {
   """Usuario que crea la solicitud"""
   code: String @deprecated(reason: "Migración mysql")
 
+  """Compañía a la que pertence la solicitud"""
+  company: Company!
+
   """Fecha de creación de la solicitud"""
   createdAt: DateTime!
 
@@ -3490,6 +3493,9 @@ type StockRequest {
 type StockTransfer {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañía a la que pertence el traslado"""
+  company: Company!
 
   """Fecha de creación del traslado"""
   createdAt: DateTime!

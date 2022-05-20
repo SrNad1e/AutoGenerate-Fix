@@ -29,7 +29,11 @@ export class StockTransferResolver {
 		_: FiltersStockTransfersInput,
 		@Context() context,
 	) {
-		return this.stockTransferService.findAll(context.req.body.variables.input);
+		return this.stockTransferService.findAll(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 
 	@Query(() => StockTransfer, {
@@ -57,8 +61,8 @@ export class StockTransferResolver {
 	) {
 		return this.stockTransferService.create(
 			context.req.body.variables.input,
-			context.req.user,
-			context.req.companyId,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -79,8 +83,8 @@ export class StockTransferResolver {
 		return this.stockTransferService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
-			context.req.companyId,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }
