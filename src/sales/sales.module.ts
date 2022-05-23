@@ -20,6 +20,10 @@ import {
 } from './entities/authorization.entity';
 import { PointOfSalesService } from './services/point-of-sales.service';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import {
+	ReturnInvoice,
+	ReturnInvoiceSchema,
+} from './entities/return-invoice.entity';
 
 @Module({
 	imports: [
@@ -40,17 +44,19 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 			},
 			{
 				name: Invoice.name,
-				useFactory: async (connection: Connection) => {
+				useFactory: async () => {
 					const schema = InvoiceSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'invoice_increment',
-						inc_field: 'number',
-						//	start_seq: 1888,
-					});
+					schema.index({ number: 1, authorization: -1 }, { unique: true });
 					return schema;
 				},
-				inject: [getConnectionToken('')],
+			},
+			{
+				name: ReturnInvoice.name,
+				useFactory: async () => {
+					const schema = ReturnInvoiceSchema;
+					schema.index({ number: 1, authorization: -1 }, { unique: true });
+					return schema;
+				},
 			},
 		]),
 		MongooseModule.forFeature([

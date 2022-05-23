@@ -828,6 +828,18 @@ type DetailRequest {
   updatedAt: DateTime!
 }
 
+"""Productos de la devolucion"""
+type DetailReturnInvoice {
+  """Precio del producto en la factura"""
+  price: Float!
+
+  """Producto agregado a la factura"""
+  product: Product!
+
+  """Cantidad de productos en la factura"""
+  quantity: Float!
+}
+
 """Productos del ajuste de productos"""
 input DetailStockAdjustmentCreateInput {
   """Identificador de mongo del producto"""
