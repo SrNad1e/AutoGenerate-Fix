@@ -28,7 +28,7 @@ class DetailTransfer {
 	quantityConfirmed?: number;
 
 	@Field(() => String, {
-		description: 'Estado del producto (confirmed, new)',
+		description: 'Estado del producto (confirmed, new, sent)',
 	})
 	status: string;
 
