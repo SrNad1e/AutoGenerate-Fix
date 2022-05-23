@@ -74,7 +74,7 @@ export class StockRequestService {
 		const filters: FilterQuery<StockRequest> = {};
 		try {
 			if (user.username !== 'admin') {
-				filters.company = new Types.ObjectId(companyId);
+				filters['company._id'] = new Types.ObjectId(companyId);
 			}
 
 			if (number) {

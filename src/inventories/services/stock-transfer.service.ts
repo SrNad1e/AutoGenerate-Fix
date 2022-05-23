@@ -91,7 +91,7 @@ export class StockTransferService {
 
 		try {
 			if (user.username !== 'admin') {
-				filters.company = new Types.ObjectId(companyId);
+				filters['company._id'] = new Types.ObjectId(companyId);
 			}
 
 			if (number) {
@@ -415,7 +415,13 @@ export class StockTransferService {
 			const response = await this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, observationOrigin, ...options, user },
+					$set: {
+						details: newDetails,
+						requests: requests?.map((request) => new Types.ObjectId(request)),
+						observationOrigin,
+						...options,
+						user,
+					},
 				},
 				{
 					new: true,
