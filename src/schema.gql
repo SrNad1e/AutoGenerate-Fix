@@ -362,6 +362,12 @@ type Company {
   user: User!
 }
 
+"""Datos para confirmar los productos del traslado"""
+input ConfirmStockTransferInput {
+  """Productos para confirmar"""
+  details: [DetailConfirmStockTransferInput!]!
+}
+
 """Modelo para la transportadora"""
 type Conveyor {
   """Identificador de mongo"""
@@ -727,6 +733,18 @@ type DetailAdjustment {
   updatedAt: DateTime!
 }
 
+"""Producto a confirmar en el traslado"""
+input DetailConfirmStockTransferInput {
+  """Acción a efectuar con el producto (delete, update, create)"""
+  action: String!
+
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
 """Detalle de la salida de productos"""
 type DetailInput {
   """Fecha de agregado del deltalle a la entrada"""
@@ -929,7 +947,7 @@ type DetailTransfer {
   """Cantidad del productos confirmados en el traslado"""
   quantityConfirmed: Float
 
-  """Estado del producto (confirmed, new)"""
+  """Estado del producto (confirmed, new, sent)"""
   status: String!
 
   """Fecha de actualizacion el producto"""
@@ -1581,6 +1599,15 @@ type Mutation {
     """Productos y pedido para actualizar"""
     addProductsOrderInput: AddProductsOrderInput!
   ): Order!
+
+  """Confirma los productos del traslado"""
+  confirmProductsStockTransfer(
+    """Datos para confirmar los productos del traslado"""
+    confirmStockTransferInput: ConfirmStockTransferInput!
+
+    """Identificador del traslado de productos"""
+    id: String!
+  ): StockTransfer!
 
   """Crea un atributo"""
   createAttrib(
@@ -3458,6 +3485,9 @@ type StockRequest {
   """Usuario que crea la solicitud"""
   code: String @deprecated(reason: "Migración mysql")
 
+  """Compañía a la que pertence la solicitud"""
+  company: Company!
+
   """Fecha de creación de la solicitud"""
   createdAt: DateTime!
 
@@ -3490,6 +3520,9 @@ type StockRequest {
 type StockTransfer {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañía a la que pertence el traslado"""
+  company: Company!
 
   """Fecha de creación del traslado"""
   createdAt: DateTime!

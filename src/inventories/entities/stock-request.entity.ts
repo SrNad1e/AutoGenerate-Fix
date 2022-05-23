@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -40,6 +41,12 @@ export class StockRequest extends Document {
 	})
 	@Prop({ type: String, default: 'open' })
 	status: string;
+
+	@Field(() => Company, {
+		description: 'Compañía a la que pertence la solicitud',
+	})
+	@Prop({ type: Object, required: true })
+	company: Company;
 
 	@Field(() => Warehouse, {
 		description: 'Bodega de origen de la solicitud',
