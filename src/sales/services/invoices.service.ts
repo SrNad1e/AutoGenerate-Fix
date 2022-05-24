@@ -76,6 +76,7 @@ export class InvoicesService {
 	async create(
 		{ customerId, details, payments }: CreateInvoiceInput,
 		user: User,
+		companyId: string,
 	) {
 		if (!user.pointOfSale) {
 			throw new BadRequestException(
@@ -161,6 +162,7 @@ export class InvoicesService {
 		const newInvoice = new this.invoiceModel({
 			authorization: { ...pointOfSale?.authorization },
 			customer,
+			company: new Types.ObjectId(companyId),
 			shop: user.shop,
 			payments: newPayments,
 			summary,

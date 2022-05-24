@@ -241,6 +241,7 @@ export class OrdersService {
 						})),
 					},
 					user,
+					companyId,
 				);
 				invoice = result._id;
 			}

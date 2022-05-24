@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 
 import { Customer } from 'src/crm/entities/customer.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -76,6 +77,16 @@ export class Invoice extends Document {
 		required: true,
 	})
 	customer: Customer;
+
+	@Field(() => Company, {
+		description: 'Empresa a la que perteneces la factura',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: Company.name,
+		autopopulate: true,
+	})
+	company: Types.ObjectId;
 
 	@Field(() => Shop, { description: 'Tienda donde se realiza la factura' })
 	@Prop({

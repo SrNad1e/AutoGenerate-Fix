@@ -1592,6 +1592,9 @@ type Invoice {
   """Autorización de facturación"""
   authorization: AuthorizationDian!
 
+  """Empresa a la que perteneces la factura"""
+  company: Company!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
