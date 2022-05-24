@@ -264,4 +264,8 @@
 		}
 	]
 	//ELIMINAR INDEX CODE EN ORDERS
+	//AGREGAR CAMPO ACTIVE EN LAS FACTURAS
+	//AGREGAR AUTORIZACION A LAS FACTURAS
+	//CAMBIAR EL IDENTIFICATION CON DOCUMENT db.invoices.update({}, {$rename:{"customer.identification":"customer.document"}}, false, true);
+	//AGREGA EL TIPO DE DOCUMENTO
 }
