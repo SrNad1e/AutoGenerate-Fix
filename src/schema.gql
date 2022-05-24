@@ -1285,6 +1285,27 @@ input FiltersReferencesInput {
   sort: SortReference
 }
 
+"""Filtros de listado de clientes"""
+input FiltersReturnsInvoiceInput {
+  """Si la devolucion de encuentra se encuentra activ<"""
+  active: Boolean
+
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortReturnInovice
+}
+
 """Filtros para la lista de tallas"""
 input FiltersSizesInput {
   """Identificador de la talla"""
@@ -2164,6 +2185,12 @@ type Query {
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!
 
+  """Lista de devoluciones de factura"""
+  returnsInvoice(
+    """Filtros de lista de devoluciones de factura"""
+    filtersReturnsInvoice: FiltersReturnsInvoiceInput = {}
+  ): ResponseReturnsInvoice!
+
   """Listar las tallas"""
   sizes(
     """Filtros para consultar las tallas"""
@@ -2726,6 +2753,39 @@ type ResponseReferences {
   totalPages: Float!
 }
 
+"""Lista de devoluciones de factura"""
+type ResponseReturnsInvoice {
+  """Lista de ajustes"""
+  docs: [ReturnInvoice!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de las tallas"""
 type ResponseSizes {
   """Lista de tallas"""
@@ -2955,6 +3015,42 @@ type ResponseWarehouses {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Devoluciones de facturación"""
+type ReturnInvoice {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Autorización"""
+  authorization: AuthorizationDian!
+
+  """Compañía a la que pertence el ajuste"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Productos de la devolución"""
+  details: [DetailReturnInvoice!]
+
+  """Factura de la devolución"""
+  invoice: Invoice!
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la factrura"""
+  user: User!
+
+  """Bodega del ajuste"""
+  warehouse: Warehouse!
 }
 
 """Rol del usuario """
@@ -3230,6 +3326,15 @@ input SortReference {
   description: Float
   name: Float
   price: Float
+}
+
+"""Ordenamiento de las devoluciones en factura"""
+input SortReturnInovice {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
 }
 
 """Ordenamiento para el listado de tallas"""

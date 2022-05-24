@@ -24,6 +24,8 @@ import {
 	ReturnInvoice,
 	ReturnInvoiceSchema,
 } from './entities/return-invoice.entity';
+import { ReturnsInvoiceService } from './services/returns-invoice.service';
+import { ReturnsInvoiceResolver } from './resolvers/returns-invoice.resolver';
 
 @Module({
 	imports: [
@@ -75,6 +77,8 @@ import {
 		OrdersResolver,
 		InvoicesService,
 		PointOfSalesService,
+		ReturnsInvoiceService,
+		ReturnsInvoiceResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
