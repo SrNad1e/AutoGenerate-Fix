@@ -7,6 +7,7 @@ import { PaymentsResolver } from './resolvers/payments.resolver';
 import { Box, BoxSchema } from './entities/box.entity';
 import { Expense, ExpenseSchema } from './entities/expense.entity';
 import { Receipt, ReceiptSchema } from './entities/receipt.entity';
+import { ReceiptsService } from './services/receipts.service';
 
 @Module({
 	imports: [
@@ -43,7 +44,7 @@ import { Receipt, ReceiptSchema } from './entities/receipt.entity';
 			},
 		]),
 	],
-	providers: [PaymentsService, PaymentsResolver],
-	exports: [PaymentsService],
+	providers: [PaymentsService, PaymentsResolver, ReceiptsService],
+	exports: [PaymentsService, ReceiptsService],
 })
 export class TreasuryModule {}
