@@ -26,6 +26,7 @@ import {
 } from './entities/return-invoice.entity';
 import { ReturnsInvoiceService } from './services/returns-invoice.service';
 import { ReturnsInvoiceResolver } from './resolvers/returns-invoice.resolver';
+import { InvoicesResolver } from './resolvers/invoices.resolver';
 
 @Module({
 	imports: [
@@ -79,6 +80,7 @@ import { ReturnsInvoiceResolver } from './resolvers/returns-invoice.resolver';
 		PointOfSalesService,
 		ReturnsInvoiceService,
 		ReturnsInvoiceResolver,
+		InvoicesResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })

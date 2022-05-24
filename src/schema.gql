@@ -1166,6 +1166,27 @@ input FiltersImagesInput {
   sort: SortImage
 }
 
+"""Filtros del listado de facturas"""
+input FiltersInvoicesInput {
+  """Si la factura de encuentra se encuentra activa"""
+  active: Boolean
+
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortInovice
+}
+
 """Filtros para obtener el listado de tipos de medios de pago"""
 input FiltersPaymentsInput {
   """Estado del tipo de los médios de pago"""
@@ -1285,7 +1306,7 @@ input FiltersReferencesInput {
   sort: SortReference
 }
 
-"""Filtros de listado de clientes"""
+"""Filtros de listado de devoluciones de facturación"""
 input FiltersReturnsInvoiceInput {
   """Si la devolucion de encuentra se encuentra activ<"""
   active: Boolean
@@ -2140,6 +2161,12 @@ type Query {
     filtersImagesInput: FiltersImagesInput = {}
   ): ResponseImages!
 
+  """Lista de facturas"""
+  invoices(
+    """Filtros de lista de facturas"""
+    filtersInvoices: FiltersInvoicesInput = {}
+  ): ResponseInvoices!
+
   """Obtiene la orden por el id"""
   orderId(
     """identificador del pedido"""
@@ -2625,6 +2652,39 @@ type ResponseCustomers {
 type ResponseImages {
   """Lista de imagenes"""
   docs: [Image!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de facturas"""
+type ResponseInvoices {
+  """Lista de facturas"""
+  docs: [Invoice!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3297,6 +3357,15 @@ input SortCustomer {
 """Ordenamiento para el listado de imagenes"""
 input SortImage {
   name: Float
+}
+
+"""Ordenamiento de facturas"""
+input SortInovice {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
 }
 
 """Ordenamiento de la teinda"""
