@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Company } from 'src/configurations/entities/company.entity';
+import { User } from 'src/users/entities/user.entity';
 
 import { Box } from './box.entity';
 
@@ -39,9 +40,18 @@ export class BoxHistory extends Document {
 	@Prop({ type: String })
 	documentType: string;
 
-	@Field(() => Number, { description: 'Número consecutivo del documento' })
-	@Prop({ type: Number })
-	documentNumber: number;
+	@Field(() => String, {
+		description: 'documento que realiza el movimiento',
+		nullable: true,
+	})
+	@Prop({ type: Types.ObjectId })
+	documentId: Types.ObjectId;
+
+	@Field(() => User, {
+		description: 'Usuario que creó o editó el movimiento',
+	})
+	@Prop({ type: Object, required: true })
+	user: User;
 
 	@Field(() => Date, { description: 'Fecha de creación del movimiento' })
 	createdAt: Date;

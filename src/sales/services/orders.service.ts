@@ -13,6 +13,7 @@ import { StockHistoryService } from 'src/inventories/services/stock-history.serv
 import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { User } from 'src/users/entities/user.entity';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
@@ -20,7 +21,7 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
-import { InvoicesService } from './invoices.service';
+import { ReturnsInvoiceService } from './returns-invoice.service';
 
 const populate = [
 	{
@@ -47,7 +48,7 @@ export class OrdersService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
-		private readonly invoicesService: InvoicesService,
+		private readonly receiptsService: ReceiptsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly conveyorsService: ConveyorsService,
 	) {}
@@ -186,7 +187,6 @@ export class OrdersService {
 				dataUpdate['details'] = newDetails;
 			}
 		}
-		let invoice;
 
 		if (status) {
 			if (!statuTypes.includes(status)) {
@@ -216,34 +216,42 @@ export class OrdersService {
 						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
-				case 'calcelled' || 'closed':
+				case 'cancelled' || 'closed':
 					throw new BadRequestException('El pedido se encuentra finalizado');
 				default:
 					break;
 			}
 
-			if (
-				(order.status === 'open' && status === 'closed') ||
-				status === 'invoiced'
-			) {
-				const result = await this.invoicesService.create(
-					{
-						customerId: customerId || order?.customer?._id.toString(),
-						details: order.details.map((item) => ({
-							productId: item.product._id.toString(),
-							quantity: item.quantity,
-							price: item.price,
-							discount: item.discount,
-						})),
-						payments: order.payments.map((item) => ({
-							paymentId: item.payment._id.toString(),
-							total: item.total,
-						})),
-					},
-					user,
-					companyId,
-				);
-				invoice = result._id;
+			const payments = [];
+
+			if (order.status === 'open' && status === 'closed') {
+				for (let i = 0; i < order?.payments?.length; i++) {
+					const { total, payment } = order?.payments[i];
+
+					const valuesReceipt = {
+						value: total,
+						paymentId: payment?._id?.toString(),
+						concept: `Abono a pedido ${order?.number}`,
+						boxId:
+							payment?.type === 'cash'
+								? order?.pointOfSale['box'].toString()
+								: undefined,
+					};
+
+					const receipt = await this.receiptsService.create(
+						valuesReceipt,
+						user,
+						companyId,
+					);
+
+					payments.push({
+						...order?.payments[i],
+						receipt: receipt?._id,
+					});
+				}
+			}
+			if (payments.length > 0) {
+				dataUpdate['payments'] = payments;
 			}
 
 			dataUpdate['status'] = status;
@@ -277,7 +285,7 @@ export class OrdersService {
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
-				$set: { ...dataUpdate, user, invoice, conveyor },
+				$set: { ...dataUpdate, user, conveyor },
 			},
 			{
 				populate,

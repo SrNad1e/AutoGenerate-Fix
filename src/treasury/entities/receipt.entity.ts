@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Payment } from './payment.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Egreso de dinero' })
@@ -17,20 +18,28 @@ export class Receipt extends Document {
 
 	@Field(() => Number, { description: 'Valor del recibo de caja' })
 	@Prop({ type: Number, default: 0 })
-	valor: number;
+	value: number;
 
 	@Field(() => String, {
-		description: 'Observación del recibo de caja',
+		description: 'Concepto del recibo de caja',
 		nullable: true,
 	})
 	@Prop({ type: String })
-	observation: string;
+	concept: string;
 
 	@Field(() => String, {
 		description: 'Estado del recibo de caja',
 	})
 	@Prop({ type: String, default: 'active' })
 	status: string;
+
+	@Field(() => Payment, {
+		description: 'Método de pago del recibo de caja',
+	})
+	@Prop({
+		type: Object,
+	})
+	payment: Payment;
 
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece el recibo de caja',

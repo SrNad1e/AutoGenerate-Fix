@@ -8,6 +8,9 @@ import { Box, BoxSchema } from './entities/box.entity';
 import { Expense, ExpenseSchema } from './entities/expense.entity';
 import { Receipt, ReceiptSchema } from './entities/receipt.entity';
 import { ReceiptsService } from './services/receipts.service';
+import { BoxHistoryService } from './services/box-history.service';
+import { BoxHistory, BoxHistorySchema } from './entities/box-history.entity';
+import { BoxService } from './services/box.service';
 
 @Module({
 	imports: [
@@ -42,9 +45,19 @@ import { ReceiptsService } from './services/receipts.service';
 				name: Payment.name,
 				schema: PaymentSchema,
 			},
+			{
+				name: BoxHistory.name,
+				schema: BoxHistorySchema,
+			},
 		]),
 	],
-	providers: [PaymentsService, PaymentsResolver, ReceiptsService],
+	providers: [
+		PaymentsService,
+		PaymentsResolver,
+		ReceiptsService,
+		BoxHistoryService,
+		BoxService,
+	],
 	exports: [PaymentsService, ReceiptsService],
 })
 export class TreasuryModule {}

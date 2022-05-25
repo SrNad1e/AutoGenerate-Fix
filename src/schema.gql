@@ -149,6 +149,36 @@ type AuthorizationDian {
   prefix: String!
 }
 
+"""Caja donde se deposita el dinero"""
+type Box {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Base de la caja"""
+  base: Float!
+
+  """Empresa a la que perteneces la caja"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Caja principal de la empresa"""
+  isMain: Boolean!
+
+  """Nombre de la caja"""
+  name: String!
+
+  """Total de dinero en la caja sin contar la base"""
+  total: Float!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la caja"""
+  user: User!
+}
+
 """Marca del producto"""
 type Brand {
   """Identificador de mongo"""
@@ -2001,6 +2031,9 @@ type PaymentOrder {
   payment: Payment!
 
   """Total pagado"""
+  receipt: Receipt
+
+  """Total pagado"""
   total: Float!
 
   """Fecha de actualizado del pago al pedido"""
@@ -2047,6 +2080,9 @@ type PointOfSale {
 
   """Tienda a la que pertenece el punto de venta"""
   authorization: AuthorizationDian!
+
+  """Caja del punto de venta"""
+  box: Box!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -2304,6 +2340,39 @@ type Query {
     """Filtros para consultar las bodegas"""
     filtersWarehousesInput: FiltersWarehousesInput = {}
   ): ResponseWarehouses!
+}
+
+"""Egreso de dinero"""
+type Receipt {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Empresa a la que pertenece el recibo de caja"""
+  company: Company!
+
+  """Concepto del recibo de caja"""
+  concept: String
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Consecutivo del recibo de caja"""
+  number: Float!
+
+  """Método de pago del recibo de caja"""
+  payment: Payment!
+
+  """Estado del recibo de caja"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el recibo de caja"""
+  user: User!
+
+  """Valor del recibo de caja"""
+  value: Float!
 }
 
 """Referencia de los productos"""

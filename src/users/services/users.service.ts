@@ -29,13 +29,6 @@ const populate = [
 	{ path: 'pointOfSale', model: PointOfSale.name },
 	{ path: 'companies', model: Company.name },
 	{ path: 'customer', model: Customer.name },
-	/*{
-		path: 'customer',
-		populate: {
-			path: 'customerType',
-			model: CustomerType.name,
-		},
-	},*/
 	{
 		path: 'shop',
 		populate: {
@@ -45,10 +38,12 @@ const populate = [
 	},
 	{
 		path: 'pointOfSale',
-		populate: {
-			path: 'authorization',
-			model: AuthorizationDian.name,
-		},
+		populate: [
+			{
+				path: 'authorization',
+				model: AuthorizationDian.name,
+			},
+		],
 	},
 
 	{
