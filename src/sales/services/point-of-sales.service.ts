@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { Shop } from 'src/shops/entities/shop.entity';
 import { Box } from 'src/treasury/entities/box.entity';
 import { User } from 'src/users/entities/user.entity';
 
@@ -11,6 +12,10 @@ const populate = [
 	{
 		path: 'authorization',
 		model: AuthorizationDian.name,
+	},
+	{
+		path: 'shop',
+		model: Shop.name,
 	},
 	{
 		path: 'box',
@@ -43,6 +48,7 @@ export class PointOfSalesService {
 			limit,
 			page,
 			sort,
+			populate,
 			lean: true,
 		};
 
