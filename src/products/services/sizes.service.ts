@@ -96,10 +96,11 @@ export class SizesService {
 		try {
 			const sizesMysql = await this.sizeRepo.find();
 
-			const sizesMongo = sizesMysql.map((size) => ({
+			const sizesMongo = sizesMysql.map((size, key) => ({
 				value: size.value,
 				active: size.active,
 				id: size.id,
+				weight: key + 1,
 				user: {
 					name: 'Administrador del Sistema',
 					username: 'admin',

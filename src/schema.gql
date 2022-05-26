@@ -609,6 +609,9 @@ input CreateReferenceInput {
 input CreateSizeInput {
   """Valor asignado a la talla"""
   value: String!
+
+  """Posición del ordenamiento"""
+  weight: String!
 }
 
 """Datos para crear el ajuste de productos"""
@@ -3389,6 +3392,9 @@ type Size {
 
   """Valor de la talla"""
   value: String!
+
+  """Peso de la talla para el ordenamiento"""
+  weight: Float!
 }
 
 """Ordenamiento para el listado de atributos"""
@@ -3537,7 +3543,7 @@ input SortSize {
   active: Float
   createdAt: Float
   updatedAt: Float
-  value: Float
+  weight: Float
 }
 
 """Ordenamiento del ajuste de productos"""
@@ -4110,6 +4116,9 @@ input UpdateSizeInput {
 
   """Valor asignado a la talla"""
   value: String
+
+  """Posición del ordenamiento"""
+  weight: Float
 }
 
 """Datos para actualizar el ajuste de productos"""
