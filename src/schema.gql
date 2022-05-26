@@ -1382,6 +1382,27 @@ input FiltersPaymentsInput {
   type: String
 }
 
+"""Filtros para obtener los puntos de venta"""
+input FiltersPointOfSalesInput {
+  """Identificador del punto de venta"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín busqueda del punto de venta"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Tienda a la que pertenecen los puntos de venta"""
+  shopId: String
+
+  """Ordenamiento"""
+  sort: SortPointOfSale
+}
+
 input FiltersProductInput {
   """Identificador de mongo"""
   _id: String
@@ -2431,6 +2452,12 @@ type Query {
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
 
+  """Lista de puntos de venta"""
+  pointOfSales(
+    """Filtros de lista de puntos de venta"""
+    filtersPointOfSales: FiltersPointOfSalesInput = {}
+  ): ResponsePointOfSales!
+
   """Obtiene un producto"""
   product(
     """Filtros para obtener el primer producto de la busqueda"""
@@ -3039,6 +3066,39 @@ type ResponseInvoices {
 type ResponsePayments {
   """Lista de metodos de pago"""
   docs: [Payment!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de puntos de venta"""
+type ResponsePointOfSales {
+  """Lista de puntos de venta"""
+  docs: [PointOfSale!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3746,6 +3806,14 @@ input SortPayment {
   createdAt: Float
   name: Float
   type: Float
+  updatedAt: Float
+}
+
+"""Ordenamiento para el listado de colores"""
+input SortPointOfSale {
+  closeDate: Float
+  createdAt: Float
+  name: Float
   updatedAt: Float
 }
 
