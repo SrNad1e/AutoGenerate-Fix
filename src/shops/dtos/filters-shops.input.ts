@@ -26,6 +26,9 @@ export class SortShop {
 
 @InputType({ description: 'Filtros usados para consultar las tiendas' })
 export class FiltersShopsInput {
+	@Field({ description: 'Identificador de la tienda', nullable: true })
+	_id?: string;
+
 	@Field(() => String, { description: 'Comodín de la tienda', nullable: true })
 	name?: string;
 

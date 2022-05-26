@@ -118,8 +118,6 @@ export class ClosesXInvoingService {
 			user,
 		});
 
-		//falta actualizar el punto de venta
-
 		return (await newClose.save()).populate(populate);
 	}
 }

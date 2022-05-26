@@ -30,6 +30,7 @@ import {
 	CloseXInvoicingSchema,
 } from './entities/close-x-invoicing.entity';
 import { ClosesXInvoingService } from './services/closes-xinvoing.service';
+import { ClosesXinvoicingResolver } from './resolvers/closes-xinvoicing.resolver';
 
 @Module({
 	imports: [
@@ -93,6 +94,7 @@ import { ClosesXInvoingService } from './services/closes-xinvoing.service';
 		ReturnsInvoiceResolver,
 		InvoicesResolver,
 		ClosesXInvoingService,
+		ClosesXinvoicingResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
