@@ -243,7 +243,7 @@ export class StockAdjustmentService {
 				.filter((detail) => detail.product.stock[0].quantity < detail.quantity)
 				.map((detail) => ({
 					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
+					quantity: detail.quantity - detail.product.stock[0].quantity,
 				}));
 
 			const deleteStockHistoryInput: CreateStockHistoryInput = {
