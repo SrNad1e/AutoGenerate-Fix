@@ -506,7 +506,7 @@ export class StockRequestService {
 
 			const product = await this.productsService.findById(
 				detail._id.toString(),
-				shop?.warehouseMain?._id?.toString(),
+				shop?.defaultWarehouse?._id?.toString(),
 			);
 
 			const total = warehouse.min - (detail.stock.quantity || 0);
