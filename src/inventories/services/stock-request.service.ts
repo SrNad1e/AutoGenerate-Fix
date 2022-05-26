@@ -511,18 +511,20 @@ export class StockRequestService {
 
 			const total = warehouse.min - (detail.stock.quantity || 0);
 
-			if (product.stock[0].quantity < total) {
-				if (product.stock[0].quantity > 0) {
+			if (total > 0) {
+				if (product.stock[0].quantity < total) {
+					if (product.stock[0].quantity > 0) {
+						details.push({
+							productId: detail._id.toString(),
+							quantity: product.stock[0].quantity,
+						});
+					}
+				} else {
 					details.push({
 						productId: detail._id.toString(),
-						quantity: product.stock[0].quantity,
+						quantity: total,
 					});
 				}
-			} else {
-				details.push({
-					productId: detail._id.toString(),
-					quantity: total,
-				});
 			}
 		}
 
@@ -531,6 +533,8 @@ export class StockRequestService {
 				'No se encontraron productos para realizar la solicitud',
 			);
 		}
+
+		console.log(details);
 
 		return this.create(
 			{

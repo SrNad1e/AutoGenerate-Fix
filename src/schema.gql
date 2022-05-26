@@ -149,6 +149,36 @@ type AuthorizationDian {
   prefix: String!
 }
 
+"""Caja donde se deposita el dinero"""
+type Box {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Base de la caja"""
+  base: Float!
+
+  """Empresa a la que perteneces la caja"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Caja principal de la empresa"""
+  isMain: Boolean!
+
+  """Nombre de la caja"""
+  name: String!
+
+  """Total de dinero en la caja sin contar la base"""
+  total: Float!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la caja"""
+  user: User!
+}
+
 """Marca del producto"""
 type Brand {
   """Identificador de mongo"""
@@ -168,6 +198,42 @@ type Brand {
 
   """Usuario que crea la marca"""
   user: User!
+}
+
+"""Arqueo de caja"""
+type CashRegister {
+  """Billete o moneda de $ 1.000"""
+  B1000: Float!
+
+  """Billete de $ 2.000"""
+  B2000: Float!
+
+  """Billete de $ 5.000"""
+  B5000: Float!
+
+  """Billete de $ 10.000"""
+  B10000: Float!
+
+  """Billete de $ 20.000"""
+  B20000: Float!
+
+  """Billete de $ 50.000"""
+  B50000: Float!
+
+  """Billete de $ 100.000"""
+  B100000: Float!
+
+  """Moneda de 50"""
+  M50: Float!
+
+  """Moneda de $ 100"""
+  M100: Float!
+
+  """Moneda de $ 200"""
+  M200: Float!
+
+  """Moneda de $ 500"""
+  M500: Float!
 }
 
 """Categoría del producto nivel 1"""
@@ -543,6 +609,9 @@ input CreateReferenceInput {
 input CreateSizeInput {
   """Valor asignado a la talla"""
   value: String!
+
+  """Posición del ordenamiento"""
+  weight: String!
 }
 
 """Datos para crear el ajuste de productos"""
@@ -826,6 +895,18 @@ type DetailRequest {
 
   """Fecha de actualizado del producto a la solicitud"""
   updatedAt: DateTime!
+}
+
+"""Productos de la devolucion"""
+type DetailReturnInvoice {
+  """Precio del producto en la factura"""
+  price: Float!
+
+  """Producto agregado a la factura"""
+  product: Product!
+
+  """Cantidad de productos en la factura"""
+  quantity: Float!
 }
 
 """Productos del ajuste de productos"""
@@ -1154,6 +1235,27 @@ input FiltersImagesInput {
   sort: SortImage
 }
 
+"""Filtros del listado de facturas"""
+input FiltersInvoicesInput {
+  """Si la factura de encuentra se encuentra activa"""
+  active: Boolean
+
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortInovice
+}
+
 """Filtros para obtener el listado de tipos de medios de pago"""
 input FiltersPaymentsInput {
   """Estado del tipo de los médios de pago"""
@@ -1271,6 +1373,27 @@ input FiltersReferencesInput {
 
   """Ordenamiento"""
   sort: SortReference
+}
+
+"""Filtros de listado de devoluciones de facturación"""
+input FiltersReturnsInvoiceInput {
+  """Si la devolucion de encuentra se encuentra activ<"""
+  active: Boolean
+
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortReturnInovice
 }
 
 """Filtros para la lista de tallas"""
@@ -1537,6 +1660,9 @@ type Invoice {
 
   """Autorización de facturación"""
   authorization: AuthorizationDian!
+
+  """Empresa a la que perteneces la factura"""
+  company: Company!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -1944,10 +2070,25 @@ type PaymentOrder {
   payment: Payment!
 
   """Total pagado"""
+  receipt: Receipt
+
+  """Total pagado"""
   total: Float!
 
   """Fecha de actualizado del pago al pedido"""
   updatedAt: DateTime!
+}
+
+"""Resumen de los pagos"""
+type PaymentOrderClose {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de las pagos del medio"""
+  quantity: Float!
+
+  """Valor del medio de pago"""
+  value: Float!
 }
 
 """Medio de pago que se va a agregar"""
@@ -1990,6 +2131,12 @@ type PointOfSale {
 
   """Tienda a la que pertenece el punto de venta"""
   authorization: AuthorizationDian!
+
+  """Caja del punto de venta"""
+  box: Box!
+
+  """Fecha de cierre"""
+  closeDate: DateTime
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -2107,6 +2254,12 @@ type Query {
     filtersImagesInput: FiltersImagesInput = {}
   ): ResponseImages!
 
+  """Lista de facturas"""
+  invoices(
+    """Filtros de lista de facturas"""
+    filtersInvoices: FiltersInvoicesInput = {}
+  ): ResponseInvoices!
+
   """Obtiene la orden por el id"""
   orderId(
     """identificador del pedido"""
@@ -2151,6 +2304,12 @@ type Query {
     """Filtros para las referencias"""
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!
+
+  """Lista de devoluciones de factura"""
+  returnsInvoice(
+    """Filtros de lista de devoluciones de factura"""
+    filtersReturnsInvoice: FiltersReturnsInvoiceInput = {}
+  ): ResponseReturnsInvoice!
 
   """Listar las tallas"""
   sizes(
@@ -2235,6 +2394,42 @@ type Query {
     """Filtros para consultar las bodegas"""
     filtersWarehousesInput: FiltersWarehousesInput = {}
   ): ResponseWarehouses!
+}
+
+"""Egreso de dinero"""
+type Receipt {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Método de pago del recibo de caja"""
+  box: Box!
+
+  """Empresa a la que pertenece el recibo de caja"""
+  company: Company!
+
+  """Concepto del recibo de caja"""
+  concept: String
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Consecutivo del recibo de caja"""
+  number: Float!
+
+  """Método de pago del recibo de caja"""
+  payment: Payment!
+
+  """Estado del recibo de caja"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el recibo de caja"""
+  user: User!
+
+  """Valor del recibo de caja"""
+  value: Float!
 }
 
 """Referencia de los productos"""
@@ -2615,6 +2810,39 @@ type ResponseImages {
   totalPages: Float!
 }
 
+"""Lista de facturas"""
+type ResponseInvoices {
+  """Lista de facturas"""
+  docs: [Invoice!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta a la consulta de metodos de pago"""
 type ResponsePayments {
   """Lista de metodos de pago"""
@@ -2685,6 +2913,39 @@ type ResponseProducts {
 type ResponseReferences {
   """Lista de referencias"""
   docs: [ReferenceData!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de devoluciones de factura"""
+type ResponseReturnsInvoice {
+  """Lista de ajustes"""
+  docs: [ReturnInvoice!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2945,6 +3206,42 @@ type ResponseWarehouses {
   totalPages: Float!
 }
 
+"""Devoluciones de facturación"""
+type ReturnInvoice {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Autorización"""
+  authorization: AuthorizationDian!
+
+  """Compañía a la que pertence el ajuste"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Productos de la devolución"""
+  details: [DetailReturnInvoice!]
+
+  """Factura de la devolución"""
+  invoice: Invoice!
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la factrura"""
+  user: User!
+
+  """Bodega del ajuste"""
+  warehouse: Warehouse!
+}
+
 """Rol del usuario """
 type Role {
   """Identificador de mongo"""
@@ -3095,6 +3392,9 @@ type Size {
 
   """Valor de la talla"""
   value: String!
+
+  """Peso de la talla para el ordenamiento"""
+  weight: Float!
 }
 
 """Ordenamiento para el listado de atributos"""
@@ -3191,6 +3491,15 @@ input SortImage {
   name: Float
 }
 
+"""Ordenamiento de facturas"""
+input SortInovice {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento de la teinda"""
 input SortPayment {
   active: Float
@@ -3220,12 +3529,21 @@ input SortReference {
   price: Float
 }
 
+"""Ordenamiento de las devoluciones en factura"""
+input SortReturnInovice {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de tallas"""
 input SortSize {
   active: Float
   createdAt: Float
   updatedAt: Float
-  value: Float
+  weight: Float
 }
 
 """Ordenamiento del ajuste de productos"""
@@ -3608,6 +3926,21 @@ type SummaryOrder {
   totalPaid: Float!
 }
 
+"""Resumen de las ordenes"""
+type SummaryOrderClose {
+  """Cantidad de las ordenes canceladas"""
+  quantityCancel: Float!
+
+  """Cantidad de las ordenes finalizadas"""
+  quantityClosed: Float!
+
+  """Cantidad de las ordenes abiertas"""
+  quantityOpen: Float!
+
+  """Valor de las ordenes finalizadas"""
+  value: Float!
+}
+
 """Datos para actualizar el atributo"""
 input UpdateAttribInput {
   """Se encuentra activa el atributo"""
@@ -3783,6 +4116,9 @@ input UpdateSizeInput {
 
   """Valor asignado a la talla"""
   value: String
+
+  """Posición del ordenamiento"""
+  weight: Float
 }
 
 """Datos para actualizar el ajuste de productos"""

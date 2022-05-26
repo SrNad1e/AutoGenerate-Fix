@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as SchemaMongo } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
@@ -22,6 +23,16 @@ export class StockHistory extends Document {
 	@Field(() => Number, { description: 'Cantidad en movimiento' })
 	@Prop({ types: Number })
 	quantity: number;
+
+	@Field(() => Company, {
+		description: 'Empresa a la que perteneces el movimiento',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: Company.name,
+		autopopulate: true,
+	})
+	company: Types.ObjectId;
 
 	@Field(() => Product, { description: 'Producto' })
 	@Prop({ type: SchemaMongo.Types.ObjectId, ref: 'Product' })

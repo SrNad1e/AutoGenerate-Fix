@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
-import * as AutoIncrementFactory from 'mongoose-sequence';
-import { Connection } from 'mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import { CrmModule } from 'src/crm/crm.module';
 
 import { Order, OrderSchema } from './entities/order.entity';
@@ -20,6 +18,18 @@ import {
 } from './entities/authorization.entity';
 import { PointOfSalesService } from './services/point-of-sales.service';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import {
+	ReturnInvoice,
+	ReturnInvoiceSchema,
+} from './entities/return-invoice.entity';
+import { ReturnsInvoiceService } from './services/returns-invoice.service';
+import { ReturnsInvoiceResolver } from './resolvers/returns-invoice.resolver';
+import { InvoicesResolver } from './resolvers/invoices.resolver';
+import {
+	CloseXInvoicing,
+	CloseXInvoicingSchema,
+} from './entities/close-x-invoicing.entity';
+import { ClosesXInvoingService } from './services/closes-xinvoing.service';
 
 @Module({
 	imports: [
@@ -40,17 +50,27 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 			},
 			{
 				name: Invoice.name,
-				useFactory: async (connection: Connection) => {
+				useFactory: async () => {
 					const schema = InvoiceSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'invoice_increment',
-						inc_field: 'number',
-						//	start_seq: 1888,
-					});
+					schema.index({ number: 1, authorization: -1 }, { unique: true });
 					return schema;
 				},
-				inject: [getConnectionToken('')],
+			},
+			{
+				name: ReturnInvoice.name,
+				useFactory: async () => {
+					const schema = ReturnInvoiceSchema;
+					schema.index({ number: 1, authorization: -1 }, { unique: true });
+					return schema;
+				},
+			},
+			{
+				name: CloseXInvoicing.name,
+				useFactory: async () => {
+					const schema = CloseXInvoicingSchema;
+					schema.index({ number: 1, company: -1 }, { unique: true });
+					return schema;
+				},
 			},
 		]),
 		MongooseModule.forFeature([
@@ -69,6 +89,10 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 		OrdersResolver,
 		InvoicesService,
 		PointOfSalesService,
+		ReturnsInvoiceService,
+		ReturnsInvoiceResolver,
+		InvoicesResolver,
+		ClosesXInvoingService,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })

@@ -3,7 +3,7 @@ import { Field, InputType } from '@nestjs/graphql';
 @InputType({ description: 'Ordenamiento para el listado de tallas' })
 export class SortSize {
 	@Field({ nullable: true })
-	value?: number;
+	weight?: number;
 
 	@Field({ nullable: true })
 	active?: number;

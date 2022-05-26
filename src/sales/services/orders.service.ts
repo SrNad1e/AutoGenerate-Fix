@@ -7,12 +7,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
+import * as dayjs from 'dayjs';
 
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { User } from 'src/users/entities/user.entity';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
@@ -20,7 +22,6 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
-import { InvoicesService } from './invoices.service';
 
 const populate = [
 	{
@@ -47,7 +48,7 @@ export class OrdersService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
-		private readonly invoicesService: InvoicesService,
+		private readonly receiptsService: ReceiptsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly conveyorsService: ConveyorsService,
 	) {}
@@ -186,7 +187,6 @@ export class OrdersService {
 				dataUpdate['details'] = newDetails;
 			}
 		}
-		let invoice;
 
 		if (status) {
 			if (!statuTypes.includes(status)) {
@@ -216,33 +216,42 @@ export class OrdersService {
 						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
-				case 'calcelled' || 'closed':
+				case 'cancelled' || 'closed':
 					throw new BadRequestException('El pedido se encuentra finalizado');
 				default:
 					break;
 			}
 
-			if (
-				(order.status === 'open' && status === 'closed') ||
-				status === 'invoiced'
-			) {
-				const result = await this.invoicesService.create(
-					{
-						customerId: customerId || order?.customer?._id.toString(),
-						details: order.details.map((item) => ({
-							productId: item.product._id.toString(),
-							quantity: item.quantity,
-							price: item.price,
-							discount: item.discount,
-						})),
-						payments: order.payments.map((item) => ({
-							paymentId: item.payment._id.toString(),
-							total: item.total,
-						})),
-					},
-					user,
-				);
-				invoice = result._id;
+			const payments = [];
+
+			if (order.status === 'open' && status === 'closed') {
+				for (let i = 0; i < order?.payments?.length; i++) {
+					const { total, payment } = order?.payments[i];
+
+					const valuesReceipt = {
+						value: total,
+						paymentId: payment?._id?.toString(),
+						concept: `Abono a pedido ${order?.number}`,
+						boxId:
+							payment?.type === 'cash'
+								? order?.pointOfSale['box']?.toString()
+								: undefined,
+					};
+
+					const receipt = await this.receiptsService.create(
+						valuesReceipt,
+						user,
+						companyId,
+					);
+
+					payments.push({
+						...order?.payments[i],
+						receipt: receipt?._id,
+					});
+				}
+			}
+			if (payments.length > 0) {
+				dataUpdate['payments'] = payments;
 			}
 
 			dataUpdate['status'] = status;
@@ -261,6 +270,9 @@ export class OrdersService {
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
+
+			//TODO: anular recibo de caja, actualizar la caja
+
 			await this.stockHistoryService.addStock(
 				{
 					details,
@@ -276,7 +288,7 @@ export class OrdersService {
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
-				$set: { ...dataUpdate, user, invoice, conveyor },
+				$set: { ...dataUpdate, user, conveyor },
 			},
 			{
 				populate,
@@ -296,6 +308,123 @@ export class OrdersService {
 			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
 			.populate(populate)
 			.lean();
+	}
+
+	async getSummaryOrder(closeDate: string, pointOfSaleId: string) {
+		const dateIntial = new Date(closeDate);
+		const dateFinal = dayjs(closeDate).add(1, 'd');
+
+		const ordersCancel: any = await this.orderModel.aggregate([
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: 'cancelled',
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$_id',
+					total: {
+						$sum: 1,
+					},
+				},
+			},
+		]);
+
+		const ordersOpen: any = await this.orderModel.aggregate([
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: 'open',
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$_id',
+					total: {
+						$sum: 1,
+					},
+				},
+			},
+		]);
+
+		const ordersClosed: any = await this.orderModel.aggregate([
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: {
+						$in: ['closed', 'sent', 'invoiced'],
+					},
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$_id',
+					total: {
+						$sum: 1,
+					},
+					value: {
+						$sum: '$summary.total',
+					},
+				},
+			},
+		]);
+
+		const payments: any = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: {
+						$in: ['closed', 'sent', 'invoiced'],
+					},
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					total: {
+						$sum: 1,
+					},
+					value: {
+						$sum: '$payments.total',
+					},
+				},
+			},
+		]);
+
+		return {
+			summaryOrder: {
+				quantityClosed: ordersClosed?.total || 0,
+				quantityOpen: ordersOpen?.total || 0,
+				quantityCancel: ordersCancel?.total || 0,
+				value: ordersClosed?.value || 0,
+			},
+			payments:
+				payments?.map((payment) => ({
+					quantity: payment?.total,
+					value: payment?.value,
+					payment: payment?._id,
+				})) || [],
+		};
 	}
 
 	async addProducts(

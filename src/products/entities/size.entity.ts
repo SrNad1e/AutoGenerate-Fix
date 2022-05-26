@@ -14,6 +14,10 @@ export class Size extends Document {
 	@Prop({ type: String, required: true })
 	value: string;
 
+	@Field(() => Number, { description: 'Peso de la talla para el ordenamiento' })
+	@Prop({ type: Number, unique: true })
+	weight: number;
+
 	@Field(() => Boolean, { description: 'Estado de la talla' })
 	@Prop({ type: Boolean, default: true })
 	active: boolean;

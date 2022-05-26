@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import { PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
@@ -104,6 +104,7 @@ export class StockHistoryService {
 						warehouse: warehouseId,
 						currentStock: product?.stock[0]?.quantity,
 						quantity,
+						company: new Types.ObjectId(companyId),
 						product: productId,
 						documentType,
 						documentNumber: document.number,
@@ -193,6 +194,7 @@ export class StockHistoryService {
 						warehouse: warehouseId,
 						currentStock: product?.stock[0]?.quantity,
 						quantity: -quantity,
+						company: new Types.ObjectId(companyId),
 						product: productId,
 						documentType,
 						documentNumber: document.number,
@@ -203,7 +205,6 @@ export class StockHistoryService {
 				}
 			}
 		} catch (error) {
-
 			if (item) {
 				//TODO: pendiente planear el reversar
 			}

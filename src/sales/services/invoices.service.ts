@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import * as dayjs from 'dayjs';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { CustomersService } from 'src/crm/services/customers.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateInvoiceInput } from '../dtos/create-invoice-input';
+import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { Invoice } from '../entities/invoice.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 
@@ -21,9 +23,60 @@ export class InvoicesService {
 		private readonly productsService: ProductsService,
 	) {}
 
+	async findAll(
+		{
+			sort,
+			active,
+			limit = 20,
+			page = 1,
+			dateFinal,
+			dateInitial,
+		}: FiltersInvoicesInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<Invoice> = {};
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (active !== undefined) {
+			filters.active = active;
+		}
+
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		}
+
+		const options = {
+			limit,
+			page,
+			sort,
+			lean: true,
+		};
+
+		return this.invoiceModel.paginate(filters, options);
+	}
+
 	async create(
 		{ customerId, details, payments }: CreateInvoiceInput,
 		user: User,
+		companyId: string,
 	) {
 		if (!user.pointOfSale) {
 			throw new BadRequestException(
@@ -109,6 +162,7 @@ export class InvoicesService {
 		const newInvoice = new this.invoiceModel({
 			authorization: { ...pointOfSale?.authorization },
 			customer,
+			company: new Types.ObjectId(companyId),
 			shop: user.shop,
 			payments: newPayments,
 			summary,
