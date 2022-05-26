@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Box } from './box.entity';
 import { Payment } from './payment.entity';
 
 @Schema({ timestamps: true })
@@ -40,6 +41,15 @@ export class Receipt extends Document {
 		type: Object,
 	})
 	payment: Payment;
+
+	@Field(() => Box, {
+		description: 'Método de pago del recibo de caja',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: 'Box',
+	})
+	box: Types.ObjectId;
 
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece el recibo de caja',

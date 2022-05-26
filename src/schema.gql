@@ -200,6 +200,42 @@ type Brand {
   user: User!
 }
 
+"""Arqueo de caja"""
+type CashRegister {
+  """Billete o moneda de $ 1.000"""
+  B1000: Float!
+
+  """Billete de $ 2.000"""
+  B2000: Float!
+
+  """Billete de $ 5.000"""
+  B5000: Float!
+
+  """Billete de $ 10.000"""
+  B10000: Float!
+
+  """Billete de $ 20.000"""
+  B20000: Float!
+
+  """Billete de $ 50.000"""
+  B50000: Float!
+
+  """Billete de $ 100.000"""
+  B100000: Float!
+
+  """Moneda de 50"""
+  M50: Float!
+
+  """Moneda de $ 100"""
+  M100: Float!
+
+  """Moneda de $ 200"""
+  M200: Float!
+
+  """Moneda de $ 500"""
+  M500: Float!
+}
+
 """Categoría del producto nivel 1"""
 type CategoryLevel1 {
   """Identificador de mongo"""
@@ -2040,6 +2076,18 @@ type PaymentOrder {
   updatedAt: DateTime!
 }
 
+"""Resumen de los pagos"""
+type PaymentOrderClose {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de las pagos del medio"""
+  quantity: Float!
+
+  """Valor del medio de pago"""
+  value: Float!
+}
+
 """Medio de pago que se va a agregar"""
 input PaymentsOrderInput {
   """Acción a realizar con el medio de pago (create, update, delete)"""
@@ -2083,6 +2131,9 @@ type PointOfSale {
 
   """Caja del punto de venta"""
   box: Box!
+
+  """Fecha de cierre"""
+  closeDate: DateTime
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -2346,6 +2397,9 @@ type Query {
 type Receipt {
   """Identificador de mongo"""
   _id: String!
+
+  """Método de pago del recibo de caja"""
+  box: Box!
 
   """Empresa a la que pertenece el recibo de caja"""
   company: Company!
@@ -3864,6 +3918,21 @@ type SummaryOrder {
 
   """Total pago del pedido"""
   totalPaid: Float!
+}
+
+"""Resumen de las ordenes"""
+type SummaryOrderClose {
+  """Cantidad de las ordenes canceladas"""
+  quantityCancel: Float!
+
+  """Cantidad de las ordenes finalizadas"""
+  quantityClosed: Float!
+
+  """Cantidad de las ordenes abiertas"""
+  quantityOpen: Float!
+
+  """Valor de las ordenes finalizadas"""
+  value: Float!
 }
 
 """Datos para actualizar el atributo"""

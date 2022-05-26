@@ -35,6 +35,10 @@ export class PointOfSale extends Document {
 	@Prop({ type: Types.ObjectId, ref: 'Box', required: true })
 	box: Types.ObjectId;
 
+	@Field(() => Date, { description: 'Fecha de cierre', nullable: true })
+	@Prop({ type: Date })
+	closeDate: Date;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el punto de venta',
 	})

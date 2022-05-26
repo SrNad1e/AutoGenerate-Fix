@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
+import * as dayjs from 'dayjs';
 
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
@@ -21,7 +22,6 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
-import { ReturnsInvoiceService } from './returns-invoice.service';
 
 const populate = [
 	{
@@ -234,7 +234,7 @@ export class OrdersService {
 						concept: `Abono a pedido ${order?.number}`,
 						boxId:
 							payment?.type === 'cash'
-								? order?.pointOfSale['box'].toString()
+								? order?.pointOfSale['box']?.toString()
 								: undefined,
 					};
 
@@ -270,6 +270,9 @@ export class OrdersService {
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
+
+			//TODO: anular recibo de caja, actualizar la caja
+
 			await this.stockHistoryService.addStock(
 				{
 					details,
@@ -305,6 +308,123 @@ export class OrdersService {
 			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
 			.populate(populate)
 			.lean();
+	}
+
+	async getSummaryOrder(closeDate: string, pointOfSaleId: string) {
+		const dateIntial = new Date(closeDate);
+		const dateFinal = dayjs(closeDate).add(1, 'd');
+
+		const ordersCancel: any = await this.orderModel.aggregate([
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: 'cancelled',
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$_id',
+					total: {
+						$sum: 1,
+					},
+				},
+			},
+		]);
+
+		const ordersOpen: any = await this.orderModel.aggregate([
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: 'open',
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$_id',
+					total: {
+						$sum: 1,
+					},
+				},
+			},
+		]);
+
+		const ordersClosed: any = await this.orderModel.aggregate([
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: {
+						$in: ['closed', 'sent', 'invoiced'],
+					},
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$_id',
+					total: {
+						$sum: 1,
+					},
+					value: {
+						$sum: '$summary.total',
+					},
+				},
+			},
+		]);
+
+		const payments: any = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					updatedAt: {
+						$gte: dateIntial,
+						$lt: dateFinal,
+					},
+					status: {
+						$in: ['closed', 'sent', 'invoiced'],
+					},
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					total: {
+						$sum: 1,
+					},
+					value: {
+						$sum: '$payments.total',
+					},
+				},
+			},
+		]);
+
+		return {
+			summaryOrder: {
+				quantityClosed: ordersClosed?.total || 0,
+				quantityOpen: ordersOpen?.total || 0,
+				quantityCancel: ordersCancel?.total || 0,
+				value: ordersClosed?.value || 0,
+			},
+			payments:
+				payments?.map((payment) => ({
+					quantity: payment?.total,
+					value: payment?.value,
+					payment: payment?._id,
+				})) || [],
+		};
 	}
 
 	async addProducts(

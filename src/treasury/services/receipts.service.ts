@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
-import { User } from 'src/users/entities/user.entity';
 
+import { User } from 'src/users/entities/user.entity';
 import { CreateReceiptInput } from '../dtos/create-receipt.input';
 import { Receipt } from '../entities/receipt.entity';
 import { BoxHistoryService } from './box-history.service';
@@ -38,9 +38,13 @@ export class ReceiptsService {
 			throw new NotFoundException('El medio de pago no existe');
 		}
 
-		const receipt = await this.receiptModel.findOne({
-			category: new Types.ObjectId(companyId),
-		});
+		const receipt = await this.receiptModel
+			.findOne({
+				category: new Types.ObjectId(companyId),
+			})
+			.sort({
+				_id: -1,
+			});
 
 		const number = (receipt?.number || 0) + 1;
 
@@ -52,6 +56,7 @@ export class ReceiptsService {
 			company: companyId,
 			user,
 		});
+
 		if (boxId) {
 			await this.boxHistoryService.addCash(
 				{

@@ -1,0 +1,129 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+import { User } from 'src/users/entities/user.entity';
+import { Company } from 'src/configurations/entities/company.entity';
+import { Payment } from 'src/treasury/entities/payment.entity';
+import { PointOfSale } from './pointOfSale.entity';
+
+@ObjectType({ description: 'Arqueo de caja' })
+export class CashRegister {
+	@Field(() => Number, { description: 'Moneda de 50' })
+	'M50': number;
+
+	@Field(() => Number, { description: 'Moneda de $ 100' })
+	'M100': number;
+
+	@Field(() => Number, { description: 'Moneda de $ 200' })
+	'M200': number;
+
+	@Field(() => Number, { description: 'Moneda de $ 500' })
+	'M500': number;
+
+	@Field(() => Number, { description: 'Billete o moneda de $ 1.000' })
+	'B1000': number;
+
+	@Field(() => Number, { description: 'Billete de $ 2.000' })
+	'B2000': number;
+
+	@Field(() => Number, { description: 'Billete de $ 5.000' })
+	'B5000': number;
+
+	@Field(() => Number, { description: 'Billete de $ 10.000' })
+	'B10000': number;
+
+	@Field(() => Number, { description: 'Billete de $ 20.000' })
+	'B20000': number;
+
+	@Field(() => Number, { description: 'Billete de $ 50.000' })
+	'B50000': number;
+
+	@Field(() => Number, { description: 'Billete de $ 100.000' })
+	'B100000': number;
+}
+
+@ObjectType({ description: 'Resumen de las ordenes' })
+export class SummaryOrderClose {
+	@Field(() => Number, { description: 'Cantidad de las ordenes finalizadas' })
+	quantityClosed: number;
+
+	@Field(() => Number, { description: 'Cantidad de las ordenes abiertas' })
+	quantityOpen: number;
+
+	@Field(() => Number, { description: 'Cantidad de las ordenes canceladas' })
+	quantityCancel: number;
+
+	@Field(() => Number, { description: 'Valor de las ordenes finalizadas' })
+	value: number;
+}
+
+@ObjectType({ description: 'Resumen de los pagos' })
+export class PaymentOrderClose {
+	@Field(() => Number, { description: 'Cantidad de las pagos del medio' })
+	quantity: number;
+
+	@Field(() => Number, { description: 'Valor del medio de pago' })
+	value: number;
+
+	@Field(() => Payment, {
+		description: 'Medio de pago',
+	})
+	payment: Types.ObjectId;
+}
+
+@Schema({ timestamps: true, collection: 'closesXInvoicing' })
+@ObjectType({ description: 'Cierre X de facturación' })
+export class CloseXInvoicing extends Document {
+	@Field(() => String, { description: 'Identificador de mongo' })
+	_id: Types.ObjectId;
+
+	@Field(() => CashRegister, {
+		description: 'Listado de billetes y monedas registrados',
+	})
+	cashRegister: CashRegister;
+
+	@Field(() => Number, { description: 'Número consecutivo' })
+	@Prop({ type: Number, requiere: true })
+	number: number;
+
+	@Field(() => Company, { description: 'Compañía a la que pertence el cierre' })
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
+
+	@Field(() => PointOfSale, {
+		description: 'Punto de venta que registra el cierre',
+	})
+	@Prop({ type: Types.ObjectId, required: true })
+	pointOfSale: Types.ObjectId;
+
+	@Field(() => Date, { description: 'Fecha de cierre' })
+	@Prop({ type: Date, required: true })
+	closeDate: Date;
+
+	@Field(() => SummaryOrderClose, { description: 'Datos de las ordenes' })
+	@Prop({ type: Object, requiere: true })
+	summaryOrder: SummaryOrderClose;
+
+	@Field(() => [PaymentOrderClose], {
+		description: 'Listado de pagos',
+		nullable: true,
+	})
+	@Prop({ type: Object, default: [] })
+	payments: PaymentOrderClose[];
+
+	@Field(() => User, {
+		description: 'Usuario que creó o editó el cierre',
+	})
+	@Prop({ type: Object, required: true })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación' })
+	createdAt: Date;
+
+	@Field(() => Date, { description: 'Fecha de actualización' })
+	updatedAt: Date;
+}
+
+export const CloseXInvoicingSchema =
+	SchemaFactory.createForClass(CloseXInvoicing);

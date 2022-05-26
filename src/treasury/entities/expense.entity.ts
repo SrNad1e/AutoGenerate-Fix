@@ -20,11 +20,11 @@ export class Expense extends Document {
 	valor: number;
 
 	@Field(() => String, {
-		description: 'Observación del egreso',
+		description: 'Concepto del egreso',
 		nullable: true,
 	})
 	@Prop({ type: String })
-	observation: string;
+	concept: string;
 
 	@Field(() => String, {
 		description: 'Estado del egreso',

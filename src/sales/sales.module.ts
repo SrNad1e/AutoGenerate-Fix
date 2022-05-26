@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
-import * as AutoIncrementFactory from 'mongoose-sequence';
-import { Connection } from 'mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import { CrmModule } from 'src/crm/crm.module';
 
 import { Order, OrderSchema } from './entities/order.entity';
@@ -27,6 +25,11 @@ import {
 import { ReturnsInvoiceService } from './services/returns-invoice.service';
 import { ReturnsInvoiceResolver } from './resolvers/returns-invoice.resolver';
 import { InvoicesResolver } from './resolvers/invoices.resolver';
+import {
+	CloseXInvoicing,
+	CloseXInvoicingSchema,
+} from './entities/close-x-invoicing.entity';
+import { ClosesXInvoingService } from './services/closes-xinvoing.service';
 
 @Module({
 	imports: [
@@ -61,6 +64,14 @@ import { InvoicesResolver } from './resolvers/invoices.resolver';
 					return schema;
 				},
 			},
+			{
+				name: CloseXInvoicing.name,
+				useFactory: async () => {
+					const schema = CloseXInvoicingSchema;
+					schema.index({ number: 1, company: -1 }, { unique: true });
+					return schema;
+				},
+			},
 		]),
 		MongooseModule.forFeature([
 			{
@@ -81,6 +92,7 @@ import { InvoicesResolver } from './resolvers/invoices.resolver';
 		ReturnsInvoiceService,
 		ReturnsInvoiceResolver,
 		InvoicesResolver,
+		ClosesXInvoingService,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
