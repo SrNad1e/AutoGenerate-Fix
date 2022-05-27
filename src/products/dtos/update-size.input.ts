@@ -8,6 +8,12 @@ export class UpdateSizeInput {
 	})
 	value?: string;
 
+	@Field(() => Number, {
+		description: 'Posición del ordenamiento',
+		nullable: true,
+	})
+	weight: number;
+
 	@Field(() => Boolean, {
 		description: 'Se encuentra activa la talla',
 		nullable: true,

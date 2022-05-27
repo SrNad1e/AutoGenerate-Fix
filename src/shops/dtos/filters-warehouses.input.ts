@@ -20,6 +20,9 @@ export class SortWarehouse {
 
 @InputType({ description: 'Filtros de las bodegas' })
 export class FiltersWarehousesInput {
+	@Field({ description: 'Identificador de la bodega', nullable: true })
+	_id?: string;
+
 	@Field({ description: 'Comodín busqueda de la bodega', nullable: true })
 	name?: string;
 

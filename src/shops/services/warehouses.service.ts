@@ -21,6 +21,7 @@ export class WarehousesService {
 
 	async findAll(
 		{
+			_id,
 			name,
 			limit = 10,
 			page = 1,
@@ -49,6 +50,10 @@ export class WarehousesService {
 			filters.isMain = isMain;
 		}
 
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
+		}
+
 		const options = {
 			limit,
 			page: page,
@@ -57,6 +62,10 @@ export class WarehousesService {
 		};
 
 		return this.warehouseModel.paginate(filters, options);
+	}
+
+	async getAll() {
+		return this.warehouseModel.find().lean();
 	}
 
 	async findOne(params: FiltersWarehousesInput) {

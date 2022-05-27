@@ -80,8 +80,9 @@ export class StockInputService {
 		const filters: FilterQuery<StockInput> = {};
 
 		if (user.username !== 'admin') {
-			filters.company = companyId;
+			filters.company = new Types.ObjectId(companyId);
 		}
+
 		if (number) {
 			filters.number = number;
 		}
@@ -179,10 +180,25 @@ export class StockInputService {
 
 		for (let i = 0; i < details.length; i++) {
 			const { quantity, productId } = details[i];
+
+			if (quantity <= 0) {
+				throw new BadRequestException('Los productos no pueden estar en 0');
+			}
+
 			const product = await this.productsService.findById(
 				productId,
 				warehouseId,
 			);
+
+			if (!product) {
+				throw new BadRequestException('Uno de los productos no existe');
+			}
+
+			if (product?.status !== 'active') {
+				throw new BadRequestException(
+					`El producto ${product?.barcode} no se encuentra activo`,
+				);
+			}
 
 			detailsInput.push({
 				product,
@@ -242,6 +258,9 @@ export class StockInputService {
 		companyId: string,
 	) {
 		const stockInput = await this.stockInputModel.findById(id).lean();
+		if (!stockInput) {
+			throw new NotFoundException('La entrada no existe');
+		}
 
 		if (
 			user.username !== 'admin' &&
@@ -311,13 +330,27 @@ export class StockInputService {
 				if (action === 'create') {
 					if (productFind) {
 						throw new BadRequestException(
-							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
+							`El producto ${productFind.product.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
 					const product = await this.productsService.findById(
 						productId,
 						stockInput.warehouse._id.toString(),
 					);
+
+					if (quantity <= 0) {
+						throw new BadRequestException('Los productos no pueden estar en 0');
+					}
+
+					if (!product) {
+						throw new BadRequestException('Uno de los productos no existe');
+					}
+
+					if (product?.status !== 'active') {
+						throw new BadRequestException(
+							`El producto ${product?.barcode} no se encuentra activo`,
+						);
+					}
 					newDetails.push({
 						product,
 						quantity,

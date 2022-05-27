@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Shop } from 'src/shops/entities/shop.entity';
+import { Box } from 'src/treasury/entities/box.entity';
 import { User } from 'src/users/entities/user.entity';
 import { AuthorizationDian } from './authorization.entity';
 
@@ -19,7 +20,12 @@ export class PointOfSale extends Document {
 	@Field(() => Shop, {
 		description: 'Tienda a la que pertenece el punto de venta',
 	})
-	@Prop({ type: Types.ObjectId, ref: 'Shop', required: true })
+	@Prop({
+		type: Types.ObjectId,
+		ref: Shop.name,
+		autopopulate: true,
+		required: true,
+	})
 	shop: Types.ObjectId;
 
 	@Field(() => AuthorizationDian, {
@@ -27,6 +33,16 @@ export class PointOfSale extends Document {
 	})
 	@Prop({ type: Types.ObjectId, ref: 'AuthorizationDian', required: true })
 	authorization: Types.ObjectId;
+
+	@Field(() => Box, {
+		description: 'Caja del punto de venta',
+	})
+	@Prop({ type: Types.ObjectId, ref: 'Box', required: true })
+	box: Types.ObjectId;
+
+	@Field(() => Date, { description: 'Fecha de cierre', nullable: true })
+	@Prop({ type: Date })
+	closeDate: Date;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el punto de venta',

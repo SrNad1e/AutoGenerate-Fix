@@ -17,7 +17,7 @@ export class CreateStockTransferInput {
 			'Estado del traslado (open, sent, confirmed, incomplete, cancelled)',
 		nullable: true,
 	})
-	status: string;
+	status?: string;
 
 	@Field(() => [DetailStockTransferCreateInput], {
 		description: 'Productos del traslado',

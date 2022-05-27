@@ -71,8 +71,9 @@ export class CreateCustomerInput {
 
 	@Field(() => String, {
 		description: 'Identificación de tipo de cliente',
+		nullable: true,
 	})
-	customerTypeId: string;
+	customerTypeId?: string;
 
 	@Field(() => String, { description: 'Número de teléfono', nullable: true })
 	phone?: string;

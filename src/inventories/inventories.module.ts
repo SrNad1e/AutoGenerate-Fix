@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as AutoIncrementFactory from 'mongoose-sequence';
-import { getConnectionToken, MongooseModule } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 
 import {
 	StockRequest,
@@ -46,53 +44,15 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 		ShopsModule,
 		UsersModule,
 		TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
-		MongooseModule.forFeatureAsync([
-			{
-				name: StockRequest.name,
-				useFactory: async (connection: Connection) => {
-					const schema = StockRequestSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'stock_request_increment',
-						inc_field: 'number',
-						//	start_seq: 1888,
-					});
-					return schema;
-				},
-				inject: [getConnectionToken('')],
-			},
+		MongooseModule.forFeature([
 			{
 				name: StockTransfer.name,
-				useFactory: async (connection: Connection) => {
-					const schema = StockTransferSchema;
-					schema.post('save', (pru) => {
-						console.log(pru);
-					});
-					/*const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'stock_transfer_increment',
-						inc_field: 'number',
-						//	start_seq: 1888,
-					});*/
-					return schema;
-				},
-				inject: [getConnectionToken('')],
+				schema: StockTransferSchema,
 			},
 			{
-				name: StockOutput.name,
-				useFactory: async (connection: Connection) => {
-					const schema = StockOutputSchema;
-					const AutoIncrement = AutoIncrementFactory(connection);
-					schema.plugin(AutoIncrement, {
-						id: 'stock_output_increment',
-						inc_field: 'number',
-					});
-					return schema;
-				},
-				inject: [getConnectionToken('')],
+				name: StockRequest.name,
+				schema: StockRequestSchema,
 			},
-		]),
-		MongooseModule.forFeature([
 			{
 				name: StockAdjustment.name,
 				schema: StockAdjustmentSchema,
@@ -108,6 +68,10 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 			{
 				name: Order.name,
 				schema: OrderSchema,
+			},
+			{
+				name: StockOutput.name,
+				schema: StockOutputSchema,
 			},
 		]),
 	],

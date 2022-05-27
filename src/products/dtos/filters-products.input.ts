@@ -48,6 +48,13 @@ export class FiltersProductsInput {
 	})
 	name?: string;
 
+	@Field({
+		description:
+			'Se usa para seleccionar solo los productos que tengan inventario',
+		nullable: true,
+	})
+	withStock?: boolean;
+
 	@Field({ description: 'Id de color', nullable: true })
 	colorId?: string;
 
@@ -84,6 +91,9 @@ export class FiltersProductInput {
 
 	@Field({ description: 'talla del producto', nullable: true })
 	size?: string;
+
+	@Field({ description: 'Estado del producto', nullable: true })
+	status?: string;
 
 	@Field(() => String, {
 		description: 'Referencia del producto',

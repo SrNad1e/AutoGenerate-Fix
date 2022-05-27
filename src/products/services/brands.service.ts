@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateBrandInput } from '../dtos/create-brand.input';
-import { FiltersAttribsInput } from '../dtos/filters-attribs.input';
+import { FiltersBrandsInput } from '../dtos/filters-brands.input';
 import { UpdateBrandInput } from '../dtos/update-brand.input';
 import { Brand } from '../entities/brand.entity';
 
@@ -15,12 +15,13 @@ export class BrandsService {
 	) {}
 
 	async findAll({
+		_id,
 		active,
 		limit = 10,
 		page = 1,
 		sort,
 		name,
-	}: FiltersAttribsInput) {
+	}: FiltersBrandsInput) {
 		const filters: FilterQuery<Brand> = {};
 
 		if (active !== undefined) {
@@ -32,6 +33,10 @@ export class BrandsService {
 				$regex: name,
 				$options: 'i',
 			};
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {

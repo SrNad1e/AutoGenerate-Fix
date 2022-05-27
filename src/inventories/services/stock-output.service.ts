@@ -175,12 +175,24 @@ export class StockOutputService {
 
 		for (let i = 0; i < details.length; i++) {
 			const { quantity, productId } = details[i];
+			if (quantity <= 0) {
+				throw new BadRequestException('Los productos no pueden estar en 0');
+			}
+
 			const product = await this.productsService.validateStock(
 				productId,
 				quantity,
 				warehouseId,
 			);
+			if (!product) {
+				throw new BadRequestException('Uno de los productos no existe');
+			}
 
+			if (product?.status !== 'active') {
+				throw new BadRequestException(
+					`El producto ${product?.barcode} no se encuentra activo`,
+				);
+			}
 			detailsInput.push({
 				product,
 				quantity,
@@ -309,13 +321,26 @@ export class StockOutputService {
 					stockOutput.warehouse._id.toString(),
 				);
 
+				if (!product) {
+					throw new BadRequestException('Uno de los productos no existe');
+				}
+
+				if (product?.status !== 'active') {
+					throw new BadRequestException(
+						`El producto ${product?.barcode} no se encuentra activo`,
+					);
+				}
+
 				if (action === 'create') {
+					if (quantity <= 0) {
+						throw new BadRequestException('Los productos no pueden estar en 0');
+					}
 					const productFind = stockOutput.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);
 					if (productFind) {
 						throw new BadRequestException(
-							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
+							`El producto ${productFind.product.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
 

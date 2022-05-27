@@ -20,6 +20,9 @@ export class SortColor {
 
 @InputType({ description: 'Filtros para la lista de colores' })
 export class FiltersColorsInput {
+	@Field({ description: 'Identificador del color', nullable: true })
+	_id?: string;
+
 	@Field({ description: 'Comodín busqueda del color', nullable: true })
 	name?: string;
 

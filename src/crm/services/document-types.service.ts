@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
-import { FiltersDocumentTypesInput } from '../dtos/filters-document-types.input';
 
+import { FiltersDocumentTypesInput } from '../dtos/filters-document-types.input';
 import { DocumentType } from '../entities/documentType.entity';
 
 @Injectable()

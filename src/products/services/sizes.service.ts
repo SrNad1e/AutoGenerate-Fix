@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { User } from 'src/users/entities/user.entity';
@@ -21,6 +21,7 @@ export class SizesService {
 	) {}
 
 	async findAll({
+		_id,
 		name,
 		limit = 10,
 		page = 1,
@@ -35,6 +36,10 @@ export class SizesService {
 
 		if (active !== undefined) {
 			filters.active = active;
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {
@@ -91,10 +96,11 @@ export class SizesService {
 		try {
 			const sizesMysql = await this.sizeRepo.find();
 
-			const sizesMongo = sizesMysql.map((size) => ({
+			const sizesMongo = sizesMysql.map((size, key) => ({
 				value: size.value,
 				active: size.active,
 				id: size.id,
+				weight: key + 1,
 				user: {
 					name: 'Administrador del Sistema',
 					username: 'admin',

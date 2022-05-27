@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel, FilterQuery } from 'mongoose';
+import { PaginateModel, FilterQuery, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateAttribInput } from '../dtos/create-attrib.input';
@@ -16,6 +16,7 @@ export class AttribsService {
 	) {}
 
 	async findAll({
+		_ids,
 		active,
 		limit = 10,
 		page = 1,
@@ -32,6 +33,12 @@ export class AttribsService {
 			filters.name = {
 				$regex: name,
 				$options: 'i',
+			};
+		}
+
+		if (_ids) {
+			filters._id = {
+				$in: _ids.map((id) => new Types.ObjectId(id)),
 			};
 		}
 

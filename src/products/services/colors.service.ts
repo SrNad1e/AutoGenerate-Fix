@@ -26,6 +26,7 @@ export class ColorsService {
 	) {}
 
 	async findAll({
+		_id,
 		name = '',
 		limit = 10,
 		page = 1,
@@ -36,6 +37,9 @@ export class ColorsService {
 
 		if (active !== undefined) {
 			filters.active = active;
+		}
+		if (_id) {
+			filters._id = _id;
 		}
 
 		const options = {

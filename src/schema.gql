@@ -149,6 +149,36 @@ type AuthorizationDian {
   prefix: String!
 }
 
+"""Caja donde se deposita el dinero"""
+type Box {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Base de la caja"""
+  base: Float!
+
+  """Empresa a la que perteneces la caja"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Caja principal de la empresa"""
+  isMain: Boolean!
+
+  """Nombre de la caja"""
+  name: String!
+
+  """Total de dinero en la caja sin contar la base"""
+  total: Float!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la caja"""
+  user: User!
+}
+
 """Marca del producto"""
 type Brand {
   """Identificador de mongo"""
@@ -168,6 +198,78 @@ type Brand {
 
   """Usuario que crea la marca"""
   user: User!
+}
+
+"""Arqueo de caja"""
+type CashRegister {
+  """Billete o moneda de $ 1.000"""
+  B1000: Float!
+
+  """Billete de $ 2.000"""
+  B2000: Float!
+
+  """Billete de $ 5.000"""
+  B5000: Float!
+
+  """Billete de $ 10.000"""
+  B10000: Float!
+
+  """Billete de $ 20.000"""
+  B20000: Float!
+
+  """Billete de $ 50.000"""
+  B50000: Float!
+
+  """Billete de $ 100.000"""
+  B100000: Float!
+
+  """Moneda de 50"""
+  M50: Float!
+
+  """Moneda de $ 100"""
+  M100: Float!
+
+  """Moneda de $ 200"""
+  M200: Float!
+
+  """Moneda de $ 500"""
+  M500: Float!
+}
+
+"""Arqueo de caja"""
+input CashRegisterInput {
+  """Billete o moneda de $ 1.000"""
+  B1000: Float!
+
+  """Billete de $ 2.000"""
+  B2000: Float!
+
+  """Billete de $ 5.000"""
+  B5000: Float!
+
+  """Billete de $ 10.000"""
+  B10000: Float!
+
+  """Billete de $ 20.000"""
+  B20000: Float!
+
+  """Billete de $ 50.000"""
+  B50000: Float!
+
+  """Billete de $ 100.000"""
+  B100000: Float!
+
+  """Moneda de 50"""
+  M50: Float!
+
+  """Moneda de $ 100"""
+  M100: Float!
+
+  """Moneda de $ 200"""
+  M200: Float!
+
+  """Moneda de $ 500"""
+  M500: Float!
 }
 
 """Categoría del producto nivel 1"""
@@ -203,7 +305,7 @@ type CategoryLevel2 {
   createdAt: DateTime!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre"""
   parentId: String
@@ -224,7 +326,7 @@ type CategoryLevel3 {
   createdAt: DateTime!
 
   """Nombre de la categoría"""
-  name: String!
+  name: String
 
   """Identificador de la categoría padre"""
   parentId: String
@@ -281,6 +383,45 @@ input CityInput {
   updatedAt: DateTime
 }
 
+"""Cierre X de facturación"""
+type CloseXInvoicing {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Listado de billetes y monedas registrados"""
+  cashRegister: CashRegister!
+
+  """Fecha de cierre"""
+  closeDate: DateTime!
+
+  """Compañía a la que pertence el cierre"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Egresos del día"""
+  expenses: [Expense!]
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Listado de pagos"""
+  payments: [PaymentOrderClose!]
+
+  """Punto de venta que registra el cierre"""
+  pointOfSale: PointOfSale!
+
+  """Datos de las ordenes"""
+  summaryOrder: SummaryOrderClose!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cierre"""
+  user: User!
+}
+
 """Color del producto"""
 type Color {
   """Identificador de mongo"""
@@ -312,6 +453,18 @@ type Color {
 
   """Usuario que crea el color"""
   user: User!
+}
+
+"""Combinaciones de color y talla"""
+input CombinationInput {
+  """Identificador del color"""
+  colorId: String!
+
+  """Identificadores de las imagenes"""
+  imageIds: [String!]
+
+  """Identificador de la talla"""
+  sizeId: String!
 }
 
 """Empresa"""
@@ -348,6 +501,12 @@ type Company {
 
   """Usuario que crea la compañia"""
   user: User!
+}
+
+"""Datos para confirmar los productos del traslado"""
+input ConfirmStockTransferInput {
+  """Productos para confirmar"""
+  details: [DetailConfirmStockTransferInput!]!
 }
 
 """Modelo para la transportadora"""
@@ -395,6 +554,18 @@ input CreateCategoryInput {
   parentId: String
 }
 
+"""Datos para crear un cierre X"""
+input CreateCloseXInvoicingInput {
+  """Listado de cash reportado"""
+  cashRegister: CashRegisterInput!
+
+  """Fecha del cierre"""
+  closeDate: String!
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
+}
+
 """Datos para crear un color"""
 input CreateColorInput {
   """Url asignado al color"""
@@ -408,6 +579,42 @@ input CreateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String!
+}
+
+"""Datos para crear un cliente"""
+input CreateCustomerInput {
+  """Direcciones del cliente"""
+  addresses: [AddressInput!]
+
+  """Fecha de nacimiento"""
+  birthday: DateTime
+
+  """Identificación de tipo de cliente"""
+  customerTypeId: String
+
+  """Número de documento"""
+  document: String!
+
+  """Identificación del tipo de documento"""
+  documentTypeId: String!
+
+  """Correo del cliente"""
+  email: String
+
+  """Nombres del cliente"""
+  firstName: String!
+
+  """Es el cliente por defecto, solo debe existir uno"""
+  isDefault: Boolean
+
+  """El teléfono tiene whatsapp"""
+  isWhatsapp: Boolean
+
+  """Apellidos del cliente"""
+  lastName: String!
+
+  """Número de teléfono"""
+  phone: String
 }
 
 """Datos para crear el pedido"""
@@ -433,6 +640,12 @@ input CreateProductInput {
 
 """Datos para crear una referencia"""
 input CreateReferenceInput {
+  """Estado de la referencia"""
+  active: Boolean
+
+  """Atributos de la referencia"""
+  attribIds: [String!]!
+
   """Marca de la referencia"""
   brandId: String!
 
@@ -440,16 +653,16 @@ input CreateReferenceInput {
   categoryLevel1Id: String!
 
   """Categoría nivel 2 de la referencia"""
-  categoryLevel2Id: String!
+  categoryLevel2Id: String
 
   """Categoría nivel 3 de la referencia"""
-  categoryLevel3Id: String!
+  categoryLevel3Id: String
 
   """Se puede cambiar"""
-  changeable: Boolean!
+  changeable: Boolean
 
-  """Compañía de la referencia"""
-  companyId: String!
+  """Combinaciones de talla y color para crear los productos"""
+  combinations: [CombinationInput!]
 
   """Costo de la referencia"""
   cost: Float!
@@ -483,6 +696,9 @@ input CreateReferenceInput {
 input CreateSizeInput {
   """Valor asignado a la talla"""
   value: String!
+
+  """Posición del ordenamiento"""
+  weight: String!
 }
 
 """Datos para crear el ajuste de productos"""
@@ -673,6 +889,18 @@ type DetailAdjustment {
   updatedAt: DateTime!
 }
 
+"""Producto a confirmar en el traslado"""
+input DetailConfirmStockTransferInput {
+  """Acción a efectuar con el producto (delete, update, create)"""
+  action: String!
+
+  """Identificador de mongo del producto"""
+  productId: String!
+
+  """Cantidad de productos"""
+  quantity: Float!
+}
+
 """Detalle de la salida de productos"""
 type DetailInput {
   """Fecha de agregado del deltalle a la entrada"""
@@ -690,6 +918,12 @@ type DetailInput {
 
 """Productos de la factura"""
 type DetailInvoice {
+  """Descuento del producto en la factura"""
+  discount: Float!
+
+  """Precio del producto en la factura"""
+  price: Float!
+
   """Producto agregado a la factura"""
   product: Product!
 
@@ -748,6 +982,18 @@ type DetailRequest {
 
   """Fecha de actualizado del producto a la solicitud"""
   updatedAt: DateTime!
+}
+
+"""Productos de la devolucion"""
+type DetailReturnInvoice {
+  """Precio del producto en la factura"""
+  price: Float!
+
+  """Producto agregado a la factura"""
+  product: Product!
+
+  """Cantidad de productos en la factura"""
+  quantity: Float!
 }
 
 """Productos del ajuste de productos"""
@@ -869,7 +1115,7 @@ type DetailTransfer {
   """Cantidad del productos confirmados en el traslado"""
   quantityConfirmed: Float
 
-  """Estado del producto (confirmed, new)"""
+  """Estado del producto (confirmed, new, sent)"""
   status: String!
 
   """Fecha de actualizacion el producto"""
@@ -897,8 +1143,44 @@ type DocumentType {
   user: User!
 }
 
+"""Egreso de dinero"""
+type Expense {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Caja que afecta el egreso"""
+  box: Box!
+
+  """Empresa a la que pertenece el egreso"""
+  company: Company!
+
+  """Concepto del egreso"""
+  concept: String
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Consecutivo del egreso"""
+  number: Float!
+
+  """Estado del egreso"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el egreso"""
+  user: User!
+
+  """Valor del egreso"""
+  valor: Float!
+}
+
 """Filtros para la lista de atributos"""
 input FiltersAttribsInput {
+  """Identificadores de los atributos"""
+  _ids: [String!]
+
   """Estado del atributo"""
   active: Boolean
 
@@ -917,6 +1199,9 @@ input FiltersAttribsInput {
 
 """Filtros para la lista de marcas"""
 input FiltersBrandsInput {
+  """Identificador de la marcas"""
+  _id: String
+
   """Estado del atributo"""
   active: Boolean
 
@@ -990,8 +1275,32 @@ input FiltersCitiesInput {
   state: String
 }
 
+"""Filtros para consultar los cierres X"""
+input FiltersClosesXInvoicingInput {
+  """Fecha del cierre"""
+  closeDate: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número del cierre"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Tienda del cierre"""
+  shopId: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCloseXInvoicing
+}
+
 """Filtros para la lista de colores"""
 input FiltersColorsInput {
+  """Identificador del color"""
+  _id: String
+
   """Estado de la bodega"""
   active: Boolean
 
@@ -1045,8 +1354,11 @@ input FiltersCustomersInput {
 
 """Filtros para los tipos de documento"""
 input FiltersDocumentTypesInput {
+  """Estado activo del documento"""
+  active: Boolean
+
   """Nombre del tipo de documento"""
-  name: String!
+  name: String
 }
 
 """Filtros para la lista de imagenes"""
@@ -1062,6 +1374,27 @@ input FiltersImagesInput {
 
   """Ordenamiento"""
   sort: SortImage
+}
+
+"""Filtros del listado de facturas"""
+input FiltersInvoicesInput {
+  """Si la factura de encuentra se encuentra activa"""
+  active: Boolean
+
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortInovice
 }
 
 """Filtros para obtener el listado de tipos de medios de pago"""
@@ -1085,6 +1418,27 @@ input FiltersPaymentsInput {
   type: String
 }
 
+"""Filtros para obtener los puntos de venta"""
+input FiltersPointOfSalesInput {
+  """Identificador del punto de venta"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín busqueda del punto de venta"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Tienda a la que pertenecen los puntos de venta"""
+  shopId: String
+
+  """Ordenamiento"""
+  sort: SortPointOfSale
+}
+
 input FiltersProductInput {
   """Identificador de mongo"""
   _id: String
@@ -1103,6 +1457,9 @@ input FiltersProductInput {
 
   """talla del producto"""
   size: String
+
+  """Estado del producto"""
+  status: String
 
   """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
@@ -1139,6 +1496,9 @@ input FiltersProductsInput {
 
   """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
+
+  """Se usa para seleccionar solo los productos que tengan inventario"""
+  withStock: Boolean
 }
 
 """Filtros para la lista de referencias"""
@@ -1177,8 +1537,68 @@ input FiltersReferencesInput {
   sort: SortReference
 }
 
+"""Filtros de listado de devoluciones de facturación"""
+input FiltersReturnsInvoiceInput {
+  """Si la devolucion de encuentra se encuentra activ<"""
+  active: Boolean
+
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortReturnInovice
+}
+
+"""Filtros usados para consultar las tiendas"""
+input FiltersShopsInput {
+  """Identificador de la tienda"""
+  _id: String
+
+  """Dirección de la sucursal"""
+  address: String
+
+  """Empresa de la tienda"""
+  companyId: String
+
+  """Bodega por defecto para la sucursal"""
+  defaultWarehouseId: String
+
+  """Meta asignada a la tienda"""
+  goal: Float
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín de la tienda"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Teléfono de la sucursal"""
+  phone: String
+
+  """Ordenamiento"""
+  sort: SortShop
+
+  """Estado de la tienda (active, inactive, suspend)"""
+  status: String
+}
+
 """Filtros para la lista de tallas"""
 input FiltersSizesInput {
+  """Identificador de la talla"""
+  _id: String
+
   """Estado de la bodega"""
   active: Boolean
 
@@ -1373,6 +1793,9 @@ input FiltersUsersInput {
 
 """Filtros de las bodegas"""
 input FiltersWarehousesInput {
+  """Identificador de la bodega"""
+  _id: String
+
   """Estado de la bodega"""
   active: Boolean
 
@@ -1436,6 +1859,9 @@ type Invoice {
   """Autorización de facturación"""
   authorization: AuthorizationDian!
 
+  """Empresa a la que perteneces la factura"""
+  company: Company!
+
   """Fecha de creación"""
   createdAt: DateTime!
 
@@ -1498,6 +1924,15 @@ type Mutation {
     addProductsOrderInput: AddProductsOrderInput!
   ): Order!
 
+  """Confirma los productos del traslado"""
+  confirmProductsStockTransfer(
+    """Datos para confirmar los productos del traslado"""
+    confirmStockTransferInput: ConfirmStockTransferInput!
+
+    """Identificador del traslado de productos"""
+    id: String!
+  ): StockTransfer!
+
   """Crea un atributo"""
   createAttrib(
     """Datos para crear un atributo"""
@@ -1516,11 +1951,23 @@ type Mutation {
     createCategoryInput: CreateCategoryInput!
   ): CategoryLevel1!
 
+  """Crea un cierre X de facturación"""
+  createCloseXInvoicing(
+    """Datos para crear el cierre x de facturación"""
+    createCloseXInvoicing: CreateCloseXInvoicingInput = {}
+  ): CloseXInvoicing!
+
   """Crea un color"""
   createColor(
     """Datos para crear el color"""
     createColorInput: CreateColorInput!
   ): Color!
+
+  """Se encarga crear un cliente"""
+  createCustomer(
+    """Parámetros para actualizar el cliente"""
+    createCustomerInput: CreateCustomerInput!
+  ): Customer!
 
   """Se encarga de crear el pedido"""
   createOrder(
@@ -1787,8 +2234,14 @@ type Payment {
   """Estado del tipo de los médios de pago"""
   active: Boolean!
 
+  """Color del medio de pago"""
+  color: String
+
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Logo para el medio de pago"""
+  logo: Image
 
   """Nombre del medio de pago"""
   name: String!
@@ -1821,10 +2274,25 @@ type PaymentOrder {
   payment: Payment!
 
   """Total pagado"""
+  receipt: Receipt
+
+  """Total pagado"""
   total: Float!
 
   """Fecha de actualizado del pago al pedido"""
   updatedAt: DateTime!
+}
+
+"""Resumen de los pagos"""
+type PaymentOrderClose {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de las pagos del medio"""
+  quantity: Float!
+
+  """Valor del medio de pago"""
+  value: Float!
 }
 
 """Medio de pago que se va a agregar"""
@@ -1868,6 +2336,12 @@ type PointOfSale {
   """Tienda a la que pertenece el punto de venta"""
   authorization: AuthorizationDian!
 
+  """Caja del punto de venta"""
+  box: Box!
+
+  """Fecha de cierre"""
+  closeDate: DateTime
+
   """Fecha de creación"""
   createdAt: DateTime!
 
@@ -1899,7 +2373,7 @@ type Product {
   createdAt: DateTime!
 
   """Imagenes del producto"""
-  images: [Image!]!
+  images: [Image!]
 
   """Referencia del producto"""
   reference: Reference!
@@ -1911,7 +2385,7 @@ type Product {
   status: String!
 
   """Inventario del producto por bodegas"""
-  stock: [Stock!]!
+  stock: [Stock!]
 
   """Fecha de actualización del producto"""
   updatedAt: DateTime!
@@ -1951,6 +2425,12 @@ type Query {
     filtersCitiesInput: FiltersCitiesInput = {}
   ): ResponseCities!
 
+  """Lista de cierres x"""
+  closesXInvoicing(
+    """Filtros de lista de cierres x"""
+    filtersClosesXInvoicing: FiltersClosesXInvoicingInput = {}
+  ): ResponseClosesXInvoicing!
+
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
@@ -1984,6 +2464,12 @@ type Query {
     filtersImagesInput: FiltersImagesInput = {}
   ): ResponseImages!
 
+  """Lista de facturas"""
+  invoices(
+    """Filtros de lista de facturas"""
+    filtersInvoices: FiltersInvoicesInput = {}
+  ): ResponseInvoices!
+
   """Obtiene la orden por el id"""
   orderId(
     """identificador del pedido"""
@@ -2002,6 +2488,12 @@ type Query {
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
 
+  """Lista de puntos de venta"""
+  pointOfSales(
+    """Filtros de lista de puntos de venta"""
+    filtersPointOfSales: FiltersPointOfSalesInput = {}
+  ): ResponsePointOfSales!
+
   """Obtiene un producto"""
   product(
     """Filtros para obtener el primer producto de la busqueda"""
@@ -2018,7 +2510,7 @@ type Query {
   referenceId(
     """Identificador de la referencia"""
     id: String!
-  ): Reference!
+  ): ReferenceData!
 
   """Listado de las referencias"""
   references(
@@ -2028,6 +2520,18 @@ type Query {
     """Filtros para las referencias"""
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!
+
+  """Lista de devoluciones de factura"""
+  returnsInvoice(
+    """Filtros de lista de devoluciones de factura"""
+    filtersReturnsInvoice: FiltersReturnsInvoiceInput = {}
+  ): ResponseReturnsInvoice!
+
+  """Se encarga de listar las tiendas"""
+  shops(
+    """Filtros para consultar las tiendas"""
+    filtersShopsInput: FiltersShopsInput = {}
+  ): ResponseShops!
 
   """Listar las tallas"""
   sizes(
@@ -2114,6 +2618,42 @@ type Query {
   ): ResponseWarehouses!
 }
 
+"""Egreso de dinero"""
+type Receipt {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Método de pago del recibo de caja"""
+  box: Box!
+
+  """Empresa a la que pertenece el recibo de caja"""
+  company: Company!
+
+  """Concepto del recibo de caja"""
+  concept: String
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Consecutivo del recibo de caja"""
+  number: Float!
+
+  """Método de pago del recibo de caja"""
+  payment: Payment!
+
+  """Estado del recibo de caja"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el recibo de caja"""
+  user: User!
+
+  """Valor del recibo de caja"""
+  value: Float!
+}
+
 """Referencia de los productos"""
 type Reference {
   """Identificador de mongo"""
@@ -2123,7 +2663,7 @@ type Reference {
   active: Boolean!
 
   """Atributos de la referencia"""
-  attribs: [Attrib!]!
+  attribs: [Attrib!]
 
   """Marca de la referencia"""
   brand: Brand!
@@ -2132,10 +2672,10 @@ type Reference {
   categoryLevel1: CategoryLevel1!
 
   """Categoría Nivel 2 de la referencia"""
-  categoryLevel2: CategoryLevel2!
+  categoryLevel2: CategoryLevel2
 
   """Categoría Nivel 3 de la referencia"""
-  categoryLevel3: CategoryLevel3!
+  categoryLevel3: CategoryLevel3
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!
@@ -2177,7 +2717,7 @@ type ReferenceData {
   active: Boolean!
 
   """Atributos de la referencia"""
-  attribs: [Attrib!]!
+  attribs: [Attrib!]
 
   """Marca de la referencia"""
   brand: Brand!
@@ -2186,10 +2726,10 @@ type ReferenceData {
   categoryLevel1: CategoryLevel1!
 
   """Categoría Nivel 2 de la referencia"""
-  categoryLevel2: CategoryLevel2!
+  categoryLevel2: CategoryLevel2
 
   """Categoría Nivel 3 de la referencia"""
-  categoryLevel3: CategoryLevel3!
+  categoryLevel3: CategoryLevel3
 
   """Determina si la referencia se puede cambiar"""
   changeable: Boolean!
@@ -2360,6 +2900,39 @@ type ResponseCities {
   totalPages: Float!
 }
 
+"""Lista de cierres X"""
+type ResponseClosesXInvoicing {
+  """Lista de cierres X"""
+  docs: [CloseXInvoicing!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de los colores"""
 type ResponseColors {
   """Lista de colores"""
@@ -2492,10 +3065,76 @@ type ResponseImages {
   totalPages: Float!
 }
 
+"""Lista de facturas"""
+type ResponseInvoices {
+  """Lista de facturas"""
+  docs: [Invoice!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta a la consulta de metodos de pago"""
 type ResponsePayments {
   """Lista de metodos de pago"""
   docs: [Payment!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de puntos de venta"""
+type ResponsePointOfSales {
+  """Lista de puntos de venta"""
+  docs: [PointOfSale!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2562,6 +3201,72 @@ type ResponseProducts {
 type ResponseReferences {
   """Lista de referencias"""
   docs: [ReferenceData!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de devoluciones de factura"""
+type ResponseReturnsInvoice {
+  """Lista de ajustes"""
+  docs: [ReturnInvoice!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de tiendas"""
+type ResponseShops {
+  """Lista de tiendas"""
+  docs: [Shop!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2822,6 +3527,42 @@ type ResponseWarehouses {
   totalPages: Float!
 }
 
+"""Devoluciones de facturación"""
+type ReturnInvoice {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Autorización"""
+  authorization: AuthorizationDian!
+
+  """Compañía a la que pertence el ajuste"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Productos de la devolución"""
+  details: [DetailReturnInvoice!]
+
+  """Factura de la devolución"""
+  invoice: Invoice!
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Estado del ajuste (open, confirmed, cancelled)"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la factrura"""
+  user: User!
+
+  """Bodega del ajuste"""
+  warehouse: Warehouse!
+}
+
 """Rol del usuario """
 type Role {
   """Identificador de mongo"""
@@ -2972,6 +3713,9 @@ type Size {
 
   """Valor de la talla"""
   value: String!
+
+  """Peso de la talla para el ordenamiento"""
+  weight: Float!
 }
 
 """Ordenamiento para el listado de atributos"""
@@ -3012,6 +3756,21 @@ input SortCity {
   state: Float
 
   """ordernamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de cierre z"""
+input SortCloseXInvoicing {
+  """Ordenamiento por fecha de cierre"""
+  closeDate: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por numero"""
+  number: Float
+
+  """Ordenamiento por fecha de actualización"""
   updatedAt: Float
 }
 
@@ -3068,12 +3827,29 @@ input SortImage {
   name: Float
 }
 
+"""Ordenamiento de facturas"""
+input SortInovice {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento de la teinda"""
 input SortPayment {
   active: Float
   createdAt: Float
   name: Float
   type: Float
+  updatedAt: Float
+}
+
+"""Ordenamiento para el listado de colores"""
+input SortPointOfSale {
+  closeDate: Float
+  createdAt: Float
+  name: Float
   updatedAt: Float
 }
 
@@ -3097,12 +3873,32 @@ input SortReference {
   price: Float
 }
 
+"""Ordenamiento de las devoluciones en factura"""
+input SortReturnInovice {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de la tienda"""
+input SortShop {
+  address: Float
+  createdAt: Float
+  goal: Float
+  name: Float
+  phone: Float
+  status: Float
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de tallas"""
 input SortSize {
   active: Float
   createdAt: Float
   updatedAt: Float
-  value: Float
+  weight: Float
 }
 
 """Ordenamiento del ajuste de productos"""
@@ -3362,6 +4158,9 @@ type StockRequest {
   """Usuario que crea la solicitud"""
   code: String @deprecated(reason: "Migración mysql")
 
+  """Compañía a la que pertence la solicitud"""
+  company: Company!
+
   """Fecha de creación de la solicitud"""
   createdAt: DateTime!
 
@@ -3394,6 +4193,9 @@ type StockRequest {
 type StockTransfer {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañía a la que pertence el traslado"""
+  company: Company!
 
   """Fecha de creación del traslado"""
   createdAt: DateTime!
@@ -3477,6 +4279,21 @@ type SummaryOrder {
 
   """Total pago del pedido"""
   totalPaid: Float!
+}
+
+"""Resumen de las ordenes"""
+type SummaryOrderClose {
+  """Cantidad de las ordenes canceladas"""
+  quantityCancel: Float!
+
+  """Cantidad de las ordenes finalizadas"""
+  quantityClosed: Float!
+
+  """Cantidad de las ordenes abiertas"""
+  quantityOpen: Float!
+
+  """Valor de las ordenes finalizadas"""
+  value: Float!
 }
 
 """Datos para actualizar el atributo"""
@@ -3654,6 +4471,9 @@ input UpdateSizeInput {
 
   """Valor asignado a la talla"""
   value: String
+
+  """Posición del ordenamiento"""
+  weight: Float
 }
 
 """Datos para actualizar el ajuste de productos"""

@@ -22,6 +22,10 @@ import { Product } from '../entities/product.entity';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
 import { Image } from 'src/staticfiles/entities/image.entity';
+import { WarehousesService } from 'src/shops/services/warehouses.service';
+import { ColorsService } from './colors.service';
+import { SizesService } from './sizes.service';
+import { AttribsService } from './attribs.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -41,6 +45,10 @@ export class ReferencesService {
 		private readonly productModel: PaginateModel<Product>,
 		private readonly brandsService: BrandsService,
 		private readonly categoriesService: CategoriesService,
+		private readonly warehousesService: WarehousesService,
+		private readonly colorsService: ColorsService,
+		private readonly sizesService: SizesService,
+		private readonly attribsService: AttribsService,
 	) {}
 
 	async findAll(
@@ -145,14 +153,38 @@ export class ReferencesService {
 			filters.companies = { $in: new Types.ObjectId(companyId) };
 		}
 
-		const response = await this.referenceModel
+		const reference = await this.referenceModel
 			.findOne(filters)
 			.populate(populate)
 			.lean();
-		if (response) {
-			return response;
+		if (!reference) {
+			throw new NotFoundException('La referencia no existe');
 		}
-		throw new NotFoundException('La referencia no existe');
+
+		const products = await this.productModel
+			.find({
+				reference: reference?._id,
+				status: 'active',
+			})
+			.populate([
+				'size',
+				{
+					path: 'color',
+					populate: {
+						path: 'image',
+						model: Image.name,
+					},
+				},
+				{
+					path: 'images',
+					model: Image.name,
+				},
+			]);
+
+		return {
+			...reference,
+			products,
+		};
 	}
 
 	async findOne(params: FiltersReferenceInput) {
@@ -170,11 +202,12 @@ export class ReferencesService {
 			categoryLevel1Id,
 			categoryLevel2Id,
 			categoryLevel3Id,
-			companyId,
+			attribIds,
+			combinations,
 			...props
 		}: CreateReferenceInput,
 		user: User,
-		companyIdUser: string,
+		companyId: string,
 	) {
 		const brand = await this.brandsService.findById(brandId);
 
@@ -182,56 +215,162 @@ export class ReferencesService {
 			throw new NotFoundException('La marca no existe');
 		}
 
-		const categoryLevel1 = await this.categoriesService.findById(
-			categoryLevel1Id,
-			1,
-		);
+		let categoryLevel1;
+		if (categoryLevel1Id) {
+			categoryLevel1 = await this.categoriesService.findById(
+				categoryLevel1Id,
+				1,
+			);
 
-		if (!categoryLevel1) {
-			throw new NotFoundException('La categoría nivel 1 no existe');
+			if (!categoryLevel1) {
+				throw new NotFoundException('La categoría nivel 1 no existe');
+			}
+		}
+		let categoryLevel2;
+		if (categoryLevel2Id) {
+			categoryLevel2 = await this.categoriesService.findById(
+				categoryLevel2Id,
+				2,
+			);
+
+			if (!categoryLevel2) {
+				throw new NotFoundException('La categoría nivel 2 no existe');
+			}
 		}
 
-		const categoryLevel2 = await this.categoriesService.findById(
-			categoryLevel2Id,
-			2,
-		);
+		let categoryLevel3;
+		if (categoryLevel3Id) {
+			categoryLevel3 = await this.categoriesService.findById(
+				categoryLevel3Id,
+				3,
+			);
 
-		if (!categoryLevel2) {
-			throw new NotFoundException('La categoría nivel 2 no existe');
+			if (!categoryLevel3) {
+				throw new NotFoundException('La categoría nivel 3 no existe');
+			}
 		}
 
-		const categoryLevel3 = await this.categoriesService.findById(
-			categoryLevel3Id,
-			3,
-		);
+		const attribs = [];
 
-		if (!categoryLevel3) {
-			throw new NotFoundException('La categoría nivel 3 no existe');
+		for (let i = 0; i < attribIds?.length; i++) {
+			const attribId = attribIds[i];
+			const attrib = await this.attribsService.findById(attribId);
+			if (!attrib) {
+				throw new NotFoundException('Atributo no existe');
+			}
+			attribs.push(attrib._id);
 		}
 
 		const reference = new this.referenceModel({
 			...props,
 			user,
 			brand: brand._id,
-			categoryLevel1: categoryLevel1._id,
-			categoryLevel2: categoryLevel2._id,
-			categoryLevel3: categoryLevel3._id,
+			categoryLevel1: categoryLevel1?._id,
+			categoryLevel2: categoryLevel2?._id,
+			categoryLevel3: categoryLevel3?._id,
+			attribs,
 			shipping: {
 				weight,
 				width,
 				long,
 				volume,
 				height,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			},
-			companies: [companyIdUser],
+			companies: [new Types.ObjectId(companyId)],
 		});
+		const responseReference = await reference.save();
 
-		return (await reference.save()).populate(populate);
+		if (responseReference && combinations?.length > 0) {
+			const warehouses = await this.warehousesService.getAll();
+
+			const stock = warehouses.map((warehouse) => ({
+				warehouse: warehouse._id,
+				quantity: 0,
+				user,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			}));
+
+			const products = await this.productModel.paginate({}, { limit: 0 });
+
+			for (let i = 0; i < combinations?.length; i++) {
+				const { colorId, sizeId, imageIds } = combinations[i];
+				const color = await this.colorsService.findById(colorId);
+				if (!color) {
+					throw new NotFoundException(
+						'La referencia fue creada pero algunos productos tienen un color que no existe',
+					);
+				}
+				const size = await this.sizesService.findById(sizeId);
+				if (!size) {
+					throw new NotFoundException(
+						'La referencia fue creada pero algunos productos tienen una talla que no existe',
+					);
+				}
+
+				const total = () => {
+					const totalData = products.totalDocs + i;
+					if (totalData < 10) {
+						return `00000${totalData}`;
+					}
+
+					if (totalData < 100) {
+						return `0000${totalData}`;
+					}
+
+					if (totalData < 1000) {
+						return `000${totalData}`;
+					}
+
+					if (totalData < 10000) {
+						return `00${totalData}`;
+					}
+
+					if (totalData < 100000) {
+						return `0${totalData}`;
+					}
+
+					if (totalData < 1000000) {
+						return `${totalData}`;
+					}
+				};
+
+				const barcode = `7700000${total()}`;
+
+				const newProduct = new this.productModel({
+					reference: responseReference._id,
+					barcode,
+					color: color._id,
+					size: size._id,
+					images: imageIds?.map((id) => new Types.ObjectId(id)) || [],
+					user,
+					stock,
+				});
+
+				await newProduct.save();
+			}
+		}
+
+		return responseReference;
 	}
 
 	async update(
 		id: string,
-		params: UpdateReferenceInput,
+		{
+			categoryLevel1Id,
+			attribIds,
+			categoryLevel2Id,
+			categoryLevel3Id,
+			brandId,
+			height,
+			long,
+			volume,
+			weight,
+			width,
+			...params
+		}: UpdateReferenceInput,
 		user: User,
 		companyId: string,
 	) {
@@ -249,11 +388,83 @@ export class ReferencesService {
 			);
 		}
 
-		return this.referenceModel.findByIdAndUpdate(id, {
-			$set: {
-				...params,
+		let categoryLevel1;
+		if (categoryLevel1Id) {
+			categoryLevel1 = await this.categoriesService.findById(
+				categoryLevel1Id,
+				1,
+			);
+
+			if (!categoryLevel1) {
+				throw new NotFoundException('La categoría nivel 1 no existe');
+			}
+		}
+
+		let categoryLevel2;
+		if (categoryLevel2Id) {
+			categoryLevel2 = await this.categoriesService.findById(
+				categoryLevel2Id,
+				2,
+			);
+
+			if (!categoryLevel2) {
+				throw new NotFoundException('La categoría nivel 2 no existe');
+			}
+		}
+
+		let categoryLevel3;
+		if (categoryLevel3Id) {
+			categoryLevel3 = await this.categoriesService.findById(
+				categoryLevel3Id,
+				3,
+			);
+
+			if (!categoryLevel3) {
+				throw new NotFoundException('La categoría nivel 3 no existe');
+			}
+		}
+
+		const attribs: any = [];
+		if (attribIds) {
+			for (let i = 0; i < attribIds?.length; i++) {
+				const attribId = attribIds[i];
+
+				const attrib = await this.attribsService.findById(attribId);
+
+				if (!attrib) {
+					throw new NotFoundException('Uno de los atributos no existe');
+				}
+
+				attribs.push(attrib._id);
+			}
+		}
+
+		let brand;
+		if (brandId) {
+			brand = await this.brandsService.findById(brandId);
+			if (!brand) {
+				throw new NotFoundException('La marca no existe');
+			}
+		}
+
+		return this.referenceModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					categoryLevel1,
+					categoryLevel2,
+					categoryLevel3,
+					attribs,
+					brand,
+					...params,
+				},
 			},
-		});
+			{
+				lean: true,
+				populate,
+				new: true,
+			},
+		);
 	}
 
 	/**

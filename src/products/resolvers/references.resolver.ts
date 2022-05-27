@@ -4,7 +4,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateReferenceInput } from '../dtos/create-reference.input';
 import { FiltersReferencesInput } from '../dtos/filters-references.input';
-import { ResponseReferences } from '../dtos/response-references';
+import { ResponseReferences, ReferenceData } from '../dtos/response-references';
 import { UpdateReferenceInput } from '../dtos/update-reference';
 import { Reference } from '../entities/reference.entity';
 import { ReferencesService } from '../services/references.service';
@@ -39,7 +39,7 @@ export class ReferencesResolver {
 		);
 	}
 
-	@Query(() => Reference, {
+	@Query(() => ReferenceData, {
 		name: 'referenceId',
 		description: 'Obtiene la referencia por el identificador',
 	})

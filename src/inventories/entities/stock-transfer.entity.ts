@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types, Schema as SchemaMongo } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -7,6 +7,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { StockRequest } from './stock-request.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 @ObjectType({ description: 'Detalle del traslado de productos' })
 class DetailTransfer {
@@ -27,7 +28,7 @@ class DetailTransfer {
 	quantityConfirmed?: number;
 
 	@Field(() => String, {
-		description: 'Estado del producto (confirmed, new)',
+		description: 'Estado del producto (confirmed, new, sent)',
 	})
 	status: string;
 
@@ -71,6 +72,12 @@ export class StockTransfer extends Document {
 	@Field(() => [DetailTransfer], { description: 'Detalle de los productos' })
 	details: DetailTransfer[];
 
+	@Field(() => Company, {
+		description: 'Compañía a la que pertence el traslado',
+	})
+	@Prop({ type: Object, required: true })
+	company: Company;
+
 	@Prop({ type: String })
 	@Field(() => String, {
 		description: 'Observación del que crea el traslado',
@@ -104,15 +111,16 @@ export class StockTransfer extends Document {
 	observation?: string;
 
 	@Prop({
-		type: [SchemaMongo.Types.ObjectId],
+		type: [Types.ObjectId],
 		ref: 'StockRequest',
 		autopopulate: true,
+		default: [],
 	})
 	@Field(() => [StockRequest], {
 		description: 'Solicitudes usadas',
 		nullable: true,
 	})
-	requests: Types.ObjectId[];
+	requests?: Types.ObjectId[];
 
 	@Field(() => Date, { description: 'Fecha de creación del traslado' })
 	createdAt: Date;

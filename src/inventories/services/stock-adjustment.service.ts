@@ -55,6 +55,7 @@ const populate = [
 		],
 	},
 ];
+
 const statusTypes = ['cancelled', 'open', 'confirmed'];
 
 @Injectable()
@@ -189,6 +190,17 @@ export class StockAdjustmentService {
 				productId,
 				warehouseId,
 			);
+
+			if (!product) {
+				throw new BadRequestException('Uno de los productos no existe');
+			}
+
+			if (product?.status !== 'active') {
+				throw new BadRequestException(
+					`El producto ${product?.barcode} no se encuentra activo`,
+				);
+			}
+
 			detailsAdjustment.push({
 				product,
 				quantity,
@@ -232,7 +244,7 @@ export class StockAdjustmentService {
 				.filter((detail) => detail.product.stock[0].quantity < detail.quantity)
 				.map((detail) => ({
 					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
+					quantity: detail.quantity - detail.product.stock[0].quantity,
 				}));
 
 			const deleteStockHistoryInput: CreateStockHistoryInput = {
@@ -336,13 +348,22 @@ export class StockAdjustmentService {
 					);
 					if (productFind) {
 						throw new BadRequestException(
-							`El producto ${productFind.product.reference} / ${productFind.product.barcode} ya se encuentra registrado`,
+							`El producto ${productFind?.product?.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
 						);
 					}
 					const product = await this.productsService.findById(
 						productId,
 						stockAdjustment.warehouse._id.toString(),
 					);
+					if (!product) {
+						throw new BadRequestException('Uno de los productos no existe');
+					}
+
+					if (product?.status !== 'active') {
+						throw new BadRequestException(
+							`El producto ${product?.barcode} no se encuentra activo`,
+						);
+					}
 					newDetails.push({
 						product,
 						quantity,

@@ -50,7 +50,7 @@ export class CustomersService {
 		if (dato) {
 			filters.$or = [
 				{
-					identification: {
+					document: {
 						$regex: dato,
 						$options: 'i',
 					},
@@ -104,12 +104,15 @@ export class CustomersService {
 		return this.customerModel.findOne(filters).lean();
 	}
 
-	async create({
-		documentTypeId,
-		customerTypeId,
-		document,
-		...params
-	}: CreateCustomerInput) {
+	async create(
+		{
+			documentTypeId,
+			customerTypeId,
+			document,
+			...params
+		}: CreateCustomerInput,
+		user: User,
+	) {
 		const customer = await this.customerModel.findOne({ document });
 
 		if (customer) {
@@ -123,19 +126,21 @@ export class CustomersService {
 		if (!documentType) {
 			throw new NotFoundException('El tipo de documento no existe');
 		}
-
-		const customerType = await this.customerTypeService.findById(
-			customerTypeId,
-		);
-
-		if (!customerType) {
-			throw new NotFoundException('El tipo de cliente no existe');
+		let customerType;
+		if (customerTypeId) {
+			customerType = await this.customerTypeService.findById(customerTypeId);
+			if (!customerType) {
+				throw new NotFoundException('El tipo de cliente no existe');
+			}
+		} else {
+			customerType = await this.customerTypeService.findOne('Detal');
 		}
 
 		const newCustomer = new this.customerModel({
 			documentType: documentType._id,
 			document,
 			customerType: customerType._id,
+			user,
 			...params,
 		});
 

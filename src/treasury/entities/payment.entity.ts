@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Image } from 'src/staticfiles/entities/image.entity';
 
 import { User } from 'src/users/entities/user.entity';
 
@@ -19,6 +20,20 @@ export class Payment extends Document {
 	})
 	@Prop({ type: String, required: true })
 	type: string;
+
+	@Field(() => String, {
+		description: 'Color del medio de pago',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	color?: string;
+
+	@Field(() => Image, {
+		description: 'Logo para el medio de pago',
+		nullable: true,
+	})
+	@Prop({ type: Types.ObjectId, ref: Image.name })
+	logo?: Types.ObjectId;
 
 	@Field(() => Boolean, {
 		description: 'Estado del tipo de los médios de pago',

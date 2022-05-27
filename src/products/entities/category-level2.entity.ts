@@ -11,7 +11,10 @@ export class CategoryLevel2 extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: ObjectId;
 
-	@Field(() => String, { description: 'Nombre de la categoría' })
+	@Field(() => String, {
+		description: 'Nombre de la categoría',
+		nullable: true,
+	})
 	@Prop({ type: String, required: true })
 	name: string;
 
@@ -25,7 +28,7 @@ export class CategoryLevel2 extends Document {
 		ref: CategoryLevel3.name,
 		autopopulate: true,
 	})
-	childs: Types.ObjectId[];
+	childs?: Types.ObjectId[];
 
 	@Field(() => String, {
 		description: 'Identificador de la categoría padre',

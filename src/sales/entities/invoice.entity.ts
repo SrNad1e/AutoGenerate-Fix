@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 
 import { Customer } from 'src/crm/entities/customer.entity';
 import { Product } from 'src/products/entities/product.entity';
@@ -16,6 +17,12 @@ export class DetailInvoice {
 
 	@Field(() => Number, { description: 'Cantidad de productos en la factura' })
 	quantity: number;
+
+	@Field(() => Number, { description: 'Descuento del producto en la factura' })
+	discount: number;
+
+	@Field(() => Number, { description: 'Precio del producto en la factura' })
+	price: number;
 }
 
 @ObjectType({ description: 'Medios de pago de la factura' })
@@ -57,7 +64,7 @@ export class Invoice extends Document {
 	@Field(() => AuthorizationDian, {
 		description: 'Autorización de facturación',
 	})
-	@Prop({ type: Number, required: true })
+	@Prop({ type: Object, required: true })
 	authorization: AuthorizationDian;
 
 	@Field(() => Number, { description: 'Número de factura' })
@@ -70,6 +77,16 @@ export class Invoice extends Document {
 		required: true,
 	})
 	customer: Customer;
+
+	@Field(() => Company, {
+		description: 'Empresa a la que perteneces la factura',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: Company.name,
+		autopopulate: true,
+	})
+	company: Types.ObjectId;
 
 	@Field(() => Shop, { description: 'Tienda donde se realiza la factura' })
 	@Prop({

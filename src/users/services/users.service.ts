@@ -22,7 +22,6 @@ import { RolesService } from './roles.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { FiltersUserInput } from '../dtos/filters-user.input';
 import { Customer } from 'src/crm/entities/customer.entity';
-import { CustomerType } from 'src/crm/entities/customerType.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },
@@ -30,13 +29,6 @@ const populate = [
 	{ path: 'pointOfSale', model: PointOfSale.name },
 	{ path: 'companies', model: Company.name },
 	{ path: 'customer', model: Customer.name },
-	/*{
-		path: 'customer',
-		populate: {
-			path: 'customerType',
-			model: CustomerType.name,
-		},
-	},*/
 	{
 		path: 'shop',
 		populate: {
@@ -46,10 +38,12 @@ const populate = [
 	},
 	{
 		path: 'pointOfSale',
-		populate: {
-			path: 'authorization',
-			model: AuthorizationDian.name,
-		},
+		populate: [
+			{
+				path: 'authorization',
+				model: AuthorizationDian.name,
+			},
+		],
 	},
 
 	{

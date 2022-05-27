@@ -7,6 +7,7 @@ import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
+import { Receipt } from 'src/treasury/entities/receipt.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
@@ -47,6 +48,9 @@ export class PaymentOrder {
 
 	@Field(() => Number, { description: 'Total pagado' })
 	total: number;
+
+	@Field(() => Receipt, { description: 'Total pagado', nullable: true })
+	receipt?: Types.ObjectId;
 
 	@Field(() => Date, {
 		description: 'Fecha de agregado del pago al pedido',
@@ -110,6 +114,7 @@ export class Order extends Document {
 	})
 	@Prop({
 		type: Object,
+		default: [],
 	})
 	payments: PaymentOrder[];
 
