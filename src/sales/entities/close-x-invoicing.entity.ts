@@ -94,7 +94,7 @@ export class CloseXInvoicing extends Document {
 	@Field(() => PointOfSale, {
 		description: 'Punto de venta que registra el cierre',
 	})
-	@Prop({ type: Types.ObjectId, required: true })
+	@Prop({ type: Types.ObjectId, ref: PointOfSale.name, required: true })
 	pointOfSale: Types.ObjectId;
 
 	@Field(() => Date, { description: 'Fecha de cierre' })

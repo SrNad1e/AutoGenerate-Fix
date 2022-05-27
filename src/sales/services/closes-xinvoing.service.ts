@@ -1,26 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
-import { Payment } from 'src/treasury/entities/payment.entity';
+import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
 import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
-import { PointOfSale } from '../entities/pointOfSale.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 
-const populate = [
+const populate: PopulateOptions[] = [
 	{
 		path: 'pointOfSale',
-		model: PointOfSale.name,
+		populate: [
+			{
+				path: 'authorization',
+				model: 'AuthorizationDian',
+			},
+			{
+				path: 'shop',
+				model: 'Shop',
+			},
+		],
 	},
 	{
 		path: 'payments',
 		populate: {
 			path: 'payment',
-			model: Payment.name,
+			model: 'Payment',
 		},
 	},
 ];
@@ -78,10 +85,14 @@ export class ClosesXInvoingService {
 			limit,
 			page,
 			sort,
+			populate,
 			lean: true,
 		};
+		const response = await this.closeXInvoicingModel.paginate(filters, options);
 
-		return this.closeXInvoicingModel.paginate(filters, options);
+		console.log(response?.docs[0]?.pointOfSale);
+
+		return response;
 	}
 
 	async create(
@@ -111,7 +122,7 @@ export class ClosesXInvoingService {
 		const newClose = new this.closeXInvoicingModel({
 			cashRegister,
 			number,
-			company: companyId,
+			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			closeDate: new Date(closeDate),
 			...summaryOrder,
