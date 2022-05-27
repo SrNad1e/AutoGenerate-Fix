@@ -400,6 +400,9 @@ type CloseXInvoicing {
   """Fecha de creación"""
   createdAt: DateTime!
 
+  """Egresos del día"""
+  expenses: [Expense!]
+
   """Número consecutivo"""
   number: Float!
 
@@ -1138,6 +1141,39 @@ type DocumentType {
 
   """Usuario que creó o editó el pedido"""
   user: User!
+}
+
+"""Egreso de dinero"""
+type Expense {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Caja que afecta el egreso"""
+  box: Box!
+
+  """Empresa a la que pertenece el egreso"""
+  company: Company!
+
+  """Concepto del egreso"""
+  concept: String
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Consecutivo del egreso"""
+  number: Float!
+
+  """Estado del egreso"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el egreso"""
+  user: User!
+
+  """Valor del egreso"""
+  valor: Float!
 }
 
 """Filtros para la lista de atributos"""

@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Box } from './box.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Egreso de dinero' })
@@ -41,6 +42,16 @@ export class Expense extends Document {
 		autopopulate: true,
 	})
 	company: Types.ObjectId;
+
+	@Field(() => Box, {
+		description: 'Caja que afecta el egreso',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: Box.name,
+		autopopulate: true,
+	})
+	box: Types.ObjectId;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el egreso',

@@ -6,6 +6,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { PointOfSale } from './pointOfSale.entity';
+import { Expense } from 'src/treasury/entities/expense.entity';
 
 @ObjectType({ description: 'Arqueo de caja' })
 export class CashRegister {
@@ -104,6 +105,10 @@ export class CloseXInvoicing extends Document {
 	@Field(() => SummaryOrderClose, { description: 'Datos de las ordenes' })
 	@Prop({ type: Object, requiere: true })
 	summaryOrder: SummaryOrderClose;
+
+	@Field(() => [Expense], { description: 'Egresos del día', nullable: true })
+	@Prop({ type: Types.ObjectId, default: [] })
+	expenses?: Types.ObjectId;
 
 	@Field(() => [PaymentOrderClose], {
 		description: 'Listado de pagos',

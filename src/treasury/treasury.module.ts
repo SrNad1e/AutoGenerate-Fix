@@ -11,6 +11,7 @@ import { ReceiptsService } from './services/receipts.service';
 import { BoxHistoryService } from './services/box-history.service';
 import { BoxHistory, BoxHistorySchema } from './entities/box-history.entity';
 import { BoxService } from './services/box.service';
+import { ExpenseService } from './services/expense.service';
 
 @Module({
 	imports: [
@@ -57,6 +58,7 @@ import { BoxService } from './services/box.service';
 		ReceiptsService,
 		BoxHistoryService,
 		BoxService,
+		ExpenseService,
 	],
 	exports: [PaymentsService, ReceiptsService],
 })
