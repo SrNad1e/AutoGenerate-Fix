@@ -312,7 +312,7 @@ export class OrdersService {
 
 	async getSummaryOrder(closeDate: string, pointOfSaleId: string) {
 		const dateIntial = new Date(closeDate);
-		const dateFinal = dayjs(closeDate).add(1, 'd');
+		const dateFinal = dayjs(closeDate).add(1, 'd').toDate();
 
 		const ordersCancel: any = await this.orderModel.aggregate([
 			{
@@ -335,7 +335,7 @@ export class OrdersService {
 			},
 		]);
 
-		const ordersOpen: any = await this.orderModel.aggregate([
+		const aggregate = [
 			{
 				$match: {
 					updatedAt: {
@@ -354,7 +354,9 @@ export class OrdersService {
 					},
 				},
 			},
-		]);
+		];
+
+		const ordersOpen: any = await this.orderModel.aggregate(aggregate);
 
 		const ordersClosed: any = await this.orderModel.aggregate([
 			{
@@ -413,10 +415,10 @@ export class OrdersService {
 
 		return {
 			summaryOrder: {
-				quantityClosed: ordersClosed?.total || 0,
-				quantityOpen: ordersOpen?.total || 0,
-				quantityCancel: ordersCancel?.total || 0,
-				value: ordersClosed?.value || 0,
+				quantityClosed: ordersClosed[0]?.total || 0,
+				quantityOpen: ordersOpen[0]?.total || 0,
+				quantityCancel: ordersCancel[0]?.total || 0,
+				value: ordersClosed[0]?.value || 0,
 			},
 			payments:
 				payments?.map((payment) => ({

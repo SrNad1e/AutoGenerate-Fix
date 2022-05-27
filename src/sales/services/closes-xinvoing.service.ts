@@ -73,12 +73,15 @@ export class ClosesXInvoingService {
 				user,
 				companyId,
 			);
+
 			if (pointOfSales?.docs?.length > 0) {
 				const ids = pointOfSales?.docs?.map(
 					(pointOfSale) => new Types.ObjectId(pointOfSale._id),
 				);
 
 				filters.pointOfSale = { $in: ids };
+			} else {
+				filters.pointOfSale = '';
 			}
 		}
 		const options = {
@@ -88,11 +91,7 @@ export class ClosesXInvoingService {
 			populate,
 			lean: true,
 		};
-		const response = await this.closeXInvoicingModel.paginate(filters, options);
-
-		console.log(response?.docs[0]?.pointOfSale);
-
-		return response;
+		return this.closeXInvoicingModel.paginate(filters, options);
 	}
 
 	async create(
@@ -115,6 +114,9 @@ export class ClosesXInvoingService {
 			.findOne({
 				company: new Types.ObjectId(companyId),
 			})
+			.sort({
+				_id: -1,
+			})
 			.lean();
 
 		const number = (closeX?.number || 0) + 1;
@@ -128,7 +130,14 @@ export class ClosesXInvoingService {
 			...summaryOrder,
 			user,
 		});
+		const response = await (await newClose.save()).populate(populate);
 
-		return (await newClose.save()).populate(populate);
+		return {
+			...response['_doc'],
+			pointOfSale: {
+				...response?.pointOfSale['_doc'],
+				authorization: response?.pointOfSale['authorization']._doc,
+			},
+		};
 	}
 }
