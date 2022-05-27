@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
+import * as dayjs from 'dayjs';
+import { ExpensesService } from 'src/treasury/services/expenses.service';
 
 import { User } from 'src/users/entities/user.entity';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
@@ -39,6 +41,7 @@ export class ClosesXInvoingService {
 		private readonly closeXInvoicingModel: PaginateModel<CloseXInvoicing>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
+		private readonly expensessService: ExpensesService,
 	) {}
 
 	async findAll(
@@ -110,6 +113,21 @@ export class ClosesXInvoingService {
 			pointOfSaleId,
 		);
 
+		const dateInitial = dayjs(closeDate).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate).add(1, 'd').format('YYYY/MM/DD');
+
+		const expenses = await this.expensessService.findAll(
+			{
+				status: 'active',
+				limit: 200,
+				boxId: pointOfSaleId,
+				dateInitial,
+				dateFinal,
+			},
+			user,
+			companyId,
+		);
+
 		const closeX = await this.closeXInvoicingModel
 			.findOne({
 				company: new Types.ObjectId(companyId),
@@ -126,6 +144,7 @@ export class ClosesXInvoingService {
 			number,
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
+			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
 			closeDate: new Date(closeDate),
 			...summaryOrder,
 			user,

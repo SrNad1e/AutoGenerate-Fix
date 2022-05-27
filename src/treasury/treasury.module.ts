@@ -11,7 +11,7 @@ import { ReceiptsService } from './services/receipts.service';
 import { BoxHistoryService } from './services/box-history.service';
 import { BoxHistory, BoxHistorySchema } from './entities/box-history.entity';
 import { BoxService } from './services/box.service';
-import { ExpenseService } from './services/expense.service';
+import { ExpensesService } from './services/expenses.service';
 
 @Module({
 	imports: [
@@ -58,8 +58,8 @@ import { ExpenseService } from './services/expense.service';
 		ReceiptsService,
 		BoxHistoryService,
 		BoxService,
-		ExpenseService,
+		ExpensesService,
 	],
-	exports: [PaymentsService, ReceiptsService],
+	exports: [PaymentsService, ReceiptsService, ExpensesService],
 })
 export class TreasuryModule {}

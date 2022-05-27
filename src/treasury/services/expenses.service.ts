@@ -8,7 +8,7 @@ import { FiltersExpensesInput } from '../dtos/filters-expenses.input';
 import { Expense } from '../entities/expense.entity';
 
 @Injectable()
-export class ExpenseService {
+export class ExpensesService {
 	constructor(
 		@InjectModel(Expense.name)
 		private readonly expenseModel: PaginateModel<Expense>,

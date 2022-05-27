@@ -107,8 +107,8 @@ export class CloseXInvoicing extends Document {
 	summaryOrder: SummaryOrderClose;
 
 	@Field(() => [Expense], { description: 'Egresos del día', nullable: true })
-	@Prop({ type: Types.ObjectId, default: [] })
-	expenses?: Types.ObjectId;
+	@Prop({ type: [Types.ObjectId], default: [] })
+	expenses?: Types.ObjectId[];
 
 	@Field(() => [PaymentOrderClose], {
 		description: 'Listado de pagos',
