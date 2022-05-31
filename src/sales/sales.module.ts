@@ -37,6 +37,7 @@ import {
 	CloseZInvoicing,
 	CloseZInvoicingSchema,
 } from './entities/close-z-invoicing.entity';
+import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver';
 
 @Module({
 	imports: [
@@ -111,6 +112,7 @@ import {
 		ClosesXInvoicingService,
 		ClosesXinvoicingResolver,
 		ClosesZinvoicingService,
+		ClosesZinvoicingResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
