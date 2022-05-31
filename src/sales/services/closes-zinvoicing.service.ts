@@ -114,7 +114,7 @@ export class ClosesZinvoicingService {
 		}
 
 		if (dayjs(closeDate) <= dayjs(pointOfSale?.closeDate)) {
-			throw new NotFoundException('El punto de se encuentra cerrado');
+			throw new NotFoundException('El punto de venta se encuentra cerrado');
 		}
 
 		const summaryOrder = await this.ordersService.getSummaryOrder(
