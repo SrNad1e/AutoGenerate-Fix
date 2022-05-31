@@ -22,6 +22,7 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
+import { PointOfSalesService } from './point-of-sales.service';
 
 const populate = [
 	{
@@ -51,6 +52,7 @@ export class OrdersService {
 		private readonly receiptsService: ReceiptsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly conveyorsService: ConveyorsService,
+		private readonly pointOfSalesService: PointOfSalesService,
 	) {}
 
 	async findById(id: string) {
@@ -304,8 +306,21 @@ export class OrdersService {
 	 * @returns pedidos del punto de venta
 	 */
 	async getByPointOfSales(idPointOfSale: string) {
+		const pointOfSale = await this.pointOfSalesService.findById(idPointOfSale);
+
+		if (!pointOfSale) {
+			throw new NotFoundException('El punto de venta no existe');
+		}
+
+		if (dayjs() < dayjs(pointOfSale?.closeDate)) {
+			throw new NotFoundException('El punto de venta ya se encuentra cerrado');
+		}
+
 		return this.orderModel
-			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
+			.find({
+				pointOfSale: new Types.ObjectId(idPointOfSale),
+				status: 'open',
+			})
 			.populate(populate)
 			.lean();
 	}
