@@ -6,12 +6,12 @@ import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-inp
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
 import { ResponseClosesXInvoicing } from '../dtos/response-closes-x-invoicing';
 import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
-import { ClosesXInvoingService } from '../services/closes-xinvoing.service';
+import { ClosesXInvoicingService } from '../services/closes-xinvoicing.service';
 
 @Resolver()
 export class ClosesXinvoicingResolver {
 	constructor(
-		private readonly closesXInvoicingService: ClosesXInvoingService,
+		private readonly closesXInvoicingService: ClosesXInvoicingService,
 	) {}
 
 	@Query(() => ResponseClosesXInvoicing, {

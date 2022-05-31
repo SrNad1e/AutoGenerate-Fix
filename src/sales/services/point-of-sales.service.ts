@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { Shop } from 'src/shops/entities/shop.entity';
@@ -57,5 +57,20 @@ export class PointOfSalesService {
 
 	async findById(id: string) {
 		return this.pointOfSaleModel.findById(id).populate(populate);
+	}
+
+	async update(id: string, { closeDate }: any, user: User, companyId: string) {
+		const pointOfSale = await this.findById(id);
+
+		if (!pointOfSale) {
+			throw new NotFoundException('El punto de venta no existe');
+		}
+
+		return this.pointOfSaleModel.findByIdAndUpdate(id, {
+			$set: {
+				closeDate,
+				user,
+			},
+		});
 	}
 }
