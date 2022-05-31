@@ -82,6 +82,7 @@ export class CategoriesService {
 	async findAllLevel({
 		level,
 		name,
+		_id,
 		parentId,
 		sort,
 		limit = 10,
@@ -94,6 +95,10 @@ export class CategoriesService {
 				$regex: name,
 				$options: 'i',
 			};
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {

@@ -11,6 +11,12 @@ export class FiltersCategoriesLevelInput {
 	name?: string;
 
 	@Field(() => String, {
+		description: 'Identificador de la categoría',
+		nullable: true,
+	})
+	_id?: string;
+
+	@Field(() => String, {
 		description: 'Identificador de la categoría padre',
 		nullable: true,
 	})

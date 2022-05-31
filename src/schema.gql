@@ -1304,6 +1304,9 @@ input FiltersCategoriesInput {
 
 """Filtros para obtener la lista de categorías"""
 input FiltersCategoriesLevelInput {
+  """Identificador de la categoría"""
+  _id: String
+
   """Nivel de categoria"""
   level: Float!
 
