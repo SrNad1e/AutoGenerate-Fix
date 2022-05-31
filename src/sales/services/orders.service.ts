@@ -373,7 +373,7 @@ export class OrdersService {
 			},
 			{
 				$group: {
-					_id: '$_id',
+					_id: '$pointOfSale',
 					total: {
 						$sum: 1,
 					},
@@ -747,6 +747,27 @@ export class OrdersService {
 		);
 
 		const change = totalPaid - order.summary.total;
+
+		const cash = newPayments.reduce((sum, payment) => sum + payment?.total, 0);
+
+		if (!(cash > 0 && cash > change)) {
+			throw new BadRequestException(
+				`El valor diferente a efectivo supera el valor del pedido`,
+			);
+		}
+
+		if (cash) {
+			newPayments = newPayments.map((payment) => {
+				if (payment?.payment?.type === 'cash') {
+					return {
+						...payment,
+						total: payment?.total - change,
+					};
+				}
+
+				return payment;
+			});
+		}
 
 		const summary = {
 			...order.summary,

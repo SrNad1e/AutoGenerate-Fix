@@ -412,6 +412,12 @@ type CloseXInvoicing {
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
 
+  """Transacciones reportadas por el usuario"""
+  quantityBank: Float!
+
+  """Devoluciones generadas"""
+  refunds: RefundOrderClose
+
   """Datos de las ordenes"""
   summaryOrder: SummaryOrderClose!
 
@@ -564,6 +570,9 @@ input CreateCloseXInvoicingInput {
 
   """Identificador del punto de venta"""
   pointOfSaleId: String!
+
+  """Cantidad de trasnferencias reportadas"""
+  quantityBank: Float!
 }
 
 """Datos para crear un color"""
@@ -1173,7 +1182,7 @@ type Expense {
   user: User!
 
   """Valor del egreso"""
-  valor: Float!
+  value: Float!
 }
 
 """Filtros para la lista de atributos"""
@@ -2766,6 +2775,15 @@ type ReferenceData {
 
   """Usuario que crea la referencia"""
   user: User!
+}
+
+"""Resumen de los pagos"""
+type RefundOrderClose {
+  """Cantidad de devoluciones"""
+  quantity: Float
+
+  """Valor de las devoluciones"""
+  value: Float
 }
 
 """Respuesta al listado de los atributos"""

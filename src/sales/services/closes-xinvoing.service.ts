@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
-import { ExpensesService } from 'src/treasury/services/expenses.service';
 
+import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
@@ -98,7 +98,12 @@ export class ClosesXInvoingService {
 	}
 
 	async create(
-		{ cashRegister, closeDate, pointOfSaleId }: CreateCloseXInvoicingInput,
+		{
+			cashRegister,
+			closeDate,
+			pointOfSaleId,
+			quantityBank,
+		}: CreateCloseXInvoicingInput,
 		user: User,
 		companyId: string,
 	) {
@@ -140,15 +145,17 @@ export class ClosesXInvoingService {
 		const number = (closeX?.number || 0) + 1;
 
 		const newClose = new this.closeXInvoicingModel({
-			cashRegister,
+			cashRegister: cashRegister,
 			number,
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
 			closeDate: new Date(closeDate),
+			quantityBank,
 			...summaryOrder,
 			user,
 		});
+
 		const response = await (await newClose.save()).populate(populate);
 
 		return {

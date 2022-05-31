@@ -18,7 +18,7 @@ export class Expense extends Document {
 
 	@Field(() => Number, { description: 'Valor del egreso' })
 	@Prop({ type: Number, default: 0 })
-	valor: number;
+	value: number;
 
 	@Field(() => String, {
 		description: 'Concepto del egreso',
