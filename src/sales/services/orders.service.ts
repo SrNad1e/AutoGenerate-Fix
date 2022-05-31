@@ -65,6 +65,13 @@ export class OrdersService {
 		}
 
 		if (user?.pointOfSale && status === 'open') {
+			if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
+				throw new NotFoundException(
+					`El punto de venta se encuentra cerrado para el día ${dayjs(
+						user?.pointOfSale['closeDate'],
+					).format('DD/MM/YYYY')}`,
+				);
+			}
 			const customer = await this.customersService.getCustomerDefault();
 			const shop = await this.shopsService.findById(
 				user.pointOfSale['shop'].toString(),
@@ -312,8 +319,12 @@ export class OrdersService {
 			throw new NotFoundException('El punto de venta no existe');
 		}
 
-		if (dayjs() < dayjs(pointOfSale?.closeDate)) {
-			throw new NotFoundException('El punto de venta ya se encuentra cerrado');
+		if (dayjs().isBefore(dayjs(pointOfSale?.closeDate).add(1, 'd'))) {
+			throw new NotFoundException(
+				`El punto de venta se encuentra cerrado para el día ${dayjs(
+					pointOfSale?.closeDate,
+				).format('DD/MM/YYYY')}`,
+			);
 		}
 
 		return this.orderModel
