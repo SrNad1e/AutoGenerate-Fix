@@ -35,6 +35,7 @@ export class CategoriesService {
 
 	async findAll({ name, limit = 10, page = 1, sort }: FiltersCategoriesInput) {
 		const filters: FilterQuery<CategoryLevel1> = {};
+
 		if (name) {
 			filters.name = { $regex: name, $options: 'i' };
 
@@ -51,7 +52,11 @@ export class CategoriesService {
 				];
 			}
 
-			const categoryLevel2 = await this.categoryLevel2Model.find(filtersLevel2);
+			const categoryLevel2 = await this.categoryLevel2Model.find(
+				filtersLevel2?.$or
+					? filtersLevel2
+					: { name: { $regex: name, $options: 'i' } },
+			);
 
 			if (categoryLevel2.length > 0) {
 				filters.$or = [
