@@ -46,4 +46,7 @@ export class CreateCloseXInvoicingInput {
 
 	@Field(() => String, { description: 'Fecha del cierre' })
 	closeDate: string;
+
+	@Field(() => Number, { description: 'Cantidad de trasnferencias reportadas' })
+	quantityBank: number;
 }
