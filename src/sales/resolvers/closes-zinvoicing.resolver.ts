@@ -37,8 +37,8 @@ export class ClosesZinvoicingResolver {
 	}
 
 	@Mutation(() => CloseZInvoicing, {
-		name: 'createCloseXInvoicing',
-		description: 'Crea un cierre X de facturación',
+		name: 'createCloseZInvoicing',
+		description: 'Crea un cierre Z de facturación',
 	})
 	@UseGuards(JwtAuthGuard)
 	create(

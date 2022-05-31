@@ -605,6 +605,21 @@ input CreateCategoryInput {
   parentId: String
 }
 
+"""Datos para crear un cierre X"""
+input CreateCloseXInvoicingInput {
+  """Listado de cash reportado"""
+  cashRegister: CashRegisterInput!
+
+  """Fecha del cierre"""
+  closeDate: String!
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
+
+  """Cantidad de trasnferencias reportadas"""
+  quantityBank: Float!
+}
+
 """Datos para crear un cierre Z"""
 input CreateCloseZInvoicingInput {
   """Listado de cash reportado"""
@@ -2028,6 +2043,12 @@ type Mutation {
 
   """Crea un cierre X de facturación"""
   createCloseXInvoicing(
+    """Datos para crear el cierre x de facturación"""
+    createCloseXInvoicing: CreateCloseXInvoicingInput = {}
+  ): CloseXInvoicing!
+
+  """Crea un cierre Z de facturación"""
+  createCloseZInvoicing(
     """Datos para crear el cierre z de facturación"""
     createCloseZInvoicing: CreateCloseZInvoicingInput = {}
   ): CloseZInvoicing!
