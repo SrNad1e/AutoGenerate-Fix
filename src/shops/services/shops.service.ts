@@ -35,9 +35,9 @@ export class ShopsService {
 		private readonly companiesService: CompaniesService,
 	) {}
 
-	async getAll(params: FiltersShopsInput, user: User, companyId: string) {
+	async findAll(params: FiltersShopsInput, user: User, companyId: string) {
 		const filters: FilterQuery<Shop> = {};
-		const { limit = 20, page = 1, name, status, sort } = params;
+		const { limit = 20, page = 1, name, status, sort, _id } = params;
 
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -45,6 +45,10 @@ export class ShopsService {
 
 		if (name) {
 			filters['name'] = { $regex: name, $options: 'i' };
+		}
+
+		if (_id) {
+			filters._id = _id;
 		}
 
 		if (status) {

@@ -6,41 +6,42 @@ import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { PointOfSale } from './pointOfSale.entity';
+import { Expense } from 'src/treasury/entities/expense.entity';
 
 @ObjectType({ description: 'Arqueo de caja' })
 export class CashRegister {
 	@Field(() => Number, { description: 'Moneda de 50' })
-	'M50': number;
+	M50: number;
 
 	@Field(() => Number, { description: 'Moneda de $ 100' })
-	'M100': number;
+	M100: number;
 
 	@Field(() => Number, { description: 'Moneda de $ 200' })
-	'M200': number;
+	M200: number;
 
 	@Field(() => Number, { description: 'Moneda de $ 500' })
-	'M500': number;
+	M500: number;
 
 	@Field(() => Number, { description: 'Billete o moneda de $ 1.000' })
-	'B1000': number;
+	B1000: number;
 
 	@Field(() => Number, { description: 'Billete de $ 2.000' })
-	'B2000': number;
+	B2000: number;
 
 	@Field(() => Number, { description: 'Billete de $ 5.000' })
-	'B5000': number;
+	B5000: number;
 
 	@Field(() => Number, { description: 'Billete de $ 10.000' })
-	'B10000': number;
+	B10000: number;
 
 	@Field(() => Number, { description: 'Billete de $ 20.000' })
-	'B20000': number;
+	B20000: number;
 
 	@Field(() => Number, { description: 'Billete de $ 50.000' })
-	'B50000': number;
+	B50000: number;
 
 	@Field(() => Number, { description: 'Billete de $ 100.000' })
-	'B100000': number;
+	B100000: number;
 }
 
 @ObjectType({ description: 'Resumen de las ordenes' })
@@ -72,6 +73,21 @@ export class PaymentOrderClose {
 	payment: Types.ObjectId;
 }
 
+@ObjectType({ description: 'Resumen de los pagos' })
+export class RefundOrderClose {
+	@Field(() => Number, {
+		description: 'Cantidad de devoluciones',
+		nullable: true,
+	})
+	quantity: number;
+
+	@Field(() => Number, {
+		description: 'Valor de las devoluciones',
+		nullable: true,
+	})
+	value: number;
+}
+
 @Schema({ timestamps: true, collection: 'closesXInvoicing' })
 @ObjectType({ description: 'Cierre X de facturación' })
 export class CloseXInvoicing extends Document {
@@ -81,6 +97,7 @@ export class CloseXInvoicing extends Document {
 	@Field(() => CashRegister, {
 		description: 'Listado de billetes y monedas registrados',
 	})
+	@Prop({ type: Object, requiere: true })
 	cashRegister: CashRegister;
 
 	@Field(() => Number, { description: 'Número consecutivo' })
@@ -94,7 +111,7 @@ export class CloseXInvoicing extends Document {
 	@Field(() => PointOfSale, {
 		description: 'Punto de venta que registra el cierre',
 	})
-	@Prop({ type: Types.ObjectId, required: true })
+	@Prop({ type: Types.ObjectId, ref: PointOfSale.name, required: true })
 	pointOfSale: Types.ObjectId;
 
 	@Field(() => Date, { description: 'Fecha de cierre' })
@@ -105,12 +122,29 @@ export class CloseXInvoicing extends Document {
 	@Prop({ type: Object, requiere: true })
 	summaryOrder: SummaryOrderClose;
 
+	@Field(() => [Expense], { description: 'Egresos del día', nullable: true })
+	@Prop({ type: [Types.ObjectId], default: [] })
+	expenses?: Types.ObjectId[];
+
+	@Field(() => RefundOrderClose, {
+		description: 'Devoluciones generadas',
+		nullable: true,
+	})
+	@Prop({ type: Array, default: [] })
+	refunds: RefundOrderClose[];
+
 	@Field(() => [PaymentOrderClose], {
 		description: 'Listado de pagos',
 		nullable: true,
 	})
 	@Prop({ type: Object, default: [] })
 	payments: PaymentOrderClose[];
+
+	@Field(() => Number, {
+		description: 'Transacciones reportadas por el usuario',
+	})
+	@Prop({ type: Object, default: 0 })
+	quantityBank: number;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cierre',

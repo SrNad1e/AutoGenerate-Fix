@@ -22,6 +22,7 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
+import { PointOfSalesService } from './point-of-sales.service';
 
 const populate = [
 	{
@@ -51,6 +52,7 @@ export class OrdersService {
 		private readonly receiptsService: ReceiptsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly conveyorsService: ConveyorsService,
+		private readonly pointOfSalesService: PointOfSalesService,
 	) {}
 
 	async findById(id: string) {
@@ -63,6 +65,13 @@ export class OrdersService {
 		}
 
 		if (user?.pointOfSale && status === 'open') {
+			if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
+				throw new NotFoundException(
+					`El punto de venta se encuentra cerrado para el día ${dayjs(
+						user?.pointOfSale['closeDate'],
+					).format('DD/MM/YYYY')}`,
+				);
+			}
 			const customer = await this.customersService.getCustomerDefault();
 			const shop = await this.shopsService.findById(
 				user.pointOfSale['shop'].toString(),
@@ -304,15 +313,32 @@ export class OrdersService {
 	 * @returns pedidos del punto de venta
 	 */
 	async getByPointOfSales(idPointOfSale: string) {
+		const pointOfSale = await this.pointOfSalesService.findById(idPointOfSale);
+
+		if (!pointOfSale) {
+			throw new NotFoundException('El punto de venta no existe');
+		}
+
+		if (dayjs().isBefore(dayjs(pointOfSale?.closeDate).add(1, 'd'))) {
+			throw new NotFoundException(
+				`El punto de venta se encuentra cerrado para el día ${dayjs(
+					pointOfSale?.closeDate,
+				).format('DD/MM/YYYY')}`,
+			);
+		}
+
 		return this.orderModel
-			.find({ pointOfSale: new Types.ObjectId(idPointOfSale), status: 'open' })
+			.find({
+				pointOfSale: new Types.ObjectId(idPointOfSale),
+				status: 'open',
+			})
 			.populate(populate)
 			.lean();
 	}
 
 	async getSummaryOrder(closeDate: string, pointOfSaleId: string) {
 		const dateIntial = new Date(closeDate);
-		const dateFinal = dayjs(closeDate).add(1, 'd');
+		const dateFinal = dayjs(closeDate).add(1, 'd').toDate();
 
 		const ordersCancel: any = await this.orderModel.aggregate([
 			{
@@ -335,7 +361,7 @@ export class OrdersService {
 			},
 		]);
 
-		const ordersOpen: any = await this.orderModel.aggregate([
+		const aggregate = [
 			{
 				$match: {
 					updatedAt: {
@@ -354,7 +380,9 @@ export class OrdersService {
 					},
 				},
 			},
-		]);
+		];
+
+		const ordersOpen: any = await this.orderModel.aggregate(aggregate);
 
 		const ordersClosed: any = await this.orderModel.aggregate([
 			{
@@ -371,7 +399,7 @@ export class OrdersService {
 			},
 			{
 				$group: {
-					_id: '$_id',
+					_id: '$pointOfSale',
 					total: {
 						$sum: 1,
 					},
@@ -413,10 +441,10 @@ export class OrdersService {
 
 		return {
 			summaryOrder: {
-				quantityClosed: ordersClosed?.total || 0,
-				quantityOpen: ordersOpen?.total || 0,
-				quantityCancel: ordersCancel?.total || 0,
-				value: ordersClosed?.value || 0,
+				quantityClosed: ordersClosed[0]?.total || 0,
+				quantityOpen: ordersOpen[0]?.total || 0,
+				quantityCancel: ordersCancel[0]?.total || 0,
+				value: ordersClosed[0]?.value || 0,
 			},
 			payments:
 				payments?.map((payment) => ({
@@ -745,6 +773,27 @@ export class OrdersService {
 		);
 
 		const change = totalPaid - order.summary.total;
+
+		const cash = newPayments.reduce((sum, payment) => sum + payment?.total, 0);
+
+		if (!(cash > 0 && cash > change)) {
+			throw new BadRequestException(
+				`El valor diferente a efectivo supera el valor del pedido`,
+			);
+		}
+
+		if (cash) {
+			newPayments = newPayments.map((payment) => {
+				if (payment?.payment?.type === 'cash') {
+					return {
+						...payment,
+						total: payment?.total - change,
+					};
+				}
+
+				return payment;
+			});
+		}
 
 		const summary = {
 			...order.summary,

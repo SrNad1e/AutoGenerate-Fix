@@ -1,37 +1,47 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
-import { Payment } from 'src/treasury/entities/payment.entity';
+import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
+import * as dayjs from 'dayjs';
 
+import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { User } from 'src/users/entities/user.entity';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
 import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
-import { PointOfSale } from '../entities/pointOfSale.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 
-const populate = [
+const populate: PopulateOptions[] = [
 	{
 		path: 'pointOfSale',
-		model: PointOfSale.name,
+		populate: [
+			{
+				path: 'authorization',
+				model: 'AuthorizationDian',
+			},
+			{
+				path: 'shop',
+				model: 'Shop',
+			},
+		],
 	},
 	{
 		path: 'payments',
 		populate: {
 			path: 'payment',
-			model: Payment.name,
+			model: 'Payment',
 		},
 	},
 ];
 
 @Injectable()
-export class ClosesXInvoingService {
+export class ClosesXInvoicingService {
 	constructor(
 		@InjectModel(CloseXInvoicing.name)
 		private readonly closeXInvoicingModel: PaginateModel<CloseXInvoicing>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
+		private readonly expensessService: ExpensesService,
 	) {}
 
 	async findAll(
@@ -66,26 +76,34 @@ export class ClosesXInvoingService {
 				user,
 				companyId,
 			);
+
 			if (pointOfSales?.docs?.length > 0) {
 				const ids = pointOfSales?.docs?.map(
 					(pointOfSale) => new Types.ObjectId(pointOfSale._id),
 				);
 
 				filters.pointOfSale = { $in: ids };
+			} else {
+				filters.pointOfSale = '';
 			}
 		}
 		const options = {
 			limit,
 			page,
 			sort,
+			populate,
 			lean: true,
 		};
-
 		return this.closeXInvoicingModel.paginate(filters, options);
 	}
 
 	async create(
-		{ cashRegister, closeDate, pointOfSaleId }: CreateCloseXInvoicingInput,
+		{
+			cashRegister,
+			closeDate,
+			pointOfSaleId,
+			quantityBank,
+		}: CreateCloseXInvoicingInput,
 		user: User,
 		companyId: string,
 	) {
@@ -100,26 +118,52 @@ export class ClosesXInvoingService {
 			pointOfSaleId,
 		);
 
+		const dateInitial = dayjs(closeDate).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate).add(1, 'd').format('YYYY/MM/DD');
+
+		const expenses = await this.expensessService.findAll(
+			{
+				status: 'active',
+				limit: 200,
+				boxId: pointOfSaleId,
+				dateInitial,
+				dateFinal,
+			},
+			user,
+			companyId,
+		);
+
 		const closeX = await this.closeXInvoicingModel
 			.findOne({
 				company: new Types.ObjectId(companyId),
+			})
+			.sort({
+				_id: -1,
 			})
 			.lean();
 
 		const number = (closeX?.number || 0) + 1;
 
 		const newClose = new this.closeXInvoicingModel({
-			cashRegister,
+			cashRegister: cashRegister,
 			number,
-			company: companyId,
+			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
+			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
 			closeDate: new Date(closeDate),
+			quantityBank,
 			...summaryOrder,
 			user,
 		});
 
-		//falta actualizar el punto de venta
+		const response = await (await newClose.save()).populate(populate);
 
-		return (await newClose.save()).populate(populate);
+		return {
+			...response['_doc'],
+			pointOfSale: {
+				...response?.pointOfSale['_doc'],
+				authorization: response?.pointOfSale['authorization']._doc,
+			},
+		};
 	}
 }

@@ -55,6 +55,7 @@ const populate = [
 		],
 	},
 ];
+
 const statusTypes = ['cancelled', 'open', 'confirmed'];
 
 @Injectable()

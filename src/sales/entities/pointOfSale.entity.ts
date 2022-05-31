@@ -20,7 +20,12 @@ export class PointOfSale extends Document {
 	@Field(() => Shop, {
 		description: 'Tienda a la que pertenece el punto de venta',
 	})
-	@Prop({ type: Types.ObjectId, ref: 'Shop', required: true })
+	@Prop({
+		type: Types.ObjectId,
+		ref: Shop.name,
+		autopopulate: true,
+		required: true,
+	})
 	shop: Types.ObjectId;
 
 	@Field(() => AuthorizationDian, {

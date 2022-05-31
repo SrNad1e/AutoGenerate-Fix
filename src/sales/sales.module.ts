@@ -29,7 +29,15 @@ import {
 	CloseXInvoicing,
 	CloseXInvoicingSchema,
 } from './entities/close-x-invoicing.entity';
-import { ClosesXInvoingService } from './services/closes-xinvoing.service';
+import { ClosesXInvoicingService } from './services/closes-xinvoicing.service';
+import { ClosesXinvoicingResolver } from './resolvers/closes-xinvoicing.resolver';
+import { PointOfSalesResolver } from './resolvers/point-of-sales.resolver';
+import { ClosesZinvoicingService } from './services/closes-zinvoicing.service';
+import {
+	CloseZInvoicing,
+	CloseZInvoicingSchema,
+} from './entities/close-z-invoicing.entity';
+import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver';
 
 @Module({
 	imports: [
@@ -72,6 +80,14 @@ import { ClosesXInvoingService } from './services/closes-xinvoing.service';
 					return schema;
 				},
 			},
+			{
+				name: CloseZInvoicing.name,
+				useFactory: async () => {
+					const schema = CloseZInvoicingSchema;
+					schema.index({ number: 1, company: -1 }, { unique: true });
+					return schema;
+				},
+			},
 		]),
 		MongooseModule.forFeature([
 			{
@@ -88,11 +104,15 @@ import { ClosesXInvoingService } from './services/closes-xinvoing.service';
 		OrdersService,
 		OrdersResolver,
 		InvoicesService,
+		InvoicesResolver,
 		PointOfSalesService,
+		PointOfSalesResolver,
 		ReturnsInvoiceService,
 		ReturnsInvoiceResolver,
-		InvoicesResolver,
-		ClosesXInvoingService,
+		ClosesXInvoicingService,
+		ClosesXinvoicingResolver,
+		ClosesZinvoicingService,
+		ClosesZinvoicingResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })

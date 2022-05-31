@@ -236,6 +236,42 @@ type CashRegister {
   M500: Float!
 }
 
+"""Arqueo de caja"""
+input CashRegisterInput {
+  """Billete o moneda de $ 1.000"""
+  B1000: Float!
+
+  """Billete de $ 2.000"""
+  B2000: Float!
+
+  """Billete de $ 5.000"""
+  B5000: Float!
+
+  """Billete de $ 10.000"""
+  B10000: Float!
+
+  """Billete de $ 20.000"""
+  B20000: Float!
+
+  """Billete de $ 50.000"""
+  B50000: Float!
+
+  """Billete de $ 100.000"""
+  B100000: Float!
+
+  """Moneda de 50"""
+  M50: Float!
+
+  """Moneda de $ 100"""
+  M100: Float!
+
+  """Moneda de $ 200"""
+  M200: Float!
+
+  """Moneda de $ 500"""
+  M500: Float!
+}
+
 """Categoría del producto nivel 1"""
 type CategoryLevel1 {
   """Identificador de mongo"""
@@ -345,6 +381,96 @@ input CityInput {
 
   """Fecha de actualización"""
   updatedAt: DateTime
+}
+
+"""Cierre X de facturación"""
+type CloseXInvoicing {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Listado de billetes y monedas registrados"""
+  cashRegister: CashRegister!
+
+  """Fecha de cierre"""
+  closeDate: DateTime!
+
+  """Compañía a la que pertence el cierre"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Egresos del día"""
+  expenses: [Expense!]
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Listado de pagos"""
+  payments: [PaymentOrderClose!]
+
+  """Punto de venta que registra el cierre"""
+  pointOfSale: PointOfSale!
+
+  """Transacciones reportadas por el usuario"""
+  quantityBank: Float!
+
+  """Devoluciones generadas"""
+  refunds: RefundOrderClose
+
+  """Datos de las ordenes"""
+  summaryOrder: SummaryOrderClose!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cierre"""
+  user: User!
+}
+
+"""Cierre Z de facturación"""
+type CloseZInvoicing {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Listado de billetes y monedas registrados"""
+  cashRegister: CashRegister!
+
+  """Fecha de cierre"""
+  closeDate: DateTime!
+
+  """Compañía a la que pertence el cierre"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Egresos del día"""
+  expenses: [Expense!]
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Listado de pagos"""
+  payments: [PaymentOrderClose!]
+
+  """Punto de venta que registra el cierre"""
+  pointOfSale: PointOfSale!
+
+  """Transacciones reportadas por el usuario"""
+  quantityBank: Float!
+
+  """Devoluciones generadas"""
+  refunds: RefundOrderClose
+
+  """Datos de las ordenes"""
+  summaryOrder: SummaryOrderClose!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cierre"""
+  user: User!
 }
 
 """Color del producto"""
@@ -477,6 +603,36 @@ input CreateCategoryInput {
 
   """Identificador de la categoría padre"""
   parentId: String
+}
+
+"""Datos para crear un cierre X"""
+input CreateCloseXInvoicingInput {
+  """Listado de cash reportado"""
+  cashRegister: CashRegisterInput!
+
+  """Fecha del cierre"""
+  closeDate: String!
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
+
+  """Cantidad de trasnferencias reportadas"""
+  quantityBank: Float!
+}
+
+"""Datos para crear un cierre Z"""
+input CreateCloseZInvoicingInput {
+  """Listado de cash reportado"""
+  cashRegister: CashRegisterInput!
+
+  """Fecha del cierre"""
+  closeDate: String!
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
+
+  """Cantidad de trasnferencias reportadas"""
+  quantityBank: Float!
 }
 
 """Datos para crear un color"""
@@ -1056,6 +1212,39 @@ type DocumentType {
   user: User!
 }
 
+"""Egreso de dinero"""
+type Expense {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Caja que afecta el egreso"""
+  box: Box!
+
+  """Empresa a la que pertenece el egreso"""
+  company: Company!
+
+  """Concepto del egreso"""
+  concept: String
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Consecutivo del egreso"""
+  number: Float!
+
+  """Estado del egreso"""
+  status: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el egreso"""
+  user: User!
+
+  """Valor del egreso"""
+  value: Float!
+}
+
 """Filtros para la lista de atributos"""
 input FiltersAttribsInput {
   """Identificadores de los atributos"""
@@ -1153,6 +1342,48 @@ input FiltersCitiesInput {
 
   """Nombre del departamento"""
   state: String
+}
+
+"""Filtros para consultar los cierres X"""
+input FiltersClosesXInvoicingInput {
+  """Fecha del cierre"""
+  closeDate: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número del cierre"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Tienda del cierre"""
+  shopId: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCloseXInvoicing
+}
+
+"""Filtros para consultar los cierres Z"""
+input FiltersClosesZInvoicingInput {
+  """Fecha del cierre"""
+  closeDate: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número del cierre"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Tienda del cierre"""
+  shopId: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCloseZInvoicing
 }
 
 """Filtros para la lista de colores"""
@@ -1277,6 +1508,27 @@ input FiltersPaymentsInput {
   type: String
 }
 
+"""Filtros para obtener los puntos de venta"""
+input FiltersPointOfSalesInput {
+  """Identificador del punto de venta"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín busqueda del punto de venta"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Tienda a la que pertenecen los puntos de venta"""
+  shopId: String
+
+  """Ordenamiento"""
+  sort: SortPointOfSale
+}
+
 input FiltersProductInput {
   """Identificador de mongo"""
   _id: String
@@ -1394,6 +1646,42 @@ input FiltersReturnsInvoiceInput {
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortReturnInovice
+}
+
+"""Filtros usados para consultar las tiendas"""
+input FiltersShopsInput {
+  """Identificador de la tienda"""
+  _id: String
+
+  """Dirección de la sucursal"""
+  address: String
+
+  """Empresa de la tienda"""
+  companyId: String
+
+  """Bodega por defecto para la sucursal"""
+  defaultWarehouseId: String
+
+  """Meta asignada a la tienda"""
+  goal: Float
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín de la tienda"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Teléfono de la sucursal"""
+  phone: String
+
+  """Ordenamiento"""
+  sort: SortShop
+
+  """Estado de la tienda (active, inactive, suspend)"""
+  status: String
 }
 
 """Filtros para la lista de tallas"""
@@ -1752,6 +2040,18 @@ type Mutation {
     """Datos para crear una categoría"""
     createCategoryInput: CreateCategoryInput!
   ): CategoryLevel1!
+
+  """Crea un cierre X de facturación"""
+  createCloseXInvoicing(
+    """Datos para crear el cierre x de facturación"""
+    createCloseXInvoicing: CreateCloseXInvoicingInput = {}
+  ): CloseXInvoicing!
+
+  """Crea un cierre Z de facturación"""
+  createCloseZInvoicing(
+    """Datos para crear el cierre z de facturación"""
+    createCloseZInvoicing: CreateCloseZInvoicingInput = {}
+  ): CloseZInvoicing!
 
   """Crea un color"""
   createColor(
@@ -2221,6 +2521,18 @@ type Query {
     filtersCitiesInput: FiltersCitiesInput = {}
   ): ResponseCities!
 
+  """Lista de cierres x"""
+  closesXInvoicing(
+    """Filtros de lista de cierres x"""
+    filtersClosesXInvoicing: FiltersClosesXInvoicingInput = {}
+  ): ResponseClosesXInvoicing!
+
+  """Lista de cierres z"""
+  closesZInvoicing(
+    """Filtros de lista de cierres z"""
+    filtersClosesZInvoicing: FiltersClosesZInvoicingInput = {}
+  ): ResponseClosesZInvoicing!
+
   """Lista los colores"""
   colors(
     """Filtros para obtener los colores"""
@@ -2278,6 +2590,12 @@ type Query {
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
 
+  """Lista de puntos de venta"""
+  pointOfSales(
+    """Filtros de lista de puntos de venta"""
+    filtersPointOfSales: FiltersPointOfSalesInput = {}
+  ): ResponsePointOfSales!
+
   """Obtiene un producto"""
   product(
     """Filtros para obtener el primer producto de la busqueda"""
@@ -2310,6 +2628,12 @@ type Query {
     """Filtros de lista de devoluciones de factura"""
     filtersReturnsInvoice: FiltersReturnsInvoiceInput = {}
   ): ResponseReturnsInvoice!
+
+  """Se encarga de listar las tiendas"""
+  shops(
+    """Filtros para consultar las tiendas"""
+    filtersShopsInput: FiltersShopsInput = {}
+  ): ResponseShops!
 
   """Listar las tallas"""
   sizes(
@@ -2546,6 +2870,15 @@ type ReferenceData {
   user: User!
 }
 
+"""Resumen de los pagos"""
+type RefundOrderClose {
+  """Cantidad de devoluciones"""
+  quantity: Float
+
+  """Valor de las devoluciones"""
+  value: Float
+}
+
 """Respuesta al listado de los atributos"""
 type ResponseAttribs {
   """Lista de atributos"""
@@ -2649,6 +2982,72 @@ type ResponseCategories {
 type ResponseCities {
   """Lista de ciudades"""
   docs: [City!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de cierres X"""
+type ResponseClosesXInvoicing {
+  """Lista de cierres X"""
+  docs: [CloseXInvoicing!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de cierres Z"""
+type ResponseClosesZInvoicing {
+  """Lista de cierres Z"""
+  docs: [CloseZInvoicing!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -2876,6 +3275,39 @@ type ResponsePayments {
   totalPages: Float!
 }
 
+"""Lista de puntos de venta"""
+type ResponsePointOfSales {
+  """Lista de puntos de venta"""
+  docs: [PointOfSale!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de los productos"""
 type ResponseProducts {
   """Lista de productos"""
@@ -2946,6 +3378,39 @@ type ResponseReferences {
 type ResponseReturnsInvoice {
   """Lista de ajustes"""
   docs: [ReturnInvoice!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de tiendas"""
+type ResponseShops {
+  """Lista de tiendas"""
+  docs: [Shop!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3438,6 +3903,36 @@ input SortCity {
   updatedAt: Float
 }
 
+"""Ordenamiento de cierre z"""
+input SortCloseXInvoicing {
+  """Ordenamiento por fecha de cierre"""
+  closeDate: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por numero"""
+  number: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de cierre z"""
+input SortCloseZInvoicing {
+  """Ordenamiento por fecha de cierre"""
+  closeDate: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por numero"""
+  number: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de colores"""
 input SortColor {
   active: Float
@@ -3509,6 +4004,14 @@ input SortPayment {
   updatedAt: Float
 }
 
+"""Ordenamiento para el listado de colores"""
+input SortPointOfSale {
+  closeDate: Float
+  createdAt: Float
+  name: Float
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de productos"""
 input SortProduct {
   barcode: Float
@@ -3535,6 +4038,17 @@ input SortReturnInovice {
   createdAt: Float
 
   """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de la tienda"""
+input SortShop {
+  address: Float
+  createdAt: Float
+  goal: Float
+  name: Float
+  phone: Float
+  status: Float
   updatedAt: Float
 }
 
