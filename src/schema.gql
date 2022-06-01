@@ -428,6 +428,51 @@ type CloseXInvoicing {
   user: User!
 }
 
+"""Cierre Z de facturación"""
+type CloseZInvoicing {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Listado de billetes y monedas registrados"""
+  cashRegister: CashRegister!
+
+  """Fecha de cierre"""
+  closeDate: DateTime!
+
+  """Compañía a la que pertence el cierre"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Egresos del día"""
+  expenses: [Expense!]
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Listado de pagos"""
+  payments: [PaymentOrderClose!]
+
+  """Punto de venta que registra el cierre"""
+  pointOfSale: PointOfSale!
+
+  """Transacciones reportadas por el usuario"""
+  quantityBank: Float!
+
+  """Devoluciones generadas"""
+  refunds: RefundOrderClose
+
+  """Datos de las ordenes"""
+  summaryOrder: SummaryOrderClose!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cierre"""
+  user: User!
+}
+
 """Color del producto"""
 type Color {
   """Identificador de mongo"""
@@ -562,6 +607,21 @@ input CreateCategoryInput {
 
 """Datos para crear un cierre X"""
 input CreateCloseXInvoicingInput {
+  """Listado de cash reportado"""
+  cashRegister: CashRegisterInput!
+
+  """Fecha del cierre"""
+  closeDate: String!
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
+
+  """Cantidad de trasnferencias reportadas"""
+  quantityBank: Float!
+}
+
+"""Datos para crear un cierre Z"""
+input CreateCloseZInvoicingInput {
   """Listado de cash reportado"""
   cashRegister: CashRegisterInput!
 
@@ -1244,6 +1304,9 @@ input FiltersCategoriesInput {
 
 """Filtros para obtener la lista de categorías"""
 input FiltersCategoriesLevelInput {
+  """Identificador de la categoría"""
+  _id: String
+
   """Nivel de categoria"""
   level: Float!
 
@@ -1303,6 +1366,27 @@ input FiltersClosesXInvoicingInput {
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortCloseXInvoicing
+}
+
+"""Filtros para consultar los cierres Z"""
+input FiltersClosesZInvoicingInput {
+  """Fecha del cierre"""
+  closeDate: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número del cierre"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Tienda del cierre"""
+  shopId: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCloseZInvoicing
 }
 
 """Filtros para la lista de colores"""
@@ -1966,6 +2050,12 @@ type Mutation {
     createCloseXInvoicing: CreateCloseXInvoicingInput = {}
   ): CloseXInvoicing!
 
+  """Crea un cierre Z de facturación"""
+  createCloseZInvoicing(
+    """Datos para crear el cierre z de facturación"""
+    createCloseZInvoicing: CreateCloseZInvoicingInput = {}
+  ): CloseZInvoicing!
+
   """Crea un color"""
   createColor(
     """Datos para crear el color"""
@@ -2439,6 +2529,12 @@ type Query {
     """Filtros de lista de cierres x"""
     filtersClosesXInvoicing: FiltersClosesXInvoicingInput = {}
   ): ResponseClosesXInvoicing!
+
+  """Lista de cierres z"""
+  closesZInvoicing(
+    """Filtros de lista de cierres z"""
+    filtersClosesZInvoicing: FiltersClosesZInvoicingInput = {}
+  ): ResponseClosesZInvoicing!
 
   """Lista los colores"""
   colors(
@@ -2922,6 +3018,39 @@ type ResponseCities {
 type ResponseClosesXInvoicing {
   """Lista de cierres X"""
   docs: [CloseXInvoicing!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de cierres Z"""
+type ResponseClosesZInvoicing {
+  """Lista de cierres Z"""
+  docs: [CloseZInvoicing!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3779,6 +3908,21 @@ input SortCity {
 
 """Ordenamiento de cierre z"""
 input SortCloseXInvoicing {
+  """Ordenamiento por fecha de cierre"""
+  closeDate: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por numero"""
+  number: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de cierre z"""
+input SortCloseZInvoicing {
   """Ordenamiento por fecha de cierre"""
   closeDate: Float
 

@@ -5,11 +5,11 @@ import * as dayjs from 'dayjs';
 
 import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { User } from 'src/users/entities/user.entity';
-import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
-import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
-import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
+import { FiltersClosesZInvoicingInput } from '../dtos/filters-closes-z-invoicing-input';
+import { CloseZInvoicing } from '../entities/close-z-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
+import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 
 const populate: PopulateOptions[] = [
 	{
@@ -35,10 +35,10 @@ const populate: PopulateOptions[] = [
 ];
 
 @Injectable()
-export class ClosesXInvoingService {
+export class ClosesZinvoicingService {
 	constructor(
-		@InjectModel(CloseXInvoicing.name)
-		private readonly closeXInvoicingModel: PaginateModel<CloseXInvoicing>,
+		@InjectModel(CloseZInvoicing.name)
+		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
 		private readonly expensessService: ExpensesService,
@@ -52,11 +52,11 @@ export class ClosesXInvoingService {
 			sort,
 			limit = 10,
 			page = 1,
-		}: FiltersClosesXInvoicingInput,
+		}: FiltersClosesZInvoicingInput,
 		user: User,
 		companyId: string,
 	) {
-		const filters: FilterQuery<CloseXInvoicing> = {};
+		const filters: FilterQuery<CloseZInvoicing> = {};
 
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -94,7 +94,7 @@ export class ClosesXInvoingService {
 			populate,
 			lean: true,
 		};
-		return this.closeXInvoicingModel.paginate(filters, options);
+		return this.closeZInvoicingModel.paginate(filters, options);
 	}
 
 	async create(
@@ -111,6 +111,14 @@ export class ClosesXInvoingService {
 
 		if (!pointOfSale) {
 			throw new NotFoundException('El punto de venta no existe');
+		}
+
+		if (dayjs(closeDate) <= dayjs(pointOfSale?.closeDate)) {
+			throw new NotFoundException(
+				`El punto de venta se encuentra cerrado para el día ${dayjs(
+					pointOfSale?.closeDate,
+				).format('DD/MM/YYYY')}`,
+			);
 		}
 
 		const summaryOrder = await this.ordersService.getSummaryOrder(
@@ -133,7 +141,7 @@ export class ClosesXInvoingService {
 			companyId,
 		);
 
-		const closeX = await this.closeXInvoicingModel
+		const closeX = await this.closeZInvoicingModel
 			.findOne({
 				company: new Types.ObjectId(companyId),
 			})
@@ -144,7 +152,7 @@ export class ClosesXInvoingService {
 
 		const number = (closeX?.number || 0) + 1;
 
-		const newClose = new this.closeXInvoicingModel({
+		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
 			number,
 			company: new Types.ObjectId(companyId),
@@ -157,6 +165,17 @@ export class ClosesXInvoingService {
 		});
 
 		const response = await (await newClose.save()).populate(populate);
+
+		if (response?._id) {
+			await this.pointOfSalesService.update(
+				pointOfSaleId,
+				{
+					closeDate,
+				},
+				user,
+				companyId,
+			);
+		}
 
 		return {
 			...response['_doc'],
