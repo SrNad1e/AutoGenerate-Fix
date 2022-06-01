@@ -16,6 +16,12 @@ export class SortReference {
 
 	@Field(() => Number, { nullable: true })
 	cost?: number;
+
+	@Field(() => Number, { nullable: true })
+	createdAt?: number;
+
+	@Field(() => Number, { nullable: true })
+	updatedAt?: number;
 }
 
 @InputType({ description: 'Filtros para la lista de referencias' })
