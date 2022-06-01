@@ -369,6 +369,7 @@ export class ReferencesService {
 			volume,
 			weight,
 			width,
+			...params
 		}: UpdateReferenceInput,
 		user: User,
 		companyId: string,
@@ -469,6 +470,7 @@ export class ReferencesService {
 					attribs,
 					brand,
 					shipping,
+					params,
 				},
 			},
 			{
