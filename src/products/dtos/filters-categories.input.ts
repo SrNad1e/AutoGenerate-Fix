@@ -15,6 +15,12 @@ export class SortCategories {
 @InputType({ description: 'Filtros para obtener la lista de categorías' })
 export class FiltersCategoriesInput {
 	@Field(() => String, {
+		description: 'Identificador de la categoría padre',
+		nullable: true,
+	})
+	_id?: string;
+
+	@Field(() => String, {
 		description: 'Nombre de la categoría',
 		nullable: true,
 	})

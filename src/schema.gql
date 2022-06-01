@@ -1289,6 +1289,9 @@ input FiltersBrandsInput {
 
 """Filtros para obtener la lista de categorías"""
 input FiltersCategoriesInput {
+  """Identificador de la categoría padre"""
+  _id: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -4030,9 +4033,11 @@ input SortProduct {
 input SortReference {
   changeable: Float
   cost: Float
+  createdAt: Float
   description: Float
   name: Float
   price: Float
+  updatedAt: Float
 }
 
 """Ordenamiento de las devoluciones en factura"""
