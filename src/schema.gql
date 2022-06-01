@@ -1614,6 +1614,9 @@ input FiltersReferencesInput {
   """Identificación de la marca"""
   categoryLevel3Id: String
 
+  """Referencia se puede cambiar"""
+  changeable: Boolean
+
   """Costo para la busqueda de referencias"""
   cost: Float
 

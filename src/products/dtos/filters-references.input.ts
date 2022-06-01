@@ -77,6 +77,12 @@ export class FiltersReferencesInput {
 	@Field(() => Boolean, { description: 'Referencia activa', nullable: true })
 	active?: boolean;
 
+	@Field(() => Boolean, {
+		description: 'Referencia se puede cambiar',
+		nullable: true,
+	})
+	changeable?: boolean;
+
 	@Field(() => SortReference, { description: 'Ordenamiento', nullable: true })
 	sort?: SortReference;
 }
