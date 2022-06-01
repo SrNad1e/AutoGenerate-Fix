@@ -475,7 +475,7 @@ export class ReferencesService {
 					attribs,
 					brand,
 					shipping,
-					params,
+					...params,
 				},
 			},
 			{
