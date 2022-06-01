@@ -61,6 +61,7 @@ export class ReferencesService {
 			sort,
 			price,
 			active,
+			changeable,
 		}: FiltersReferencesInput,
 		products: boolean,
 		companyId?: string,
@@ -70,6 +71,10 @@ export class ReferencesService {
 
 		if (active !== undefined) {
 			filters.active = active;
+		}
+
+		if (changeable !== undefined) {
+			filters.changeable = changeable;
 		}
 
 		if (brandId) {
