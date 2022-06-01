@@ -369,7 +369,6 @@ export class ReferencesService {
 			volume,
 			weight,
 			width,
-			...params
 		}: UpdateReferenceInput,
 		user: User,
 		companyId: string,
@@ -447,16 +446,29 @@ export class ReferencesService {
 			}
 		}
 
+		let shipping;
+
+		if (height || long || volume || weight || width) {
+			shipping = {
+				...reference.shipping,
+				height,
+				long,
+				volume,
+				weight,
+				width,
+			};
+		}
+
 		return this.referenceModel.findByIdAndUpdate(
 			id,
 			{
 				$set: {
-					categoryLevel1,
-					categoryLevel2,
-					categoryLevel3,
+					categoryLevel1: categoryLevel1?._id,
+					categoryLevel2: categoryLevel2?._id || null,
+					categoryLevel3: categoryLevel3?._id || null,
 					attribs,
 					brand,
-					...params,
+					shipping,
 				},
 			},
 			{
