@@ -364,7 +364,7 @@ export class ProductsService {
 					size: size?._id,
 					status,
 					barcode,
-					images: imagesId.map((item) => new Types.ObjectId(item)),
+					images: imagesId?.map((item) => new Types.ObjectId(item)) || [],
 					user,
 				},
 			},
