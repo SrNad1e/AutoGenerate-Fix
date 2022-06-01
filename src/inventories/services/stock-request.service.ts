@@ -534,8 +534,6 @@ export class StockRequestService {
 			);
 		}
 
-		console.log(details);
-
 		return this.create(
 			{
 				warehouseDestinationId: shop?.defaultWarehouse?._id?.toString(),
