@@ -33,7 +33,13 @@ export class CategoriesService {
 		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3>,
 	) {}
 
-	async findAll({ name, limit = 10, page = 1, sort }: FiltersCategoriesInput) {
+	async findAll({
+		_id,
+		name,
+		limit = 10,
+		page = 1,
+		sort,
+	}: FiltersCategoriesInput) {
 		const filters: FilterQuery<CategoryLevel1> = {};
 
 		if (name) {
@@ -66,6 +72,10 @@ export class CategoriesService {
 
 				delete filters.name;
 			}
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {
