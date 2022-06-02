@@ -6,10 +6,7 @@ import { ConfirmStockTransferInput } from '../dtos/confirmProducts-stockTransfer
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
 import { FiltersStockTransfersInput } from '../dtos/filters-stockTransfers.input';
 import { ResponseStockTransfers } from '../dtos/response-stockTransfers';
-import {
-	DetailStockTransferInput,
-	UpdateStockTransferInput,
-} from '../dtos/update-stockTransfer-input';
+import { UpdateStockTransferInput } from '../dtos/update-stockTransfer-input';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { StockTransferService } from '../services/stock-transfer.service';
 

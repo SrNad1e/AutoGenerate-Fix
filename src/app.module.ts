@@ -2,6 +2,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { APP_GUARD } from '@nestjs/core';
 import * as Joi from 'joi';
 
 import config from './config';
@@ -17,6 +18,7 @@ import { SalesModule } from './sales/sales.module';
 import { CrmModule } from './crm/crm.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { StaticFilesModule } from './staticfiles/static-files.module';
+import { PermissionsGuard } from './users/guards/permissions.guard';
 
 @Module({
 	imports: [
@@ -59,6 +61,12 @@ import { StaticFilesModule } from './staticfiles/static-files.module';
 		CrmModule,
 		ConfigurationsModule,
 	],
-	providers: [AppGateway],
+	providers: [
+		/*	{
+			provide: APP_GUARD,
+			useClass: PermissionsGuard,
+		},*/
+		AppGateway,
+	],
 })
 export class AppModule {}
