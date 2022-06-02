@@ -1,6 +1,7 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongoose';
+import { InventoryPermissions } from '../libs/permissions.decorator';
 
 @Schema()
 @ObjectType({ description: 'Permisos a los que tiene el usuario' })
@@ -24,11 +25,11 @@ export class Permission {
 	@Prop({ type: String, required: true })
 	description: string;
 
-	@Field({
-		description: 'Tipo de acción (list, see, create, update, autogenerate)',
+	@Field(() => InventoryPermissions, {
+		description: `Tipo de acción`,
 	})
-	@Prop({ type: String, required: true })
-	action: string;
+	@Prop({ type: String, unique: true })
+	action: InventoryPermissions;
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);
