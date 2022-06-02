@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	InventoryPermissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { CreateCategoryInput } from '../dtos/create-category.input';
 import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.input';
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';
@@ -18,7 +20,6 @@ export class CategoriesResolver {
 		name: 'categories',
 		description: 'Lista las categorías',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersCategoriesInput',
@@ -36,7 +37,7 @@ export class CategoriesResolver {
 		name: 'categoriesLevel',
 		description: 'Lista las categorías por level',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.READ_INVENTORY_CATEGORIES)
 	findAllLevel(
 		@Args({
 			name: 'filtersCategoriesLevelInput',
@@ -56,7 +57,7 @@ export class CategoriesResolver {
 		name: 'createCategory',
 		description: 'Crea una categoría',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_CATEGORY)
 	create(
 		@Args('createCategoryInput', {
 			description: 'Datos para crear una categoría',
@@ -74,7 +75,7 @@ export class CategoriesResolver {
 		name: 'updateCategory',
 		description: 'Actualiza la categoría',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_CATEGORY)
 	update(
 		@Args('id', { description: 'Identificador de la categoría a actualizar' })
 		id: string,

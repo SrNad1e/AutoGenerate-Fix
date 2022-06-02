@@ -1,13 +1,15 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { ResponseColors } from '../dtos/response-colors';
 import { FiltersColorsInput } from '../dtos/filters-colors.input';
 import { Color } from '../entities/color.entity';
 import { ColorsService } from '../services/colors.service';
 import { UpdateColorInput } from '../dtos/update-color.input';
 import { CreateColorInput } from '../dtos/create-color.input';
+import {
+	InventoryPermissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 
 @Resolver(() => Color)
 export class ColorsResolver {
@@ -17,7 +19,6 @@ export class ColorsResolver {
 		name: 'colors',
 		description: 'Lista los colores',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersColorsInput',
@@ -32,7 +33,7 @@ export class ColorsResolver {
 	}
 
 	@Mutation(() => Color, { name: 'createColor', description: 'Crea un color' })
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_COLOR)
 	create(
 		@Args('createColorInput', { description: 'Datos para crear el color' })
 		_: CreateColorInput,
@@ -48,7 +49,7 @@ export class ColorsResolver {
 		name: 'updateColor',
 		description: 'Actualiza el color',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_COLOR)
 	update(
 		@Args('id', { description: 'Identificador del color a actualizar' })
 		id: string,

@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+	InventoryPermissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateProductInput } from '../dtos/create-product.input';
 import {
 	FiltersProductInput,
@@ -20,7 +22,6 @@ export class ProductsResolver {
 		name: 'products',
 		description: 'Lista los productos',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersProductsInput',
@@ -39,7 +40,7 @@ export class ProductsResolver {
 	}
 
 	@Query(() => Product, { name: 'product', description: 'Obtiene un producto' })
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.READ_INVENTORY_PRODUCTS)
 	findOne(
 		@Args({
 			name: 'filtersProductInput',
@@ -57,7 +58,7 @@ export class ProductsResolver {
 		name: 'createProduct',
 		description: 'Crea un producto',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_PRODUCT)
 	create(
 		@Args('createProductInput', { description: 'Datos para crear un producto' })
 		_: CreateProductInput,
@@ -74,7 +75,7 @@ export class ProductsResolver {
 		name: 'updateProduct',
 		description: 'Se encarga actualizar un producto',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_PRODUCT)
 	update(
 		@Args('id', { description: 'Identificador del producto a actualizar' })
 		id: string,

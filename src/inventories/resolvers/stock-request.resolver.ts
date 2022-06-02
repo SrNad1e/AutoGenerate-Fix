@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	InventoryPermissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
 import { FiltersStockRequestsInput } from '../dtos/filters-stockRequests.input';
 import { ResponseStockRequests } from '../dtos/response-stockRequests';
@@ -17,7 +19,7 @@ export class StockRequestResolver {
 		name: 'stockRequests',
 		description: 'Lista las solicitudes de productos',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.READ_INVENTORY_REQUESTS)
 	findAll(
 		@Args({
 			name: 'filtersStockRequestsInput',
@@ -39,7 +41,7 @@ export class StockRequestResolver {
 		name: 'stockRequestId',
 		description: 'Obtiene una solicitud de productos por su identificador',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.READ_INVENTORY_REQUESTS)
 	findById(
 		@Args('id', { description: 'Identificador de la solicitud de productos' })
 		id: string,
@@ -51,7 +53,7 @@ export class StockRequestResolver {
 		name: 'createStockRequest',
 		description: 'Crea una solicitud',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_REQUEST)
 	create(
 		@Args('createStockRequestInput', {
 			description: 'Datos para crear una solicitud de productos',
@@ -70,7 +72,7 @@ export class StockRequestResolver {
 		name: 'updateStockRequest',
 		description: 'Actualiza una solicitud de productos',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_REQUEST)
 	update(
 		@Args('id', { description: 'Identificador de la solicitud de productos' })
 		id: string,
@@ -92,7 +94,7 @@ export class StockRequestResolver {
 		name: 'generateStockRequest',
 		description: 'Autogenera una solicitud de productos por bodega',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(InventoryPermissions.AUTOGENERATE_INVENTORY_REQUEST)
 	autogenerate(
 		@Args('shopId', { description: 'Tienda para validar el inventario' })
 		shopId: string,
