@@ -5,6 +5,8 @@ import { User } from '../entities/user.entity';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
 import { Permissions, RequirePermissions } from '../libs/permissions.decorator';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -33,7 +35,7 @@ export class UsersResolver {
 		description:
 			'Se encarga de obtener el usuario dependiendo del token enviado',
 	})
-	@RequirePermissions(Permissions.READ_USERS)
+	@UseGuards(JwtAuthGuard)
 	getCurrent(@Context() context) {
 		return context.req.user.user;
 	}
