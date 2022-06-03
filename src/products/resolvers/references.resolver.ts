@@ -1,6 +1,6 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 
@@ -60,7 +60,7 @@ export class ReferencesResolver {
 		name: 'createReference',
 		description: 'Crea una referencia',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_REFERENCE)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_REFERENCE)
 	create(
 		@Args('createReferenceInput', {
 			description: 'Datos para la creación de la referencia',
@@ -79,7 +79,7 @@ export class ReferencesResolver {
 		name: 'updateReference',
 		description: 'Actualiza una referencia',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_REFERENCE)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_REFERENCE)
 	update(
 		@Args('id', {
 			description: 'Identificador de la referencia para actualizar',

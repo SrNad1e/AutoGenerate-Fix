@@ -7,7 +7,7 @@ import { ColorsService } from '../services/colors.service';
 import { UpdateColorInput } from '../dtos/update-color.input';
 import { CreateColorInput } from '../dtos/create-color.input';
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 
@@ -33,7 +33,7 @@ export class ColorsResolver {
 	}
 
 	@Mutation(() => Color, { name: 'createColor', description: 'Crea un color' })
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_COLOR)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_COLOR)
 	create(
 		@Args('createColorInput', { description: 'Datos para crear el color' })
 		_: CreateColorInput,
@@ -49,7 +49,7 @@ export class ColorsResolver {
 		name: 'updateColor',
 		description: 'Actualiza el color',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_COLOR)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_COLOR)
 	update(
 		@Args('id', { description: 'Identificador del color a actualizar' })
 		id: string,

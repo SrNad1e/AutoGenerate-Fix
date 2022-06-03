@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { CreateBrandInput } from '../dtos/create-brand.input';
@@ -33,7 +33,7 @@ export class BrandsResolver {
 	}
 
 	@Mutation(() => Brand, { name: 'createBrand', description: 'Crea una marca' })
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_BRAND)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_BRAND)
 	create(
 		@Args('createBrandInput', { description: 'Datos para crear una marca' })
 		_: CreateBrandInput,
@@ -49,7 +49,7 @@ export class BrandsResolver {
 		name: 'updateBrand',
 		description: 'Actualiza la marca',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_BRAND)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_BRAND)
 	update(
 		@Args('id', { description: 'Identificador de la marca a actualizar' })
 		id: string,

@@ -1,6 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { FiltersReturnsInvoiceInput } from '../dtos/filters-returns-invoice';
 import { ResponseReturnsInvoice } from '../dtos/response-returnsInvoice';
 import { ReturnsInvoiceService } from '../services/returns-invoice.service';
@@ -13,7 +16,7 @@ export class ReturnsInvoiceResolver {
 		name: 'returnsInvoice',
 		description: 'Lista de devoluciones de factura',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVOICING_RETURNS)
 	findAll(
 		@Args({
 			name: 'filtersReturnsInvoice',

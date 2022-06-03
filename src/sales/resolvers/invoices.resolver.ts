@@ -1,9 +1,11 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { ResponseInvoices } from '../dtos/response-invoices';
-
 import { InvoicesService } from '../services/invoices.service';
 
 @Resolver()
@@ -14,7 +16,7 @@ export class InvoicesResolver {
 		name: 'invoices',
 		description: 'Lista de facturas',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVOICING_INVOICES)
 	findAll(
 		@Args({
 			name: 'filtersInvoices',

@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { CreateAttribInput } from '../dtos/create-attrib.input';
@@ -36,7 +36,7 @@ export class AttribsResolver {
 		name: 'createAttrib',
 		description: 'Crea un atributo',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_ATTRIB)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_ATTRIB)
 	create(
 		@Args('createAttribInput', { description: 'Datos para crear un atributo' })
 		_: CreateAttribInput,
@@ -52,7 +52,7 @@ export class AttribsResolver {
 		name: 'updateAttrib',
 		description: 'Actualiza un atributo',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_ATTRIB)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_ATTRIB)
 	update(
 		@Args('id', { description: 'Identificador del atributo a actualizar' })
 		id: string,

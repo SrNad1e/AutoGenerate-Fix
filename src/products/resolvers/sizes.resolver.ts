@@ -1,6 +1,6 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 
@@ -33,7 +33,7 @@ export class SizesResolver {
 	}
 
 	@Mutation(() => Size, { name: 'createSize', description: 'Crear una talla' })
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_SIZE)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_SIZE)
 	create(
 		@Args('createSizeInput', { description: 'Datos para crear la talla' })
 		_: CreateSizeInput,
@@ -49,7 +49,7 @@ export class SizesResolver {
 		name: 'updateSize',
 		description: 'Actualizar la talla',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_SIZE)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_SIZE)
 	update(
 		@Args('id', { description: 'Identificador de la talla a actualizar' })
 		id: string,

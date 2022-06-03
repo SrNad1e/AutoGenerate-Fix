@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { ConfirmStockTransferInput } from '../dtos/confirmProducts-stockTransfer.input';
@@ -20,7 +20,7 @@ export class StockTransferResolver {
 		name: 'stockTransfers',
 		description: 'Obtiene listado de traslados de productos entre bodegas',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_TRANSFERS)
+	@RequirePermissions(Permissions.READ_INVENTORY_TRANSFERS)
 	findAll(
 		@Args({
 			name: 'filtersStockTransfersInput',
@@ -43,7 +43,7 @@ export class StockTransferResolver {
 		name: 'stockTransferId',
 		description: 'Consulta el trasldo por el identificador',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_TRANSFERS)
+	@RequirePermissions(Permissions.READ_INVENTORY_TRANSFERS)
 	findById(
 		@Args('id', { description: 'Identificador del traslado' }) id: string,
 	) {
@@ -54,7 +54,7 @@ export class StockTransferResolver {
 		name: 'createStockTransfer',
 		description: 'Crea una traslado de productos',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_TRANSFER)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_TRANSFER)
 	create(
 		@Args('createStockTransferInput', {
 			description: 'Datos para la creación de un traslado de productos',
@@ -73,7 +73,7 @@ export class StockTransferResolver {
 		name: 'updateStockTransfer',
 		description: 'Actualiza traslado',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_TRANSFER)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_TRANSFER)
 	update(
 		@Args('id', { description: 'Identificador del traslado de productos' })
 		id: string,
@@ -95,7 +95,7 @@ export class StockTransferResolver {
 		name: 'confirmProductsStockTransfer',
 		description: 'Confirma los productos del traslado',
 	})
-	@RequirePermissions(InventoryPermissions.CONFIRM_INVENTORY_TRANSFER)
+	@RequirePermissions(Permissions.CONFIRM_INVENTORY_TRANSFER)
 	confirmProducts(
 		@Args('id', { description: 'Identificador del traslado de productos' })
 		id: string,

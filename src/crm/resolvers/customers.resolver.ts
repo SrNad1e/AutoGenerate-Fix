@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { CreateCustomerInput } from '../dtos/create-customer.input';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';
 import { ResponseCustomers } from '../dtos/response-customers';
@@ -17,7 +19,7 @@ export class CustomersResolver {
 		name: 'customers',
 		description: 'Listado de clientes',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_CRM_CITIES)
 	findAll(
 		@Args({
 			name: 'filtersCustomerInput',
@@ -35,7 +37,7 @@ export class CustomersResolver {
 		name: 'createCustomer',
 		description: 'Se encarga crear un cliente',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_CRM_CUSTOMER)
 	create(
 		@Args('createCustomerInput', {
 			description: 'Parámetros para actualizar el cliente',
@@ -53,7 +55,7 @@ export class CustomersResolver {
 		name: 'updateCustomer',
 		description: 'Se encarga actualizar un cliente',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_CRM_CUSTOMER)
 	update(
 		@Args('id', { description: 'Identificador del cliente' }) id: string,
 		@Args('updateCustomerInput', {

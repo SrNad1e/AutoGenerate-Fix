@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
@@ -19,7 +19,7 @@ export class StockOutputResolver {
 		name: 'stockOutputs',
 		description: 'Listado de salidas de productos',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_OUTPUTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_OUTPUTS)
 	findAll(
 		@Args({
 			name: 'filtersStockOutputsInput',
@@ -41,7 +41,7 @@ export class StockOutputResolver {
 		name: 'stockOutputId',
 		description: 'Obtiene una salida de productos con base al identificador',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_OUTPUTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_OUTPUTS)
 	findById(
 		@Args('id', { description: 'Identificador de la salida de productos' })
 		id: string,
@@ -58,7 +58,7 @@ export class StockOutputResolver {
 		name: 'createStockOutput',
 		description: 'Crea una salida de productos',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_OUTPUT)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_OUTPUT)
 	create(
 		@Args('createStockOutputInput', {
 			description: 'Datos para crear una salida de productos',
@@ -77,7 +77,7 @@ export class StockOutputResolver {
 		name: 'updateStockOutput',
 		description: 'Actualiza una salida de productos',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_OUTPUT)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_OUTPUT)
 	update(
 		@Args('id', {
 			description: 'Identificador de la salida de productos a actualizar',

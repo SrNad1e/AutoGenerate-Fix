@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { CreateCategoryInput } from '../dtos/create-category.input';
@@ -37,7 +37,7 @@ export class CategoriesResolver {
 		name: 'categoriesLevel',
 		description: 'Lista las categorías por level',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_CATEGORIES)
+	@RequirePermissions(Permissions.READ_INVENTORY_CATEGORIES)
 	findAllLevel(
 		@Args({
 			name: 'filtersCategoriesLevelInput',
@@ -57,7 +57,7 @@ export class CategoriesResolver {
 		name: 'createCategory',
 		description: 'Crea una categoría',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_CATEGORY)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_CATEGORY)
 	create(
 		@Args('createCategoryInput', {
 			description: 'Datos para crear una categoría',
@@ -75,7 +75,7 @@ export class CategoriesResolver {
 		name: 'updateCategory',
 		description: 'Actualiza la categoría',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_CATEGORY)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_CATEGORY)
 	update(
 		@Args('id', { description: 'Identificador de la categoría a actualizar' })
 		id: string,

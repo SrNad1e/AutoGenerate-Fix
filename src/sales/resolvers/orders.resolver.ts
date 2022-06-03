@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
@@ -17,7 +19,7 @@ export class OrdersResolver {
 		name: 'ordersByPointOfSale',
 		description: 'Obtener las ordenes por punto de venta',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.ACCESS_POS)
 	getByPointOfSales(
 		@Args('idPointOfSale', { description: 'Identificador del punto de venta' })
 		idPointOfSale: string,
@@ -29,7 +31,7 @@ export class OrdersResolver {
 		name: 'orderId',
 		description: 'Obtiene la orden por el id',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVOICING_ORDERS)
 	findById(
 		@Args('id', { description: 'identificador del pedido' }) id: string,
 	) {
@@ -40,7 +42,7 @@ export class OrdersResolver {
 		name: 'createOrder',
 		description: 'Se encarga de crear el pedido',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVOICING_ORDER)
 	create(
 		@Args('createOrderInput', {
 			description: 'Parámetros para la creación del pedido',
@@ -59,7 +61,7 @@ export class OrdersResolver {
 		name: 'updateOrder',
 		description: 'Se encarga actualizar un pedido',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVOICING_ORDER)
 	update(
 		@Args('id', { description: 'Identificador del pedido' }) id: string,
 		@Args('updateOrderInput', {
@@ -80,10 +82,10 @@ export class OrdersResolver {
 		name: 'addProductsOrder',
 		description: 'Se encarga de agregar productos a un pedido',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVOICING_ORDER)
 	addProducts(
 		@Args('addProductsOrderInput', {
-			description: 'Productos y pedido para actualizar',
+			description: 'Productos del pedido para actualizar',
 		})
 		_: AddProductsOrderInput,
 		@Context() context,
@@ -99,7 +101,7 @@ export class OrdersResolver {
 		name: 'addPaymentsOrder',
 		description: 'Se encarga de agregar medios de pago',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVOICING_ORDER)
 	addPayments(
 		@Args('addPaymentsOrderInput', {
 			description: 'Medios de pago y orden a actualizar',

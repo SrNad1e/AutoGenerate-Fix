@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Query, Args, Context, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { FiltersImagesInput } from '../dtos/filters-images.input';
 import { ResponseImages } from '../dtos/response-images';
 import { ImagesService } from '../services/images.service';
@@ -14,7 +16,7 @@ export class ImagesResolver {
 		name: 'images',
 		description: 'Listado de imagenes',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_STATICFILES_IMAGES)
 	findAll(
 		@Args({
 			name: 'filtersImagesInput',

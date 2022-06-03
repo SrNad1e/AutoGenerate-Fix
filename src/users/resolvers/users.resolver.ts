@@ -1,11 +1,10 @@
-import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 
 import { UsersService } from '../services/users.service';
 import { User } from '../entities/user.entity';
 import { UpdateUserInput } from '../dtos/update-user.input';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
+import { Permissions, RequirePermissions } from '../libs/permissions.decorator';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -15,7 +14,7 @@ export class UsersResolver {
 		name: 'users',
 		description: 'Consulta todos los usuarios con base a los filtros',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_USERS)
 	findAll(
 		@Args('filtersUsersInput', {
 			description: 'Filtros para consultar los usuarios',
@@ -34,13 +33,13 @@ export class UsersResolver {
 		description:
 			'Se encarga de obtener el usuario dependiendo del token enviado',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_USERS)
 	getCurrent(@Context() context) {
 		return context.req.user.user;
 	}
 
 	@Mutation(() => User)
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_USER)
 	updateUser(
 		@Args('updateUserInput', {
 			description: 'Datos a actualiazar en el usuario',

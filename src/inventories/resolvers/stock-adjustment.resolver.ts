@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
@@ -21,7 +21,7 @@ export class StockAdjustmentResolver {
 		name: 'stockAdjustments',
 		description: 'Lista de ajustes de productos',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_ADJUSTMENTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_ADJUSTMENTS)
 	findAll(
 		@Args({
 			name: 'filtersStockAdjustmentsInput',
@@ -43,7 +43,7 @@ export class StockAdjustmentResolver {
 		name: 'stockAdjustmentId',
 		description: 'Obtiene un ajuste de productos con base a su identificador',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_ADJUSTMENTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_ADJUSTMENTS)
 	findById(
 		@Args('id', { description: 'Identificador del ajuste de productos' })
 		id: string,
@@ -60,7 +60,7 @@ export class StockAdjustmentResolver {
 		name: 'createStockAdjustment',
 		description: 'Crea un ajuste de productos',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_ADJUSTMENT)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_ADJUSTMENT)
 	create(
 		@Args('createStockAdjustmentInput', {
 			description: 'Crea un ajuste de productos',
@@ -79,7 +79,7 @@ export class StockAdjustmentResolver {
 		name: 'updateStockAdjustment',
 		description: 'Actualiza un ajuste de productos',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_ADJUSTMENT)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_ADJUSTMENT)
 	update(
 		@Args('id', { description: 'Identificador de ajuste de productos' })
 		id: string,

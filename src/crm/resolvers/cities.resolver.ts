@@ -1,6 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { FiltersCitiesInput } from '../dtos/filters-cities-input';
 import { ResponseCities } from '../dtos/response-cities';
 import { CitiesService } from '../services/cities.service';
@@ -13,7 +16,7 @@ export class CitiesResolver {
 		name: 'cities',
 		description: 'Listado de ciudades',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_CRM_CITIES)
 	findAll(
 		@Args({
 			name: 'filtersCitiesInput',

@@ -1,6 +1,6 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 
@@ -40,7 +40,7 @@ export class ProductsResolver {
 	}
 
 	@Query(() => Product, { name: 'product', description: 'Obtiene un producto' })
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_PRODUCTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_PRODUCTS)
 	findOne(
 		@Args({
 			name: 'filtersProductInput',
@@ -58,7 +58,7 @@ export class ProductsResolver {
 		name: 'createProduct',
 		description: 'Crea un producto',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_PRODUCT)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_PRODUCT)
 	create(
 		@Args('createProductInput', { description: 'Datos para crear un producto' })
 		_: CreateProductInput,
@@ -75,7 +75,7 @@ export class ProductsResolver {
 		name: 'updateProduct',
 		description: 'Se encarga actualizar un producto',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_PRODUCT)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_PRODUCT)
 	update(
 		@Args('id', { description: 'Identificador del producto a actualizar' })
 		id: string,

@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { ResponseShops } from '../dtos/response-shops';
 import { ShopsService } from '../services/shops.service';
@@ -14,7 +16,7 @@ export class ShopsResolver {
 		name: 'shops',
 		description: 'Se encarga de listar las tiendas',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_SHOPS)
 	findAll(
 		@Args({
 			name: 'filtersShopsInput',

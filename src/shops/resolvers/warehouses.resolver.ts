@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/users/libs/permissions.decorator';
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { ResponseWarehouses } from '../dtos/response-warehouses';
 import { Warehouse } from '../entities/warehouse.entity';
@@ -15,7 +17,7 @@ export class WarehousesResolver {
 		name: 'warehouses',
 		description: 'Se encarga de listar las bodegas',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_SHOPS_WAREHOUSES)
 	findAll(
 		@Args({
 			name: 'filtersWarehousesInput',
@@ -37,7 +39,7 @@ export class WarehousesResolver {
 		name: 'warehouseId',
 		description: 'Se encarga de traer bodega por identificador',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_SHOPS_WAREHOUSES)
 	findById(
 		@Args({
 			name: 'warehouseId',

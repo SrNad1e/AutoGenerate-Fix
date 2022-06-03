@@ -1,7 +1,7 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
-	InventoryPermissions,
+	Permissions,
 	RequirePermissions,
 } from 'src/users/libs/permissions.decorator';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
@@ -19,7 +19,7 @@ export class StockRequestResolver {
 		name: 'stockRequests',
 		description: 'Lista las solicitudes de productos',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_REQUESTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_REQUESTS)
 	findAll(
 		@Args({
 			name: 'filtersStockRequestsInput',
@@ -41,7 +41,7 @@ export class StockRequestResolver {
 		name: 'stockRequestId',
 		description: 'Obtiene una solicitud de productos por su identificador',
 	})
-	@RequirePermissions(InventoryPermissions.READ_INVENTORY_REQUESTS)
+	@RequirePermissions(Permissions.READ_INVENTORY_REQUESTS)
 	findById(
 		@Args('id', { description: 'Identificador de la solicitud de productos' })
 		id: string,
@@ -53,7 +53,7 @@ export class StockRequestResolver {
 		name: 'createStockRequest',
 		description: 'Crea una solicitud',
 	})
-	@RequirePermissions(InventoryPermissions.CREATE_INVENTORY_REQUEST)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_REQUEST)
 	create(
 		@Args('createStockRequestInput', {
 			description: 'Datos para crear una solicitud de productos',
@@ -72,7 +72,7 @@ export class StockRequestResolver {
 		name: 'updateStockRequest',
 		description: 'Actualiza una solicitud de productos',
 	})
-	@RequirePermissions(InventoryPermissions.UPDATE_INVENTORY_REQUEST)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_REQUEST)
 	update(
 		@Args('id', { description: 'Identificador de la solicitud de productos' })
 		id: string,
@@ -94,7 +94,7 @@ export class StockRequestResolver {
 		name: 'generateStockRequest',
 		description: 'Autogenera una solicitud de productos por bodega',
 	})
-	@RequirePermissions(InventoryPermissions.AUTOGENERATE_INVENTORY_REQUEST)
+	@RequirePermissions(Permissions.AUTOGENERATE_INVENTORY_REQUEST)
 	autogenerate(
 		@Args('shopId', { description: 'Tienda para validar el inventario' })
 		shopId: string,
