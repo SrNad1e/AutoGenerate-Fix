@@ -2,7 +2,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 
 import { CreateReferenceInput } from '../dtos/create-reference.input';
 import { FiltersReferencesInput } from '../dtos/filters-references.input';

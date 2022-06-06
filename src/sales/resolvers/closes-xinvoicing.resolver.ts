@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
 import { ResponseClosesXInvoicing } from '../dtos/response-closes-x-invoicing';

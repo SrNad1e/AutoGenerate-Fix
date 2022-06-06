@@ -13,7 +13,8 @@ import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
 import { FiltersStockInputsInput } from '../dtos/filters-stockInputs.input';

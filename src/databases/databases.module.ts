@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import config from 'src/config';
 import { ProductMysql } from 'src/products/entities/product.entity';
-import { UserMysql } from 'src/users/entities/user.entity';
 import { ColorMysql } from 'src/products/entities/color.entity';
 import { SizeMysql } from 'src/products/entities/size.entity';
 import { WarehouseMysql } from 'src/shops/entities/warehouse.entity';
@@ -14,6 +13,7 @@ import {
 	StockTransferMysql,
 } from 'src/inventories/entities/stock-transfer.entity';
 import { ShopMysql } from 'src/shops/entities/shop.entity';
+import { UserMysql } from 'src/configurations/entities/user.entity';
 
 @Global()
 @Module({

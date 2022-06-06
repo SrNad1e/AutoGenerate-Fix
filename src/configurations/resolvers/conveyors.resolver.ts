@@ -3,7 +3,7 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersConveyorsInput } from '../dtos/filters-conveyors.input';
 import { ResponseConveyors } from '../dtos/response-conveyors.input';
 import { ConveyorsService } from '../services/conveyors.service';

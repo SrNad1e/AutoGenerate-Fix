@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateAttribInput } from '../dtos/create-attrib.input';
 import { FiltersAttribsInput } from '../dtos/filters-attribs.input';
 import { ResponseAttribs } from '../dtos/response-attribs';

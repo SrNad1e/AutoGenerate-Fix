@@ -3,7 +3,7 @@ import { Query, Args, Context, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersImagesInput } from '../dtos/filters-images.input';
 import { ResponseImages } from '../dtos/response-images';
 import { ImagesService } from '../services/images.service';
@@ -16,7 +16,7 @@ export class ImagesResolver {
 		name: 'images',
 		description: 'Listado de imagenes',
 	})
-	@RequirePermissions(Permissions.READ_STATICFILES_IMAGES)
+	@RequirePermissions(Permissions.READ_CONFIGURATION_IMAGES)
 	findAll(
 		@Args({
 			name: 'filtersImagesInput',

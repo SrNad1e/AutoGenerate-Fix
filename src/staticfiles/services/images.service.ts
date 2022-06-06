@@ -6,8 +6,8 @@ import { FilterQuery, PaginateModel } from 'mongoose';
 import config from 'src/config';
 import { Image } from '../entities/image.entity';
 import { resizeImage, uploadFileAWS } from 'src/common/aws';
-import { User } from 'src/users/entities/user.entity';
 import { FiltersImagesInput } from '../dtos/filters-images.input';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Injectable()
 export class ImagesService {

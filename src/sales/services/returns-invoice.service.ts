@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
-import { User } from 'src/users/entities/user.entity';
 import { FiltersReturnsInvoiceInput } from '../dtos/filters-returns-invoice';
 import { ReturnInvoice } from '../entities/return-invoice.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Injectable()
 export class ReturnsInvoiceService {

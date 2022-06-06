@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateCustomerInput } from '../dtos/create-customer.input';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';
 import { ResponseCustomers } from '../dtos/response-customers';

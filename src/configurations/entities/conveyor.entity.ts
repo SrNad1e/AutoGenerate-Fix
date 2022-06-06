@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Image } from 'src/staticfiles/entities/image.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from './user.entity';
 
 @ObjectType({ description: 'Modelo para la transportadora' })
 @Schema({ timestamps: true })

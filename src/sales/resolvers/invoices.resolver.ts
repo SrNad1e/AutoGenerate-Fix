@@ -3,7 +3,7 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { ResponseInvoices } from '../dtos/response-invoices';
 import { InvoicesService } from '../services/invoices.service';

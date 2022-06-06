@@ -2,7 +2,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
-import { APP_GUARD } from '@nestjs/core';
 import * as Joi from 'joi';
 
 import config from './config';
@@ -12,13 +11,11 @@ import { InventoriesModule } from './inventories/inventories.module';
 import { ProductsModule } from './products/products.module';
 import { ShopsModule } from './shops/shops.module';
 import { TreasuryModule } from './treasury/treasury.module';
-import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
 import { SalesModule } from './sales/sales.module';
 import { CrmModule } from './crm/crm.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { StaticFilesModule } from './staticfiles/static-files.module';
-import { PermissionsGuard } from './users/guards/permissions.guard';
 
 @Module({
 	imports: [
@@ -56,17 +53,10 @@ import { PermissionsGuard } from './users/guards/permissions.guard';
 		ProductsModule,
 		ShopsModule,
 		TreasuryModule,
-		UsersModule,
 		SalesModule,
 		CrmModule,
 		ConfigurationsModule,
 	],
-	providers: [
-		/*	{
-			provide: APP_GUARD,
-			useClass: PermissionsGuard,
-		},*/
-		AppGateway,
-	],
+	providers: [AppGateway],
 })
 export class AppModule {}

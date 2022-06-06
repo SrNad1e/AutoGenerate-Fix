@@ -12,7 +12,6 @@ import { SizesService } from './services/sizes.service';
 import { ColorsService } from './services/colors.service';
 import { Color, ColorMysql, ColorSchema } from './entities/color.entity';
 import { Size, SizeMysql, SizeSchema } from './entities/size.entity';
-import { UsersModule } from 'src/users/users.module';
 import { ProductsResolver } from './resolvers/products.resolver';
 import { ShopsModule } from 'src/shops/shops.module';
 import { Reference, ReferenceSchema } from './entities/reference.entity';
@@ -65,7 +64,6 @@ import { CategoriesResolver } from './resolvers/categories.resolver';
 			},
 		]),
 		TypeOrmModule.forFeature([ProductMysql, SizeMysql, ColorMysql]),
-		UsersModule,
 		ShopsModule,
 		ConfigurationsModule,
 	],

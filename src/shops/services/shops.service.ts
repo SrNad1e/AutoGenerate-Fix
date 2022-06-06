@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
-import { CompaniesService } from 'src/configurations/services/companies.service';
-import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+
+import { CompaniesService } from 'src/configurations/services/companies.service';
 import { CreateShopInput } from '../dtos/create-shop.input';
 import { FiltersShopInput } from '../dtos/filters-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { UpdateShopInput } from '../dtos/update-shop.input';
-
 import { Shop, ShopMysql } from '../entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 const populate = [
 	{

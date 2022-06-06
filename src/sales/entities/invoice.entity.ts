@@ -1,13 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Company } from 'src/configurations/entities/company.entity';
 
+import { Company } from 'src/configurations/entities/company.entity';
+import { User } from 'src/configurations/entities/user.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
-import { User } from 'src/users/entities/user.entity';
 import { AuthorizationDian } from './authorization.entity';
 
 @ObjectType({ description: 'Productos de la factura' })

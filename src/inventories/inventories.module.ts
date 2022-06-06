@@ -8,7 +8,6 @@ import {
 } from './entities/stock-request.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { ShopsModule } from 'src/shops/shops.module';
-import { UsersModule } from 'src/users/users.module';
 import {
 	StockTransfer,
 	StockTransferDetailMysql,
@@ -42,7 +41,6 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 	imports: [
 		ProductsModule,
 		ShopsModule,
-		UsersModule,
 		TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
 		MongooseModule.forFeature([
 			{

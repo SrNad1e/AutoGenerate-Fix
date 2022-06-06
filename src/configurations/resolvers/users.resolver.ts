@@ -4,7 +4,7 @@ import { UsersService } from '../services/users.service';
 import { User } from '../entities/user.entity';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
-import { Permissions, RequirePermissions } from '../libs/permissions.decorator';
+import { Permissions, RequirePermissions } from '../../configurations/libs/permissions.decorator';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
@@ -16,7 +16,7 @@ export class UsersResolver {
 		name: 'users',
 		description: 'Consulta todos los usuarios con base a los filtros',
 	})
-	@RequirePermissions(Permissions.READ_USERS)
+	@RequirePermissions(Permissions.READ_CONFIGURATION_USERS)
 	findAll(
 		@Args('filtersUsersInput', {
 			description: 'Filtros para consultar los usuarios',
@@ -41,7 +41,7 @@ export class UsersResolver {
 	}
 
 	@Mutation(() => User)
-	@RequirePermissions(Permissions.UPDATE_USER)
+	@RequirePermissions(Permissions.UPDATE_CONFIGURATION_USER)
 	updateUser(
 		@Args('updateUserInput', {
 			description: 'Datos a actualiazar en el usuario',

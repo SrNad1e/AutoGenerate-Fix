@@ -5,10 +5,10 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Color } from './color.entity';
 import { Size } from './size.entity';
-import { User } from 'src/users/entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Reference } from './reference.entity';
 import { Image } from 'src/staticfiles/entities/image.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @ObjectType({ description: 'Inventario por bodegas del producto' })
 export class Stock {

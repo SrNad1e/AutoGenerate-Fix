@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
-import { CompaniesService } from 'src/configurations/services/companies.service';
-import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { CompaniesService } from 'src/configurations/services/companies.service';
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { Warehouse, WarehouseMysql } from '../entities/warehouse.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Injectable()
 export class WarehousesService {

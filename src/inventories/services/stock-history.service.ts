@@ -5,7 +5,8 @@ import { PaginateModel, Types } from 'mongoose';
 import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistory } from '../entities/stock-history.entity';

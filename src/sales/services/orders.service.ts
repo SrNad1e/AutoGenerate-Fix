@@ -5,17 +5,16 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
-import { ConveyorsService } from 'src/configurations/services/conveyors.service';
-import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import * as dayjs from 'dayjs';
 
+import { CustomerTypeService } from 'src/crm/services/customer-type.service';
+import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { ShopsService } from 'src/shops/services/shops.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
-import { User } from 'src/users/entities/user.entity';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
@@ -23,6 +22,7 @@ import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
+import { User } from 'src/configurations/entities/user.entity';
 
 const populate = [
 	{

@@ -10,7 +10,8 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
 import { WarehousesService } from 'src/shops/services/warehouses.service';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
 import { FiltersStockOutputsInput } from '../dtos/filters-stockOutputs.input';
 import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';

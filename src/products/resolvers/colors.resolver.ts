@@ -9,7 +9,7 @@ import { CreateColorInput } from '../dtos/create-color.input';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 
 @Resolver(() => Color)
 export class ColorsResolver {

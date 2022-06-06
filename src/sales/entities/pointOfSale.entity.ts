@@ -1,10 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { User } from 'src/configurations/entities/user.entity';
 
 import { Shop } from 'src/shops/entities/shop.entity';
 import { Box } from 'src/treasury/entities/box.entity';
-import { User } from 'src/users/entities/user.entity';
 import { AuthorizationDian } from './authorization.entity';
 
 @Schema({ timestamps: true })

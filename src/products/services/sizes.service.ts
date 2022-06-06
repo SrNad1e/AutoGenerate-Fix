@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { User } from 'src/configurations/entities/user.entity';
 import { Repository } from 'typeorm';
 
-import { User } from 'src/users/entities/user.entity';
 import { CreateSizeInput } from '../dtos/create-size.input';
 import { FiltersSizesInput } from '../dtos/filters-sizes.input';
 import { ResponseSizes } from '../dtos/response-sizes';

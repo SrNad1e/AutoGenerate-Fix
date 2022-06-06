@@ -3,10 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { User } from 'src/configurations/entities/user.entity';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
-import { User } from 'src/users/entities/user.entity';
 import { CreateInvoiceInput } from '../dtos/create-invoice-input';
 import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { Invoice } from '../entities/invoice.entity';

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Caja donde se deposita el dinero' })

@@ -9,7 +9,6 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { Repository } from 'typeorm';
 
 import { WarehousesService } from 'src/shops/services/warehouses.service';
-import { UsersService } from 'src/users/services/users.service';
 import {
 	FiltersProductInput,
 	FiltersProductsInput,
@@ -20,7 +19,6 @@ import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { ReferencesService } from './references.service';
 import { BrandsService } from './brands.service';
-import { User } from 'src/users/entities/user.entity';
 import { CreateProductInput } from '../dtos/create-product.input';
 import { UpdateProductInput } from '../dtos/update-product.input';
 import { CompaniesService } from 'src/configurations/services/companies.service';
@@ -29,6 +27,8 @@ import { Size } from '../entities/size.entity';
 import { Color } from '../entities/color.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Image } from 'src/staticfiles/entities/image.entity';
+import { UsersService } from 'src/configurations/services/users.service';
+import { User } from 'src/configurations/entities/user.entity';
 
 const populate = [
 	{

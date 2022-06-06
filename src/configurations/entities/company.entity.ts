@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
+import { User } from './user.entity';
 
 @ObjectType({ description: 'Empresa' })
 @Schema({ timestamps: true })

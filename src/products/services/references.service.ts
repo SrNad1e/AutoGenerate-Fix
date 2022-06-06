@@ -6,7 +6,6 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
 import { CreateReferenceInput } from '../dtos/create-reference.input';
 import { FiltersReferenceInput } from '../dtos/filters-reference.input';
 import { FiltersReferencesInput } from '../dtos/filters-references.input';
@@ -26,6 +25,7 @@ import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { AttribsService } from './attribs.service';
+import { User } from 'src/configurations/entities/user.entity';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },

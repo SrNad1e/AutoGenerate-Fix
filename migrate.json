@@ -519,6 +519,111 @@
 			"name": "Imprimir",
 			"description": "Permite imprimir la devolucion de facturación",
 			"action": "PRINT_INVOICING_RETURN"
+		},
+		{
+			"module": "Configuración",
+			"option": "Transportadoras",
+			"name": "Acceder",
+			"description": "Permite acceder a las transportadoras",
+			"action": "ACCESS_CONFIGURATION_CONVEYORS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Transportadoras",
+			"name": "Consultar",
+			"description": "Permite consultar las transportadoras",
+			"action": "READ_CONFIGURATION_CONVEYORS"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Acceder",
+			"description": "Permite acceder a las ciudades",
+			"action": "ACCESS_CRM_CITIES"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Acceder",
+			"description": "Permite acceder a los clientes",
+			"action": "ACCESS_CRM_CUSTOMERS"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Consultar",
+			"description": "Permite consultar las ciudades",
+			"action": "READ_CRM_CITIES"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Consultar",
+			"description": "Permite consultar a los clientes",
+			"action": "READ_CRM_CUSTOMERS"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Crear",
+			"description": "Permite crear el cliente",
+			"action": "CREATE_CRM_CUSTOMER"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Actualizar",
+			"description": "Permite actualizar el cliente",
+			"action": "UPDATE_CRM_CUSTOMER"
+		},
+		{
+			"module": "Configuración",
+			"option": "Tienda",
+			"name": "Consultar",
+			"description": "Permite consultar las tiendas",
+			"action": "READ_CONFIGURATION_SHOPS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Consultar",
+			"description": "Permite consultar los usuarios",
+			"action": "READ_CONFIGURATION_USERS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Consultar",
+			"description": "Permite consultar las bodegas",
+			"action": "READ_CONFIGURATION_WAREHOUSES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Actualizar",
+			"description": "Permite actualizar el usuario",
+			"action": "UPDATE_CONFIGURATION_USER"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Actualizar",
+			"description": "Permite actualizar el usuario",
+			"action": "UPDATE_CONFIGURATION_USER"
+		},
+		{
+			"module": "Configuración",
+			"option": "Imagen",
+			"name": "Consultar",
+			"description": "Permite consultar las imagenes",
+			"action": "READ_CONFIGURATION_IMAGES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Médio de pago",
+			"name": "Consultar",
+			"description": "Permite consultar los medios de pago",
+			"action": "READ_TREASURY_PAYMENTS"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS

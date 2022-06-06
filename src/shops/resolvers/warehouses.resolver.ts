@@ -3,7 +3,7 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { ResponseWarehouses } from '../dtos/response-warehouses';
 import { Warehouse } from '../entities/warehouse.entity';
@@ -17,7 +17,7 @@ export class WarehousesResolver {
 		name: 'warehouses',
 		description: 'Se encarga de listar las bodegas',
 	})
-	@RequirePermissions(Permissions.READ_SHOPS_WAREHOUSES)
+	@RequirePermissions(Permissions.READ_CONFIGURATION_WAREHOUSES)
 	findAll(
 		@Args({
 			name: 'filtersWarehousesInput',
@@ -39,7 +39,7 @@ export class WarehousesResolver {
 		name: 'warehouseId',
 		description: 'Se encarga de traer bodega por identificador',
 	})
-	@RequirePermissions(Permissions.READ_SHOPS_WAREHOUSES)
+	@RequirePermissions(Permissions.READ_CONFIGURATION_WAREHOUSES)
 	findById(
 		@Args({
 			name: 'warehouseId',

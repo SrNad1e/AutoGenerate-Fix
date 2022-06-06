@@ -6,7 +6,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Product } from 'src/products/entities/product.entity';
 import { StockRequest } from './stock-request.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 import { Company } from 'src/configurations/entities/company.entity';
 
 @ObjectType({ description: 'Detalle del traslado de productos' })

@@ -3,8 +3,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Modelo de la bodega' })

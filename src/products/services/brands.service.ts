@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { User } from 'src/configurations/entities/user.entity';
 
-import { User } from 'src/users/entities/user.entity';
 import { CreateBrandInput } from '../dtos/create-brand.input';
 import { FiltersBrandsInput } from '../dtos/filters-brands.input';
 import { UpdateBrandInput } from '../dtos/update-brand.input';

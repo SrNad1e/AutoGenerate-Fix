@@ -15,7 +15,7 @@ import { Role } from '../entities/role.entity';
 import { User, UserMysql } from '../entities/user.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
-import { Permission } from '../entities/permission.entity';
+import { Permission } from '../../configurations/entities/permission.entity';
 import { CreateUserInput } from '../dtos/create-user.input';
 import { CompaniesService } from 'src/configurations/services/companies.service';
 import { RolesService } from './roles.service';

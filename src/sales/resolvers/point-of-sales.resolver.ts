@@ -3,7 +3,7 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersPointOfSalesInput } from '../dtos/filters-point-of-sales.input';
 import { ResponsePointOfSales } from '../dtos/response-point-of-sales';
 import { PointOfSalesService } from '../services/point-of-sales.service';

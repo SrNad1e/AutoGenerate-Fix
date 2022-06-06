@@ -3,7 +3,7 @@ import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersCitiesInput } from '../dtos/filters-cities-input';
 import { ResponseCities } from '../dtos/response-cities';
 import { CitiesService } from '../services/cities.service';

@@ -2,7 +2,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 
 import { CreateSizeInput } from '../dtos/create-size.input';
 import { FiltersSizesInput } from '../dtos/filters-sizes.input';

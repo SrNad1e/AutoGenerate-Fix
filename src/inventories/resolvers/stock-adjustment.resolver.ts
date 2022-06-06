@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
 import { FiltersStockAdjustmentsInput } from '../dtos/filters-stockAdjustments.input';
 import { ResponseStockAdjustments } from '../dtos/response-stockAdjustments';

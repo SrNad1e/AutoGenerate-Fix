@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
 	Permissions,
 	RequirePermissions,
-} from 'src/users/libs/permissions.decorator';
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateBrandInput } from '../dtos/create-brand.input';
 import { FiltersBrandsInput } from '../dtos/filters-brands.input';
 import { ResponseBrands } from '../dtos/response-brands';

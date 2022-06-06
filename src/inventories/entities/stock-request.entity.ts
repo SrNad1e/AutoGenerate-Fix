@@ -5,7 +5,8 @@ import { Company } from 'src/configurations/entities/company.entity';
 
 import { Product } from 'src/products/entities/product.entity';
 import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 
 @ObjectType()
 export class DetailRequest {
