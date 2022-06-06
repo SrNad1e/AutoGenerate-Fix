@@ -237,11 +237,7 @@ export class ProductsService {
 		user: User,
 		companyId: string,
 	) {
-		const reference = await this.referencesService.findById(
-			referenceId,
-			user,
-			companyId,
-		);
+		const reference = await this.referencesService.findById(referenceId);
 		if (!reference) {
 			throw new NotFoundException('La referencia no existe');
 		}
