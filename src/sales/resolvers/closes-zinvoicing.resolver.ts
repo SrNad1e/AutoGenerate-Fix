@@ -42,7 +42,7 @@ export class ClosesZinvoicingResolver {
 		name: 'createCloseZInvoicing',
 		description: 'Crea un cierre Z de facturación',
 	})
-	@RequirePermissions(Permissions.READ_INVOICING_CLOSESZ)
+	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSEZ)
 	create(
 		@Args({
 			name: 'createCloseZInvoicing',
