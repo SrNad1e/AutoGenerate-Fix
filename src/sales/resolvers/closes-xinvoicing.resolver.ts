@@ -42,7 +42,7 @@ export class ClosesXinvoicingResolver {
 		name: 'createCloseXInvoicing',
 		description: 'Crea un cierre X de facturación',
 	})
-	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSESX)
+	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSEX)
 	create(
 		@Args({
 			name: 'createCloseXInvoicing',
