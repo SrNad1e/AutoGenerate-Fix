@@ -12,6 +12,7 @@ import { StockInput } from '../entities/stock-input.entity';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { ReturnOrder } from 'src/sales/entities/return-order.entity';
 
 @Injectable()
 export class StockHistoryService {
@@ -26,6 +27,8 @@ export class StockHistoryService {
 		private readonly stockOutputModel: PaginateModel<StockOutput>,
 		@InjectModel(StockAdjustment.name)
 		private readonly stockAdjustmentModel: PaginateModel<StockAdjustment>,
+		@InjectModel(ReturnOrder.name)
+		private readonly returnOrderModel: PaginateModel<ReturnOrder>,
 		@InjectModel(Order.name)
 		private readonly orderModel: PaginateModel<Order>,
 		private readonly warehousesService: WarehousesService,
@@ -58,6 +61,9 @@ export class StockHistoryService {
 					break;
 				case 'adjustment':
 					document = await this.stockAdjustmentModel.findById(documentId);
+					break;
+				case 'returnOrder':
+					document = await this.returnOrderModel.findById(documentId);
 					break;
 				default:
 					throw new BadRequestException(

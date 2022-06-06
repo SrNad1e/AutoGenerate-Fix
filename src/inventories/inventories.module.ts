@@ -36,6 +36,10 @@ import { StockOutputResolver } from './resolvers/stock-output.resolver';
 import { StockAdjustmentResolver } from './resolvers/stock-adjustment.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import {
+	ReturnOrder,
+	ReturnOrderSchema,
+} from 'src/sales/entities/return-order.entity';
 
 @Module({
 	imports: [
@@ -70,6 +74,10 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 			{
 				name: StockOutput.name,
 				schema: StockOutputSchema,
+			},
+			{
+				name: ReturnOrder.name,
+				schema: ReturnOrderSchema,
 			},
 		]),
 	],

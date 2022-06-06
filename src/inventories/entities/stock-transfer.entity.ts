@@ -75,8 +75,8 @@ export class StockTransfer extends Document {
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence el traslado',
 	})
-	@Prop({ type: Object, required: true })
-	company: Company;
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
 
 	@Prop({ type: String })
 	@Field(() => String, {

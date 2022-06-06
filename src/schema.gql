@@ -761,6 +761,14 @@ input CreateReferenceInput {
   width: Float!
 }
 
+input CreateReturnOrderInput {
+  """Productos que se devuelven del pedido"""
+  details: [DetailReturnInput!]!
+
+  """Pedido al que afecta la devolución"""
+  orderId: String!
+}
+
 """Datos para crear una talla"""
 input CreateSizeInput {
   """Valor asignado a la talla"""
@@ -1053,15 +1061,24 @@ type DetailRequest {
   updatedAt: DateTime!
 }
 
+"""Producto de la devoliución del pedido"""
+input DetailReturnInput {
+  """Identificador del producto"""
+  productId: String!
+
+  """Cantidad del producto"""
+  quantity: Float!
+}
+
 """Productos de la devolucion"""
 type DetailReturnInvoice {
-  """Precio del producto en la factura"""
+  """Precio del producto de la devolución"""
   price: Float!
 
-  """Producto agregado a la factura"""
+  """Producto de la devolución"""
   product: Product!
 
-  """Cantidad de productos en la factura"""
+  """Cantidad de productos de la devolución"""
   quantity: Float!
 }
 
@@ -1636,9 +1653,9 @@ input FiltersReferencesInput {
   sort: SortReference
 }
 
-"""Filtros de listado de devoluciones de facturación"""
-input FiltersReturnsInvoiceInput {
-  """Si la devolucion de encuentra se encuentra activ<"""
+"""Filtros de listado de devoluciones del pedido"""
+input FiltersReturnsOrderInput {
+  """Si la devolucion de encuentra se encuentra activo"""
   active: Boolean
 
   """Fecha final para la busqueda"""
@@ -1654,7 +1671,7 @@ input FiltersReturnsInvoiceInput {
   page: Float
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
-  sort: SortReturnInovice
+  sort: SortReturnOrder
 }
 
 """Filtros usados para consultar las tiendas"""
@@ -2091,6 +2108,12 @@ type Mutation {
     """Datos para la creación de la referencia"""
     createReferenceInput: CreateReferenceInput!
   ): Reference!
+
+  """Se encarga de crear la devolución del pedido"""
+  createReturnOrder(
+    """Parámetros para la creación de la devolución de pedido"""
+    createReturnOrderInput: CreateReturnOrderInput!
+  ): ReturnOrder!
 
   """Crear una talla"""
   createSize(
@@ -2723,11 +2746,11 @@ type Query {
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!
 
-  """Lista de devoluciones de factura"""
-  returnsInvoice(
-    """Filtros de lista de devoluciones de factura"""
-    filtersReturnsInvoice: FiltersReturnsInvoiceInput = {}
-  ): ResponseReturnsInvoice!
+  """Lista de devoluciones de pedidos"""
+  returnsOrder(
+    """Filtros de lista de devoluciones de pedidos"""
+    filtersReturnsOrder: FiltersReturnsOrderInput = {}
+  ): ResponseReturnsOrder!
 
   """Se encarga de listar las tiendas"""
   shops(
@@ -3474,10 +3497,10 @@ type ResponseReferences {
   totalPages: Float!
 }
 
-"""Lista de devoluciones de factura"""
-type ResponseReturnsInvoice {
+"""Lista de devoluciones de ordenes"""
+type ResponseReturnsOrder {
   """Lista de ajustes"""
-  docs: [ReturnInvoice!]!
+  docs: [ReturnOrder!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3772,14 +3795,14 @@ type ResponseWarehouses {
 }
 
 """Devoluciones de facturación"""
-type ReturnInvoice {
+type ReturnOrder {
   """Identificador de mongo"""
   _id: String!
 
-  """Autorización"""
-  authorization: AuthorizationDian!
+  """Estado del devolucion"""
+  active: Boolean!
 
-  """Compañía a la que pertence el ajuste"""
+  """Compañía a la que pertence la devolución"""
   company: Company!
 
   """Fecha de creación"""
@@ -3788,23 +3811,17 @@ type ReturnInvoice {
   """Productos de la devolución"""
   details: [DetailReturnInvoice!]
 
-  """Factura de la devolución"""
-  invoice: Invoice!
-
   """Número consecutivo"""
   number: Float!
 
-  """Estado del ajuste (open, confirmed, cancelled)"""
-  status: String!
+  """Pedido de la devolución"""
+  order: Order!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
 
   """Usuario que creó o editó la factrura"""
   user: User!
-
-  """Bodega del ajuste"""
-  warehouse: Warehouse!
 }
 
 """Rol del usuario """
@@ -4134,8 +4151,8 @@ input SortReference {
   updatedAt: Float
 }
 
-"""Ordenamiento de las devoluciones en factura"""
-input SortReturnInovice {
+"""Ordenamiento de las devoluciones en pedido"""
+input SortReturnOrder {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
 

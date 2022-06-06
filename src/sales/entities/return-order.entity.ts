@@ -3,27 +3,27 @@ import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
-import { Invoice } from './invoice.entity';
-import { AuthorizationDian } from './authorization.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
-import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+import { Order } from './order.entity';
 
 @ObjectType({ description: 'Productos de la devolucion' })
 export class DetailReturnInvoice {
-	@Field(() => Product, { description: 'Producto agregado a la factura' })
+	@Field(() => Product, { description: 'Producto de la devolución' })
 	product: Product;
 
-	@Field(() => Number, { description: 'Cantidad de productos en la factura' })
+	@Field(() => Number, {
+		description: 'Cantidad de productos de la devolución',
+	})
 	quantity: number;
 
-	@Field(() => Number, { description: 'Precio del producto en la factura' })
+	@Field(() => Number, { description: 'Precio del producto de la devolución' })
 	price: number;
 }
 
-@Schema({ timestamps: true, collection: 'returnsInvoice' })
+@Schema({ timestamps: true, collection: 'returnsOrder' })
 @ObjectType({ description: 'Devoluciones de facturación' })
-export class ReturnInvoice extends Document {
+export class ReturnOrder extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
@@ -31,29 +31,21 @@ export class ReturnInvoice extends Document {
 	@Prop({ type: Number, requiere: true })
 	number: number;
 
-	@Field(() => Company, { description: 'Compañía a la que pertence el ajuste' })
-	@Prop({ type: Object, required: true })
-	company: Company;
-
-	@Field(() => Warehouse, { description: 'Bodega del ajuste' })
-	@Prop({ type: Object, required: true })
-	warehouse: Warehouse;
-
-	@Field(() => String, {
-		description: 'Estado del ajuste (open, confirmed, cancelled)',
+	@Field(() => Company, {
+		description: 'Compañía a la que pertence la devolución',
 	})
-	@Prop({ type: String, default: 'open' })
-	status: string;
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
 
-	@Field(() => Invoice, { description: 'Factura de la devolución' })
-	@Prop({ type: Object, required: true })
-	invoice: Invoice;
-
-	@Field(() => AuthorizationDian, {
-		description: 'Autorización',
+	@Field(() => Boolean, {
+		description: 'Estado del devolucion',
 	})
+	@Prop({ type: Boolean, default: true })
+	active: boolean;
+
+	@Field(() => Order, { description: 'Pedido de la devolución' })
 	@Prop({ type: Object, required: true })
-	authorization: AuthorizationDian;
+	order: Types.ObjectId;
 
 	@Field(() => [DetailReturnInvoice], {
 		description: 'Productos de la devolución',
@@ -74,4 +66,4 @@ export class ReturnInvoice extends Document {
 	@Field(() => Date, { description: 'Fecha de actualización' })
 	updatedAt: Date;
 }
-export const ReturnInvoiceSchema = SchemaFactory.createForClass(ReturnInvoice);
+export const ReturnOrderSchema = SchemaFactory.createForClass(ReturnOrder);

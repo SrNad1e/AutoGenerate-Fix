@@ -55,8 +55,8 @@ export class StockAdjustment extends Document {
 	warehouse: Warehouse;
 
 	@Field(() => Company, { description: 'Compañía a la que pertence el ajuste' })
-	@Prop({ type: Object, required: true })
-	company: Company;
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
 
 	@Field(() => String, {
 		description: 'Observación de la entrada',

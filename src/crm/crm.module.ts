@@ -19,6 +19,9 @@ import { City, CitySchema } from './entities/city.entity';
 import { CitiesResolver } from './resolvers/cities.resolver';
 import { CitiesService } from './services/cities.service';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { Coupon, CouponSchema } from './entities/coupon.entity';
+import { CouponsService } from './services/coupons.service';
+import { CouponsResolver } from './resolvers/coupons.resolver';
 
 @Module({
 	imports: [
@@ -36,6 +39,14 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 				useFactory: () => {
 					const schema = OrderSchema;
 					schema.index({ number: 1, company: -1 }, { unique: true });
+					return schema;
+				},
+			},
+			{
+				name: Coupon.name,
+				useFactory: () => {
+					const schema = CouponSchema;
+					schema.index({ code: 1, company: -1, number: 1 }, { unique: true });
 					return schema;
 				},
 			},
@@ -63,6 +74,8 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 		DocumentTypesResolver,
 		CitiesResolver,
 		CitiesService,
+		CouponsService,
+		CouponsResolver,
 	],
 	exports: [CustomersService, CustomerTypeService],
 })

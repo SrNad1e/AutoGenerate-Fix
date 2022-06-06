@@ -45,8 +45,8 @@ export class StockRequest extends Document {
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence la solicitud',
 	})
-	@Prop({ type: Object, required: true })
-	company: Company;
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
 
 	@Field(() => Warehouse, {
 		description: 'Bodega de origen de la solicitud',

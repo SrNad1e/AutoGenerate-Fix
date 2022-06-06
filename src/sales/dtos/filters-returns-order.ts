@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType({ description: 'Ordenamiento de las devoluciones en factura' })
-export class SortReturnInovice {
+@InputType({ description: 'Ordenamiento de las devoluciones en pedido' })
+export class SortReturnOrder {
 	@Field(() => Number, {
 		description: 'Ordenamiento por fecha de creación',
 		nullable: true,
@@ -15,13 +15,13 @@ export class SortReturnInovice {
 	updatedAt: number;
 }
 
-@InputType({ description: 'Filtros de listado de devoluciones de facturación' })
-export class FiltersReturnsInvoiceInput {
-	@Field(() => SortReturnInovice, {
+@InputType({ description: 'Filtros de listado de devoluciones del pedido' })
+export class FiltersReturnsOrderInput {
+	@Field(() => SortReturnOrder, {
 		description: 'Ordenamiento (1 es ascendente, -1 es descendente)',
 		nullable: true,
 	})
-	sort: SortReturnInovice;
+	sort: SortReturnOrder;
 
 	@Field(() => String, {
 		description: 'Fecha inicial para la busqueda',
@@ -36,7 +36,7 @@ export class FiltersReturnsInvoiceInput {
 	dateFinal: string;
 
 	@Field(() => Boolean, {
-		description: 'Si la devolucion de encuentra se encuentra activ<',
+		description: 'Si la devolucion de encuentra se encuentra activo',
 		nullable: true,
 	})
 	active: boolean;

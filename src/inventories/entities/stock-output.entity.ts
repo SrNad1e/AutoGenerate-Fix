@@ -57,8 +57,8 @@ export class StockOutput extends Document {
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence la salida',
 	})
-	@Prop({ type: Object, required: true })
-	company: Company;
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
 
 	@Field(() => String, {
 		description: 'Observación de la entrada',

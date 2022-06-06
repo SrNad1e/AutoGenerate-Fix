@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { ReturnInvoice } from '../entities/return-invoice.entity';
+import { ReturnOrder } from '../entities/return-order.entity';
 
-@ObjectType({ description: 'Lista de devoluciones de factura' })
-export class ResponseReturnsInvoice {
-	@Field(() => [ReturnInvoice], { description: 'Lista de ajustes' })
-	docs: ReturnInvoice[];
+@ObjectType({ description: 'Lista de devoluciones de ordenes' })
+export class ResponseReturnsOrder {
+	@Field(() => [ReturnOrder], { description: 'Lista de ajustes' })
+	docs: ReturnOrder[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;

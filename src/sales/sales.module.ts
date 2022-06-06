@@ -17,12 +17,9 @@ import {
 } from './entities/authorization.entity';
 import { PointOfSalesService } from './services/point-of-sales.service';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
-import {
-	ReturnInvoice,
-	ReturnInvoiceSchema,
-} from './entities/return-invoice.entity';
-import { ReturnsInvoiceService } from './services/returns-invoice.service';
-import { ReturnsInvoiceResolver } from './resolvers/returns-invoice.resolver';
+import { ReturnOrder, ReturnOrderSchema } from './entities/return-order.entity';
+import { ReturnsOrderService } from './services/returns-order.service';
+import { ReturnsOrderResolver } from './resolvers/returns-order.resolver';
 import { InvoicesResolver } from './resolvers/invoices.resolver';
 import {
 	CloseXInvoicing,
@@ -63,9 +60,9 @@ import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver
 				},
 			},
 			{
-				name: ReturnInvoice.name,
+				name: ReturnOrder.name,
 				useFactory: async () => {
-					const schema = ReturnInvoiceSchema;
+					const schema = ReturnOrderSchema;
 					schema.index({ number: 1, authorization: -1 }, { unique: true });
 					return schema;
 				},
@@ -105,8 +102,8 @@ import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver
 		InvoicesResolver,
 		PointOfSalesService,
 		PointOfSalesResolver,
-		ReturnsInvoiceService,
-		ReturnsInvoiceResolver,
+		ReturnsOrderService,
+		ReturnsOrderResolver,
 		ClosesXInvoicingService,
 		ClosesXinvoicingResolver,
 		ClosesZinvoicingService,
