@@ -22,6 +22,7 @@ export class ProductsResolver {
 		name: 'products',
 		description: 'Lista los productos',
 	})
+	@RequirePermissions(Permissions.READ_INVENTORY_PRODUCTS)
 	findAll(
 		@Args({
 			name: 'filtersProductsInput',
