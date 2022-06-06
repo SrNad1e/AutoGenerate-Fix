@@ -11,8 +11,6 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { Color } from 'src/products/entities/color.entity';
 import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/configurations/entities/user.entity';
 
 import { ConfirmStockTransferInput } from '../dtos/confirmProducts-stockTransfer.input';
@@ -24,6 +22,8 @@ import { StockRequest } from '../entities/stock-request.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { StockHistoryService } from './stock-history.service';
 import { StockRequestService } from './stock-request.service';
+import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
 
 const populate = [
 	{

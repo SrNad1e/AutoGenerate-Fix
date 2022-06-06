@@ -4,9 +4,8 @@ import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { Product } from 'src/products/entities/product.entity';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
-
+import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 
 @ObjectType({ description: 'Detalle de la salida de productos' })
 export class DetailOutput {

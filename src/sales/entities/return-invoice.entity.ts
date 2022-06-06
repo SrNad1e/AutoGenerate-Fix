@@ -3,11 +3,11 @@ import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { Invoice } from './invoice.entity';
 import { AuthorizationDian } from './authorization.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
+import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 
 @ObjectType({ description: 'Productos de la devolucion' })
 export class DetailReturnInvoice {

@@ -12,7 +12,6 @@ import { ConveyorsService } from 'src/configurations/services/conveyors.service'
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
-import { ShopsService } from 'src/shops/services/shops.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
@@ -23,6 +22,7 @@ import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { User } from 'src/configurations/entities/user.entity';
+import { ShopsService } from 'src/configurations/services/shops.service';
 
 const populate = [
 	{

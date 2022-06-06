@@ -4,7 +4,7 @@ import {
 	Permissions,
 	RequirePermissions,
 } from 'src/configurations/libs/permissions.decorator';
-import { FiltersImagesInput } from '../dtos/filters-images.input';
+import { FiltersImagesInput } from '../../configurations/dtos/filters-images.input';
 import { ResponseImages } from '../dtos/response-images';
 import { ImagesService } from '../services/images.service';
 

@@ -13,7 +13,6 @@ import { ColorsService } from './services/colors.service';
 import { Color, ColorMysql, ColorSchema } from './entities/color.entity';
 import { Size, SizeMysql, SizeSchema } from './entities/size.entity';
 import { ProductsResolver } from './resolvers/products.resolver';
-import { ShopsModule } from 'src/shops/shops.module';
 import { Reference, ReferenceSchema } from './entities/reference.entity';
 import { ReferencesService } from './services/references.service';
 import { Brand, BrandSchema } from './entities/brand.entity';
@@ -37,11 +36,12 @@ import { AttribsResolver } from './resolvers/attribs.resolver';
 import { BrandsResolver } from './resolvers/brands.resolver';
 import { ConfigurationsModule } from 'src/configurations/configurations.module';
 import { CategoriesService } from './services/categories.service';
-import { Image, ImageSchema } from 'src/staticfiles/entities/image.entity';
+import { Image, ImageSchema } from 'src/configurations/entities/image.entity';
 import { CategoriesResolver } from './resolvers/categories.resolver';
 
 @Module({
 	imports: [
+		ConfigurationsModule,
 		MongooseModule.forFeature([
 			{ name: Color.name, schema: ColorSchema },
 			{ name: Image.name, schema: ImageSchema },
@@ -64,8 +64,6 @@ import { CategoriesResolver } from './resolvers/categories.resolver';
 			},
 		]),
 		TypeOrmModule.forFeature([ProductMysql, SizeMysql, ColorMysql]),
-		ShopsModule,
-		ConfigurationsModule,
 	],
 	providers: [
 		ProductsService,

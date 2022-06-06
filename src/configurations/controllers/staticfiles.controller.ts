@@ -9,8 +9,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 
-import { ImagesService } from '../services/images.service';
 import { JwtRestAuthGuard } from 'src/configurations/guards/jwt-rest-auth.guard';
+import { ImagesService } from '../services/images.service';
 
 @Controller('upload')
 export class StaticfilesController {

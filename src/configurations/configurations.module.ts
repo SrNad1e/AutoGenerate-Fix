@@ -15,7 +15,6 @@ import { CrmModule } from 'src/crm/crm.module';
 import config from 'src/config';
 import { Permission, PermissionSchema } from './entities/permission.entity';
 import { Role, RoleSchema } from './entities/role.entity';
-import { Shop, ShopSchema } from 'src/shops/entities/shop.entity';
 import {
 	PointOfSale,
 	PointOfSaleSchema,
@@ -28,6 +27,21 @@ import { UsersService } from './services/users.service';
 import { LocalStrategy } from './libs/local.strategy';
 import { JwtStrategy } from './libs/jwt.strategy';
 import { RolesService } from './services/roles.service';
+import { Image, ImageSchema } from './entities/image.entity';
+import { ImagesService } from './services/images.service';
+import { ImagesResolver } from './resolvers/images.resolver';
+import { StaticfilesController } from './controllers/staticfiles.controller';
+import { Shop, ShopMysql, ShopSchema } from './entities/shop.entity';
+import {
+	Warehouse,
+	WarehouseMysql,
+	WarehouseSchema,
+} from './entities/warehouse.entity';
+import { ShopsController } from './controllers/shops.controller';
+import { ShopsService } from './services/shops.service';
+import { WarehousesService } from './services/warehouses.service';
+import { WarehousesResolver } from './resolvers/warehouses.resolver';
+import { ShopsResolver } from './resolvers/shops.resolver';
 
 @Module({
 	imports: [
@@ -47,8 +61,16 @@ import { RolesService } from './services/roles.service';
 			{ name: Company.name, schema: CompanySchema },
 			{ name: Conveyor.name, schema: ConveyorSchema },
 			{
+				name: Image.name,
+				schema: ImageSchema,
+			},
+			{
 				name: Permission.name,
 				schema: PermissionSchema,
+			},
+			{
+				name: PointOfSale.name,
+				schema: PointOfSaleSchema,
 			},
 			{
 				name: Role.name,
@@ -59,8 +81,8 @@ import { RolesService } from './services/roles.service';
 				schema: ShopSchema,
 			},
 			{
-				name: PointOfSale.name,
-				schema: PointOfSaleSchema,
+				name: Warehouse.name,
+				schema: WarehouseSchema,
 			},
 		]),
 		MongooseModule.forFeatureAsync([
@@ -84,7 +106,7 @@ import { RolesService } from './services/roles.service';
 				},
 			},
 		]),
-		TypeOrmModule.forFeature([UserMysql]),
+		TypeOrmModule.forFeature([UserMysql, ShopMysql, WarehouseMysql]),
 	],
 	providers: [
 		AuthResolver,
@@ -92,12 +114,25 @@ import { RolesService } from './services/roles.service';
 		CompaniesService,
 		ConveyorsResolver,
 		ConveyorsService,
+		ImagesResolver,
+		ImagesService,
 		JwtStrategy,
 		LocalStrategy,
+		ShopsResolver,
+		ShopsService,
 		RolesService,
 		UsersResolver,
 		UsersService,
+		WarehousesResolver,
+		WarehousesService,
 	],
-	exports: [CompaniesService, ConveyorsService, UsersService],
+	controllers: [StaticfilesController, ShopsController],
+	exports: [
+		CompaniesService,
+		ConveyorsService,
+		UsersService,
+		ShopsService,
+		WarehousesService,
+	],
 })
 export class ConfigurationsModule {}

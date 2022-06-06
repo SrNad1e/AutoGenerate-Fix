@@ -4,9 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
 import config from 'src/config';
-import { Image } from '../entities/image.entity';
+import { Image } from '../../configurations/entities/image.entity';
 import { resizeImage, uploadFileAWS } from 'src/common/aws';
-import { FiltersImagesInput } from '../dtos/filters-images.input';
+import { FiltersImagesInput } from '../../configurations/dtos/filters-images.input';
 import { User } from 'src/configurations/entities/user.entity';
 
 @Injectable()

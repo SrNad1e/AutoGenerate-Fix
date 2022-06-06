@@ -9,9 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
-import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/configurations/entities/user.entity';
-
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
 import { FiltersStockOutputsInput } from '../dtos/filters-stockOutputs.input';
 import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
@@ -19,8 +17,9 @@ import { StockOutput } from '../entities/stock-output.entity';
 import { StockHistoryService } from './stock-history.service';
 import { Size } from 'src/products/entities/size.entity';
 import { Color } from 'src/products/entities/color.entity';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
+import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
 
 const populate = [
 	{

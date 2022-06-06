@@ -4,7 +4,6 @@ import { CrmModule } from 'src/crm/crm.module';
 
 import { Order, OrderSchema } from './entities/order.entity';
 import { OrdersService } from './services/orders.service';
-import { ShopsModule } from 'src/shops/shops.module';
 import { OrdersResolver } from './resolvers/orders.resolver';
 import { ProductsModule } from 'src/products/products.module';
 import { InventoriesModule } from 'src/inventories/inventories.module';
@@ -43,7 +42,6 @@ import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver
 	imports: [
 		InventoriesModule,
 		CrmModule,
-		ShopsModule,
 		ProductsModule,
 		TreasuryModule,
 		ConfigurationsModule,

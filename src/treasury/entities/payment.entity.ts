@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
-import { Image } from 'src/staticfiles/entities/image.entity';
+import { Image } from 'src/configurations/entities/image.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Medios de pago' })

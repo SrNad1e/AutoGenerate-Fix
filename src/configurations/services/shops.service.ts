@@ -9,7 +9,7 @@ import { CreateShopInput } from '../dtos/create-shop.input';
 import { FiltersShopInput } from '../dtos/filters-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { UpdateShopInput } from '../dtos/update-shop.input';
-import { Shop, ShopMysql } from '../entities/shop.entity';
+import { Shop, ShopMysql } from '../../configurations/entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
 

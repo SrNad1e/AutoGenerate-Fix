@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { Image } from 'src/staticfiles/entities/image.entity';
+import { Image } from 'src/configurations/entities/image.entity';
 import { User } from './user.entity';
 
 @ObjectType({ description: 'Modelo para la transportadora' })

@@ -8,12 +8,10 @@ import { Repository } from 'typeorm';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
-import { Shop } from 'src/shops/entities/shop.entity';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { Role } from '../entities/role.entity';
 import { User, UserMysql } from '../entities/user.entity';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../../configurations/entities/permission.entity';
 import { CreateUserInput } from '../dtos/create-user.input';
@@ -22,6 +20,8 @@ import { RolesService } from './roles.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { FiltersUserInput } from '../dtos/filters-user.input';
 import { Customer } from 'src/crm/entities/customer.entity';
+import { Shop } from '../entities/shop.entity';
+import { Warehouse } from '../entities/warehouse.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },

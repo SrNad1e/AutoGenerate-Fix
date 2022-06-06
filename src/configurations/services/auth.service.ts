@@ -10,10 +10,10 @@ import * as bcrypt from 'bcryptjs';
 import { PaginateModel } from 'mongoose';
 
 import { CustomersService } from 'src/crm/services/customers.service';
-import { Shop } from 'src/shops/entities/shop.entity';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
 import { SignUpInput } from '../dtos/signup.input';
+import { Shop } from '../entities/shop.entity';
 import { User } from '../entities/user.entity';
 import { RolesService } from './roles.service';
 import { UsersService } from './users.service';

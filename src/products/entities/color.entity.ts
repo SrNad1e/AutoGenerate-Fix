@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { Image } from 'src/staticfiles/entities/image.entity';
+import { Image } from 'src/configurations/entities/image.entity';
 import { User } from 'src/configurations/entities/user.entity';
 
 @Schema({ timestamps: true })

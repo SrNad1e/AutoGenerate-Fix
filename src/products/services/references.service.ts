@@ -20,12 +20,12 @@ import { Reference } from '../entities/reference.entity';
 import { Product } from '../entities/product.entity';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
-import { Image } from 'src/staticfiles/entities/image.entity';
-import { WarehousesService } from 'src/shops/services/warehouses.service';
+import { Image } from 'src/configurations/entities/image.entity';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { AttribsService } from './attribs.service';
 import { User } from 'src/configurations/entities/user.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },

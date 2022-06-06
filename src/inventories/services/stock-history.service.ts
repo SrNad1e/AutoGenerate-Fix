@@ -4,15 +4,14 @@ import { PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
-import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/configurations/entities/user.entity';
-
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistory } from '../entities/stock-history.entity';
 import { StockInput } from '../entities/stock-input.entity';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
 
 @Injectable()
 export class StockHistoryService {

@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { Shop } from 'src/configurations/entities/shop.entity';
 import { User } from 'src/configurations/entities/user.entity';
-import { Shop } from 'src/shops/entities/shop.entity';
 import { Box } from 'src/treasury/entities/box.entity';
 import { AuthorizationDian } from '../entities/authorization.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';

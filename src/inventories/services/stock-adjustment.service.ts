@@ -12,16 +12,15 @@ import { Color } from 'src/products/entities/color.entity';
 import { Reference } from 'src/products/entities/reference.entity';
 import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
-import { WarehousesService } from 'src/shops/services/warehouses.service';
 import { User } from 'src/configurations/entities/user.entity';
-
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { FiltersStockAdjustmentsInput } from '../dtos/filters-stockAdjustments.input';
 import { UpdateStockAdjustmentInput } from '../dtos/update-stockAdjustment-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistoryService } from './stock-history.service';
+import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
 
 const populate = [
 	{

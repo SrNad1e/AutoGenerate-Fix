@@ -3,11 +3,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Shop } from 'src/shops/entities/shop.entity';
 import { Role } from './role.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
+import { Shop } from './shop.entity';
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Usuario que manipula los datos de la aplicación' })
