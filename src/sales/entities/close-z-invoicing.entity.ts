@@ -2,7 +2,6 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { PointOfSale } from './pointOfSale.entity';
 import { Expense } from 'src/treasury/entities/expense.entity';
@@ -12,6 +11,7 @@ import {
 	RefundOrderClose,
 	SummaryOrderClose,
 } from './close-x-invoicing.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Schema({ timestamps: true, collection: 'closesZInvoicing' })
 @ObjectType({ description: 'Cierre Z de facturación' })

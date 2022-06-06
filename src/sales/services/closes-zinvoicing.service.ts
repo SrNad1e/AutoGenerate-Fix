@@ -4,12 +4,12 @@ import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
 import { ExpensesService } from 'src/treasury/services/expenses.service';
-import { User } from 'src/users/entities/user.entity';
 import { FiltersClosesZInvoicingInput } from '../dtos/filters-closes-z-invoicing-input';
 import { CloseZInvoicing } from '../entities/close-z-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
+import { User } from 'src/configurations/entities/user.entity';
 
 const populate: PopulateOptions[] = [
 	{

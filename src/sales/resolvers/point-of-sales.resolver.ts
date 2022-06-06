@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 import { FiltersPointOfSalesInput } from '../dtos/filters-point-of-sales.input';
 import { ResponsePointOfSales } from '../dtos/response-point-of-sales';
 import { PointOfSalesService } from '../services/point-of-sales.service';
@@ -14,7 +16,7 @@ export class PointOfSalesResolver {
 		name: 'pointOfSales',
 		description: 'Lista de puntos de venta',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVOICING_POINTOFSALES)
 	findAll(
 		@Args({
 			name: 'filtersPointOfSales',

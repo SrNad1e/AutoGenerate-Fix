@@ -1,15 +1,14 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 import { ConfirmStockTransferInput } from '../dtos/confirmProducts-stockTransfer.input';
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
 import { FiltersStockTransfersInput } from '../dtos/filters-stockTransfers.input';
 import { ResponseStockTransfers } from '../dtos/response-stockTransfers';
-import {
-	DetailStockTransferInput,
-	UpdateStockTransferInput,
-} from '../dtos/update-stockTransfer-input';
+import { UpdateStockTransferInput } from '../dtos/update-stockTransfer-input';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { StockTransferService } from '../services/stock-transfer.service';
 
@@ -21,7 +20,7 @@ export class StockTransferResolver {
 		name: 'stockTransfers',
 		description: 'Obtiene listado de traslados de productos entre bodegas',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVENTORY_TRANSFERS)
 	findAll(
 		@Args({
 			name: 'filtersStockTransfersInput',
@@ -44,7 +43,7 @@ export class StockTransferResolver {
 		name: 'stockTransferId',
 		description: 'Consulta el trasldo por el identificador',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVENTORY_TRANSFERS)
 	findById(
 		@Args('id', { description: 'Identificador del traslado' }) id: string,
 	) {
@@ -55,7 +54,7 @@ export class StockTransferResolver {
 		name: 'createStockTransfer',
 		description: 'Crea una traslado de productos',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_TRANSFER)
 	create(
 		@Args('createStockTransferInput', {
 			description: 'Datos para la creación de un traslado de productos',
@@ -74,7 +73,7 @@ export class StockTransferResolver {
 		name: 'updateStockTransfer',
 		description: 'Actualiza traslado',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_TRANSFER)
 	update(
 		@Args('id', { description: 'Identificador del traslado de productos' })
 		id: string,
@@ -96,7 +95,7 @@ export class StockTransferResolver {
 		name: 'confirmProductsStockTransfer',
 		description: 'Confirma los productos del traslado',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CONFIRM_INVENTORY_TRANSFER)
 	confirmProducts(
 		@Args('id', { description: 'Identificador del traslado de productos' })
 		id: string,

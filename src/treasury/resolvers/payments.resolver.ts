@@ -1,8 +1,10 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
-import { FiltersPaymentsInput } from '../dtos/filters-payments.input';
 
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
+import { FiltersPaymentsInput } from '../dtos/filters-payments.input';
 import { ResponsePayments } from '../dtos/response-payments';
 import { PaymentsService } from '../services/payments.service';
 
@@ -14,7 +16,7 @@ export class PaymentsResolver {
 		name: 'payments',
 		description: 'Se encarga de listar los metodos de pago',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_TREASURY_PAYMENTS)
 	findAll(
 		@Args({
 			name: 'filtersPaymentsInput',

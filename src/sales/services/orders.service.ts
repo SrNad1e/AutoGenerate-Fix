@@ -4,18 +4,16 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel, Types } from 'mongoose';
-import { ConveyorsService } from 'src/configurations/services/conveyors.service';
-import { CustomerTypeService } from 'src/crm/services/customer-type.service';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
+import { CustomerTypeService } from 'src/crm/services/customer-type.service';
+import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
-import { ShopsService } from 'src/shops/services/shops.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
-import { User } from 'src/users/entities/user.entity';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
@@ -23,6 +21,9 @@ import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
+import { User } from 'src/configurations/entities/user.entity';
+import { ShopsService } from 'src/configurations/services/shops.service';
+import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 
 const populate = [
 	{
@@ -54,6 +55,67 @@ export class OrdersService {
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
 	) {}
+
+	async findAll(
+		{
+			status,
+			dateFinal,
+			dateInitial,
+			document,
+			number,
+			sort,
+			limit = 10,
+			page = 1,
+		}: FiltersOrdersInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<Order> = {};
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (status) {
+			filters.status = status;
+		}
+
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		}
+
+		if (number) {
+			filters.number = number;
+		}
+
+		if (document) {
+			filters.customer.document = document;
+		}
+
+		const options = {
+			limit,
+			page,
+			sort,
+			populate,
+			lean: true,
+		};
+
+		return this.orderModel.paginate(filters, options);
+	}
 
 	async findById(id: string) {
 		return this.orderModel.findById(id).populate(populate).lean();

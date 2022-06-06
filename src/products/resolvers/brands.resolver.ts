@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateBrandInput } from '../dtos/create-brand.input';
 import { FiltersBrandsInput } from '../dtos/filters-brands.input';
 import { ResponseBrands } from '../dtos/response-brands';
@@ -17,7 +19,6 @@ export class BrandsResolver {
 		name: 'brands',
 		description: 'Listado de marcas',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersBrandsInput',
@@ -32,7 +33,7 @@ export class BrandsResolver {
 	}
 
 	@Mutation(() => Brand, { name: 'createBrand', description: 'Crea una marca' })
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_BRAND)
 	create(
 		@Args('createBrandInput', { description: 'Datos para crear una marca' })
 		_: CreateBrandInput,
@@ -48,7 +49,7 @@ export class BrandsResolver {
 		name: 'updateBrand',
 		description: 'Actualiza la marca',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_BRAND)
 	update(
 		@Args('id', { description: 'Identificador de la marca a actualizar' })
 		id: string,

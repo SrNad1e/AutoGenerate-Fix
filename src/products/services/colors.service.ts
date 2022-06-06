@@ -8,9 +8,9 @@ import { ResponseColors } from '../dtos/response-colors';
 import { FiltersColorsInput } from '../dtos/filters-colors.input';
 import { Color, ColorMysql } from '../entities/color.entity';
 import { CreateColorInput } from '../dtos/create-color.input';
-import { User } from 'src/users/entities/user.entity';
 import { UpdateColorInput } from '../dtos/update-color.input';
-import { Image } from 'src/staticfiles/entities/image.entity';
+import { Image } from 'src/configurations/entities/image.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 const populate = [{ path: 'image', model: Image.name }];
 

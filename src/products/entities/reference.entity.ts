@@ -2,13 +2,13 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
 import { Attrib } from './attrib.entity';
 import { Brand } from './brand.entity';
 import { CategoryLevel1 } from './category-level1.entity';
 import { CategoryLevel2 } from './category-level2.entity';
 import { CategoryLevel3 } from './category-level3.entity';
 import { Company } from '../../configurations/entities/company.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @ObjectType({ description: 'Datos de medidas para el envío de los productos' })
 export class Shipping {

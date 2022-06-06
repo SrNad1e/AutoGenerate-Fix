@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateCloseZInvoicingInput } from '../dtos/create-close-z-invoicing-input';
 import { FiltersClosesZInvoicingInput } from '../dtos/filters-closes-z-invoicing-input';
 import { ResponseClosesZInvoicing } from '../dtos/response-closes-z-invoicing';
@@ -18,7 +20,7 @@ export class ClosesZinvoicingResolver {
 		name: 'closesZInvoicing',
 		description: 'Lista de cierres z',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVOICING_CLOSESZ)
 	findAll(
 		@Args({
 			name: 'filtersClosesZInvoicing',
@@ -40,7 +42,7 @@ export class ClosesZinvoicingResolver {
 		name: 'createCloseZInvoicing',
 		description: 'Crea un cierre Z de facturación',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSEZ)
 	create(
 		@Args({
 			name: 'createCloseZInvoicing',

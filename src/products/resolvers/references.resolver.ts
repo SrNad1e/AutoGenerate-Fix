@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateReferenceInput } from '../dtos/create-reference.input';
 import { FiltersReferencesInput } from '../dtos/filters-references.input';
 import { ResponseReferences, ReferenceData } from '../dtos/response-references';
@@ -43,7 +45,6 @@ export class ReferencesResolver {
 		name: 'referenceId',
 		description: 'Obtiene la referencia por el identificador',
 	})
-	@UseGuards(JwtAuthGuard)
 	findById(
 		@Args('id', { description: 'Identificador de la referencia' }) id: string,
 		@Context() context,
@@ -59,7 +60,7 @@ export class ReferencesResolver {
 		name: 'createReference',
 		description: 'Crea una referencia',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_REFERENCE)
 	create(
 		@Args('createReferenceInput', {
 			description: 'Datos para la creación de la referencia',
@@ -78,7 +79,7 @@ export class ReferencesResolver {
 		name: 'updateReference',
 		description: 'Actualiza una referencia',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_REFERENCE)
 	update(
 		@Args('id', {
 			description: 'Identificador de la referencia para actualizar',

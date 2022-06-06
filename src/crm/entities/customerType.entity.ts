@@ -2,7 +2,8 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Tipos de clientes' })

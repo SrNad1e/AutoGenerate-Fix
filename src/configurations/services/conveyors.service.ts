@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
-import { Image } from 'src/staticfiles/entities/image.entity';
+import { Image } from 'src/configurations/entities/image.entity';
 import { FiltersConveyorsInput } from '../dtos/filters-conveyors.input';
 import { Conveyor } from '../entities/conveyor.entity';
 

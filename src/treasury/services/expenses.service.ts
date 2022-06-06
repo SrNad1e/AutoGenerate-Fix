@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { User } from 'src/configurations/entities/user.entity';
 
-import { User } from 'src/users/entities/user.entity';
 import { FiltersExpensesInput } from '../dtos/filters-expenses.input';
 import { Expense } from '../entities/expense.entity';
 

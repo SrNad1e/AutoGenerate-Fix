@@ -2,7 +2,8 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 
 @ObjectType({ description: 'Ciudad de la dirección' })
 @Schema({ timestamps: true })

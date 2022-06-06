@@ -4,14 +4,15 @@ import { PaginateModel, Types } from 'mongoose';
 
 import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
-import { WarehousesService } from 'src/shops/services/warehouses.service';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
 import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistory } from '../entities/stock-history.entity';
 import { StockInput } from '../entities/stock-input.entity';
 import { StockOutput } from '../entities/stock-output.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { ReturnOrder } from 'src/sales/entities/return-order.entity';
 
 @Injectable()
 export class StockHistoryService {
@@ -26,6 +27,8 @@ export class StockHistoryService {
 		private readonly stockOutputModel: PaginateModel<StockOutput>,
 		@InjectModel(StockAdjustment.name)
 		private readonly stockAdjustmentModel: PaginateModel<StockAdjustment>,
+		@InjectModel(ReturnOrder.name)
+		private readonly returnOrderModel: PaginateModel<ReturnOrder>,
 		@InjectModel(Order.name)
 		private readonly orderModel: PaginateModel<Order>,
 		private readonly warehousesService: WarehousesService,
@@ -58,6 +61,9 @@ export class StockHistoryService {
 					break;
 				case 'adjustment':
 					document = await this.stockAdjustmentModel.findById(documentId);
+					break;
+				case 'returnOrder':
+					document = await this.returnOrderModel.findById(documentId);
 					break;
 				default:
 					throw new BadRequestException(

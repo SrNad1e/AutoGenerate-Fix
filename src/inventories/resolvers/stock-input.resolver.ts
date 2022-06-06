@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
 import { FiltersStockInputsInput } from '../dtos/filters-stockInputs.input';
 import { ResponseStockInputs } from '../dtos/response-stockInputs';
@@ -17,7 +19,7 @@ export class StockInputResolver {
 		name: 'stockInputs',
 		description: 'Lista de entradas de productos',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVENTORY_INPUTS)
 	findAll(
 		@Args({
 			name: 'filtersStockInputsInput',
@@ -39,7 +41,7 @@ export class StockInputResolver {
 		name: 'stockInputId',
 		description: 'Obtiene una entrada de productos con base a su identificador',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.READ_INVENTORY_INPUTS)
 	findById(
 		@Args('id', { description: 'Identificador de la entrada de productos' })
 		id: string,
@@ -56,7 +58,7 @@ export class StockInputResolver {
 		name: 'createStockInput',
 		description: 'Crea una entrada de productos',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_INPUT)
 	create(
 		@Args('createStockInputInput', {
 			description: 'Datos para crear una entrada de productos',
@@ -75,7 +77,7 @@ export class StockInputResolver {
 		name: 'updateStockInput',
 		description: 'Actualiza una entrada de productos',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_INPUT)
 	update(
 		@Args('id', {
 			description: 'Identificador de la entrada de productos a actualizar',

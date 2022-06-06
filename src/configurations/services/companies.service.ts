@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
+
 import { CreateCompanyInput } from '../dtos/create-company.input';
 import { Company } from '../entities/company.entity';
 

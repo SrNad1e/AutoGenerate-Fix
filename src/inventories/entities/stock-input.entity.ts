@@ -3,9 +3,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
-import { Warehouse } from 'src/shops/entities/warehouse.entity';
+import { User } from 'src/configurations/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
+import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 
 @ObjectType({ description: 'Detalle de la salida de productos' })
 export class DetailInput {
@@ -57,8 +57,8 @@ export class StockInput extends Document {
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence la entrada',
 	})
-	@Prop({ type: Object, required: true })
-	company: Company;
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
 
 	@Field(() => String, {
 		description: 'Observación de la entrada',

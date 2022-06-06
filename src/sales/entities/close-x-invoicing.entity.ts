@@ -2,11 +2,11 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { User } from 'src/users/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { PointOfSale } from './pointOfSale.entity';
 import { Expense } from 'src/treasury/entities/expense.entity';
+import { User } from 'src/configurations/entities/user.entity';
 
 @ObjectType({ description: 'Arqueo de caja' })
 export class CashRegister {

@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
 import { CreateSizeInput } from '../dtos/create-size.input';
 import { FiltersSizesInput } from '../dtos/filters-sizes.input';
 import { ResponseSizes } from '../dtos/response-sizes';
@@ -17,7 +19,6 @@ export class SizesResolver {
 		name: 'sizes',
 		description: 'Listar las tallas',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersSizesInput',
@@ -32,7 +33,7 @@ export class SizesResolver {
 	}
 
 	@Mutation(() => Size, { name: 'createSize', description: 'Crear una talla' })
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_SIZE)
 	create(
 		@Args('createSizeInput', { description: 'Datos para crear la talla' })
 		_: CreateSizeInput,
@@ -48,7 +49,7 @@ export class SizesResolver {
 		name: 'updateSize',
 		description: 'Actualizar la talla',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_SIZE)
 	update(
 		@Args('id', { description: 'Identificador de la talla a actualizar' })
 		id: string,

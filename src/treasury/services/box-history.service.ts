@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/configurations/entities/user.entity';
 import { CreateBoxHistoryInput } from '../dtos/create-boxHistory.input';
 import { BoxHistory } from '../entities/box-history.entity';
 import { BoxService } from './box.service';

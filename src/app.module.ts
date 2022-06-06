@@ -9,14 +9,11 @@ import { DatabasesModule } from './databases/databases.module';
 import { enviroments } from './enviroments';
 import { InventoriesModule } from './inventories/inventories.module';
 import { ProductsModule } from './products/products.module';
-import { ShopsModule } from './shops/shops.module';
 import { TreasuryModule } from './treasury/treasury.module';
-import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
 import { SalesModule } from './sales/sales.module';
 import { CrmModule } from './crm/crm.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
-import { StaticFilesModule } from './staticfiles/static-files.module';
 
 @Module({
 	imports: [
@@ -49,15 +46,12 @@ import { StaticFilesModule } from './staticfiles/static-files.module';
 			}),
 		}),
 		DatabasesModule,
-		StaticFilesModule,
+		ConfigurationsModule,
+		CrmModule,
 		InventoriesModule,
 		ProductsModule,
-		ShopsModule,
-		TreasuryModule,
-		UsersModule,
 		SalesModule,
-		CrmModule,
-		ConfigurationsModule,
+		TreasuryModule,
 	],
 	providers: [AppGateway],
 })

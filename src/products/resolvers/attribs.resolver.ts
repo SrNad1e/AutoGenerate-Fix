@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { JwtAuthGuard } from 'src/users/guards/jwt-auth.guard';
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
 import { CreateAttribInput } from '../dtos/create-attrib.input';
 import { FiltersAttribsInput } from '../dtos/filters-attribs.input';
 import { ResponseAttribs } from '../dtos/response-attribs';
@@ -17,7 +19,6 @@ export class AttribsResolver {
 		name: 'attribs',
 		description: 'Listado de atributos',
 	})
-	@UseGuards(JwtAuthGuard)
 	findAll(
 		@Args({
 			name: 'filtersAttribsInput',
@@ -35,7 +36,7 @@ export class AttribsResolver {
 		name: 'createAttrib',
 		description: 'Crea un atributo',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.CREATE_INVENTORY_ATTRIB)
 	create(
 		@Args('createAttribInput', { description: 'Datos para crear un atributo' })
 		_: CreateAttribInput,
@@ -51,7 +52,7 @@ export class AttribsResolver {
 		name: 'updateAttrib',
 		description: 'Actualiza un atributo',
 	})
-	@UseGuards(JwtAuthGuard)
+	@RequirePermissions(Permissions.UPDATE_INVENTORY_ATTRIB)
 	update(
 		@Args('id', { description: 'Identificador del atributo a actualizar' })
 		id: string,

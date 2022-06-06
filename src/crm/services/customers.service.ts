@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
+import { User } from 'src/configurations/entities/user.entity';
 import { Order } from 'src/sales/entities/order.entity';
-import { User } from 'src/users/entities/user.entity';
 import { CreateCustomerInput } from '../dtos/create-customer.input';
 import { FiltersCustomerInput } from '../dtos/filters-customer.input';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';

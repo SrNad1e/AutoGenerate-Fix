@@ -3,88 +3,620 @@
 {
 	"permissions": [
 		{
-			"module": "inventory",
-			"option": "adjustment",
-			"name": "Ver",
-			"description": "Permite ver el ajuste",
-			"action": "see"
+			"module": "Configuraciones",
+			"option": "General",
+			"name": "Acceder ERP",
+			"description": "Permite ingresar a la interface ERP",
+			"action": "ACCESS_ERP"
 		},
 		{
-			"module": "inventory",
-			"option": "adjustment",
-			"name": "Actualizar",
-			"description": "Permite actualizar los ajustes",
-			"action": "update"
+			"module": "Configuraciones",
+			"option": "General",
+			"name": "Acceder POS",
+			"description": "Permite ingresar a la interface POS",
+			"action": "ACCESS_POS"
 		},
 		{
-			"module": "inventory",
-			"option": "adjustment",
+			"module": "Inventarios",
+			"option": "Ajuste",
+			"name": "Acceder",
+			"description": "Permite ingresar al módulo de ajustes de inventario",
+			"action": "ACCESS_INVENTORY_ADJUSTMENTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Entrada",
+			"name": "Acceder",
+			"description": "Permite ingresar al módulo de entradas de inventario",
+			"action": "ACCESS_INVENTORY_INPUTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Salida",
+			"name": "Acceder",
+			"description": "Permite ingresar al módulo de salidas de inventario",
+			"action": "ACCESS_INVENTORY_OUTPUTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Solicitud",
+			"name": "Acceder",
+			"description": "Permite ingresar al módulo de solicitudes de inventario",
+			"action": "ACCESS_INVENTORY_REQUESTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Traslado",
+			"name": "Acceder",
+			"description": "Permite ingresar al módulo de traslados de inventario",
+			"action": "ACCESS_INVENTORY_TRANSFERS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Traslado",
+			"name": "Consultar",
+			"description": "Permite consultar los traslados de inventario",
+			"action": "READ_INVENTORY_TRANSFERS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Solicitud",
+			"name": "Consultar",
+			"description": "Permite consultar las solicitudes de inventario",
+			"action": "READ_INVENTORY_REQUESTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Entrada",
+			"name": "Consultar",
+			"description": "Permite consultar las entradas de inventario",
+			"action": "READ_INVENTORY_OUTPUTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Salida",
+			"name": "Consultar",
+			"description": "Permite consultar las salidas de inventario",
+			"action": "READ_INVENTORY_INPUTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Ajuste",
+			"name": "Consultar",
+			"description": "Permite consultar los ajustes de inventario",
+			"action": "READ_INVENTORY_ADJUSTMENTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Traslado",
 			"name": "Crear",
-			"description": "Permite crear el ajuste",
-			"action": "create"
+			"description": "Permite crear los traslados de inventario",
+			"action": "CREATE_INVENTORY_TRANSFER"
 		},
 		{
-			"module": "inventory",
-			"option": "adjustment",
-			"name": "Listar",
-			"description": "Permite listar los ajustes",
-			"action": "list"
-		},
-		{
-			"module": "inventory",
-			"option": "output",
-			"name": "Ver",
-			"description": "Permite ver la salida",
-			"action": "see"
-		},
-		{
-			"module": "inventory",
-			"option": "output",
-			"name": "Actualizar",
-			"description": "Permite actualizar las salidas",
-			"action": "update"
-		},
-		{
-			"module": "inventory",
-			"option": "output",
+			"module": "Inventarios",
+			"option": "Solicitud",
 			"name": "Crear",
-			"description": "Permite crear la salida",
-			"action": "create"
+			"description": "Permite crear las solicitudes de inventario",
+			"action": "CREATE_INVENTORY_REQUEST"
 		},
 		{
-			"module": "inventory",
-			"option": "output",
-			"name": "Listar",
-			"description": "Permite listar las salidas",
-			"action": "list"
-		},
-		{
-			"module": "inventory",
-			"option": "input",
-			"name": "Ver",
-			"description": "Permite ver la entrada",
-			"action": "see"
-		},
-		{
-			"module": "inventory",
-			"option": "input",
-			"name": "Actualizar",
-			"description": "Permite actualizar las entradas",
-			"action": "update"
-		},
-		{
-			"module": "inventory",
-			"option": "input",
+			"module": "Inventarios",
+			"option": "Entrada",
 			"name": "Crear",
-			"description": "Permite crear la entrada",
-			"action": "create"
+			"description": "Permite crear las entradas de inventario",
+			"action": "CREATE_INVENTORY_OUTPUT"
 		},
 		{
-			"module": "inventory",
-			"option": "input",
-			"name": "Listar",
-			"description": "Permite listar las entradas",
-			"action": "list"
+			"module": "Inventarios",
+			"option": "Salida",
+			"name": "Crear",
+			"description": "Permite crear las salidas de inventario",
+			"action": "CREATE_INVENTORY_INPUT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Ajuste",
+			"name": "Crear",
+			"description": "Permite crear los ajustes de inventario",
+			"action": "CREATE_INVENTORY_ADJUSTMENT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Traslado",
+			"name": "Actualizar",
+			"description": "Permite actualizar los traslados de inventario",
+			"action": "UPDATE_INVENTORY_TRANSFER"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Solicitud",
+			"name": "Actualizar",
+			"description": "Permite actualizar las solicitudes de inventario",
+			"action": "UPDATE_INVENTORY_REQUEST"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Entrada",
+			"name": "Actualizar",
+			"description": "Permite actualizar las entradas de inventario",
+			"action": "UPDATE_INVENTORY_OUTPUT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Salida",
+			"name": "Actualizar",
+			"description": "Permite actualizar las salidas de inventario",
+			"action": "UPDATE_INVENTORY_INPUT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Ajuste",
+			"name": "Actualizar",
+			"description": "Permite actualizar los ajustes de inventario",
+			"action": "UPDATE_INVENTORY_ADJUSTMENT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Traslado",
+			"name": "Imprimir",
+			"description": "Permite imprimir los traslados de inventario",
+			"action": "PRINT_INVENTORY_TRANSFER"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Solicitud",
+			"name": "Imprimir",
+			"description": "Permite imprimir las solicitudes de inventario",
+			"action": "PRINT_INVENTORY_REQUEST"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Entrada",
+			"name": "Imprimir",
+			"description": "Permite imprimir las entradas de inventario",
+			"action": "PRINT_INVENTORY_OUTPUT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Salida",
+			"name": "Imprimir",
+			"description": "Permite imprimir las salidas de inventario",
+			"action": "PRINT_INVENTORY_INPUT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Ajuste",
+			"name": "Imprimir",
+			"description": "Permite imprimir los ajustes de inventario",
+			"action": "PRINT_INVENTORY_ADJUSTMENT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Traslado",
+			"name": "Confirmar",
+			"description": "Permite confirmar los productos del traslados de inventario",
+			"action": "CONFIRM_INVENTORY_TRANSFER"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Solicitud",
+			"name": "Autogenerar",
+			"description": "Permite autogenerar las solicitudes de inventario",
+			"action": "AUTOGENERATE_INVENTORY_REQUEST"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Atributo",
+			"name": "Acceder",
+			"description": "Permite acceder a los atributos del producto",
+			"action": "ACCESS_INVENTORY_ATTRIBS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Marca",
+			"name": "Acceder",
+			"description": "Permite acceder a las marcas del producto",
+			"action": "ACCESS_INVENTORY_BRANDS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Categoría",
+			"name": "Acceder",
+			"description": "Permite acceder a las categorías del producto",
+			"action": "ACCESS_INVENTORY_CATEGORIES"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Color",
+			"name": "Acceder",
+			"description": "Permite acceder a los colores del producto",
+			"action": "ACCESS_INVENTORY_COLORS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Producto",
+			"name": "Acceder",
+			"description": "Permite acceder a los productos",
+			"action": "ACCESS_INVENTORY_PRODUCTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Referencia",
+			"name": "Acceder",
+			"description": "Permite acceder a las referencias del producto",
+			"action": "ACCESS_INVENTORY_REFERENCES"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Talla",
+			"name": "Acceder",
+			"description": "Permite acceder a las tallas del producto",
+			"action": "ACCESS_INVENTORY_SIZES"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Atributo",
+			"name": "Consultar",
+			"description": "Permite consultar los atributos del producto",
+			"action": "READ_INVENTORY_ATTRIBS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Marca",
+			"name": "Consultar",
+			"description": "Permite consultar las marcas del producto",
+			"action": "READ_INVENTORY_BRANDS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Categoría",
+			"name": "Consultar",
+			"description": "Permite consultar las categorías del producto",
+			"action": "READ_INVENTORY_CATEGORIES"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Color",
+			"name": "Consultar",
+			"description": "Permite consultar los colores del producto",
+			"action": "READ_INVENTORY_COLORS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Producto",
+			"name": "Consultar",
+			"description": "Permite consultar los productos",
+			"action": "READ_INVENTORY_PRODUCTS"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Referencia",
+			"name": "Consultar",
+			"description": "Permite consultar las referencias del producto",
+			"action": "READ_INVENTORY_REFERENCES"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Talla",
+			"name": "Consultar",
+			"description": "Permite consultar las tallas del producto",
+			"action": "READ_INVENTORY_SIZES"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Atributo",
+			"name": "Crear",
+			"description": "Permite crear el atributo del producto",
+			"action": "CREATE_INVENTORY_ATTRIB"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Marca",
+			"name": "Crear",
+			"description": "Permite crear la marca del producto",
+			"action": "CREATE_INVENTORY_BRAND"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Categoría",
+			"name": "Crear",
+			"description": "Permite crear la categoría del producto",
+			"action": "CREATE_INVENTORY_CATEGORY"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Color",
+			"name": "Crear",
+			"description": "Permite crear el color del producto",
+			"action": "CREATE_INVENTORY_COLOR"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Producto",
+			"name": "Crear",
+			"description": "Permite crear el producto",
+			"action": "CREATE_INVENTORY_PRODUCT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Referencia",
+			"name": "Crear",
+			"description": "Permite crear la referencia del producto",
+			"action": "CREATE_INVENTORY_REFERENCE"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Talla",
+			"name": "Crear",
+			"description": "Permite crear la talla del producto",
+			"action": "CREATE_INVENTORY_SIZE"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Atributo",
+			"name": "Actualizar",
+			"description": "Permite actualizar el atributo del producto",
+			"action": "UPDATE_INVENTORY_ATTRIB"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Marca",
+			"name": "Actualizar",
+			"description": "Permite actualizar la marca del producto",
+			"action": "UPDATE_INVENTORY_BRAND"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Categoría",
+			"name": "Actualizar",
+			"description": "Permite actualizar la categoría del producto",
+			"action": "UPDATE_INVENTORY_CATEGORY"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Color",
+			"name": "Actualizar",
+			"description": "Permite actualizar el color del producto",
+			"action": "UPDATE_INVENTORY_COLOR"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Producto",
+			"name": "Actualizar",
+			"description": "Permite actualizar el producto",
+			"action": "UPDATE_INVENTORY_PRODUCT"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Referencia",
+			"name": "Actualizar",
+			"description": "Permite actualizar la referencia del producto",
+			"action": "UPDATE_INVENTORY_REFERENCE"
+		},
+		{
+			"module": "Inventarios",
+			"option": "Talla",
+			"name": "Actualizar",
+			"description": "Permite actualizar la talla del producto",
+			"action": "UPDATE_INVENTORY_SIZE"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre X",
+			"name": "Acceder",
+			"description": "Permite acceder al cierre X de facturación",
+			"action": "ACCESS_INVOICING_CLOSESX"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre Z",
+			"name": "Acceder",
+			"description": "Permite acceder al cierre Z de facturación",
+			"action": "ACCESS_INVOICING_CLOSESZ"
+		},
+		{
+			"module": "Facturación",
+			"option": "Devolución",
+			"name": "Acceder",
+			"description": "Permite acceder a las devoluciones de facturación",
+			"action": "ACCESS_INVOICING_RETURNS"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre X",
+			"name": "Consultar",
+			"description": "Permite consultar los cierres X de facturación",
+			"action": "READ_INVOICING_CLOSESX"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre Z",
+			"name": "Consultar",
+			"description": "Permite consultar los cierres Z de facturación",
+			"action": "READ_INVOICING_CLOSESZ"
+		},
+		{
+			"module": "Facturación",
+			"option": "Factura",
+			"name": "Consultar",
+			"description": "Permite consultar las facturas de facturación",
+			"action": "READ_INVOICING_INVOICES"
+		},
+		{
+			"module": "Facturación",
+			"option": "Pedido",
+			"name": "Consultar",
+			"description": "Permite consultar los pedidos de facturación",
+			"action": "READ_INVOICING_ORDERS"
+		},
+		{
+			"module": "Facturación",
+			"option": "Punto de venta",
+			"name": "Consultar",
+			"description": "Permite consultar los puntos de venta de facturación",
+			"action": "READ_INVOICING_POINTOFSALES"
+		},
+		{
+			"module": "Facturación",
+			"option": "Devolución",
+			"name": "Consultar",
+			"description": "Permite consultar las devoluciones de facturación",
+			"action": "READ_INVOICING_RETURNS"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre X",
+			"name": "Crear",
+			"description": "Permite crear el cierre X de facturación",
+			"action": "CREATE_INVOICING_CLOSEX"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre Z",
+			"name": "Crear",
+			"description": "Permite crear el cierre Z de facturación",
+			"action": "CREATE_INVOICING_CLOSEZ"
+		},
+		{
+			"module": "Facturación",
+			"option": "Pedido",
+			"name": "Crear",
+			"description": "Permite crear el pedido de facturación",
+			"action": "CREATE_INVOICING_ORDER"
+		},
+		{
+			"module": "Facturación",
+			"option": "Devolución",
+			"name": "Crear",
+			"description": "Permite crear la devolucion de facturación",
+			"action": "CREATE_INVOICING_RETURN"
+		},
+		{
+			"module": "Facturación",
+			"option": "Pedido",
+			"name": "Actualizar",
+			"description": "Permite actualizar el pedido de facturación",
+			"action": "UPDATE_INVOICING_ORDER"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre X",
+			"name": "Imprimir",
+			"description": "Permite imprimir el cierre X de facturación",
+			"action": "PRINT_INVOICING_CLOSEX"
+		},
+		{
+			"module": "Facturación",
+			"option": "Cierre Z",
+			"name": "Imprimir",
+			"description": "Permite imprimir el cierre Z de facturación",
+			"action": "PRINT_INVOICING_CLOSEZ"
+		},
+		{
+			"module": "Facturación",
+			"option": "Devolución",
+			"name": "Imprimir",
+			"description": "Permite imprimir la devolucion de facturación",
+			"action": "PRINT_INVOICING_RETURN"
+		},
+		{
+			"module": "Configuración",
+			"option": "Transportadoras",
+			"name": "Acceder",
+			"description": "Permite acceder a las transportadoras",
+			"action": "ACCESS_CONFIGURATION_CONVEYORS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Transportadoras",
+			"name": "Consultar",
+			"description": "Permite consultar las transportadoras",
+			"action": "READ_CONFIGURATION_CONVEYORS"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Acceder",
+			"description": "Permite acceder a las ciudades",
+			"action": "ACCESS_CRM_CITIES"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Acceder",
+			"description": "Permite acceder a los clientes",
+			"action": "ACCESS_CRM_CUSTOMERS"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Consultar",
+			"description": "Permite consultar las ciudades",
+			"action": "READ_CRM_CITIES"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Consultar",
+			"description": "Permite consultar a los clientes",
+			"action": "READ_CRM_CUSTOMERS"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Crear",
+			"description": "Permite crear el cliente",
+			"action": "CREATE_CRM_CUSTOMER"
+		},
+		{
+			"module": "CRM",
+			"option": "Cliente",
+			"name": "Actualizar",
+			"description": "Permite actualizar el cliente",
+			"action": "UPDATE_CRM_CUSTOMER"
+		},
+		{
+			"module": "Configuración",
+			"option": "Tienda",
+			"name": "Consultar",
+			"description": "Permite consultar las tiendas",
+			"action": "READ_CONFIGURATION_SHOPS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Consultar",
+			"description": "Permite consultar los usuarios",
+			"action": "READ_CONFIGURATION_USERS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Consultar",
+			"description": "Permite consultar las bodegas",
+			"action": "READ_CONFIGURATION_WAREHOUSES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Actualizar",
+			"description": "Permite actualizar el usuario",
+			"action": "UPDATE_CONFIGURATION_USER"
+		},
+		{
+			"module": "Configuración",
+			"option": "Imagen",
+			"name": "Consultar",
+			"description": "Permite consultar las imagenes",
+			"action": "READ_CONFIGURATION_IMAGES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Médio de pago",
+			"name": "Consultar",
+			"description": "Permite consultar los medios de pago",
+			"action": "READ_TREASURY_PAYMENTS"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
@@ -269,5 +801,4 @@
 	//AGREGAR AUTORIZACION A LAS FACTURAS
 	//CAMBIAR EL IDENTIFICATION CON DOCUMENT db.invoices.update({}, {$rename:{"customer.identification":"customer.document"}}, false, true);
 	//AGREGA EL TIPO DE DOCUMENTO
-
 }

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { User } from 'src/configurations/entities/user.entity';
 
-import { User } from 'src/users/entities/user.entity';
 import { CreateCategoryInput } from '../dtos/create-category.input';
 import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.input';
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';

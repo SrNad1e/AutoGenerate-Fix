@@ -6,80 +6,80 @@ export class UpdateReferenceInput {
 		description: 'Nombre de la referencia',
 		nullable: true,
 	})
-	name: string;
+	name?: string;
 
 	@Field(() => String, {
 		description: 'Descripción de la referencia',
 		nullable: true,
 	})
-	description: string;
+	description?: string;
 
 	@Field(() => Boolean, {
 		description: 'Se puede cambiar de la referencia',
 		nullable: true,
 	})
-	changeable: boolean;
+	changeable?: boolean;
 
 	@Field(() => Number, {
 		description: 'Precio de la referencia',
 		nullable: true,
 	})
-	price: number;
+	price?: number;
 
 	@Field(() => Number, {
 		description: 'Costo de la referencia',
 		nullable: true,
 	})
-	cost: number;
+	cost?: number;
 
 	@Field(() => String, {
 		description: 'Identificador de la marca de la referencia',
 		nullable: true,
 	})
-	brandId: string;
+	brandId?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la categoría level 1 de la referencia',
 		nullable: true,
 	})
-	categoryLevel1Id: string;
+	categoryLevel1Id?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la categoría level 2 de la referencia',
 		nullable: true,
 	})
-	categoryLevel2Id: string;
+	categoryLevel2Id?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la categoría level 3 de la referencia',
 		nullable: true,
 	})
-	categoryLevel3Id: string;
+	categoryLevel3Id?: string;
 
 	@Field(() => [String], {
 		description: 'Identificador de los atributos de la referencia',
 		nullable: true,
 	})
-	attribIds: string[];
+	attribIds?: string[];
 
 	@Field(() => Number, { description: 'Ancho del producto', nullable: true })
-	width: number;
+	width?: number;
 
 	@Field(() => Number, { description: 'Alto del producto', nullable: true })
-	height: number;
+	height?: number;
 
 	@Field(() => Number, { description: 'Largo del producto', nullable: true })
-	long: number;
+	long?: number;
 
 	@Field(() => Number, { description: 'Peso del producto', nullable: true })
-	weight: number;
+	weight?: number;
 
 	@Field(() => Number, { description: 'Volumen del producto', nullable: true })
-	volume: number;
+	volume?: number;
 
 	@Field(() => Boolean, {
 		description: 'Estado de la referencia',
 		nullable: true,
 	})
-	active: boolean;
+	active?: boolean;
 }

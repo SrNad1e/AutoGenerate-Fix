@@ -7,8 +7,6 @@ import {
 	StockRequestSchema,
 } from './entities/stock-request.entity';
 import { ProductsModule } from 'src/products/products.module';
-import { ShopsModule } from 'src/shops/shops.module';
-import { UsersModule } from 'src/users/users.module';
 import {
 	StockTransfer,
 	StockTransferDetailMysql,
@@ -37,12 +35,16 @@ import { StockAdjustmentService } from './services/stock-adjustment.service';
 import { StockOutputResolver } from './resolvers/stock-output.resolver';
 import { StockAdjustmentResolver } from './resolvers/stock-adjustment.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { ConfigurationsModule } from 'src/configurations/configurations.module';
+import {
+	ReturnOrder,
+	ReturnOrderSchema,
+} from 'src/sales/entities/return-order.entity';
 
 @Module({
 	imports: [
 		ProductsModule,
-		ShopsModule,
-		UsersModule,
+		ConfigurationsModule,
 		TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
 		MongooseModule.forFeature([
 			{
@@ -72,6 +74,10 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 			{
 				name: StockOutput.name,
 				schema: StockOutputSchema,
+			},
+			{
+				name: ReturnOrder.name,
+				schema: ReturnOrderSchema,
 			},
 		]),
 	],
