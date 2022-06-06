@@ -48,7 +48,7 @@ export class ReturnOrder extends Document {
 	@Prop({ type: Object, ref: Order.name, required: true })
 	order: Types.ObjectId;
 
-	@Field(() => Order, { description: 'Cupón generado' })
+	@Field(() => Coupon, { description: 'Cupón generado' })
 	@Prop({ type: Object, ref: Coupon.name, required: true })
 	coupon: Types.ObjectId;
 
