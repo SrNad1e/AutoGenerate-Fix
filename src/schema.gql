@@ -3805,6 +3805,9 @@ type ReturnOrder {
   """Compañía a la que pertence la devolución"""
   company: Company!
 
+  """Cupón generado"""
+  coupon: Order!
+
   """Fecha de creación"""
   createdAt: DateTime!
 

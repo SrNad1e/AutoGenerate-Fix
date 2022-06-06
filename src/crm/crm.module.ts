@@ -77,6 +77,6 @@ import { CouponsResolver } from './resolvers/coupons.resolver';
 		CouponsService,
 		CouponsResolver,
 	],
-	exports: [CustomersService, CustomerTypeService],
+	exports: [CustomersService, CustomerTypeService, CouponsService],
 })
 export class CrmModule {}

@@ -6,6 +6,7 @@ import { Company } from 'src/configurations/entities/company.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Order } from './order.entity';
+import { Coupon } from 'src/crm/entities/coupon.entity';
 
 @ObjectType({ description: 'Productos de la devolucion' })
 export class DetailReturnInvoice {
@@ -44,8 +45,12 @@ export class ReturnOrder extends Document {
 	active: boolean;
 
 	@Field(() => Order, { description: 'Pedido de la devolución' })
-	@Prop({ type: Object, required: true })
+	@Prop({ type: Object, ref: Order.name, required: true })
 	order: Types.ObjectId;
+
+	@Field(() => Order, { description: 'Cupón generado' })
+	@Prop({ type: Object, ref: Coupon.name, required: true })
+	coupon: Types.ObjectId;
 
 	@Field(() => [DetailReturnInvoice], {
 		description: 'Productos de la devolución',

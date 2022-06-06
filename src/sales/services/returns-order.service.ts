@@ -10,11 +10,17 @@ import { CreateReturnOrderInput } from '../dtos/create-return-order-input';
 import { Order } from '../entities/order.entity';
 import { OrdersService } from './orders.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
+import { CouponsService } from 'src/crm/services/coupons.service';
+import { Coupon } from 'src/crm/entities/coupon.entity';
 
 const populate = [
 	{
 		path: 'order',
 		model: Order.name,
+	},
+	{
+		path: 'coupon',
+		model: Coupon.name,
 	},
 ];
 
@@ -25,6 +31,7 @@ export class ReturnsOrderService {
 		private readonly returnOrderModel: PaginateModel<ReturnOrder>,
 		private readonly ordersService: OrdersService,
 		private readonly stockHistoryService: StockHistoryService,
+		private readonly couponsService: CouponsService,
 	) {}
 
 	async findAll(
@@ -134,6 +141,21 @@ export class ReturnsOrderService {
 			});
 		}
 
+		const coupon = await this.couponsService.create(
+			{
+				expiration: dayjs().add(30, 'd').toDate(),
+				value: detailsReturn?.reduce(
+					(sum, detail) => sum + detail?.price * detail?.quantity,
+					0,
+				),
+				title: 'Cupón de Devolución',
+				message:
+					'Condiciones de uso:\n- Válido por 15 días para todas las compras\n- Válido para el portador\n- Redimible en todas las tiendas aliadas Toulouse\nPor protocolos de bioseguridad de COVID19\nninguna prenda tiene cambio',
+			},
+			user,
+			companyId,
+		);
+
 		let number = 1;
 		const lastReturn = await this.returnOrderModel
 			.findOne({
@@ -153,10 +175,10 @@ export class ReturnsOrderService {
 			company: new Types.ObjectId(companyId),
 			order: order?._id,
 			details: detailsReturn,
+			coupon: coupon._id,
 			user,
 		});
 
-		//se realizan los ingresos de mercancía al inventario
 		await this.stockHistoryService.addStock(
 			{
 				details,
@@ -168,6 +190,6 @@ export class ReturnsOrderService {
 			companyId,
 		);
 
-		//se crea el bono
+		return responseReturnOrder.populate(populate);
 	}
 }
