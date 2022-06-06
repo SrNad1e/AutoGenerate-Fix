@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
@@ -23,6 +23,7 @@ import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
+import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 
 const populate = [
 	{
@@ -54,6 +55,67 @@ export class OrdersService {
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
 	) {}
+
+	async findAll(
+		{
+			active,
+			dateFinal,
+			dateInitial,
+			document,
+			number,
+			sort,
+			limit = 10,
+			page = 1,
+		}: FiltersOrdersInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<Order> = {};
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (active !== undefined) {
+			filters.active = active;
+		}
+
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		}
+
+		if (number) {
+			filters.number = number;
+		}
+
+		if (document) {
+			filters.customer.document = document;
+		}
+
+		const options = {
+			limit,
+			page,
+			sort,
+			populate,
+			lean: true,
+		};
+
+		return this.orderModel.paginate(filters, options);
+	}
 
 	async findById(id: string) {
 		return this.orderModel.findById(id).populate(populate).lean();

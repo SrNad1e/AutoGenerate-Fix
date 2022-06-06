@@ -606,13 +606,6 @@
 		},
 		{
 			"module": "Configuración",
-			"option": "Usuario",
-			"name": "Actualizar",
-			"description": "Permite actualizar el usuario",
-			"action": "UPDATE_CONFIGURATION_USER"
-		},
-		{
-			"module": "Configuración",
 			"option": "Imagen",
 			"name": "Consultar",
 			"description": "Permite consultar las imagenes",

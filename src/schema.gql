@@ -581,6 +581,42 @@ type Conveyor {
   user: User!
 }
 
+"""Cupones para pagos"""
+type Coupon {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Código para redención del cupón"""
+  code: String!
+
+  """Consecutivo del cupón"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Fecha de vencimiento del cupón"""
+  expiration: DateTime!
+
+  """Mensaje del pie del cupón"""
+  message: String!
+
+  """Consecutivo del cupón"""
+  number: Float!
+
+  """Título del cupón"""
+  title: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cupón"""
+  user: User!
+
+  """Valor de redención del cupón"""
+  value: Float!
+}
+
 """Datos para crear un atributo"""
 input CreateAttribInput {
   """Nombre del atributo"""
@@ -2701,6 +2737,12 @@ type Query {
     id: String!
   ): Order!
 
+  """Obtener las ordenes"""
+  orders(
+    """Filtros para la consulta de pedidos"""
+    filtersOrdersInput: String!
+  ): ResponseOrders!
+
   """Obtener las ordenes por punto de venta"""
   ordersByPointOfSale(
     """Identificador del punto de venta"""
@@ -3365,6 +3407,39 @@ type ResponseInvoices {
   totalPages: Float!
 }
 
+"""Lista de predidos"""
+type ResponseOrders {
+  """Lista de pedidos"""
+  docs: [Order!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta a la consulta de metodos de pago"""
 type ResponsePayments {
   """Lista de metodos de pago"""
@@ -3806,7 +3881,7 @@ type ReturnOrder {
   company: Company!
 
   """Cupón generado"""
-  coupon: Order!
+  coupon: Coupon!
 
   """Fecha de creación"""
   createdAt: DateTime!

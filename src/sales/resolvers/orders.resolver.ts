@@ -1,12 +1,13 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+
 import {
 	Permissions,
 	RequirePermissions,
 } from 'src/configurations/libs/permissions.decorator';
-
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
+import { ResponseOrders } from '../dtos/response-orders';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
 import { OrdersService } from '../services/orders.service';
@@ -14,6 +15,25 @@ import { OrdersService } from '../services/orders.service';
 @Resolver()
 export class OrdersResolver {
 	constructor(private readonly ordersService: OrdersService) {}
+
+	@Query(() => ResponseOrders, {
+		name: 'orders',
+		description: 'Obtener las ordenes',
+	})
+	@RequirePermissions(Permissions.READ_INVOICING_ORDERS)
+	getAll(
+		@Args('filtersOrdersInput', {
+			description: 'Filtros para la consulta de pedidos',
+		})
+		_: string,
+		@Context() context,
+	) {
+		return this.ordersService.findAll(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
+	}
 
 	@Query(() => [Order], {
 		name: 'ordersByPointOfSale',
