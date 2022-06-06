@@ -47,13 +47,8 @@ export class ReferencesResolver {
 	})
 	findById(
 		@Args('id', { description: 'Identificador de la referencia' }) id: string,
-		@Context() context,
 	) {
-		return this.referencesService.findById(
-			id,
-			context.req.user.user,
-			context.req.user.companyId,
-		);
+		return this.referencesService.findById(id);
 	}
 
 	@Mutation(() => Reference, {

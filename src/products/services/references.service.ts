@@ -151,12 +151,8 @@ export class ReferencesService {
 		};
 	}
 
-	async findById(_id: string, user: User, companyId: string) {
+	async findById(_id: string) {
 		const filters: FilterQuery<Reference> = { _id };
-
-		if (user.username !== 'admin') {
-			filters.companies = { $in: new Types.ObjectId(companyId) };
-		}
 
 		const reference = await this.referenceModel
 			.findOne(filters)
