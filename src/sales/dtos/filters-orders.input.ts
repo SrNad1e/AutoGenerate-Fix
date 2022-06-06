@@ -53,11 +53,11 @@ export class FiltersOrdersInput {
 	})
 	dateFinal: string;
 
-	@Field(() => Boolean, {
-		description: 'Si el pedido de encuentra se encuentra activo',
+	@Field(() => String, {
+		description: 'Estado del pedido',
 		nullable: true,
 	})
-	active: boolean;
+	status?: string;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;

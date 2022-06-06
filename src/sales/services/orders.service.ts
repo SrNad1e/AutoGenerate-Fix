@@ -58,7 +58,7 @@ export class OrdersService {
 
 	async findAll(
 		{
-			active,
+			status,
 			dateFinal,
 			dateInitial,
 			document,
@@ -75,8 +75,8 @@ export class OrdersService {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
-		if (active !== undefined) {
-			filters.active = active;
+		if (status) {
+			filters.status = status;
 		}
 
 		if (dateInitial) {

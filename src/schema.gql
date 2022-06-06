@@ -1546,6 +1546,33 @@ input FiltersInvoicesInput {
   sort: SortInovice
 }
 
+"""Filtros del listado de pedidos"""
+input FiltersOrdersInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Documento del cliente que registra en el pedidod"""
+  document: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del pedido"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortOrder
+
+  """Estado del pedido"""
+  status: String
+}
+
 """Filtros para obtener el listado de tipos de medios de pago"""
 input FiltersPaymentsInput {
   """Estado del tipo de los médios de pago"""
@@ -2740,7 +2767,7 @@ type Query {
   """Obtener las ordenes"""
   orders(
     """Filtros para la consulta de pedidos"""
-    filtersOrdersInput: String!
+    filtersOrdersInput: FiltersOrdersInput!
   ): ResponseOrders!
 
   """Obtener las ordenes por punto de venta"""
@@ -4185,6 +4212,18 @@ input SortImage {
 input SortInovice {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de pedidos"""
+input SortOrder {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por número consecutivo del pedido"""
+  number: Float
 
   """Ordenamiento por fecha de actualización"""
   updatedAt: Float

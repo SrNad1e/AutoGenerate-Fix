@@ -7,6 +7,7 @@ import {
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
+import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { ResponseOrders } from '../dtos/response-orders';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
@@ -25,7 +26,7 @@ export class OrdersResolver {
 		@Args('filtersOrdersInput', {
 			description: 'Filtros para la consulta de pedidos',
 		})
-		_: string,
+		_: FiltersOrdersInput,
 		@Context() context,
 	) {
 		return this.ordersService.findAll(
