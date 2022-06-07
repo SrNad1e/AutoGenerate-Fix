@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
-import { CreateRoleInput } from '../dtos/create-role.input';
 
+import { CreateRoleInput } from '../dtos/create-role.input';
 import { FiltersRoleInput } from '../dtos/filters-role.input';
 import { FiltersRolesInput } from '../dtos/filters-roles.input';
 import { UpdateRoleInput } from '../dtos/update-role.input';
