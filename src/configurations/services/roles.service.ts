@@ -5,8 +5,10 @@ import { CreateRoleInput } from '../dtos/create-role.input';
 
 import { FiltersRoleInput } from '../dtos/filters-role.input';
 import { FiltersRolesInput } from '../dtos/filters-roles.input';
+import { UpdateRoleInput } from '../dtos/update-role.input';
 import { Permission } from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
+import { User } from '../entities/user.entity';
 import { PermissionsService } from './permissions.service';
 
 const populate = [
@@ -59,12 +61,10 @@ export class RolesService {
 		return this.roleModel.findOne(filters).populate(populate).lean();
 	}
 
-	async create({
-		active,
-		changeWarehouse,
-		name,
-		permissionIds,
-	}: CreateRoleInput) {
+	async create(
+		{ active, changeWarehouse, name, permissionIds }: CreateRoleInput,
+		user: User,
+	) {
 		const permissions = [];
 
 		for (let i = 0; i < permissionIds.length; i++) {
@@ -83,6 +83,49 @@ export class RolesService {
 			changeWarehouse,
 			permissions,
 			name,
+			user,
 		});
+	}
+
+	async update(
+		roleId: string,
+		{ active, changeWarehouse, name, permissionIds }: UpdateRoleInput,
+		user: User,
+	) {
+		const role = await this.findById(roleId);
+		if (!role) {
+			throw new BadRequestException('El rol seleccionado no existe');
+		}
+
+		const permissions = [];
+
+		for (let i = 0; i < permissionIds.length; i++) {
+			const permissionId = permissionIds[i];
+			const permission = await this.permissionsService.findById(permissionId);
+			if (!permission) {
+				throw new BadRequestException(
+					'Uno de los permisos a asignar no existe',
+				);
+			}
+			permissions.push(permission?._id);
+		}
+
+		return this.roleModel.findByIdAndUpdate(
+			roleId,
+			{
+				$set: {
+					permissions: permissions.length > 0 ? permissions : undefined,
+					active,
+					changeWarehouse,
+					name,
+					user,
+				},
+			},
+			{
+				lean: true,
+				new: true,
+				populate,
+			},
+		);
 	}
 }
