@@ -29,6 +29,7 @@ import { UsersService } from 'src/configurations/services/users.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { CategoriesService } from './categories.service';
 
 const populate = [
 	{
@@ -64,6 +65,7 @@ export class ProductsService {
 		private readonly referencesService: ReferencesService,
 		private readonly brandsService: BrandsService,
 		private readonly companiesService: CompaniesService,
+		private readonly categoriesService: CategoriesService,
 	) {}
 
 	async findAll(
@@ -424,6 +426,33 @@ export class ProductsService {
 				}
 
 				if (!reference) {
+					const categoryMysql = await this.categoriesService.getByIdMysql(
+						product.category_id,
+					);
+
+					let category = await this.categoriesService.findOne({
+						name: categoryMysql?.name,
+					});
+
+					if (category?.level === 3) {
+						category = await this.categoriesService.findOne({
+							name: 'Otros',
+						});
+					}
+
+					let categoryLevel1Id;
+					let categoryLevel2Id;
+					let categoryLevel3Id;
+
+					if (category?.level === 1) {
+						categoryLevel1Id = category?.data?._id;
+					}
+
+					if (category?.level === 2) {
+						categoryLevel1Id = category?.data['parentId'];
+						categoryLevel2Id = category?.data?._id;
+					}
+
 					await this.referencesService.create(
 						{
 							name: product.reference,
@@ -437,9 +466,9 @@ export class ProductsService {
 							height: parseFloat(product.shipping_height?.toString() || '0'),
 							volume: parseFloat(product.shipping_volume?.toString() || '0'),
 							brandId: brand._id.toString(),
-							categoryLevel1Id: '6286361d8a91abf6053e6e27',
-							categoryLevel2Id: '628636888a91abf6053e6e28',
-							categoryLevel3Id: '628636b78a91abf6053e6e29',
+							categoryLevel1Id,
+							categoryLevel2Id,
+							categoryLevel3Id,
 							attribIds: [],
 						},
 						userDefault,

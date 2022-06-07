@@ -118,6 +118,9 @@ export class ProductMysql {
 	size_id: number;
 
 	@Column({ type: 'int' })
+	category_id: number;
+
+	@Column({ type: 'int' })
 	color_id: number;
 
 	@Column({ type: 'int' })

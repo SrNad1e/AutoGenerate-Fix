@@ -708,7 +708,7 @@
 	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION /shops/migrateWarehouses
 	//ELIMINAR LA COLECCION DE SHOPS
 	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION /shops/migrateShops
-	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y asginar esa bodega como bodega principal isMain
+	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y ASIGNAR LA BODEGA DE CENTRO DE DISTRIBUCION isMain
 	//CREAR USUARIO ADMIN, SE DEBE OBTENER EL ROL CREADO
 	"defaultUser": {
 		"name": "Administrador del Sistema",
@@ -725,7 +725,7 @@
 	},
 	//MIGRAR COLORES /products/migrate/colors
 	//MIGRAR TALLAS /products/migrate/sizes
-	//PENDIENTE MIGRACION DE CATEGORIAS
+	//SE CREAN MANUALMENTE TODAS LAS CATEGORÍAS
 	//ELIMINAR LA COLECCION PRODUCTOS
 	//MIGRAR PRODUCTOS /products/migrate
 	//CREAR LOS TIPOS DE DOCUMENTO
@@ -742,8 +742,7 @@
 	//CREAR LOS TIPOS DE CLIENTE
 	"customerTypes": [
 		{
-			"name": "Cliente",
-			"discount": 0,
+			"name": "Detal",
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -751,7 +750,6 @@
 		},
 		{
 			"name": "Mayorista",
-			"discount": 0,
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -759,14 +757,13 @@
 		},
 		{
 			"name": "Distribuidor",
-			"discount": 0,
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
 			}
 		}
 	],
-	//AGREGAR EL TIPO DE CLIENTE A LOS CLIENTES ACTUALES
+	//AGREGAR EL TIPO DE CLIENTE A LOS CLIENTES ACTUALES aca voy
 	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES
 	//ELIMINAR EL INDEX DE IDENTIFICATION
 	//ACTUALIZAR CAMPO IDENTIFICATION db.customers.update({}, {$rename:{"identification":"document"}}, false, true);
