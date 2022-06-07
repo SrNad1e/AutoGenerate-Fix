@@ -65,6 +65,14 @@ export class RolesService {
 		{ active, changeWarehouse, name, permissionIds }: CreateRoleInput,
 		user: User,
 	) {
+		const role = await this.findOne({ name });
+
+		if (role) {
+			throw new BadRequestException(
+				`El nombre del rol '${name}', ya se encuentra asignado`,
+			);
+		}
+
 		const permissions = [];
 
 		for (let i = 0; i < permissionIds.length; i++) {
@@ -95,6 +103,16 @@ export class RolesService {
 		const role = await this.findById(roleId);
 		if (!role) {
 			throw new BadRequestException('El rol seleccionado no existe');
+		}
+
+		if (name) {
+			const role = await this.findOne({ name });
+
+			if (role) {
+				throw new BadRequestException(
+					`El nombre del rol '${name}', ya se encuentra asignado`,
+				);
+			}
 		}
 
 		const permissions = [];
