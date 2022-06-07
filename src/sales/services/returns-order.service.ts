@@ -12,6 +12,7 @@ import { OrdersService } from './orders.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { CouponsService } from 'src/crm/services/coupons.service';
 import { Coupon } from 'src/crm/entities/coupon.entity';
+import { Shop } from 'src/configurations/entities/shop.entity';
 
 const populate = [
 	{
@@ -21,6 +22,10 @@ const populate = [
 	{
 		path: 'coupon',
 		model: Coupon.name,
+	},
+	{
+		path: 'shop',
+		model: Shop.name,
 	},
 ];
 
