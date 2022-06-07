@@ -4,9 +4,13 @@ import { UsersService } from '../services/users.service';
 import { User } from '../entities/user.entity';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
-import { Permissions, RequirePermissions } from '../../configurations/libs/permissions.decorator';
+import {
+	Permissions,
+	RequirePermissions,
+} from '../../configurations/libs/permissions.decorator';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { CreateUserInput } from '../dtos/create-user.input';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -27,6 +31,7 @@ export class UsersResolver {
 		return this.usersService.findAll(
 			context.req.body.variables.input,
 			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -41,10 +46,26 @@ export class UsersResolver {
 	}
 
 	@Mutation(() => User)
+	@RequirePermissions(Permissions.CREATE_CONFIGURATION_USER)
+	createUser(
+		@Args('createUserInput', {
+			description: 'Datos a crear en el usuario',
+		})
+		_: CreateUserInput,
+		@Context() context,
+	) {
+		return this.usersService.create(
+			context.req.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
+	}
+
+	@Mutation(() => User)
 	@RequirePermissions(Permissions.UPDATE_CONFIGURATION_USER)
 	updateUser(
 		@Args('updateUserInput', {
-			description: 'Datos a actualiazar en el usuario',
+			description: 'Datos a actualizar en el usuario',
 		})
 		updateUserInput: UpdateUserInput,
 		@Args('id', {
@@ -53,6 +74,11 @@ export class UsersResolver {
 		id: string,
 		@Context() context,
 	) {
-		return this.usersService.update(id, updateUserInput, context.req.user.user);
+		return this.usersService.update(
+			id,
+			updateUserInput,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 }

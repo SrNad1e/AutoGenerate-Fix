@@ -925,6 +925,33 @@ input CreateStockTransferInput {
   warehouseOriginId: String!
 }
 
+"""Datos para la creación de un usuario"""
+input CreateUserInput {
+  """Identificador de la empresa a la que pertenece el usuario"""
+  companyId: String
+
+  """Identificador del cliente asignado al usuario"""
+  customerId: String
+
+  """Nombre del usuario"""
+  name: String!
+
+  """Contraseña de usuario"""
+  password: String!
+
+  """Identificador del punto de venta asignado al usuario"""
+  pointOfSaleId: String
+
+  """Identificador del rol del usuario"""
+  roleId: String!
+
+  """Identificador de la tienda asignada al usuario"""
+  shopId: String!
+
+  """Usuario registrado"""
+  username: String!
+}
+
 """Cliente"""
 type Customer {
   """Identificador de mongo"""
@@ -2264,6 +2291,10 @@ type Mutation {
     """Datos para la creación de un traslado de productos"""
     createStockTransferInput: CreateStockTransferInput!
   ): StockTransfer!
+  createUser(
+    """Datos a crear en el usuario"""
+    createUserInput: CreateUserInput!
+  ): User!
 
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
@@ -2421,7 +2452,7 @@ type Mutation {
     """Identificador del usuario que se desea actualizar"""
     id: String!
 
-    """Datos a actualiazar en el usuario"""
+    """Datos a actualizar en el usuario"""
     updateUserInput: UpdateUserInput!
   ): User!
 }
