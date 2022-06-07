@@ -7,6 +7,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Order } from './order.entity';
 import { Coupon } from 'src/crm/entities/coupon.entity';
+import { Shop } from 'src/configurations/entities/shop.entity';
 
 @ObjectType({ description: 'Productos de la devolucion' })
 export class DetailReturnInvoice {
@@ -31,6 +32,10 @@ export class ReturnOrder extends Document {
 	@Field(() => Number, { description: 'Número consecutivo' })
 	@Prop({ type: Number, requiere: true })
 	number: number;
+
+	@Field(() => Shop, { description: 'Tienda' })
+	@Prop({ type: Types.ObjectId, ref: Shop.name, requiere: true })
+	shop: Types.ObjectId;
 
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence la devolución',

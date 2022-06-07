@@ -1784,8 +1784,14 @@ input FiltersReturnsOrderInput {
   """Cantidad de registros"""
   limit: Float
 
+  """Número de la devolución"""
+  number: Float
+
   """Desde donde arranca la página"""
   page: Float
+
+  """Identificador de la tienda"""
+  shopId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortReturnOrder
@@ -4085,6 +4091,9 @@ type ReturnOrder {
 
   """Pedido de la devolución"""
   order: Order!
+
+  """Tienda"""
+  shop: Shop!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
