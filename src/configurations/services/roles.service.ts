@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
+import { CreateRoleInput } from '../dtos/create-role.input';
 
 import { FiltersRoleInput } from '../dtos/filters-role.input';
 import { FiltersRolesInput } from '../dtos/filters-roles.input';
 import { Permission } from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
+import { PermissionsService } from './permissions.service';
 
 const populate = [
 	{
@@ -18,6 +20,7 @@ const populate = [
 export class RolesService {
 	constructor(
 		@InjectModel(Role.name) private readonly roleModel: PaginateModel<Role>,
+		private readonly permissionsService: PermissionsService,
 	) {}
 
 	async findAll({
@@ -54,5 +57,25 @@ export class RolesService {
 
 	async findOne(filters: FiltersRoleInput) {
 		return this.roleModel.findOne(filters).populate(populate).lean();
+	}
+
+	async create({
+		active,
+		changeWarehouse,
+		name,
+		permissionIds,
+	}: CreateRoleInput) {
+		const permissions = [];
+
+		for (let i = 0; i < permissionIds.length; i++) {
+			const permissionId = permissionIds[i];
+			//const permission = await this.per
+		}
+
+		return this.roleModel.create({
+			active,
+			changeWarehouse,
+			name,
+		});
 	}
 }
