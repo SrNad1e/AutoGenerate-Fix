@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 import { CreateRoleInput } from '../dtos/create-role.input';
@@ -69,12 +69,19 @@ export class RolesService {
 
 		for (let i = 0; i < permissionIds.length; i++) {
 			const permissionId = permissionIds[i];
-			//const permission = await this.per
+			const permission = await this.permissionsService.findById(permissionId);
+			if (!permission) {
+				throw new BadRequestException(
+					'Uno de los permisos a asignar no existe',
+				);
+			}
+			permissions.push(permission?._id);
 		}
 
 		return this.roleModel.create({
 			active,
 			changeWarehouse,
+			permissions,
 			name,
 		});
 	}
