@@ -469,7 +469,7 @@ export class ReferencesService {
 					categoryLevel2: categoryLevel2?._id || null,
 					categoryLevel3: categoryLevel3?._id || null,
 					attribs,
-					brand,
+					brand: brand?._id,
 					shipping,
 					...params,
 				},
