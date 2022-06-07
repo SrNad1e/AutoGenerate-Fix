@@ -37,19 +37,19 @@ export class PermissionsService {
 
 			for (let j = 0; j < options.length; j++) {
 				const option = options[j];
-				const actions = this.permissionModel
-					.find({
-						module,
-						option,
-					})
-					.projection({
-						name: 1,
-						description: 1,
-					});
+
+				const actions = await this.permissionModel.find({
+					module,
+					option,
+				});
 
 				newOptions.push({
 					name: option,
-					actions,
+					actions: actions.map(({ name, description, _id }) => ({
+						_id,
+						name,
+						description,
+					})),
 				});
 			}
 

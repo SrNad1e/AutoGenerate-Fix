@@ -2,6 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Opción del permiso"""
+type ActionPermission {
+  """Identificador del permiso"""
+  _id: String!
+
+  """Descripción del permiso"""
+  description: String!
+
+  """Nombre de la acción del permiso"""
+  name: String!
+}
+
 """Datos para agregar medios de pago al pedido"""
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
@@ -2366,6 +2378,15 @@ type Mutation {
   ): User!
 }
 
+"""Opción del permiso"""
+type OptionPermission {
+  """Acciones a realizan en la opción"""
+  actions: [ActionPermission!]!
+
+  """Nombre de la opción"""
+  name: String!
+}
+
 """Pedido de productos"""
 type Order {
   """Identificador de mongo"""
@@ -2519,6 +2540,15 @@ type Permission {
   option: String!
 }
 
+"""Permiso"""
+type PermissionData {
+  """Nombre del módulo"""
+  module: String!
+
+  """Opciones del módulo"""
+  options: [OptionPermission!]!
+}
+
 enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CRM_CITIES
@@ -2569,6 +2599,7 @@ enum Permissions {
   PRINT_INVOICING_RETURN
   READ_CONFIGURATION_CONVEYORS
   READ_CONFIGURATION_IMAGES
+  READ_CONFIGURATION_PERMISSIONS
   READ_CONFIGURATION_SHOPS
   READ_CONFIGURATION_USERS
   READ_CONFIGURATION_WAREHOUSES
@@ -2781,6 +2812,9 @@ type Query {
     """Filtros para consultar los metodos de pagos"""
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
+
+  """Se encarga de listar los permisos"""
+  permissions: [PermissionData!]!
 
   """Lista de puntos de venta"""
   pointOfSales(

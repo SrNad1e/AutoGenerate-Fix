@@ -43,6 +43,7 @@ import { WarehousesService } from './services/warehouses.service';
 import { WarehousesResolver } from './resolvers/warehouses.resolver';
 import { ShopsResolver } from './resolvers/shops.resolver';
 import { PermissionsService } from './services/permissions.service';
+import { PermissionsResolver } from './resolvers/permissions.resolver';
 
 @Module({
 	imports: [
@@ -127,6 +128,7 @@ import { PermissionsService } from './services/permissions.service';
 		WarehousesResolver,
 		WarehousesService,
 		PermissionsService,
+		PermissionsResolver,
 	],
 	controllers: [StaticfilesController, ShopsController],
 	exports: [
