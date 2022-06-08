@@ -24,6 +24,8 @@ import { PointOfSalesService } from './point-of-sales.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
+import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
+import { Product } from 'src/products/entities/product.entity';
 
 const populate = [
 	{
@@ -51,7 +53,7 @@ export class OrdersService {
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
 		private readonly receiptsService: ReceiptsService,
-		private readonly customerTypesService: CustomerTypeService,
+		private readonly discountRulesService: DiscountRulersService,
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
 	) {}
@@ -225,11 +227,23 @@ export class OrdersService {
 				customer.customerType._id.toString() !==
 				order.customer.customerType._id.toString()
 			) {
-				const newDetails = order.details.map((detail) => ({
-					...detail,
-					discount: 0,
-					updatedAt: new Date(),
-				}));
+				const newDetails = [];
+
+				for (let i = 0; i < order?.details?.length; i++) {
+					const detail = order?.details[i];
+
+					const discount = await this.discountRulesService.getDiscountProduct({
+						customerId: customer._id.toString(),
+						product: detail?.product as Product,
+					});
+
+					newDetails.push({
+						...detail,
+						price: detail?.product?.reference['price'] - discount,
+						discount,
+						updatedAt: new Date(),
+					});
+				}
 
 				const subtotal = newDetails.reduce(
 					(sum, detail) => sum + detail.price * detail.quantity,
@@ -562,10 +576,6 @@ export class OrdersService {
 
 		const productsUpdate = details?.filter((item) => item.action === 'update');
 
-		const customerType = await this.customerTypesService.findById(
-			order.customer.customerType._id.toString(),
-		);
-
 		if (productsUpdate) {
 			for (let i = 0; i < productsUpdate.length; i++) {
 				const { quantity, productId } = productsUpdate[i];
@@ -602,7 +612,6 @@ export class OrdersService {
 					...newDetails[index],
 					product,
 					quantity,
-					discount:0,
 					updatedAt: new Date(),
 				};
 			}
@@ -640,12 +649,17 @@ export class OrdersService {
 					);
 				}
 
+				const discount = await this.discountRulesService.getDiscountProduct({
+					customerId: order?.customer?._id.toString(),
+					product: product as Product,
+				});
+
 				newDetails.push({
 					product,
 					status: 'new',
 					quantity,
-					price: product.reference['price'],
-					discount: 0,
+					price: product.reference['price'] - discount,
+					discount,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
