@@ -41,6 +41,18 @@ export class FiltersReturnsOrderInput {
 	})
 	active: boolean;
 
+	@Field(() => String, {
+		description: 'Identificador de la tienda',
+		nullable: true,
+	})
+	shopId: string;
+
+	@Field(() => Number, {
+		description: 'Número de la devolución',
+		nullable: true,
+	})
+	number: number;
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 

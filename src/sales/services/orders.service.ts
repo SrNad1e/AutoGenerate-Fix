@@ -103,7 +103,7 @@ export class OrdersService {
 		}
 
 		if (document) {
-			filters.customer.document = document;
+			filters['customer.document'] = document;
 		}
 
 		const options = {

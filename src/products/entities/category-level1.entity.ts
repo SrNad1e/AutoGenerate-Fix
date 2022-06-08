@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { CategoryLevel2 } from './category-level2.entity';
 
@@ -11,7 +12,7 @@ import { CategoryLevel2 } from './category-level2.entity';
 export class CategoryLevel1 extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
-D
+
 	@Field(() => String, { description: 'Nombre de la categoría' })
 	@Prop({ type: String, required: true })
 	name: string;
@@ -45,3 +46,15 @@ D
 
 export const CategoryLevel1Schema =
 	SchemaFactory.createForClass(CategoryLevel1);
+
+@Entity({ name: 'categories' })
+export class CategoryMysql {
+	@PrimaryGeneratedColumn()
+	id: number;
+
+	@Column({ type: 'varchar' })
+	name: string;
+
+	@Column({ type: 'int' })
+	parent_id: number;
+}

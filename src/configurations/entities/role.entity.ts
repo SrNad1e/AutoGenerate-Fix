@@ -12,7 +12,7 @@ export class Role {
 	_id: Types.ObjectId;
 
 	@Field({ description: 'Nombre asignado al rol' })
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, unique: true })
 	name: string;
 
 	@Field(() => [Permission], {
@@ -26,7 +26,7 @@ export class Role {
 	changeWarehouse: boolean;
 
 	@Field(() => Boolean, { description: 'Se encuentra activo el rol' })
-	@Prop({ type: Boolean })
+	@Prop({ type: Boolean, default: true })
 	active: boolean;
 
 	@Field(() => User, { description: 'Usuario que creó o modificó el rol' })

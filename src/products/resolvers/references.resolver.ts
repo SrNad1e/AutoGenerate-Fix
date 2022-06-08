@@ -22,7 +22,7 @@ export class ReferencesResolver {
 	findAll(
 		@Args({
 			name: 'companyId',
-			description: 'Identificador de la sucursal',
+			description: 'Identificador de la empresa',
 		})
 		companyId: string,
 		@Args({

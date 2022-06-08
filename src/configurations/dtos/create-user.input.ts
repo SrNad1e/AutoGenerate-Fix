@@ -33,6 +33,7 @@ export class CreateUserInput {
 
 	@Field(() => String, {
 		description: 'Identificador de la empresa a la que pertenece el usuario',
+		nullable: true,
 	})
-	companyId: string;
+	companyId?: string;
 }

@@ -108,15 +108,22 @@ export class AuthService {
 			throw new NotFoundException('La tienda Mayoristas no existe');
 		}
 
-		const newUser = await this.usersService.create({
-			name: `${firstName} ${lastName}`,
-			username: email,
-			password,
-			roleId: role._id.toString(),
-			shopId: shop._id.toString(),
+		const newUser = await this.usersService.create(
+			{
+				name: `${firstName} ${lastName}`,
+				username: email,
+				password,
+				roleId: role._id.toString(),
+				shopId: shop._id.toString(),
+				companyId,
+				customerId: customer._id.toString(),
+			},
+			{
+				name: 'Administrador del sistema',
+				username: 'admin',
+			} as User,
 			companyId,
-			customerId: customer._id.toString(),
-		});
+		);
 
 		return {
 			user: newUser,

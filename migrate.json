@@ -3,399 +3,399 @@
 {
 	"permissions": [
 		{
-			"module": "Configuraciones",
+			"module": "Configuración",
 			"option": "General",
 			"name": "Acceder ERP",
 			"description": "Permite ingresar a la interface ERP",
 			"action": "ACCESS_ERP"
 		},
 		{
-			"module": "Configuraciones",
+			"module": "Configuración",
 			"option": "General",
 			"name": "Acceder POS",
 			"description": "Permite ingresar a la interface POS",
 			"action": "ACCESS_POS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Ajuste",
 			"name": "Acceder",
 			"description": "Permite ingresar al módulo de ajustes de inventario",
 			"action": "ACCESS_INVENTORY_ADJUSTMENTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Entrada",
 			"name": "Acceder",
 			"description": "Permite ingresar al módulo de entradas de inventario",
 			"action": "ACCESS_INVENTORY_INPUTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Salida",
 			"name": "Acceder",
 			"description": "Permite ingresar al módulo de salidas de inventario",
 			"action": "ACCESS_INVENTORY_OUTPUTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Solicitud",
 			"name": "Acceder",
 			"description": "Permite ingresar al módulo de solicitudes de inventario",
 			"action": "ACCESS_INVENTORY_REQUESTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Traslado",
 			"name": "Acceder",
 			"description": "Permite ingresar al módulo de traslados de inventario",
 			"action": "ACCESS_INVENTORY_TRANSFERS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Traslado",
 			"name": "Consultar",
 			"description": "Permite consultar los traslados de inventario",
 			"action": "READ_INVENTORY_TRANSFERS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Solicitud",
 			"name": "Consultar",
 			"description": "Permite consultar las solicitudes de inventario",
 			"action": "READ_INVENTORY_REQUESTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Entrada",
 			"name": "Consultar",
 			"description": "Permite consultar las entradas de inventario",
 			"action": "READ_INVENTORY_OUTPUTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Salida",
 			"name": "Consultar",
 			"description": "Permite consultar las salidas de inventario",
 			"action": "READ_INVENTORY_INPUTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Ajuste",
 			"name": "Consultar",
 			"description": "Permite consultar los ajustes de inventario",
 			"action": "READ_INVENTORY_ADJUSTMENTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Traslado",
 			"name": "Crear",
 			"description": "Permite crear los traslados de inventario",
 			"action": "CREATE_INVENTORY_TRANSFER"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Solicitud",
 			"name": "Crear",
 			"description": "Permite crear las solicitudes de inventario",
 			"action": "CREATE_INVENTORY_REQUEST"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Entrada",
 			"name": "Crear",
 			"description": "Permite crear las entradas de inventario",
 			"action": "CREATE_INVENTORY_OUTPUT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Salida",
 			"name": "Crear",
 			"description": "Permite crear las salidas de inventario",
 			"action": "CREATE_INVENTORY_INPUT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Ajuste",
 			"name": "Crear",
 			"description": "Permite crear los ajustes de inventario",
 			"action": "CREATE_INVENTORY_ADJUSTMENT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Traslado",
 			"name": "Actualizar",
 			"description": "Permite actualizar los traslados de inventario",
 			"action": "UPDATE_INVENTORY_TRANSFER"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Solicitud",
 			"name": "Actualizar",
 			"description": "Permite actualizar las solicitudes de inventario",
 			"action": "UPDATE_INVENTORY_REQUEST"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Entrada",
 			"name": "Actualizar",
 			"description": "Permite actualizar las entradas de inventario",
 			"action": "UPDATE_INVENTORY_OUTPUT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Salida",
 			"name": "Actualizar",
 			"description": "Permite actualizar las salidas de inventario",
 			"action": "UPDATE_INVENTORY_INPUT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Ajuste",
 			"name": "Actualizar",
 			"description": "Permite actualizar los ajustes de inventario",
 			"action": "UPDATE_INVENTORY_ADJUSTMENT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Traslado",
 			"name": "Imprimir",
 			"description": "Permite imprimir los traslados de inventario",
 			"action": "PRINT_INVENTORY_TRANSFER"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Solicitud",
 			"name": "Imprimir",
 			"description": "Permite imprimir las solicitudes de inventario",
 			"action": "PRINT_INVENTORY_REQUEST"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Entrada",
 			"name": "Imprimir",
 			"description": "Permite imprimir las entradas de inventario",
 			"action": "PRINT_INVENTORY_OUTPUT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Salida",
 			"name": "Imprimir",
 			"description": "Permite imprimir las salidas de inventario",
 			"action": "PRINT_INVENTORY_INPUT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Ajuste",
 			"name": "Imprimir",
 			"description": "Permite imprimir los ajustes de inventario",
 			"action": "PRINT_INVENTORY_ADJUSTMENT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Traslado",
 			"name": "Confirmar",
 			"description": "Permite confirmar los productos del traslados de inventario",
 			"action": "CONFIRM_INVENTORY_TRANSFER"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Solicitud",
 			"name": "Autogenerar",
 			"description": "Permite autogenerar las solicitudes de inventario",
 			"action": "AUTOGENERATE_INVENTORY_REQUEST"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Atributo",
 			"name": "Acceder",
 			"description": "Permite acceder a los atributos del producto",
 			"action": "ACCESS_INVENTORY_ATTRIBS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Marca",
 			"name": "Acceder",
 			"description": "Permite acceder a las marcas del producto",
 			"action": "ACCESS_INVENTORY_BRANDS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Categoría",
 			"name": "Acceder",
 			"description": "Permite acceder a las categorías del producto",
 			"action": "ACCESS_INVENTORY_CATEGORIES"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Color",
 			"name": "Acceder",
 			"description": "Permite acceder a los colores del producto",
 			"action": "ACCESS_INVENTORY_COLORS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Producto",
 			"name": "Acceder",
 			"description": "Permite acceder a los productos",
 			"action": "ACCESS_INVENTORY_PRODUCTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Referencia",
 			"name": "Acceder",
 			"description": "Permite acceder a las referencias del producto",
 			"action": "ACCESS_INVENTORY_REFERENCES"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Talla",
 			"name": "Acceder",
 			"description": "Permite acceder a las tallas del producto",
 			"action": "ACCESS_INVENTORY_SIZES"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Atributo",
 			"name": "Consultar",
 			"description": "Permite consultar los atributos del producto",
 			"action": "READ_INVENTORY_ATTRIBS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Marca",
 			"name": "Consultar",
 			"description": "Permite consultar las marcas del producto",
 			"action": "READ_INVENTORY_BRANDS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Categoría",
 			"name": "Consultar",
 			"description": "Permite consultar las categorías del producto",
 			"action": "READ_INVENTORY_CATEGORIES"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Color",
 			"name": "Consultar",
 			"description": "Permite consultar los colores del producto",
 			"action": "READ_INVENTORY_COLORS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Producto",
 			"name": "Consultar",
 			"description": "Permite consultar los productos",
 			"action": "READ_INVENTORY_PRODUCTS"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Referencia",
 			"name": "Consultar",
 			"description": "Permite consultar las referencias del producto",
 			"action": "READ_INVENTORY_REFERENCES"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Talla",
 			"name": "Consultar",
 			"description": "Permite consultar las tallas del producto",
 			"action": "READ_INVENTORY_SIZES"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Atributo",
 			"name": "Crear",
 			"description": "Permite crear el atributo del producto",
 			"action": "CREATE_INVENTORY_ATTRIB"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Marca",
 			"name": "Crear",
 			"description": "Permite crear la marca del producto",
 			"action": "CREATE_INVENTORY_BRAND"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Categoría",
 			"name": "Crear",
 			"description": "Permite crear la categoría del producto",
 			"action": "CREATE_INVENTORY_CATEGORY"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Color",
 			"name": "Crear",
 			"description": "Permite crear el color del producto",
 			"action": "CREATE_INVENTORY_COLOR"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Producto",
 			"name": "Crear",
 			"description": "Permite crear el producto",
 			"action": "CREATE_INVENTORY_PRODUCT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Referencia",
 			"name": "Crear",
 			"description": "Permite crear la referencia del producto",
 			"action": "CREATE_INVENTORY_REFERENCE"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Talla",
 			"name": "Crear",
 			"description": "Permite crear la talla del producto",
 			"action": "CREATE_INVENTORY_SIZE"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Atributo",
 			"name": "Actualizar",
 			"description": "Permite actualizar el atributo del producto",
 			"action": "UPDATE_INVENTORY_ATTRIB"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Marca",
 			"name": "Actualizar",
 			"description": "Permite actualizar la marca del producto",
 			"action": "UPDATE_INVENTORY_BRAND"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Categoría",
 			"name": "Actualizar",
 			"description": "Permite actualizar la categoría del producto",
 			"action": "UPDATE_INVENTORY_CATEGORY"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Color",
 			"name": "Actualizar",
 			"description": "Permite actualizar el color del producto",
 			"action": "UPDATE_INVENTORY_COLOR"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Producto",
 			"name": "Actualizar",
 			"description": "Permite actualizar el producto",
 			"action": "UPDATE_INVENTORY_PRODUCT"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Referencia",
 			"name": "Actualizar",
 			"description": "Permite actualizar la referencia del producto",
 			"action": "UPDATE_INVENTORY_REFERENCE"
 		},
 		{
-			"module": "Inventarios",
+			"module": "Inventario",
 			"option": "Talla",
 			"name": "Actualizar",
 			"description": "Permite actualizar la talla del producto",
@@ -612,6 +612,55 @@
 			"action": "READ_CONFIGURATION_IMAGES"
 		},
 		{
+			"module": "Configuración",
+			"option": "Permiso",
+			"name": "Consultar",
+			"description": "Permite consultar los permisos",
+			"action": "READ_CONFIGURATION_PERMISSIONS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Rol",
+			"name": "Acceder",
+			"description": "Permite acceder los roles",
+			"action": "ACCESS_CONFIGURATION_ROLES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Acceder",
+			"description": "Permite acceder a los usuarios",
+			"action": "ACCESS_CONFIGURATION_USERS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Rol",
+			"name": "Consultar",
+			"description": "Permite consultar los roles",
+			"action": "READ_CONFIGURATION_ROLES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Rol",
+			"name": "Crear",
+			"description": "Permite crear el rol",
+			"action": "CREATE_CONFIGURATION_ROLE"
+		},
+		{
+			"module": "Configuración",
+			"option": "Usuario",
+			"name": "Crear",
+			"description": "Permite crear el usuario",
+			"action": "CREATE_CONFIGURATION_USER"
+		},
+		{
+			"module": "Configuración",
+			"option": "Rol",
+			"name": "Actualizar",
+			"description": "Permite actualizar el rol",
+			"action": "UPDATE_CONFIGURATION_ROLE"
+		},
+		{
 			"module": "Tesorería",
 			"option": "Médio de pago",
 			"name": "Consultar",
@@ -659,7 +708,7 @@
 	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION /shops/migrateWarehouses
 	//ELIMINAR LA COLECCION DE SHOPS
 	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION /shops/migrateShops
-	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y asginar esa bodega como bodega principal isMain
+	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y ASIGNAR LA BODEGA DE CENTRO DE DISTRIBUCION isMain
 	//CREAR USUARIO ADMIN, SE DEBE OBTENER EL ROL CREADO
 	"defaultUser": {
 		"name": "Administrador del Sistema",
@@ -676,7 +725,7 @@
 	},
 	//MIGRAR COLORES /products/migrate/colors
 	//MIGRAR TALLAS /products/migrate/sizes
-	//PENDIENTE MIGRACION DE CATEGORIAS
+	//SE CREAN MANUALMENTE TODAS LAS CATEGORÍAS
 	//ELIMINAR LA COLECCION PRODUCTOS
 	//MIGRAR PRODUCTOS /products/migrate
 	//CREAR LOS TIPOS DE DOCUMENTO
@@ -693,8 +742,7 @@
 	//CREAR LOS TIPOS DE CLIENTE
 	"customerTypes": [
 		{
-			"name": "Cliente",
-			"discount": 0,
+			"name": "Detal",
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -702,7 +750,6 @@
 		},
 		{
 			"name": "Mayorista",
-			"discount": 0,
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -710,7 +757,6 @@
 		},
 		{
 			"name": "Distribuidor",
-			"discount": 0,
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -718,18 +764,61 @@
 		}
 	],
 	//AGREGAR EL TIPO DE CLIENTE A LOS CLIENTES ACTUALES
-	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES
+	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES 1 DETAL, 2 MAYORISTA, 3 DISTRIBUIDOR
 	//ELIMINAR EL INDEX DE IDENTIFICATION
 	//ACTUALIZAR CAMPO IDENTIFICATION db.customers.update({}, {$rename:{"identification":"document"}}, false, true);
 	//CREAR LAS AUTORIZACIONES DE FACTURACION
+	"authorizationDian": [
+		{
+			"prefix": "C01",
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	],
 	//CREAR LAS CAJAS Y ASIGNARSELAS AL PUNTO DE VENTA
+	"boxes": [
+		{
+			"name": "General",
+			"base": 0,
+			"company": "sacarla de la base de datos",
+			"isMain": true,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		},
+		{
+			"name": "C01",
+			"base": 0,
+			"company": "sacarla de la base de datos",
+			"isMain": false,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	],
 	//CREAR LOS PUNTOS DE VENTA
+	"pointOfSales":[
+		{
+			"name": "Caja 01",
+			"shop": "Sacar de base da datos",
+			"authorization": "Sacar de la base de datos",
+			"box": "Sacar de la base de datos",
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	]
 	//ASIGANR EL PUNTO DE VENTA A LOS USUARIOS
 	//CREAR EL CLIENT POR DEFECTO
 	"customers": [
 		{
 			"documentType": "Sacar de la base de datos",
-			"document": 0,
+			"document": "0",
 			"firstName": "Cliente",
 			"lastName": "Ocacional",
 			"customerType": "Sacar de la base de datos",
@@ -797,8 +886,7 @@
 		}
 	]
 	//ELIMINAR INDEX CODE EN ORDERS
-	//AGREGAR CAMPO ACTIVE EN LAS FACTURAS
-	//AGREGAR AUTORIZACION A LAS FACTURAS
-	//CAMBIAR EL IDENTIFICATION CON DOCUMENT db.invoices.update({}, {$rename:{"customer.identification":"customer.document"}}, false, true);
-	//AGREGA EL TIPO DE DOCUMENTO
+	//ELIMINAR LAS FACTURAS
+	//CAMBIAR EL IDENTIFICATION CON DOCUMENT db.orders.update({}, {$rename:{"customer.identification":"customer.document"}}, false, true);
+	//AGREGA EL TIPO DE DOCUMENTO db.orders.updateMany({},{$set:{"customer.documentType": ObjectId("629fbad9e4251f089ecd2751")}})
 }

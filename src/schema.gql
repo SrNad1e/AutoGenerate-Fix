@@ -2,6 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Opción del permiso"""
+type ActionPermission {
+  """Identificador del permiso"""
+  _id: String!
+
+  """Descripción del permiso"""
+  description: String!
+
+  """Nombre de la acción del permiso"""
+  name: String!
+}
+
 """Datos para agregar medios de pago al pedido"""
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
@@ -805,6 +817,21 @@ input CreateReturnOrderInput {
   orderId: String!
 }
 
+"""Datos para la creación de un rol"""
+input CreateRoleInput {
+  """Estado del rol"""
+  active: Boolean
+
+  """Habilita para que el usuario pueda consulta cualquier bodega"""
+  changeWarehouse: Boolean
+
+  """Nombre del rol"""
+  name: String!
+
+  """Identificadores de los permisos asignados"""
+  permissionIds: [String!]!
+}
+
 """Datos para crear una talla"""
 input CreateSizeInput {
   """Valor asignado a la talla"""
@@ -896,6 +923,33 @@ input CreateStockTransferInput {
 
   """Identificador de la bodega de origen del traslado"""
   warehouseOriginId: String!
+}
+
+"""Datos para la creación de un usuario"""
+input CreateUserInput {
+  """Identificador de la empresa a la que pertenece el usuario"""
+  companyId: String
+
+  """Identificador del cliente asignado al usuario"""
+  customerId: String
+
+  """Nombre del usuario"""
+  name: String!
+
+  """Contraseña de usuario"""
+  password: String!
+
+  """Identificador del punto de venta asignado al usuario"""
+  pointOfSaleId: String
+
+  """Identificador del rol del usuario"""
+  roleId: String!
+
+  """Identificador de la tienda asignada al usuario"""
+  shopId: String!
+
+  """Usuario registrado"""
+  username: String!
 }
 
 """Cliente"""
@@ -1730,11 +1784,35 @@ input FiltersReturnsOrderInput {
   """Cantidad de registros"""
   limit: Float
 
+  """Número de la devolución"""
+  number: Float
+
   """Desde donde arranca la página"""
   page: Float
 
+  """Identificador de la tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortReturnOrder
+}
+
+"""Filtros para consultar los roles"""
+input FiltersRolesInput {
+  """El rol se encuentra activo"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre del rol"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortRole
 }
 
 """Filtros usados para consultar las tiendas"""
@@ -2178,6 +2256,12 @@ type Mutation {
     createReturnOrderInput: CreateReturnOrderInput!
   ): ReturnOrder!
 
+  """Crea una rol"""
+  createRole(
+    """Datos para la creación del rol"""
+    createRoleInput: CreateRoleInput!
+  ): Role!
+
   """Crear una talla"""
   createSize(
     """Datos para crear la talla"""
@@ -2213,6 +2297,10 @@ type Mutation {
     """Datos para la creación de un traslado de productos"""
     createStockTransferInput: CreateStockTransferInput!
   ): StockTransfer!
+  createUser(
+    """Datos a crear en el usuario"""
+    createUserInput: CreateUserInput!
+  ): User!
 
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
@@ -2304,6 +2392,15 @@ type Mutation {
     updateReferenceInput: UpdateReferenceInput!
   ): Reference!
 
+  """Actualiza un rol"""
+  updateRole(
+    """Identificador del rol para actualizar"""
+    id: String!
+
+    """Datos para actualizar el rol"""
+    updateRoleInput: UpdateRoleInput!
+  ): Role!
+
   """Actualizar la talla"""
   updateSize(
     """Identificador de la talla a actualizar"""
@@ -2361,9 +2458,18 @@ type Mutation {
     """Identificador del usuario que se desea actualizar"""
     id: String!
 
-    """Datos a actualiazar en el usuario"""
+    """Datos a actualizar en el usuario"""
     updateUserInput: UpdateUserInput!
   ): User!
+}
+
+"""Opción del permiso"""
+type OptionPermission {
+  """Acciones a realizan en la opción"""
+  actions: [ActionPermission!]!
+
+  """Nombre de la opción"""
+  name: String!
 }
 
 """Pedido de productos"""
@@ -2519,8 +2625,19 @@ type Permission {
   option: String!
 }
 
+"""Permiso"""
+type PermissionData {
+  """Nombre del módulo"""
+  module: String!
+
+  """Opciones del módulo"""
+  options: [OptionPermission!]!
+}
+
 enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
+  ACCESS_CONFIGURATION_ROLES
+  ACCESS_CONFIGURATION_USERS
   ACCESS_CRM_CITIES
   ACCESS_CRM_CUSTOMERS
   ACCESS_ERP
@@ -2542,6 +2659,8 @@ enum Permissions {
   ACCESS_POS
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
+  CREATE_CONFIGURATION_ROLE
+  CREATE_CONFIGURATION_USER
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
@@ -2569,6 +2688,8 @@ enum Permissions {
   PRINT_INVOICING_RETURN
   READ_CONFIGURATION_CONVEYORS
   READ_CONFIGURATION_IMAGES
+  READ_CONFIGURATION_PERMISSIONS
+  READ_CONFIGURATION_ROLES
   READ_CONFIGURATION_SHOPS
   READ_CONFIGURATION_USERS
   READ_CONFIGURATION_WAREHOUSES
@@ -2593,6 +2714,7 @@ enum Permissions {
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
   READ_TREASURY_PAYMENTS
+  UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_USER
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
@@ -2782,6 +2904,9 @@ type Query {
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
 
+  """Se encarga de listar los permisos"""
+  permissions: [PermissionData!]!
+
   """Lista de puntos de venta"""
   pointOfSales(
     """Filtros de lista de puntos de venta"""
@@ -2808,7 +2933,7 @@ type Query {
 
   """Listado de las referencias"""
   references(
-    """Identificador de la sucursal"""
+    """Identificador de la empresa"""
     companyId: String!
 
     """Filtros para las referencias"""
@@ -2820,6 +2945,18 @@ type Query {
     """Filtros de lista de devoluciones de pedidos"""
     filtersReturnsOrder: FiltersReturnsOrderInput = {}
   ): ResponseReturnsOrder!
+
+  """Obtiene el rol por el identificador"""
+  roleId(
+    """Identificador del rol"""
+    id: String!
+  ): Role!
+
+  """Listado de las roles"""
+  roles(
+    """Filtros para los roles"""
+    filtersRolesInput: FiltersRolesInput = {}
+  ): ResponseRoles!
 
   """Se encarga de listar las tiendas"""
   shops(
@@ -3632,6 +3769,39 @@ type ResponseReturnsOrder {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de roles"""
+type ResponseRoles {
+  """Lista de roles"""
+  docs: [Role!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta a la consulta de tiendas"""
 type ResponseShops {
   """Lista de tiendas"""
@@ -3921,6 +4091,9 @@ type ReturnOrder {
 
   """Pedido de la devolución"""
   order: Order!
+
+  """Tienda"""
+  shop: Shop!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -4274,6 +4447,15 @@ input SortReturnOrder {
   createdAt: Float
 
   """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento para el listado de roles"""
+input SortRole {
+  active: Float
+  changeWarehouse: Float
+  createdAt: Float
+  name: Float
   updatedAt: Float
 }
 
@@ -4857,6 +5039,21 @@ input UpdateReferenceInput {
 
   """Ancho del producto"""
   width: Float
+}
+
+"""Datos para actualizar el rol"""
+input UpdateRoleInput {
+  """Estado del rol"""
+  active: Boolean!
+
+  """Puede el usuario cambiar su bodega"""
+  changeWarehouse: Boolean!
+
+  """Nombre del rol"""
+  name: String!
+
+  """Identificadores de los permisos seleccionados"""
+  permissionIds: [String!]
 }
 
 """Datos para actualizar la talla"""

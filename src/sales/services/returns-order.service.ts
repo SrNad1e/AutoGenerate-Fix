@@ -12,6 +12,7 @@ import { OrdersService } from './orders.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { CouponsService } from 'src/crm/services/coupons.service';
 import { Coupon } from 'src/crm/entities/coupon.entity';
+import { Shop } from 'src/configurations/entities/shop.entity';
 
 const populate = [
 	{
@@ -21,6 +22,10 @@ const populate = [
 	{
 		path: 'coupon',
 		model: Coupon.name,
+	},
+	{
+		path: 'shop',
+		model: Shop.name,
 	},
 ];
 
@@ -42,6 +47,8 @@ export class ReturnsOrderService {
 			page = 1,
 			dateFinal,
 			dateInitial,
+			shopId,
+			number,
 		}: FiltersReturnsOrderInput,
 		user: User,
 		companyId: string,
@@ -54,6 +61,10 @@ export class ReturnsOrderService {
 
 		if (active !== undefined) {
 			filters.active = active;
+		}
+
+		if (shopId) {
+			filters.shop = new Types.ObjectId(shopId);
 		}
 
 		if (dateInitial) {
@@ -73,6 +84,10 @@ export class ReturnsOrderService {
 				$gte: new Date(dateInitial),
 				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 			};
+		}
+
+		if (number) {
+			filters.number = number;
 		}
 
 		const options = {
@@ -175,6 +190,7 @@ export class ReturnsOrderService {
 			company: new Types.ObjectId(companyId),
 			order: order?._id,
 			details: detailsReturn,
+			shop: order?.shop?._id,
 			coupon: coupon._id,
 			user,
 		});

@@ -41,7 +41,7 @@ export class PointOfSale extends Document {
 	box: Types.ObjectId;
 
 	@Field(() => Date, { description: 'Fecha de cierre', nullable: true })
-	@Prop({ type: Date })
+	@Prop({ type: Date, default: new Date() })
 	closeDate: Date;
 
 	@Field(() => User, {

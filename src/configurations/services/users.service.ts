@@ -1,17 +1,19 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
-import { Repository } from 'typeorm';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { Role } from '../entities/role.entity';
-import { User, UserMysql } from '../entities/user.entity';
+import { User } from '../entities/user.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../../configurations/entities/permission.entity';
 import { CreateUserInput } from '../dtos/create-user.input';
@@ -59,8 +61,6 @@ const populate = [
 export class UsersService {
 	constructor(
 		@InjectModel(User.name) private readonly userModel: PaginateModel<User>,
-		@InjectRepository(UserMysql)
-		private readonly userRepo: Repository<UserMysql>,
 		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
 		@InjectModel(PointOfSale.name)
 		private readonly pointOfSaleModel: PaginateModel<PointOfSale>,
@@ -80,8 +80,15 @@ export class UsersService {
 			sort,
 		}: FiltersUsersInput,
 		user: User,
+		companyId: string,
 	) {
-		const filters: FilterQuery<User> = {};
+		const filters: FilterQuery<User> = {
+			customer: null,
+		};
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
 
 		if (customerTypeId) {
 			filters.customer = new Types.ObjectId(customerTypeId);
@@ -141,15 +148,19 @@ export class UsersService {
 		return user;
 	}
 
-	async create({
-		username,
-		shopId,
-		companyId,
-		pointOfSaleId,
-		roleId,
-		customerId,
-		...params
-	}: CreateUserInput): Promise<User> {
+	async create(
+		{
+			username,
+			shopId,
+			companyId,
+			pointOfSaleId,
+			roleId,
+			customerId,
+			...params
+		}: CreateUserInput,
+		userCreate: User,
+		idCompany: string,
+	): Promise<User> {
 		const user = await this.findOne({ username });
 
 		if (user) {
@@ -170,7 +181,9 @@ export class UsersService {
 			throw new NotFoundException('La tienda no se encuentra registrada');
 		}
 
-		const company = await this.companiesService.findById(companyId);
+		const company = await this.companiesService.findById(
+			companyId || idCompany,
+		);
 
 		if (!company) {
 			throw new NotFoundException('La empresa no se encuentra registrada');
@@ -201,6 +214,7 @@ export class UsersService {
 			customer: customer._id,
 			companies: [company._id],
 			...params,
+			user: userCreate,
 		});
 		return (await newUser.save()).populate(populate);
 	}
@@ -209,10 +223,19 @@ export class UsersService {
 		id: string,
 		updateUserInput: UpdateUserInput,
 		userUpdate: User,
+		companyId: string,
 	): Promise<User> {
 		const user = await this.findById(id);
 		if (!user) {
 			throw new NotFoundException(`Usuario que intenta actualizar no existe`);
+		}
+
+		const companies = user.companies.map((company) => company.toString());
+
+		if (userUpdate.username !== 'admin' && !companies.includes(companyId)) {
+			throw new UnauthorizedException(
+				'El usuario no puede ser modificado, consulta al administrador',
+			);
 		}
 
 		if (updateUserInput.password) {
