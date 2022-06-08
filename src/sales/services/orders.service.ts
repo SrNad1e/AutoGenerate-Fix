@@ -647,7 +647,7 @@ export class OrdersService {
 					status: 'new',
 					quantity,
 					price: product.reference['price'],
-					discount: (customerType.discount / 100) * product.reference['price'],
+					discount: 0,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
