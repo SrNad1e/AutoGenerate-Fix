@@ -21,6 +21,7 @@ import { Attrib, AttribSchema } from './entities/attrib.entity';
 import {
 	CategoryLevel1,
 	CategoryLevel1Schema,
+	CategoryMysql,
 } from './entities/category-level1.entity';
 import {
 	CategoryLevel2,
@@ -63,7 +64,12 @@ import { CategoriesResolver } from './resolvers/categories.resolver';
 				},
 			},
 		]),
-		TypeOrmModule.forFeature([ProductMysql, SizeMysql, ColorMysql]),
+		TypeOrmModule.forFeature([
+			ProductMysql,
+			SizeMysql,
+			ColorMysql,
+			CategoryMysql,
+		]),
 	],
 	providers: [
 		ProductsService,

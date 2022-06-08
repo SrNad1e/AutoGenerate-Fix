@@ -1,13 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
+import { Repository } from 'typeorm';
 
 import { CreateCategoryInput } from '../dtos/create-category.input';
 import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.input';
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';
+import { FiltersCategoryInput } from '../dtos/filters-category.input';
 import { UpdateCategoryInput } from '../dtos/update-category.input';
-import { CategoryLevel1 } from '../entities/category-level1.entity';
+import {
+	CategoryLevel1,
+	CategoryMysql,
+} from '../entities/category-level1.entity';
 import { CategoryLevel2 } from '../entities/category-level2.entity';
 import { CategoryLevel3 } from '../entities/category-level3.entity';
 
@@ -31,6 +37,8 @@ export class CategoriesService {
 		private readonly categoryLevel2Model: PaginateModel<CategoryLevel2>,
 		@InjectModel(CategoryLevel3.name)
 		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3>,
+		@InjectRepository(CategoryMysql)
+		private readonly categoryRepository: Repository<CategoryMysql>,
 	) {}
 
 	async findAll({
@@ -130,6 +138,22 @@ export class CategoriesService {
 		}
 	}
 
+	async findOne({ name }: FiltersCategoryInput) {
+		const categoryLevel1 = await this.categoryLevel1Model.findOne({ name });
+
+		if (categoryLevel1) {
+			return { level: 1, data: categoryLevel1 };
+		}
+
+		const categoryLevel2 = await this.categoryLevel2Model.findOne({ name });
+		if (categoryLevel2) {
+			return { level: 2, data: categoryLevel2 };
+		}
+		const categoryLevel3 = await this.categoryLevel3Model.findOne({ name });
+
+		return { level: 3, data: categoryLevel3 };
+	}
+
 	async findById(_id: string, level: number) {
 		switch (level) {
 			case 1:
@@ -141,6 +165,15 @@ export class CategoriesService {
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * @deprecated uso para migracion
+	 * @param id
+	 * @returns
+	 */
+	async getByIdMysql(id: number) {
+		return this.categoryRepository.findOne({ id });
 	}
 
 	async create(

@@ -14,6 +14,7 @@ import {
 import { UserMysql } from 'src/configurations/entities/user.entity';
 import { ShopMysql } from 'src/configurations/entities/shop.entity';
 import { WarehouseMysql } from 'src/configurations/entities/warehouse.entity';
+import { CategoryMysql } from 'src/products/entities/category-level1.entity';
 
 @Global()
 @Module({
@@ -57,6 +58,7 @@ import { WarehouseMysql } from 'src/configurations/entities/warehouse.entity';
 						ColorMysql,
 						SizeMysql,
 						WarehouseMysql,
+						CategoryMysql,
 					],
 				};
 			},

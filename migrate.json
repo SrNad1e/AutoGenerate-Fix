@@ -708,7 +708,7 @@
 	//MIGRAR LAS BODEGAS EJECUTA LA MIGRACION /shops/migrateWarehouses
 	//ELIMINAR LA COLECCION DE SHOPS
 	//MIGRAR LAS TIENDAS EJECUTA LA MIGRACION /shops/migrateShops
-	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y asginar esa bodega como bodega principal isMain
+	//ASIGNAR LA BODEGA PRINCIPAL A TODAS LAS BODEGAS warehouseMain y ASIGNAR LA BODEGA DE CENTRO DE DISTRIBUCION isMain
 	//CREAR USUARIO ADMIN, SE DEBE OBTENER EL ROL CREADO
 	"defaultUser": {
 		"name": "Administrador del Sistema",
@@ -725,7 +725,7 @@
 	},
 	//MIGRAR COLORES /products/migrate/colors
 	//MIGRAR TALLAS /products/migrate/sizes
-	//PENDIENTE MIGRACION DE CATEGORIAS
+	//SE CREAN MANUALMENTE TODAS LAS CATEGORÍAS
 	//ELIMINAR LA COLECCION PRODUCTOS
 	//MIGRAR PRODUCTOS /products/migrate
 	//CREAR LOS TIPOS DE DOCUMENTO
@@ -742,8 +742,7 @@
 	//CREAR LOS TIPOS DE CLIENTE
 	"customerTypes": [
 		{
-			"name": "Cliente",
-			"discount": 0,
+			"name": "Detal",
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -751,7 +750,6 @@
 		},
 		{
 			"name": "Mayorista",
-			"discount": 0,
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -759,7 +757,6 @@
 		},
 		{
 			"name": "Distribuidor",
-			"discount": 0,
 			"user": {
 				"name": "Administrador del Sistema",
 				"username": "admin"
@@ -767,12 +764,55 @@
 		}
 	],
 	//AGREGAR EL TIPO DE CLIENTE A LOS CLIENTES ACTUALES
-	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES
+	//AGREGAR TIPO DE DOCUMENTO A LOS CLIENTES ACTUALES 1 DETAL, 2 MAYORISTA, 3 DISTRIBUIDOR
 	//ELIMINAR EL INDEX DE IDENTIFICATION
 	//ACTUALIZAR CAMPO IDENTIFICATION db.customers.update({}, {$rename:{"identification":"document"}}, false, true);
 	//CREAR LAS AUTORIZACIONES DE FACTURACION
+	"authorizationDian": [
+		{
+			"prefix": "C01",
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	],
 	//CREAR LAS CAJAS Y ASIGNARSELAS AL PUNTO DE VENTA
+	"boxes": [
+		{
+			"name": "General",
+			"base": 0,
+			"company": "sacarla de la base de datos",
+			"isMain": true,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		},
+		{
+			"name": "C01",
+			"base": 0,
+			"company": "sacarla de la base de datos",
+			"isMain": false,
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	],
 	//CREAR LOS PUNTOS DE VENTA
+	"pointOfSales":[
+		{
+			"name": "Caja 01",
+			"shop": "Sacar de base da datos",
+			"authorization": "Sacar de la base de datos",
+			"box": "Sacar de la base de datos",
+			"user": {
+				"name": "Administrador del Sistema",
+				"username": "admin"
+			}
+		}
+	]
 	//ASIGANR EL PUNTO DE VENTA A LOS USUARIOS
 	//CREAR EL CLIENT POR DEFECTO
 	"customers": [
@@ -846,8 +886,7 @@
 		}
 	]
 	//ELIMINAR INDEX CODE EN ORDERS
-	//AGREGAR CAMPO ACTIVE EN LAS FACTURAS
-	//AGREGAR AUTORIZACION A LAS FACTURAS
-	//CAMBIAR EL IDENTIFICATION CON DOCUMENT db.invoices.update({}, {$rename:{"customer.identification":"customer.document"}}, false, true);
-	//AGREGA EL TIPO DE DOCUMENTO
+	//ELIMINAR LAS FACTURAS
+	//CAMBIAR EL IDENTIFICATION CON DOCUMENT db.orders.update({}, {$rename:{"customer.identification":"customer.document"}}, false, true);
+	//AGREGA EL TIPO DE DOCUMENTO db.orders.updateMany({},{$set:{"customer.documentType": ObjectId("629fbad9e4251f089ecd2751")}})
 }
