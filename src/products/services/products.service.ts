@@ -488,25 +488,33 @@ export class ProductsService {
 					for (let i = 0; i < imagesMysql?.length; i++) {
 						const { imageSizes, alt } = imagesMysql[i];
 						const { webp, jpg } = imageSizes;
-						const newImage = new this.imageModel({
-							name: alt,
-							user: userDefault,
-							urls: {
-								webp: {
-									small: webp?.S150x217.split('/')[7],
-									medium: webp?.S200x289.split('/')[7],
-									big: webp?.S900x1300.split('/')[7],
-								},
-								jpeg: {
-									small: jpg?.S150x217.split('/')[7],
-									medium: jpg?.S200x289.split('/')[7],
-									big: jpg?.S900x1300.split('/')[7],
-								},
-								original: jpg?.S400x578.split('/')[7],
-							},
+
+						const image = await this.imageModel.findOne({
+							'urls.original': jpg?.S400x578.split('/')[7],
 						});
-						const { _id } = await newImage.save();
-						images.push(_id);
+						if (!image) {
+							const newImage = new this.imageModel({
+								name: alt,
+								user: userDefault,
+								urls: {
+									webp: {
+										small: webp?.S150x217.split('/')[7],
+										medium: webp?.S200x289.split('/')[7],
+										big: webp?.S900x1300.split('/')[7],
+									},
+									jpeg: {
+										small: jpg?.S150x217.split('/')[7],
+										medium: jpg?.S200x289.split('/')[7],
+										big: jpg?.S900x1300.split('/')[7],
+									},
+									original: jpg?.S400x578.split('/')[7],
+								},
+							});
+							const { _id } = await newImage.save();
+							images.push(_id);
+						} else {
+							images.push(image._id);
+						}
 					}
 				}
 
