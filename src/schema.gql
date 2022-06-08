@@ -1319,6 +1319,11 @@ type DocumentType {
   user: User!
 }
 
+enum DocumentTypesRuler {
+  CATEGORIES
+  CUSTOMERTYPES
+}
+
 """Egreso de dinero"""
 type Expense {
   """Identificador de mongo"""
@@ -4127,6 +4132,18 @@ type Role {
 
   """Usuario que creó o modificó el rol"""
   user: User!
+}
+
+"""Reglas para el descuento"""
+type Rule {
+  """Identificador de los documentos"""
+  documentIds: [String!]!
+
+  """Tipo de documento para validar el descuento"""
+  documentType: DocumentTypesRuler!
+
+  """Tipo de regla que deben cumplir los documentos"""
+  type: [String!]!
 }
 
 """Datos de medidas para el envío de los productos"""
