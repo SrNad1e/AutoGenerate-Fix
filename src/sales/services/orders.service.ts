@@ -227,9 +227,7 @@ export class OrdersService {
 			) {
 				const newDetails = order.details.map((detail) => ({
 					...detail,
-					discount:
-						(customer?.customerType['discount'] / 100) *
-						detail?.product?.reference['price'],
+					discount: 0,
 					updatedAt: new Date(),
 				}));
 
@@ -604,7 +602,7 @@ export class OrdersService {
 					...newDetails[index],
 					product,
 					quantity,
-					discount: (customerType.discount / 100) * product?.reference['price'],
+					discount:0,
 					updatedAt: new Date(),
 				};
 			}
