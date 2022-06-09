@@ -22,6 +22,11 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { Coupon, CouponSchema } from './entities/coupon.entity';
 import { CouponsService } from './services/coupons.service';
 import { CouponsResolver } from './resolvers/coupons.resolver';
+import {
+	DiscountRuler,
+	DiscountRulerSchema,
+} from './entities/discountRuler.entity';
+import { DiscountRulersService } from './services/discount-rulers.service';
 
 @Module({
 	imports: [
@@ -64,6 +69,10 @@ import { CouponsResolver } from './resolvers/coupons.resolver';
 				name: DocumentType.name,
 				schema: DocumentTypeSchema,
 			},
+			{
+				name: DiscountRuler.name,
+				schema: DiscountRulerSchema,
+			},
 		]),
 	],
 	providers: [
@@ -76,7 +85,13 @@ import { CouponsResolver } from './resolvers/coupons.resolver';
 		CitiesService,
 		CouponsService,
 		CouponsResolver,
+		DiscountRulersService,
 	],
-	exports: [CustomersService, CustomerTypeService, CouponsService],
+	exports: [
+		CustomersService,
+		CustomerTypeService,
+		CouponsService,
+		DiscountRulersService,
+	],
 })
 export class CrmModule {}
