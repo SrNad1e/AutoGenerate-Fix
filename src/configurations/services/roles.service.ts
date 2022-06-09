@@ -86,13 +86,19 @@ export class RolesService {
 			permissions.push(permission?._id);
 		}
 
-		return this.roleModel.create({
-			active,
-			changeWarehouse,
-			permissions,
-			name,
-			user,
-		});
+		return this.roleModel.create(
+			{
+				active,
+				changeWarehouse,
+				permissions,
+				name,
+				user,
+			},
+			{
+				populate,
+				lean: true,
+			},
+		);
 	}
 
 	async update(
