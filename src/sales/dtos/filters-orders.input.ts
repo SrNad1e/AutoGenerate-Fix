@@ -64,4 +64,7 @@ export class FiltersOrdersInput {
 
 	@Field({ description: 'Desde donde arranca la página', nullable: true })
 	page?: number;
+
+	@Field({ description: 'Trae los pedidos POS solamente', nullable: true })
+	orderPOS?: boolean;
 }

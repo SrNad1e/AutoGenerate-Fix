@@ -7,7 +7,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
-import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
@@ -25,7 +24,6 @@ import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
-import { Product } from 'src/products/entities/product.entity';
 
 const populate = [
 	{
@@ -65,6 +63,7 @@ export class OrdersService {
 			dateInitial,
 			document,
 			number,
+			orderPOS,
 			sort,
 			limit = 10,
 			page = 1,
@@ -79,6 +78,10 @@ export class OrdersService {
 
 		if (status) {
 			filters.status = status;
+		}
+
+		if (orderPOS !== undefined) {
+			filters.orderPOS = orderPOS;
 		}
 
 		if (dateInitial) {
@@ -185,14 +188,15 @@ export class OrdersService {
 		}
 
 		const address =
-			user?.customer['addresses'].length > 0
-				? user?.customer['addresses'].find((address) => address?.isMain)
+			user?.customer['addresses']?.length > 0
+				? user?.customer['addresses']?.find((address) => address?.isMain)
 				: undefined;
 
 		return this.orderModel.create({
 			customer: user.customer,
 			address,
 			shop,
+			orderPos: false,
 			user,
 			number,
 			status,
@@ -232,10 +236,12 @@ export class OrdersService {
 				for (let i = 0; i < order?.details?.length; i++) {
 					const detail = order?.details[i];
 
-					const discount = await this.discountRulesService.getDiscountProduct({
-						customerId: customer._id.toString(),
-						product: detail?.product as Product,
-					});
+					const discount = await this.discountRulesService.getDiscountReference(
+						{
+							customerId: customer._id.toString(),
+							reference: detail?.product?.reference as any,
+						},
+					);
 
 					newDetails.push({
 						...detail,
@@ -649,9 +655,9 @@ export class OrdersService {
 					);
 				}
 
-				const discount = await this.discountRulesService.getDiscountProduct({
+				const discount = await this.discountRulesService.getDiscountReference({
 					customerId: order?.customer?._id.toString(),
-					product: product as Product,
+					reference: product?.reference as any,
 				});
 
 				newDetails.push({

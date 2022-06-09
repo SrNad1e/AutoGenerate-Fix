@@ -17,7 +17,7 @@ export class DiscountRulersService {
 		private readonly customersService: CustomersService,
 	) {}
 
-	async getDiscountProduct({ customerId, product }: FindDiscountInput) {
+	async getDiscountReference({ customerId, reference }: FindDiscountInput) {
 		const discountRulers = await this.discountRuler.find({
 			dateInitial: {
 				$gt: new Date(),
@@ -51,13 +51,13 @@ export class DiscountRulersService {
 								if (
 									!(
 										documentIds.includes(
-											product?.reference['categoryLevel1']?.toString(),
+											reference?.categoryLevel1?._id?.toString(),
 										) ||
 										documentIds.includes(
-											product?.reference['categoryLevel2']?.toString(),
+											reference?.categoryLevel2?._id?.toString(),
 										) ||
 										documentIds.includes(
-											product?.reference['categoryLevel3']?.toString(),
+											reference?.categoryLevel3?._id.toString(),
 										)
 									)
 								) {
@@ -78,7 +78,7 @@ export class DiscountRulersService {
 						}
 
 						if (percent > 0) {
-							return (percent * product?.reference['price']) / 100;
+							return (percent * reference.price) / 100;
 						}
 					}
 				}

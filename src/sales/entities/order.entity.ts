@@ -108,6 +108,13 @@ export class Order extends Document {
 	})
 	shop: Shop;
 
+	@Field(() => Boolean, { description: 'Pedido de POS' })
+	@Prop({
+		type: Boolean,
+		default: true,
+	})
+	orderPos: boolean;
+
 	@Field(() => [PaymentOrder], {
 		description: 'Métodos de pago usados en el pedido',
 		nullable: true,
