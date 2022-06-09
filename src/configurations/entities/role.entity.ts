@@ -15,11 +15,11 @@ export class Role {
 	@Prop({ type: String, unique: true })
 	name: string;
 
-	@Field(() => [String], {
-		description: 'Identificadores de permisos al los quie tiene el rol',
+	@Field(() => [Permission], {
+		description: 'Permisos al los quie tiene el rol',
 	})
-	@Prop({ type: [String], ref: Permission.name })
-	permissionsId: string[];
+	@Prop({ type: [Types.ObjectId], ref: Permission.name })
+	permissions: Types.ObjectId[];
 
 	@Field({ description: 'Permite hacer consultas con otra bodega' })
 	@Prop({ type: Boolean, default: false })
