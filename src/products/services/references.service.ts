@@ -26,6 +26,7 @@ import { SizesService } from './sizes.service';
 import { AttribsService } from './attribs.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -49,6 +50,7 @@ export class ReferencesService {
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
 		private readonly attribsService: AttribsService,
+		private readonly discountRulesService: DiscountRulersService,
 	) {}
 
 	async findAll(
@@ -62,10 +64,10 @@ export class ReferencesService {
 			price,
 			active,
 			changeable,
+			customerId,
 		}: FiltersReferencesInput,
 		products: boolean,
-		companyId?: string,
-		user?: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<Reference> = {};
 
@@ -95,7 +97,7 @@ export class ReferencesService {
 			};
 		}
 
-		if (user?.username !== 'admin' || companyId) {
+		if (companyId) {
 			filters.companies = {
 				$elemMatch: { $eq: new Types.ObjectId(companyId) },
 			};
@@ -112,7 +114,6 @@ export class ReferencesService {
 		const references = await this.referenceModel.paginate(filters, options);
 		let responseReferences = [];
 
-		//TODO: falta agregar precio de descuento
 		if (products) {
 			for (let i = 0; i < references?.docs?.length; i++) {
 				const reference = references?.docs[i];
@@ -135,10 +136,17 @@ export class ReferencesService {
 							model: Image.name,
 						},
 					]);
-
+				let discount = 0;
+				if (customerId) {
+					discount = await this.discountRulesService.getDiscountReference({
+						customerId,
+						reference: reference,
+					});
+				}
 				responseReferences.push({
 					...reference,
 					products,
+					discountPrice: reference?.price - discount,
 				});
 			}
 		} else {

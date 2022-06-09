@@ -39,10 +39,12 @@ import { ConfigurationsModule } from 'src/configurations/configurations.module';
 import { CategoriesService } from './services/categories.service';
 import { Image, ImageSchema } from 'src/configurations/entities/image.entity';
 import { CategoriesResolver } from './resolvers/categories.resolver';
+import { CrmModule } from 'src/crm/crm.module';
 
 @Module({
 	imports: [
 		ConfigurationsModule,
+		CrmModule,
 		MongooseModule.forFeature([
 			{ name: Color.name, schema: ColorSchema },
 			{ name: Image.name, schema: ImageSchema },

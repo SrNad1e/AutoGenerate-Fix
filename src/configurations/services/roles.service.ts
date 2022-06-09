@@ -83,7 +83,7 @@ export class RolesService {
 					'Uno de los permisos a asignar no existe',
 				);
 			}
-			permissions.push(permission?._id);
+			permissions.push(permission?._id?.toString());
 		}
 
 		return this.roleModel.create({
@@ -125,7 +125,7 @@ export class RolesService {
 					'Uno de los permisos a asignar no existe',
 				);
 			}
-			permissions.push(permission?._id);
+			permissions.push(permission?._id?.toString());
 		}
 
 		return this.roleModel.findByIdAndUpdate(

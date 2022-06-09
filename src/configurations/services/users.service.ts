@@ -21,16 +21,22 @@ import { CompaniesService } from 'src/configurations/services/companies.service'
 import { RolesService } from './roles.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { FiltersUserInput } from '../dtos/filters-user.input';
-import { Customer } from 'src/crm/entities/customer.entity';
 import { Shop } from '../entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
+import { CustomerType } from 'src/crm/entities/customerType.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
 	{ path: 'companies', model: Company.name },
-	{ path: 'customer', model: Customer.name },
+	{
+		path: 'customer',
+		populate: {
+			path: 'customerType',
+			model: CustomerType.name,
+		},
+	},
 	{
 		path: 'shop',
 		populate: {

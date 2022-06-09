@@ -52,7 +52,7 @@ export class User extends Document {
 	shop: Types.ObjectId;
 
 	@Field(() => Customer, { description: 'Cliente asignado', nullable: true })
-	@Prop({ type: Types.ObjectId })
+	@Prop({ type: Types.ObjectId, ref: Customer.name })
 	customer: Types.ObjectId;
 
 	@Prop({
