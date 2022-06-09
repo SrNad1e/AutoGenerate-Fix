@@ -245,7 +245,7 @@ export class OrdersService {
 					});
 				}
 
-				const subtotal = newDetails.reduce(
+				const total = newDetails.reduce(
 					(sum, detail) => sum + detail.price * detail.quantity,
 					0,
 				);
@@ -255,7 +255,7 @@ export class OrdersService {
 					0,
 				);
 
-				const total = subtotal - discount;
+				const subtotal = total + discount;
 
 				const tax = 0;
 
@@ -700,7 +700,7 @@ export class OrdersService {
 			companyId,
 		);
 
-		const subtotal = newDetails.reduce(
+		const total = newDetails.reduce(
 			(sum, detail) => sum + detail.price * detail.quantity,
 			0,
 		);
@@ -710,7 +710,7 @@ export class OrdersService {
 			0,
 		);
 
-		const total = subtotal - discount;
+		const subtotal = total + discount;
 
 		const tax = 0;
 
