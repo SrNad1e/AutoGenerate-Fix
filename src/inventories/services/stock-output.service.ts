@@ -95,8 +95,8 @@ export class StockOutputService {
 			filters.number = number;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusStockOutput[status]) {
+			filters.status = StatusStockOutput[status];
 		}
 
 		if (warehouseId) {
@@ -150,7 +150,7 @@ export class StockOutputService {
 	}
 
 	async create(
-		{ details, warehouseId, ...options }: CreateStockOutputInput,
+		{ details, warehouseId, status, ...options }: CreateStockOutputInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -158,8 +158,8 @@ export class StockOutputService {
 			throw new BadRequestException('La salida no puede estar vacía');
 		}
 
-		if (options.status) {
-			if (options.status === StatusStockOutput.CANCELLED) {
+		if (StatusStockOutput[status]) {
+			if (StatusStockOutput[status] === StatusStockOutput.CANCELLED) {
 				throw new BadRequestException(
 					'La salida no puede ser creada, valide el estado de la salida',
 				);
@@ -214,20 +214,21 @@ export class StockOutputService {
 			.sort({ _id: -1 });
 
 		const newStockInput = new this.stockOutputModel({
+			...options,
 			warehouse,
 			details: detailsInput,
 			total,
 			user,
+			status: StatusStockOutput[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
 			number: (stockOutput?.number || 0) + 1,
-			...options,
 		});
 
 		const response = await (await newStockInput.save()).populate(populate);
 
-		if (options.status === StatusStockOutput.CONFIRMED) {
+		if (StatusStockOutput[status] === StatusStockOutput.CONFIRMED) {
 			const detailHistory = response.details.map((detail) => ({
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
@@ -250,7 +251,7 @@ export class StockOutputService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockOutputInput,
+		{ details, status, ...options }: UpdateStockOutputInput,
 		user: User,
 		companyId: string,
 	) {
@@ -265,7 +266,7 @@ export class StockOutputService {
 			);
 		}
 
-		if (options.status) {
+		if (StatusStockOutput[status]) {
 			if (!stockOutput) {
 				throw new BadRequestException('La salida no existe');
 			}
@@ -278,7 +279,7 @@ export class StockOutputService {
 				throw new BadRequestException('La salida se encuentra confirmada');
 			}
 
-			if (options.status === stockOutput.status) {
+			if (StatusStockOutput[status] === stockOutput.status) {
 				throw new BadRequestException(
 					'El estado de la salida debe cambiar o enviarse vacío',
 				);
@@ -287,7 +288,10 @@ export class StockOutputService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === ActionDetailOutput.DELETE)
+				.filter(
+					(detail) =>
+						ActionDetailOutput[detail.action] === ActionDetailOutput.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockOutput.details
@@ -328,7 +332,7 @@ export class StockOutputService {
 					);
 				}
 
-				if (action === ActionDetailOutput.CREATE) {
+				if (ActionDetailOutput[action] === ActionDetailOutput.CREATE) {
 					if (quantity <= 0) {
 						throw new BadRequestException('Los productos no pueden estar en 0');
 					}
@@ -359,7 +363,13 @@ export class StockOutputService {
 			const response = await this.stockOutputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, total, ...options, user },
+					$set: {
+						...options,
+						details: newDetails,
+						total,
+						status: StatusStockOutput[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -368,7 +378,7 @@ export class StockOutputService {
 				},
 			);
 
-			if (options.status === StatusStockOutput.CONFIRMED) {
+			if (StatusStockOutput[status] === StatusStockOutput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -392,7 +402,7 @@ export class StockOutputService {
 			const response = await this.stockOutputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockOutput[status], user },
 				},
 				{
 					new: true,
@@ -401,7 +411,7 @@ export class StockOutputService {
 				},
 			);
 
-			if (options.status === StatusStockOutput.CONFIRMED) {
+			if (StatusStockOutput[status] === StatusStockOutput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
