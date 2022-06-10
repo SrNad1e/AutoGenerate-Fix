@@ -20,7 +20,10 @@ import {
 } from '../dtos/create-stockHistory-input';
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
 import { FiltersStockTransfersInput } from '../dtos/filters-stockTransfers.input';
-import { UpdateStockTransferInput } from '../dtos/update-stockTransfer-input';
+import {
+	ActionDetailTransfer,
+	UpdateStockTransferInput,
+} from '../dtos/update-stockTransfer-input';
 import {
 	StatusStockRequest,
 	StockRequest,
@@ -103,8 +106,8 @@ export class StockTransferService {
 				filters.number = number;
 			}
 
-			if (status) {
-				filters.status = status;
+			if (StatusStockTransfer[status]) {
+				filters.status = StatusStockTransfer[status];
 			}
 
 			if (warehouseDestinationId) {
@@ -178,18 +181,19 @@ export class StockTransferService {
 			warehouseOriginId,
 			details,
 			requests,
+			status,
 			...options
 		}: CreateStockTransferInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
-		if (options.status) {
+		if (StatusStockTransfer[status]) {
 			if (
 				[
 					StatusStockTransfer.CANCELLED,
 					StatusStockTransfer.CONFIRMED,
 					StatusStockTransfer.INCOMPLETE,
-				].includes(options.status)
+				].includes(StatusStockTransfer[status])
 			) {
 				throw new BadRequestException(
 					'El traslado no puede ser creado, valide el estado del traslado',
@@ -256,6 +260,8 @@ export class StockTransferService {
 			.sort({ _id: -1 });
 
 		const newStockTransfer = new this.stockTransferModel({
+			...options,
+			status: StatusStockTransfer[status],
 			warehouseOrigin,
 			warehouseDestination,
 			details: detailsTransfer,
@@ -266,12 +272,11 @@ export class StockTransferService {
 			number: (stockTransfer?.number || 0) + 1,
 			requests,
 			user,
-			...options,
 		});
 
 		const response = await newStockTransfer.save();
 
-		if (options.status === StatusStockTransfer.SENT) {
+		if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
 			await this.stockRequestService.updateMany({
 				requests,
 				status: StatusStockRequest.USED,
@@ -303,6 +308,7 @@ export class StockTransferService {
 			details,
 			requests,
 			observationOrigin,
+			status,
 			...options
 		}: UpdateStockTransferInput,
 		user: Partial<User>,
@@ -323,12 +329,12 @@ export class StockTransferService {
 			);
 		}
 
-		if (options.status) {
+		if (StatusStockTransfer[status]) {
 			switch (stockTransfer.status) {
 				case StatusStockTransfer.OPEN:
 					if (
 						![StatusStockTransfer.SENT, StatusStockTransfer.CANCELLED].includes(
-							options.status,
+							StatusStockTransfer[status],
 						)
 					) {
 						throw new BadRequestException('El traslado se encuentra abierto');
@@ -337,7 +343,7 @@ export class StockTransferService {
 				case StatusStockTransfer.SENT:
 					if (
 						[StatusStockTransfer.OPEN, StatusStockTransfer.CANCELLED].includes(
-							options.status,
+							StatusStockTransfer[status],
 						)
 					) {
 						throw new BadRequestException(
@@ -356,14 +362,17 @@ export class StockTransferService {
 				default:
 					throw new BadRequestException('El estado es incorrecto');
 			}
-			if (options.status === stockTransfer.status) {
+			if (StatusStockTransfer[status] === stockTransfer.status) {
 				throw new BadRequestException(
 					'El estado del traslado debe cambiar o enviarse vacío',
 				);
 			}
 		}
 
-		if (stockTransfer.status !== StatusStockTransfer.OPEN && !options.status) {
+		if (
+			stockTransfer.status !== StatusStockTransfer.OPEN &&
+			!StatusStockTransfer[status]
+		) {
 			throw new BadRequestException('Debe enviar un cambio de estado');
 		}
 
@@ -382,7 +391,10 @@ export class StockTransferService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === 'delete')
+				.filter(
+					(detail) =>
+						ActionDetailTransfer[detail.action] === ActionDetailTransfer.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockTransfer.details.filter(
@@ -392,7 +404,7 @@ export class StockTransferService {
 			for (let i = 0; i < details.length; i++) {
 				const { action, productId, quantity } = details[i];
 
-				if (action === 'create') {
+				if (ActionDetailTransfer[action] === ActionDetailTransfer.CREATE) {
 					const productFind = stockTransfer.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);
@@ -414,7 +426,7 @@ export class StockTransferService {
 					});
 				}
 
-				if (action === 'update') {
+				if (ActionDetailTransfer[action] === ActionDetailTransfer.UPDATE) {
 					const indexFind = newDetails.findIndex(
 						(item) => item.product?._id.toString() === productId,
 					);
@@ -435,10 +447,11 @@ export class StockTransferService {
 				id,
 				{
 					$set: {
+						...options,
+						status: StatusStockTransfer[status],
 						details: newDetails,
 						requests: requests?.map((request) => new Types.ObjectId(request)),
 						observationOrigin,
-						...options,
 						user,
 					},
 				},
@@ -449,7 +462,7 @@ export class StockTransferService {
 				},
 			);
 
-			if (options.status === StatusStockTransfer.SENT) {
+			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
 					status: StatusStockRequest.USED,
@@ -472,7 +485,7 @@ export class StockTransferService {
 				);
 			}
 
-			if (options.status === StatusStockTransfer.CONFIRMED) {
+			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
 				const confirmedProducts = stockTransfer.details.find(
 					(detail) => detail.status === StatusDetailTransfer.NEW,
 				);
@@ -505,7 +518,7 @@ export class StockTransferService {
 			const response = await this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockTransfer[status], user },
 				},
 				{
 					new: true,
@@ -513,7 +526,7 @@ export class StockTransferService {
 					populate,
 				},
 			);
-			if (options.status === StatusStockTransfer.SENT) {
+			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
 					status: StatusStockRequest.USED,
@@ -536,7 +549,7 @@ export class StockTransferService {
 				);
 			}
 
-			if (options.status === StatusStockTransfer.CONFIRMED) {
+			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
