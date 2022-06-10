@@ -99,8 +99,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusProduct[status]) {
+			filters.status = StatusProduct[status];
 		}
 
 		if (name) {
@@ -346,14 +346,19 @@ export class ProductsService {
 			}
 		}
 
+		let newStatus;
+		if (StatusProduct[status]) {
+			newStatus = StatusProduct[status];
+		}
+
 		return this.productModel.findByIdAndUpdate(
 			id,
 			{
 				$set: {
 					color: color?._id,
 					size: size?._id,
-					status,
 					barcode,
+					status: newStatus,
 					images: imagesId?.map((item) => new Types.ObjectId(item)) || [],
 					user,
 				},
@@ -705,8 +710,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusProduct[status]) {
+			filters.status = StatusProduct[status];
 		}
 
 		const response = await this.referencesService.getReferences({ name });
