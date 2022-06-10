@@ -374,6 +374,24 @@ export class OrdersService {
 			);
 		}
 
+		if (status === 'open') {
+			const details = order.details.map((detail) => ({
+				productId: detail?.product?._id.toString(),
+				quantity: detail?.quantity,
+			}));
+
+			await this.stockHistoryService.deleteStock(
+				{
+					details,
+					documentId: orderId,
+					documentType: 'order',
+					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+				},
+				user,
+				companyId,
+			);
+		}
+
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
@@ -684,27 +702,29 @@ export class OrdersService {
 			productsCreate.push(product);
 		}
 
-		await this.stockHistoryService.addStock(
-			{
-				details: productsDelete,
-				documentId: orderId,
-				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-			},
-			user,
-			companyId,
-		);
+		if (order?.status === 'open') {
+			await this.stockHistoryService.addStock(
+				{
+					details: productsDelete,
+					documentId: orderId,
+					documentType: 'order',
+					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+				},
+				user,
+				companyId,
+			);
 
-		await this.stockHistoryService.deleteStock(
-			{
-				details: productsCreate,
-				documentId: orderId,
-				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-			},
-			user,
-			companyId,
-		);
+			await this.stockHistoryService.deleteStock(
+				{
+					details: productsCreate,
+					documentId: orderId,
+					documentType: 'order',
+					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+				},
+				user,
+				companyId,
+			);
+		}
 
 		const total = newDetails.reduce(
 			(sum, detail) => sum + detail.price * detail.quantity,
