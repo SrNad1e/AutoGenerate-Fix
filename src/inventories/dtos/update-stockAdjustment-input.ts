@@ -14,10 +14,10 @@ export class DetailStockAdjustmentInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
 	productId: string;
 
-	@Field(() => String, {
+	@Field(() => ActionDetailAdjustment, {
 		description: 'Acción a efectuar con el producto',
 	})
-	action: string;
+	action: ActionDetailAdjustment;
 
 	@Field(() => Number, { description: 'Cantidad de productos' })
 	quantity: number;

@@ -349,6 +349,7 @@ export class StockRequestService {
 					{ new: true, lean: true },
 				);
 			}
+
 			if (details && details.length > 0) {
 				const productsDelete = details
 					.filter(
@@ -440,7 +441,12 @@ export class StockRequestService {
 				return this.stockRequestModel.findByIdAndUpdate(
 					id,
 					{
-						$set: { details: newDetails, ...options, user },
+						$set: {
+							details: newDetails,
+							...options,
+							status: StatusStockRequest[status],
+							user,
+						},
 					},
 					{
 						new: true,
@@ -452,7 +458,7 @@ export class StockRequestService {
 				return this.stockRequestModel.findByIdAndUpdate(
 					id,
 					{
-						$set: { ...options, user },
+						$set: { ...options, status: StatusStockRequest[status], user },
 					},
 					{
 						new: true,

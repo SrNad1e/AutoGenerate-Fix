@@ -2,6 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+enum ActionDetailAdjustment {
+  CREATE
+  DELETE
+  UPDATE
+}
+
 enum ActionDetailInput {
   CREATE
   DELETE
@@ -1217,7 +1223,7 @@ input DetailStockAdjustmentCreateInput {
 """Detalle del ajuste de productos"""
 input DetailStockAdjustmentInput {
   """Acción a efectuar con el producto"""
-  action: String!
+  action: ActionDetailAdjustment!
 
   """Identificador de mongo del producto"""
   productId: String!
