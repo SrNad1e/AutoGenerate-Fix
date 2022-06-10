@@ -14,11 +14,18 @@ import { ProductsService } from 'src/products/services/products.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateStockRequestInput } from '../dtos/create-stockRequest-input';
 import { FiltersStockRequestsInput } from '../dtos/filters-stockRequests.input';
-import { UpdateStockRequestInput } from '../dtos/update-stockRequest-input';
-import { StockRequest } from '../entities/stock-request.entity';
+import {
+	ActionDetailRequest,
+	UpdateStockRequestInput,
+} from '../dtos/update-stockRequest-input';
+import {
+	StatusStockRequest,
+	StockRequest,
+} from '../entities/stock-request.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { StatusProduct } from 'src/products/entities/product.entity';
 
 const populate = {
 	path: 'details',
@@ -141,7 +148,7 @@ export class StockRequestService {
 		status,
 	}: {
 		requests: string[];
-		status: string[];
+		status: StatusStockRequest[];
 	}) {
 		return this.stockRequestModel.find({
 			_id: { $in: requests },
@@ -179,12 +186,11 @@ export class StockRequestService {
 		}
 
 		if (options.status) {
-			if (!['open', 'cancelled', 'used', 'pending'].includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-			if (['cancelled', 'used'].includes(options.status)) {
+			if (
+				[StatusStockRequest.CANCELLED, StatusStockRequest.USED].includes(
+					options.status,
+				)
+			) {
 				throw new BadRequestException(
 					'La solicitud no puede ser creada, valide el estado de la solicitud',
 				);
@@ -229,7 +235,7 @@ export class StockRequestService {
 				throw new BadRequestException('Uno de los productos no existe');
 			}
 
-			if (product?.status !== 'active') {
+			if (product?.status !== StatusProduct.ACTIVE) {
 				throw new BadRequestException(
 					`El producto ${product?.barcode} no se encuentra activo`,
 				);
@@ -285,42 +291,41 @@ export class StockRequestService {
 
 			if (options.status) {
 				switch (stockRequest.status) {
-					case 'open':
-						if (options.status === 'used') {
+					case StatusStockRequest.OPEN:
+						if (options.status === StatusStockRequest.USED) {
 							throw new BadRequestException(
 								'La solicitud se encuentra abierta y no puede ser usada',
 							);
 						}
 						break;
-					case 'pending':
-						if (options.status === 'open') {
+					case StatusStockRequest.PENDING:
+						if (options.status === StatusStockRequest.OPEN) {
 							throw new BadRequestException(
 								'La solicitud se encuentra pendiente y no se puede abrir',
 							);
 						}
 						break;
-					case 'used':
-						if (options.status === 'open') {
+					case StatusStockRequest.USED:
+						if (options.status === StatusStockRequest.OPEN) {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede abrir',
 							);
 						}
-						if (options.status === 'pending') {
+						if (options.status === StatusStockRequest.PENDING) {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede enviar',
 							);
 						}
-						if (options.status === 'cancelled') {
+						if (options.status === StatusStockRequest.CANCELLED) {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede cancelar',
 							);
 						}
 						break;
-					case 'cancelled':
+					case StatusStockRequest.CANCELLED:
 						throw new BadRequestException(
 							'La solicitud se encuentra cancelada',
 						);
-						break;
 					default:
 						break;
 				}
@@ -331,7 +336,7 @@ export class StockRequestService {
 				}
 			}
 
-			if (stockRequest.status !== 'open') {
+			if (stockRequest.status !== StatusStockRequest.OPEN) {
 				if (!options.status) {
 					throw new BadRequestException('Debe enviar un cambio de estado');
 				}
@@ -345,7 +350,7 @@ export class StockRequestService {
 			}
 			if (details && details.length > 0) {
 				const productsDelete = details
-					.filter((detail) => detail.action === 'delete')
+					.filter((detail) => detail.action === ActionDetailRequest.DELETE)
 					.map((detail) => detail.productId.toString());
 
 				const newDetails = stockRequest.details.filter(
@@ -355,7 +360,7 @@ export class StockRequestService {
 				for (let i = 0; i < details.length; i++) {
 					const { action, productId, quantity } = details[i];
 
-					if (action === 'create') {
+					if (action === ActionDetailRequest.CREATE) {
 						const productFind = stockRequest.details.find(
 							(item) => item.product._id.toString() === productId.toString(),
 						);
@@ -381,7 +386,7 @@ export class StockRequestService {
 							throw new BadRequestException('Uno de los productos no existe');
 						}
 
-						if (product?.status !== 'active') {
+						if (product?.status !== StatusProduct.ACTIVE) {
 							throw new BadRequestException(
 								`El producto ${product?.barcode} no se encuentra activo`,
 							);
@@ -393,7 +398,7 @@ export class StockRequestService {
 							createdAt: new Date(),
 							updatedAt: new Date(),
 						});
-					} else if (action === 'update') {
+					} else if (action === ActionDetailRequest.UPDATE) {
 						const detailFindIndex = newDetails.findIndex(
 							(item) => item.product._id.toString() === productId.toString(),
 						);
@@ -460,7 +465,7 @@ export class StockRequestService {
 		status,
 	}: {
 		requests: string[];
-		status: string;
+		status: StatusStockRequest;
 	}) {
 		return this.stockRequestModel.updateMany(
 			{ _id: { $in: requests } },
@@ -486,7 +491,7 @@ export class StockRequestService {
 		}
 
 		const products = await this.productsService.getProducts({
-			status: 'active',
+			status: StatusProduct.ACTIVE,
 		});
 
 		const productsRequest = products

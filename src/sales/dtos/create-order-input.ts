@@ -1,10 +1,11 @@
 import { Field, InputType } from '@nestjs/graphql';
 
+import { StatusOrder } from '../entities/order.entity';
+
 @InputType({ description: 'Datos para crear el pedido' })
 export class CreateOrderInput {
-	@Field(() => String, {
-		description:
-			'Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)',
+	@Field(() => StatusOrder, {
+		description: 'Estado del pedido',
 	})
-	status: string;
+	status: StatusOrder;
 }

@@ -10,6 +10,7 @@ import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { User } from 'src/configurations/entities/user.entity';
+import { StatusExpense } from 'src/treasury/entities/expense.entity';
 
 const populate: PopulateOptions[] = [
 	{
@@ -131,7 +132,7 @@ export class ClosesZinvoicingService {
 
 		const expenses = await this.expensessService.findAll(
 			{
-				status: 'active',
+				status: StatusExpense.ACTIVE,
 				limit: 200,
 				boxId: pointOfSaleId,
 				dateInitial,

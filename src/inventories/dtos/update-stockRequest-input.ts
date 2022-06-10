@@ -1,14 +1,23 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { StatusStockRequest } from '../entities/stock-request.entity';
+
+export enum ActionDetailRequest {
+	DELETE = 'delete',
+	UPDATE = 'update',
+	CREATE = 'create',
+}
+
+registerEnumType(ActionDetailRequest, { name: 'ActionDetailRequest' });
 
 @InputType({ description: 'Detalle de la solicitud de productos' })
 export class DetailStockRequestInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
 	productId: string;
 
-	@Field(() => String, {
-		description: 'Acción a efectuar con el producto (delete, update, create)',
+	@Field(() => ActionDetailRequest, {
+		description: 'Acción a efectuar con el producto',
 	})
-	action: string;
+	action: ActionDetailRequest;
 
 	@Field(() => Number, { description: 'Cantidad de productos' })
 	quantity: number;
@@ -22,11 +31,11 @@ export class UpdateStockRequestInput {
 	})
 	details: DetailStockRequestInput[];
 
-	@Field(() => String, {
-		description: 'Estado de la solicitud (open, pending, used, cancelled )',
+	@Field(() => StatusStockRequest, {
+		description: 'Estado de la solicitud',
 		nullable: true,
 	})
-	status: string;
+	status: StatusStockRequest;
 
 	@Field(() => String, {
 		description: 'Observación de la solicitud',

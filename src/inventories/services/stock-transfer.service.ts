@@ -14,12 +14,22 @@ import { ProductsService } from 'src/products/services/products.service';
 import { User } from 'src/configurations/entities/user.entity';
 
 import { ConfirmStockTransferInput } from '../dtos/confirmProducts-stockTransfer.input';
-import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
+import {
+	CreateStockHistoryInput,
+	DocumentTypeStockHistory,
+} from '../dtos/create-stockHistory-input';
 import { CreateStockTransferInput } from '../dtos/create-stockTransfer-input';
 import { FiltersStockTransfersInput } from '../dtos/filters-stockTransfers.input';
 import { UpdateStockTransferInput } from '../dtos/update-stockTransfer-input';
-import { StockRequest } from '../entities/stock-request.entity';
-import { StockTransfer } from '../entities/stock-transfer.entity';
+import {
+	StatusStockRequest,
+	StockRequest,
+} from '../entities/stock-request.entity';
+import {
+	StatusDetailTransfer,
+	StatusStockTransfer,
+	StockTransfer,
+} from '../entities/stock-transfer.entity';
 import { StockHistoryService } from './stock-history.service';
 import { StockRequestService } from './stock-request.service';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
@@ -55,8 +65,6 @@ const populate = [
 	},
 	{ path: 'requests', model: StockRequest.name },
 ];
-
-const statusTypes = ['open', 'cancelled', 'sent', 'confirmed', 'incomplete'];
 
 @Injectable()
 export class StockTransferService {
@@ -176,13 +184,13 @@ export class StockTransferService {
 		companyId: string,
 	) {
 		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
-			if (['cancelled', 'confirmed', 'incomplete'].includes(options.status)) {
+			if (
+				[
+					StatusStockTransfer.CANCELLED,
+					StatusStockTransfer.CONFIRMED,
+					StatusStockTransfer.INCOMPLETE,
+				].includes(options.status)
+			) {
 				throw new BadRequestException(
 					'El traslado no puede ser creado, valide el estado del traslado',
 				);
@@ -195,7 +203,7 @@ export class StockTransferService {
 		if (requests) {
 			const requestOpenOrCancel = await this.stockRequestService.findAllMany({
 				requests,
-				status: ['open', 'cancelled'],
+				status: [StatusStockRequest.OPEN, StatusStockRequest.CANCELLED],
 			});
 
 			if (requestOpenOrCancel.length > 0) {
@@ -237,7 +245,7 @@ export class StockTransferService {
 			detailsTransfer.push({
 				product,
 				quantity,
-				status: 'new',
+				status: StatusDetailTransfer.NEW,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			});
@@ -263,8 +271,11 @@ export class StockTransferService {
 
 		const response = await newStockTransfer.save();
 
-		if (options.status === 'sent') {
-			await this.stockRequestService.updateMany({ requests, status: 'used' });
+		if (options.status === StatusStockTransfer.SENT) {
+			await this.stockRequestService.updateMany({
+				requests,
+				status: StatusStockRequest.USED,
+			});
 			const detailHistory = response.details.map((detail) => ({
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
@@ -274,7 +285,7 @@ export class StockTransferService {
 				details: detailHistory,
 				warehouseId: warehouseOriginId,
 				documentId: response._id.toString(),
-				documentType: 'transfer',
+				documentType: DocumentTypeStockHistory.TRANSFER,
 			};
 			await this.stockHistoryService.deleteStock(
 				deleteStockHistoryInput,
@@ -314,19 +325,30 @@ export class StockTransferService {
 
 		if (options.status) {
 			switch (stockTransfer.status) {
-				case 'open':
-					if (!['sent', 'cancelled'].includes(options.status)) {
+				case StatusStockTransfer.OPEN:
+					if (
+						![StatusStockTransfer.SENT, StatusStockTransfer.CANCELLED].includes(
+							options.status,
+						)
+					) {
 						throw new BadRequestException('El traslado se encuentra abierto');
 					}
 					break;
-				case 'sent':
-					if (['open', 'cancelled'].includes(options.status)) {
+				case StatusStockTransfer.SENT:
+					if (
+						[StatusStockTransfer.OPEN, StatusStockTransfer.CANCELLED].includes(
+							options.status,
+						)
+					) {
 						throw new BadRequestException(
 							'El traslado ya se encuentra enviado',
 						);
 					}
 					break;
-				case 'confirmed' || 'incomplete' || 'verified' || 'cancelled':
+				case StatusStockTransfer.CONFIRMED ||
+					StatusStockTransfer.INCOMPLETE ||
+					StatusStockTransfer.VERIFIED ||
+					StatusStockTransfer.CANCELLED:
 					throw new BadRequestException(
 						'El traslado ya se encuentra finalizado',
 					);
@@ -341,14 +363,14 @@ export class StockTransferService {
 			}
 		}
 
-		if (stockTransfer.status !== 'open' && !options.status) {
+		if (stockTransfer.status !== StatusStockTransfer.OPEN && !options.status) {
 			throw new BadRequestException('Debe enviar un cambio de estado');
 		}
 
 		if (requests) {
 			const requestOpenOrCancel = await this.stockRequestService.findAllMany({
 				requests,
-				status: ['open', 'cancelled'],
+				status: [StatusStockRequest.OPEN, StatusStockRequest.CANCELLED],
 			});
 
 			if (requestOpenOrCancel.length > 0) {
@@ -386,7 +408,7 @@ export class StockTransferService {
 					newDetails.push({
 						product,
 						quantity,
-						status: 'new',
+						status: StatusDetailTransfer.NEW,
 						createdAt: new Date(),
 						updatedAt: new Date(),
 					});
@@ -427,10 +449,10 @@ export class StockTransferService {
 				},
 			);
 
-			if (options.status === 'sent') {
+			if (options.status === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
-					status: 'used',
+					status: StatusStockRequest.USED,
 				});
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
@@ -441,7 +463,7 @@ export class StockTransferService {
 					details: detailHistory,
 					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'transfer',
+					documentType: DocumentTypeStockHistory.TRANSFER,
 				};
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
@@ -450,9 +472,9 @@ export class StockTransferService {
 				);
 			}
 
-			if (options.status === 'confirmed') {
+			if (options.status === StatusStockTransfer.CONFIRMED) {
 				const confirmedProducts = stockTransfer.details.find(
-					(detail) => detail.status === 'new',
+					(detail) => detail.status === StatusDetailTransfer.NEW,
 				);
 				if (confirmedProducts) {
 					throw new BadRequestException(
@@ -469,7 +491,7 @@ export class StockTransferService {
 					details: detailHistory,
 					warehouseId: stockTransfer.warehouseDestination._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'transfer',
+					documentType: DocumentTypeStockHistory.TRANSFER,
 				};
 				await this.stockHistoryService.addStock(
 					deleteStockHistoryInput,
@@ -491,10 +513,10 @@ export class StockTransferService {
 					populate,
 				},
 			);
-			if (options.status === 'sent') {
+			if (options.status === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
-					status: 'used',
+					status: StatusStockRequest.USED,
 				});
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
@@ -505,7 +527,7 @@ export class StockTransferService {
 					details: detailHistory,
 					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'transfer',
+					documentType: DocumentTypeStockHistory.TRANSFER,
 				};
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
@@ -514,7 +536,7 @@ export class StockTransferService {
 				);
 			}
 
-			if (options.status === 'confirmed') {
+			if (options.status === StatusStockTransfer.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -524,7 +546,7 @@ export class StockTransferService {
 					details: detailHistory,
 					warehouseId: stockTransfer.warehouseDestination._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'transfer',
+					documentType: DocumentTypeStockHistory.TRANSFER,
 				};
 				await this.stockHistoryService.addStock(
 					deleteStockHistoryInput,
@@ -549,14 +571,15 @@ export class StockTransferService {
 			throw new BadRequestException('El traslado no existe');
 		}
 
-		if (stockTransfer.status !== 'sent') {
+		if (stockTransfer.status !== StatusStockTransfer.SENT) {
 			throw new BadRequestException('El traslado no se encuentra enviado');
 		}
 
 		const detailsArray = stockTransfer.details
 			.filter(
 				(detail) =>
-					detail.status === 'confirmed' && detail?.quantityConfirmed > 0,
+					detail.status === StatusDetailTransfer.CONFIRMED &&
+					detail?.quantityConfirmed > 0,
 			)
 			.map((detail) => detail.product._id.toString());
 
@@ -589,7 +612,7 @@ export class StockTransferService {
 				if (detail.product._id.toString() === detailConfirm.productId) {
 					return {
 						...detail,
-						status: 'confirmed',
+						status: StatusDetailTransfer.CONFIRMED,
 						quantityConfirmed: detailConfirm.quantity,
 					};
 				}

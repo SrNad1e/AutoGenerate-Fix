@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusUser } from '../entities/user.entity';
 
 @InputType({ description: 'Ordenamiento de los usuarios' })
 export class SortUser {
@@ -36,11 +37,11 @@ export class FiltersUsersInput {
 	})
 	customerTypeId: string;
 
-	@Field(() => String, {
-		description: 'Estado del usuario (active, inactive, suspend)',
+	@Field(() => StatusUser, {
+		description: 'Estado del usuario',
 		nullable: true,
 	})
-	status: string;
+	status: StatusUser;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;

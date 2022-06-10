@@ -12,7 +12,7 @@ import {
 	FiltersProductInput,
 	FiltersProductsInput,
 } from '../dtos/filters-products.input';
-import { Product } from '../entities/product.entity';
+import { Product, StatusProduct } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
@@ -46,8 +46,6 @@ const populate = [
 	{ path: 'reference', model: Reference.name },
 	{ path: 'images', model: Image.name },
 ];
-
-const statusTypes = ['active', 'inactive'];
 
 @Injectable()
 export class ProductsService {
@@ -338,12 +336,6 @@ export class ProductsService {
 			}
 		}
 
-		if (status) {
-			if (!statusTypes.includes(status)) {
-				throw new NotFoundException(`El estado ${status} no es válido`);
-			}
-		}
-
 		if (barcode) {
 			const productCodeBar = await this.findOne({ barcode });
 
@@ -523,7 +515,7 @@ export class ProductsService {
 					barcode: product.barcode,
 					color: color._id,
 					size: size._id,
-					status: product.state ? 'active' : 'inactive',
+					status: product.state ? StatusProduct.ACTIVE : StatusProduct.INACTIVE,
 					user: user,
 					stock,
 					images,

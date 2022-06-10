@@ -1,9 +1,18 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Image } from 'src/configurations/entities/image.entity';
+
+export enum TypePayment {
+	CASH = 'cash',
+	BANK = 'bank',
+	CREDIT = 'credit',
+	BONUS = 'bonus',
+}
+
+registerEnumType(TypePayment, { name: 'TypePayment' });
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Medios de pago' })
@@ -15,11 +24,11 @@ export class Payment extends Document {
 	@Prop({ type: String, required: true })
 	name: string;
 
-	@Field(() => String, {
-		description: 'Tipo de medio de pago (cash, bank, credit, bonus)',
+	@Field(() => TypePayment, {
+		description: 'Tipo de medio de pago',
 	})
 	@Prop({ type: String, required: true })
-	type: string;
+	type: TypePayment;
 
 	@Field(() => String, {
 		description: 'Color del medio de pago',

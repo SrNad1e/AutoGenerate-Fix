@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { Types } from 'mongoose';
+import { StatusStockRequest } from '../entities/stock-request.entity';
 
 @InputType({ description: 'Ordenamiento del solicitudes de productos' })
 export class SortStockRequest {
@@ -50,11 +51,11 @@ export class FiltersStockRequestsInput {
 	})
 	number: number;
 
-	@Field(() => String, {
-		description: 'Estado de la solicitud (open, pending, cancelled, used)',
+	@Field(() => StatusStockRequest, {
+		description: 'Estado de la solicitud',
 		nullable: true,
 	})
-	status: string;
+	status: StatusStockRequest;
 
 	@Field(() => String, {
 		description: 'Id de la bodega de origen',

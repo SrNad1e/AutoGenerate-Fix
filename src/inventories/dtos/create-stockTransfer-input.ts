@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusStockTransfer } from '../entities/stock-transfer.entity';
 
 @InputType({ description: 'Productos para marcar agregados para el historial' })
 export class CreateStockTransferInput {
@@ -12,12 +13,11 @@ export class CreateStockTransferInput {
 	})
 	warehouseDestinationId: string;
 
-	@Field(() => String, {
-		description:
-			'Estado del traslado (open, sent, confirmed, incomplete, cancelled)',
+	@Field(() => StatusStockTransfer, {
+		description: 'Estado del traslado',
 		nullable: true,
 	})
-	status?: string;
+	status?: StatusStockTransfer;
 
 	@Field(() => [DetailStockTransferCreateInput], {
 		description: 'Productos del traslado',
