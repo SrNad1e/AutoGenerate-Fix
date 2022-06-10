@@ -292,7 +292,7 @@ export class OrdersService {
 					}
 					break;
 				case StatusOrder.PENDING:
-					if (![StatusOrder.OPEN].includes(status)) {
+					if (![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(status)) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
 					}
 					break;
@@ -356,23 +356,23 @@ export class OrdersService {
 		}
 
 		if (status === StatusOrder.CANCELLED) {
-			const details = order?.details?.map((detail) => ({
-				productId: detail?.product?._id.toString(),
-				quantity: detail?.quantity,
-			}));
+			if (order?.status === StatusOrder.OPEN) {
+				const details = order?.details?.map((detail) => ({
+					productId: detail?.product?._id.toString(),
+					quantity: detail?.quantity,
+				}));
 
-			//TODO: anular recibo de caja, actualizar la caja
-
-			await this.stockHistoryService.addStock(
-				{
-					details,
-					warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
-					documentId: order?._id.toString(),
-					documentType: DocumentTypeStockHistory.ORDER,
-				},
-				user,
-				companyId,
-			);
+				await this.stockHistoryService.addStock(
+					{
+						details,
+						warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
+						documentId: order?._id.toString(),
+						documentType: DocumentTypeStockHistory.ORDER,
+					},
+					user,
+					companyId,
+				);
+			}
 		}
 
 		if (status === StatusOrder.OPEN) {
@@ -780,9 +780,9 @@ export class OrdersService {
 				'El pedido que intenta actualizar no existe',
 			);
 		}
-		if (order?.status !== StatusOrder.OPEN) {
+		if ([StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
 			throw new BadRequestException(
-				`El pedido ${order.number} no se encuentra abierto`,
+				`El pedido ${order.number} ya se encuentra procesado`,
 			);
 		}
 
