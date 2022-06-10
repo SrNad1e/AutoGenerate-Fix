@@ -7,12 +7,13 @@ import { FiltersReturnsOrderInput } from '../dtos/filters-returns-order';
 import { ReturnOrder } from '../entities/return-order.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateReturnOrderInput } from '../dtos/create-return-order-input';
-import { Order } from '../entities/order.entity';
+import { Order, StatusOrder } from '../entities/order.entity';
 import { OrdersService } from './orders.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { CouponsService } from 'src/crm/services/coupons.service';
 import { Coupon } from 'src/crm/entities/coupon.entity';
 import { Shop } from 'src/configurations/entities/shop.entity';
+import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
 
 const populate = [
 	{
@@ -112,7 +113,7 @@ export class ReturnsOrderService {
 			throw new BadRequestException('El pedido no existe');
 		}
 
-		if (order?.status !== 'closed') {
+		if (order?.status !== StatusOrder.CLOSED) {
 			throw new BadRequestException(
 				'El pedido se encuentra cancelado o no se ha finalizado',
 			);
@@ -200,7 +201,7 @@ export class ReturnsOrderService {
 				details,
 				warehouseId: order?.shop?.defaultWarehouse?._id?.toString(),
 				documentId: responseReturnOrder?._id?.toString(),
-				documentType: 'returnOrder',
+				documentType: DocumentTypeStockHistory.RETURNORDER,
 			},
 			user,
 			companyId,

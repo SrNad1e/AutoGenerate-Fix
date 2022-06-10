@@ -1,4 +1,13 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { StatusStockAdjustment } from '../entities/stock-adjustment.entity';
+
+export enum ActionDetailAdjustment {
+	DELETE = 'delete',
+	UPDATE = 'update',
+	CREATE = 'create',
+}
+
+registerEnumType(ActionDetailAdjustment, { name: 'ActionDetailAdjustment' });
 
 @InputType({ description: 'Detalle del ajuste de productos' })
 export class DetailStockAdjustmentInput {
@@ -6,7 +15,7 @@ export class DetailStockAdjustmentInput {
 	productId: string;
 
 	@Field(() => String, {
-		description: 'Acción a efectuar con el producto (delete, update, create)',
+		description: 'Acción a efectuar con el producto',
 	})
 	action: string;
 
@@ -22,11 +31,11 @@ export class UpdateStockAdjustmentInput {
 	})
 	details: DetailStockAdjustmentInput[];
 
-	@Field(() => String, {
-		description: 'Estado del ajuste (open, confirmed, cancelled)',
+	@Field(() => StatusStockAdjustment, {
+		description: 'Estado del ajuste',
 		nullable: true,
 	})
-	status: string;
+	status: StatusStockAdjustment;
 
 	@Field(() => String, {
 		description: 'Observación del ajuste',

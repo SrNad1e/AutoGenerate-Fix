@@ -5,7 +5,10 @@ import { PaginateModel, Types } from 'mongoose';
 import { ProductsService } from 'src/products/services/products.service';
 import { Order } from 'src/sales/entities/order.entity';
 import { User } from 'src/configurations/entities/user.entity';
-import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
+import {
+	CreateStockHistoryInput,
+	DocumentTypeStockHistory,
+} from '../dtos/create-stockHistory-input';
 import { StockAdjustment } from '../entities/stock-adjustment.entity';
 import { StockHistory } from '../entities/stock-history.entity';
 import { StockInput } from '../entities/stock-input.entity';
@@ -13,6 +16,7 @@ import { StockOutput } from '../entities/stock-output.entity';
 import { StockTransfer } from '../entities/stock-transfer.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
 import { ReturnOrder } from 'src/sales/entities/return-order.entity';
+import { StatusProduct } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class StockHistoryService {
@@ -50,19 +54,19 @@ export class StockHistoryService {
 			}
 			let document;
 			switch (documentType) {
-				case 'transfer':
+				case DocumentTypeStockHistory.TRANSFER:
 					document = await this.stockTransferModel.findById(documentId).lean();
 					break;
-				case 'input':
+				case DocumentTypeStockHistory.INPUT:
 					document = await this.stockInputModel.findById(documentId).lean();
 					break;
-				case 'order':
+				case DocumentTypeStockHistory.ORDER:
 					document = await this.orderModel.findById(documentId).lean();
 					break;
-				case 'adjustment':
+				case DocumentTypeStockHistory.ADJUSTMENT:
 					document = await this.stockAdjustmentModel.findById(documentId);
 					break;
-				case 'returnOrder':
+				case DocumentTypeStockHistory.RETURNORDER:
 					document = await this.returnOrderModel.findById(documentId);
 					break;
 				default:
@@ -85,7 +89,7 @@ export class StockHistoryService {
 			const { totalDocs } = await this.productsService.findAll(
 				{
 					ids: products,
-					status: 'active',
+					status: StatusProduct.ACTIVE,
 					limit: -1,
 				},
 				user,
@@ -143,16 +147,16 @@ export class StockHistoryService {
 			}
 			let document;
 			switch (documentType) {
-				case 'transfer':
+				case DocumentTypeStockHistory.TRANSFER:
 					document = await this.stockTransferModel.findById(documentId).lean();
 					break;
-				case 'output':
+				case DocumentTypeStockHistory.OUTPUT:
 					document = await this.stockOutputModel.findById(documentId).lean();
 					break;
-				case 'adjustment':
+				case DocumentTypeStockHistory.ADJUSTMENT:
 					document = await this.stockAdjustmentModel.findById(documentId);
 					break;
-				case 'order':
+				case DocumentTypeStockHistory.ORDER:
 					document = await this.orderModel.findById(documentId).lean();
 					break;
 				default:
@@ -174,7 +178,7 @@ export class StockHistoryService {
 			const { totalDocs } = await this.productsService.findAll(
 				{
 					ids: products,
-					status: 'active',
+					status: StatusProduct.ACTIVE,
 					limit: -1,
 				},
 				user,

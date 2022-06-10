@@ -17,7 +17,7 @@ import { CategoryLevel2 } from '../entities/category-level2.entity';
 import { CategoryLevel3 } from '../entities/category-level3.entity';
 import { Company } from '../../configurations/entities/company.entity';
 import { Reference } from '../entities/reference.entity';
-import { Product } from '../entities/product.entity';
+import { Product, StatusProduct } from '../entities/product.entity';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
 import { Image } from 'src/configurations/entities/image.entity';
@@ -120,7 +120,7 @@ export class ReferencesService {
 				const products = await this.productModel
 					.find({
 						reference: reference?._id,
-						status: 'active',
+						status: StatusProduct.ACTIVE,
 					})
 					.populate([
 						'size',
@@ -173,7 +173,7 @@ export class ReferencesService {
 		const products = await this.productModel
 			.find({
 				reference: reference?._id,
-				status: 'active',
+				status: StatusProduct.ACTIVE,
 			})
 			.populate([
 				'size',

@@ -2,6 +2,36 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+enum ActionDetailInput {
+  CREATE
+  DELETE
+  UPDATE
+}
+
+enum ActionDetailOutput {
+  CREATE
+  DELETE
+  UPDATE
+}
+
+enum ActionDetailRequest {
+  CREATE
+  DELETE
+  UPDATE
+}
+
+enum ActionDetailTransfer {
+  CREATE
+  DELETE
+  UPDATE
+}
+
+enum ActionPaymentsOrder {
+  CREATE
+  DELETE
+  UPDATE
+}
+
 """Opción del permiso"""
 type ActionPermission {
   """Identificador del permiso"""
@@ -12,6 +42,12 @@ type ActionPermission {
 
   """Nombre de la acción del permiso"""
   name: String!
+}
+
+enum ActionProductsOrder {
+  CREATE
+  DELETE
+  UPDATE
 }
 
 """Datos para agregar medios de pago al pedido"""
@@ -736,8 +772,8 @@ input CreateCustomerInput {
 
 """Datos para crear el pedido"""
 input CreateOrderInput {
-  """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
-  status: String!
+  """Estado del pedido"""
+  status: StatusOrder!
 }
 
 """Datos para crear un producto"""
@@ -849,8 +885,8 @@ input CreateStockAdjustmentInput {
   """Observación del que realiza el ajuste"""
   observation: String
 
-  """Estado del ajuste (open, confirmed, cancelled)"""
-  status: String
+  """Estado del ajuste"""
+  status: StatusStockAdjustment
 
   """Identificador de la bodega para el ajuste"""
   warehouseId: String!
@@ -864,8 +900,8 @@ input CreateStockInputInput {
   """Observación del que realiza la entrada"""
   observation: String
 
-  """Estado de la entrada (open, confirmed, cancelled)"""
-  status: String
+  """Estado de la entrada"""
+  status: StatusStockInput
 
   """Identificador de la bodega para la entrada"""
   warehouseId: String!
@@ -879,8 +915,8 @@ input CreateStockOutputInput {
   """Observación del que realiza la salida"""
   observation: String
 
-  """Estado de la salida (open, confirmed, cancelled)"""
-  status: String
+  """Estado de la salida"""
+  status: StatusStockOutput
 
   """Identificador de la bodega para la salida"""
   warehouseId: String!
@@ -894,8 +930,8 @@ input CreateStockRequestInput {
   """Observación de la solicitud"""
   observation: String
 
-  """Estado de la solicitud (open, pending, used, cancelled )"""
-  status: String
+  """Estado de la solicitud"""
+  status: StatusStockRequest
 
   """Identificador de la bodega de destino de la solicitud"""
   warehouseDestinationId: String!
@@ -915,8 +951,8 @@ input CreateStockTransferInput {
   """Solicitudes usadas"""
   requests: [String!]
 
-  """Estado del traslado (open, sent, confirmed, incomplete, cancelled)"""
-  status: String
+  """Estado del traslado"""
+  status: StatusStockTransfer
 
   """Identificador de la bodega de destino del traslado"""
   warehouseDestinationId: String!
@@ -1031,8 +1067,8 @@ scalar DateTime
 
 """Producto que se va a agregar"""
 input DetailAddProductsOrderInput {
-  """Acción a realizar con el producto (create, update, delete)"""
-  action: String!
+  """Acción a realizar con el producto"""
+  action: ActionProductsOrder!
 
   """Identificador Producto agregado al pedido"""
   productId: String!
@@ -1115,7 +1151,7 @@ type DetailOrder {
   """Cantidad de productos en el pedido"""
   quantity: Float!
 
-  """Estado del producto (new, confirmed)"""
+  """Estado del producto"""
   status: String!
 
   """Fecha de actualizado del producto al pedido"""
@@ -1183,7 +1219,7 @@ input DetailStockAdjustmentCreateInput {
 
 """Detalle del ajuste de productos"""
 input DetailStockAdjustmentInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
+  """Acción a efectuar con el producto"""
   action: String!
 
   """Identificador de mongo del producto"""
@@ -1204,8 +1240,8 @@ input DetailStockInputCreateInput {
 
 """Detalle de la entrada de productos"""
 input DetailStockInputInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
-  action: String!
+  """Acción a efectuar con el producto"""
+  action: ActionDetailInput!
 
   """Identificador de mongo del producto"""
   productId: String!
@@ -1225,8 +1261,8 @@ input DetailStockOutputCreateInput {
 
 """Detalle de la salida de productos"""
 input DetailStockOutputInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
-  action: String!
+  """Acción a efectuar con el producto"""
+  action: ActionDetailOutput!
 
   """Identificador de mongo del producto"""
   productId: String!
@@ -1246,8 +1282,8 @@ input DetailStockRequestCreateInput {
 
 """Detalle de la solicitud de productos"""
 input DetailStockRequestInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
-  action: String!
+  """Acción a efectuar con el producto"""
+  action: ActionDetailRequest!
 
   """Identificador de mongo del producto"""
   productId: String!
@@ -1267,8 +1303,8 @@ input DetailStockTransferCreateInput {
 
 """Detalle del traslado de productos"""
 input DetailStockTransferInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
-  action: String!
+  """Acción a efectuar con el producto"""
+  action: ActionDetailTransfer!
 
   """Identificador de mongo del producto"""
   productId: String!
@@ -1291,8 +1327,8 @@ type DetailTransfer {
   """Cantidad del productos confirmados en el traslado"""
   quantityConfirmed: Float
 
-  """Estado del producto (confirmed, new, sent)"""
-  status: String!
+  """Estado del producto"""
+  status: StatusDetailTransfer!
 
   """Fecha de actualizacion el producto"""
   updatedAt: DateTime!
@@ -1345,7 +1381,7 @@ type Expense {
   number: Float!
 
   """Estado del egreso"""
-  status: String!
+  status: StatusExpense!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -1632,7 +1668,7 @@ input FiltersOrdersInput {
   sort: SortOrder
 
   """Estado del pedido"""
-  status: String
+  status: StatusOrder
 }
 
 """Filtros para obtener el listado de tipos de medios de pago"""
@@ -1858,8 +1894,8 @@ input FiltersShopsInput {
   """Ordenamiento"""
   sort: SortShop
 
-  """Estado de la tienda (active, inactive, suspend)"""
-  status: String
+  """Estado de la tienda"""
+  status: StatusShop
 }
 
 """Filtros para la lista de tallas"""
@@ -1903,8 +1939,8 @@ input FiltersStockAdjustmentsInput {
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockAdjustment
 
-  """Estado del ajuste (open, confirmed, cancelled)"""
-  status: String
+  """Estado del ajuste"""
+  status: StatusStockAdjustment
 
   """Valor total de la entrada"""
   total: Float
@@ -1933,8 +1969,8 @@ input FiltersStockInputsInput {
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockInput
 
-  """Estado de la entrada (open, confirmed, cancelled)"""
-  status: String
+  """Estado de la entrada"""
+  status: StatusStockInput
 
   """Valor total de la entrada"""
   total: Float
@@ -1963,8 +1999,8 @@ input FiltersStockOutputsInput {
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockOutput
 
-  """Estado de la salida (open, confirmed, cancelled)"""
-  status: String
+  """Estado de la salida"""
+  status: StatusStockOutput
 
   """Valor total de la entrada"""
   total: Float
@@ -1993,8 +2029,8 @@ input FiltersStockRequestsInput {
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockRequest
 
-  """Estado de la solicitud (open, pending, cancelled, used)"""
-  status: String
+  """Estado de la solicitud"""
+  status: StatusStockRequest
 
   """Id de la bodega de destino"""
   warehouseDestinationId: String
@@ -2023,8 +2059,8 @@ input FiltersStockTransfersInput {
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortStockTransfer
 
-  """Estado del traslado (open, sent, confirmed, incomplete, cancelled)"""
-  status: String
+  """Estado del traslado"""
+  status: StatusStockTransfer
 
   """Id de la bodega de destino"""
   warehouseDestinationId: String
@@ -2055,8 +2091,8 @@ input FiltersUsersInput {
   """Ordenamiento"""
   sort: SortUser
 
-  """Estado del usuario (active, inactive, suspend)"""
-  status: String
+  """Estado del usuario"""
+  status: StatusUser
 }
 
 """Filtros de las bodegas"""
@@ -2524,8 +2560,8 @@ type Order {
   """Tienda donde se solicita el pedido"""
   shop: Shop!
 
-  """Estado del pedido (open, pending, cancelled, closed, sent, invoiced)"""
-  status: String!
+  """Estado del pedido"""
+  status: StatusOrder!
 
   """Resumen de los pagosy totales"""
   summary: SummaryOrder!
@@ -2557,8 +2593,8 @@ type Payment {
   """Nombre del medio de pago"""
   name: String!
 
-  """Tipo de medio de pago (cash, bank, credit, bonus)"""
-  type: String!
+  """Tipo de medio de pago"""
+  type: TypePayment!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -2608,8 +2644,8 @@ type PaymentOrderClose {
 
 """Medio de pago que se va a agregar"""
 input PaymentsOrderInput {
-  """Acción a realizar con el medio de pago (create, update, delete)"""
-  action: String!
+  """Acción a realizar con el medio de pago"""
+  action: ActionPaymentsOrder!
 
   """Identificador medio de pago agregado al pedido"""
   paymentId: String!
@@ -2799,8 +2835,8 @@ type Product {
   """Talla del producto"""
   size: Size!
 
-  """Estado del producto (active, inactive)"""
-  status: String!
+  """Estado del producto"""
+  status: StatusProduct!
 
   """Inventario del producto por bodegas"""
   stock: [Stock!]
@@ -3087,7 +3123,7 @@ type Receipt {
   payment: Payment!
 
   """Estado del recibo de caja"""
-  status: String!
+  status: StatusReceipt!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -4210,8 +4246,8 @@ type Shop {
   """Teléfono de la tienda"""
   phone: String
 
-  """Estado de la tienda (active, inactive, suspend)"""
-  status: String!
+  """Estado de la tienda"""
+  status: StatusShop!
 
   """Fecha de creación"""
   updatedAt: DateTime!
@@ -4627,6 +4663,82 @@ input SortWarehouse {
   updatedAt: Float
 }
 
+enum StatusDetailTransfer {
+  CONFIRMED
+  NEW
+  SENT
+}
+
+enum StatusExpense {
+  ACTIVE
+  INACTIVE
+}
+
+enum StatusOrder {
+  CANCELLED
+  CLOSED
+  INVOICED
+  OPEN
+  PENDING
+  SENT
+}
+
+enum StatusProduct {
+  ACTIVE
+  INACTIVE
+}
+
+enum StatusReceipt {
+  ACTIVE
+  INACTIVE
+}
+
+enum StatusShop {
+  ACTIVE
+  INACTIVE
+  SUSPEND
+}
+
+enum StatusStockAdjustment {
+  CANCELLED
+  CONFIRMED
+  OPEN
+}
+
+enum StatusStockInput {
+  CANCELLED
+  CONFIRMED
+  OPEN
+}
+
+enum StatusStockOutput {
+  CANCELLED
+  CONFIRMED
+  OPEN
+}
+
+enum StatusStockRequest {
+  CANCELLED
+  OPEN
+  PENDING
+  USED
+}
+
+enum StatusStockTransfer {
+  CANCELLED
+  CONFIRMED
+  INCOMPLETE
+  OPEN
+  SENT
+  VERIFIED
+}
+
+enum StatusUser {
+  ACTIVE
+  INACTIVE
+  SUSPEND
+}
+
 """Inventario por bodegas del producto"""
 type Stock {
   """Fecha de creación del dato de envio"""
@@ -4665,8 +4777,8 @@ type StockAdjustment {
   """Observación de la entrada"""
   observation: String
 
-  """Estado del ajuste (open, confirmed, cancelled)"""
-  status: String!
+  """Estado del ajuste"""
+  status: StatusStockAdjustment!
 
   """Costo total del ajuste"""
   total: Float!
@@ -4701,8 +4813,8 @@ type StockInput {
   """Observación de la entrada"""
   observation: String
 
-  """Estado de la entrada (open, confirmed, cancelled)"""
-  status: String!
+  """Estado de la entrada"""
+  status: StatusStockInput!
 
   """Costo total de la entrada"""
   total: Float!
@@ -4737,8 +4849,8 @@ type StockOutput {
   """Observación de la entrada"""
   observation: String
 
-  """Estado de la salida (open, confirmed, cancelled)"""
-  status: String!
+  """Estado de la salida"""
+  status: StatusStockOutput!
 
   """Costo total de la salida"""
   total: Float!
@@ -4776,8 +4888,8 @@ type StockRequest {
   """Observación de la solicitud"""
   observation: String
 
-  """Estado de la solicitud (open, pending, used, cancelled )"""
-  status: String!
+  """Estado de la solicitud"""
+  status: StatusStockRequest!
 
   """Fecha de la última actulización de la solicitud"""
   updatedAt: DateTime!
@@ -4821,10 +4933,8 @@ type StockTransfer {
   """Solicitudes usadas"""
   requests: [StockRequest!]
 
-  """
-  Estado del traslado (open, sent, confirmed, incomplete, cancelled, verified )
-  """
-  status: String!
+  """Estado del traslado"""
+  status: StatusStockTransfer!
 
   """Fecha de actualización del traslado"""
   updatedAt: DateTime!
@@ -4897,6 +5007,13 @@ type SummaryOrderClose {
 
   """Valor de las ordenes finalizadas"""
   value: Float!
+}
+
+enum TypePayment {
+  BANK
+  BONUS
+  CASH
+  CREDIT
 }
 
 """Datos para actualizar el atributo"""
@@ -4994,8 +5111,8 @@ input UpdateOrderInput {
   """Identificación del cliente"""
   customerId: String
 
-  """Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)"""
-  status: String
+  """Estado del pedido"""
+  status: StatusOrder
 }
 
 """Datos para actualizar el producto"""
@@ -5012,8 +5129,8 @@ input UpdateProductInput {
   """Identificador de la talla"""
   sizeId: String
 
-  """Estado del producto (active, inactive)"""
-  status: String
+  """Estado del producto"""
+  status: StatusProduct
 }
 
 """Datos para actualizar referencia"""
@@ -5102,8 +5219,8 @@ input UpdateStockAdjustmentInput {
   """Observación del ajuste"""
   observation: String
 
-  """Estado del ajuste (open, confirmed, cancelled)"""
-  status: String
+  """Estado del ajuste"""
+  status: StatusStockAdjustment
 }
 
 """Datos para actualizar la entrada de productos"""
@@ -5114,8 +5231,8 @@ input UpdateStockInputInput {
   """Observación de la entrada"""
   observation: String
 
-  """Estado de la entrada (open, confirmed, cancelled)"""
-  status: String
+  """Estado de la entrada"""
+  status: StatusStockInput
 }
 
 """Datos para actualizar la salida de productos"""
@@ -5126,8 +5243,8 @@ input UpdateStockOutputInput {
   """Observación de la salida"""
   observation: String
 
-  """Estado de la salida (open, confirmed, cancelled)"""
-  status: String
+  """Estado de la salida"""
+  status: StatusStockOutput
 }
 
 """Datos para actualizar la solicitud de productos"""
@@ -5138,8 +5255,8 @@ input UpdateStockRequestInput {
   """Observación de la solicitud"""
   observation: String
 
-  """Estado de la solicitud (open, pending, used, cancelled )"""
-  status: String
+  """Estado de la solicitud"""
+  status: StatusStockRequest
 }
 
 """Datos para actualizar el traslado de productos"""
@@ -5159,8 +5276,8 @@ input UpdateStockTransferInput {
   """Solicitudes usadas"""
   requests: [String!]
 
-  """Estado del traslado (open, sent, confirmed, incomplete, cancelled)"""
-  status: String
+  """Estado del traslado"""
+  status: StatusStockTransfer
 }
 
 """Datos para actualizar el usuario"""
@@ -5187,7 +5304,7 @@ input UpdateUserInput {
   shopId: String
 
   """Estado del usuario"""
-  status: String
+  status: StatusUser
 
   """Usuario registrado"""
   username: String
@@ -5234,8 +5351,8 @@ type User {
   """Tienda a la que se encuentra asignado el usuario"""
   shop: Shop!
 
-  """Estado del usuario (active, inactive, suspend)"""
-  status: String!
+  """Estado del usuario"""
+  status: StatusUser!
 
   """Nombre de usuario"""
   updatedAt: DateTime!

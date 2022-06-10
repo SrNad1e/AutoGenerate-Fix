@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusProduct } from '../entities/product.entity';
 
 @InputType({ description: 'Datos para actualizar el producto' })
 export class UpdateProductInput {
@@ -14,11 +15,11 @@ export class UpdateProductInput {
 	})
 	sizeId?: string;
 
-	@Field(() => String, {
-		description: 'Estado del producto (active, inactive)',
+	@Field(() => StatusProduct, {
+		description: 'Estado del producto',
 		nullable: true,
 	})
-	status?: string;
+	status?: StatusProduct;
 
 	@Field(() => String, {
 		description: 'Código de barras del producto',

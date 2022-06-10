@@ -1,4 +1,12 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+
+export enum ActionPaymentsOrder {
+	CREATE = 'create',
+	UPDATE = 'update',
+	DELETE = 'delete',
+}
+
+registerEnumType(ActionPaymentsOrder, { name: 'ActionPaymentsOrder' });
 
 @InputType({ description: 'Medio de pago que se va a agregar' })
 export class PaymentsOrderInput {
@@ -10,11 +18,10 @@ export class PaymentsOrderInput {
 	@Field(() => Number, { description: 'Valor total agregado' })
 	total: number;
 
-	@Field(() => String, {
-		description:
-			'Acción a realizar con el medio de pago (create, update, delete)',
+	@Field(() => ActionPaymentsOrder, {
+		description: 'Acción a realizar con el medio de pago',
 	})
-	action: string;
+	action: ActionPaymentsOrder;
 }
 
 @InputType({ description: 'Datos para agregar medios de pago al pedido' })

@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusOrder } from '../entities/order.entity';
 
 @InputType({ description: 'Ciudad entrada' })
 export class CityInput {
@@ -72,12 +73,11 @@ export class AddressInputOrder {
 
 @InputType({ description: 'Datos para actualizar el pedido' })
 export class UpdateOrderInput {
-	@Field(() => String, {
-		description:
-			'Estado del pedido (open, pending ,cancelled, closed, sent, invoiced)',
+	@Field(() => StatusOrder, {
+		description: 'Estado del pedido',
 		nullable: true,
 	})
-	status?: string;
+	status?: StatusOrder;
 
 	@Field(() => String, {
 		description: 'Identificación del cliente',
