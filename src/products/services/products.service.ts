@@ -592,7 +592,15 @@ export class ProductsService {
 	 * @returns si todo sale bien el producto actualizado
 	 */
 	async deleteStock(productId: string, quantity: number, warehouseId: string) {
-		const product = await this.productModel.findById(productId).lean();
+		const product = await this.productModel
+			.findById(productId)
+			.populate([
+				{
+					path: 'reference',
+					model: Reference.name,
+				},
+			])
+			.lean();
 
 		if (!product) {
 			throw new BadRequestException('El producto no existe');
@@ -603,7 +611,7 @@ export class ProductsService {
 		);
 		if (stockSelected?.quantity < quantity) {
 			throw new BadRequestException(
-				`Inventario insuficiente para el producto ${product.reference} / ${product.barcode}, stock ${stockSelected.quantity}`,
+				`Inventario insuficiente para el producto ${product.reference['name']} / ${product.barcode}, stock ${stockSelected.quantity}`,
 			);
 		}
 

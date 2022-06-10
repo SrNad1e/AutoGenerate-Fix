@@ -88,8 +88,8 @@ export class StockRequestService {
 				filters.number = number;
 			}
 
-			if (status) {
-				filters.status = status;
+			if (StatusStockRequest[status]) {
+				filters.status = StatusStockRequest[status];
 			}
 
 			if (warehouseDestinationId) {
@@ -176,6 +176,7 @@ export class StockRequestService {
 			warehouseOriginId,
 			warehouseDestinationId,
 			details,
+			status,
 			...options
 		}: CreateStockRequestInput,
 		user: User,
@@ -185,10 +186,10 @@ export class StockRequestService {
 			throw new BadRequestException('La solicitud no puede estar vacía');
 		}
 
-		if (options.status) {
+		if (StatusStockRequest[status]) {
 			if (
 				[StatusStockRequest.CANCELLED, StatusStockRequest.USED].includes(
-					options.status,
+					StatusStockRequest[status],
 				)
 			) {
 				throw new BadRequestException(
@@ -269,7 +270,7 @@ export class StockRequestService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockRequestInput,
+		{ details, status, ...options }: UpdateStockRequestInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -289,34 +290,34 @@ export class StockRequestService {
 				);
 			}
 
-			if (options.status) {
+			if (StatusStockRequest[status]) {
 				switch (stockRequest.status) {
 					case StatusStockRequest.OPEN:
-						if (options.status === StatusStockRequest.USED) {
+						if (StatusStockRequest[status] === StatusStockRequest.USED) {
 							throw new BadRequestException(
 								'La solicitud se encuentra abierta y no puede ser usada',
 							);
 						}
 						break;
 					case StatusStockRequest.PENDING:
-						if (options.status === StatusStockRequest.OPEN) {
+						if (StatusStockRequest[status] === StatusStockRequest.OPEN) {
 							throw new BadRequestException(
 								'La solicitud se encuentra pendiente y no se puede abrir',
 							);
 						}
 						break;
 					case StatusStockRequest.USED:
-						if (options.status === StatusStockRequest.OPEN) {
+						if (StatusStockRequest[status] === StatusStockRequest.OPEN) {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede abrir',
 							);
 						}
-						if (options.status === StatusStockRequest.PENDING) {
+						if (StatusStockRequest[status] === StatusStockRequest.PENDING) {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede enviar',
 							);
 						}
-						if (options.status === StatusStockRequest.CANCELLED) {
+						if (StatusStockRequest[status] === StatusStockRequest.CANCELLED) {
 							throw new BadRequestException(
 								'La solicitud se encuentra usada y no se puede cancelar',
 							);
@@ -329,7 +330,7 @@ export class StockRequestService {
 					default:
 						break;
 				}
-				if (options.status === stockRequest.status) {
+				if (StatusStockRequest[status] === stockRequest.status) {
 					throw new BadRequestException(
 						'El estado de la solicitud debe cambiar o enviarse vacío',
 					);
@@ -337,7 +338,7 @@ export class StockRequestService {
 			}
 
 			if (stockRequest.status !== StatusStockRequest.OPEN) {
-				if (!options.status) {
+				if (!StatusStockRequest[status]) {
 					throw new BadRequestException('Debe enviar un cambio de estado');
 				}
 				return this.stockRequestModel.findByIdAndUpdate(
@@ -350,7 +351,10 @@ export class StockRequestService {
 			}
 			if (details && details.length > 0) {
 				const productsDelete = details
-					.filter((detail) => detail.action === ActionDetailRequest.DELETE)
+					.filter(
+						(detail) =>
+							ActionDetailRequest[detail.action] === ActionDetailRequest.DELETE,
+					)
 					.map((detail) => detail.productId.toString());
 
 				const newDetails = stockRequest.details.filter(
@@ -360,7 +364,7 @@ export class StockRequestService {
 				for (let i = 0; i < details.length; i++) {
 					const { action, productId, quantity } = details[i];
 
-					if (action === ActionDetailRequest.CREATE) {
+					if (ActionDetailRequest[action] === ActionDetailRequest.CREATE) {
 						const productFind = stockRequest.details.find(
 							(item) => item.product._id.toString() === productId.toString(),
 						);
@@ -398,7 +402,9 @@ export class StockRequestService {
 							createdAt: new Date(),
 							updatedAt: new Date(),
 						});
-					} else if (action === ActionDetailRequest.UPDATE) {
+					} else if (
+						ActionDetailRequest[action] === ActionDetailRequest.UPDATE
+					) {
 						const detailFindIndex = newDetails.findIndex(
 							(item) => item.product._id.toString() === productId.toString(),
 						);

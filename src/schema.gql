@@ -1094,9 +1094,6 @@ type DetailAdjustment {
 
 """Producto a confirmar en el traslado"""
 input DetailConfirmStockTransferInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
-  action: String!
-
   """Identificador de mongo del producto"""
   productId: String!
 

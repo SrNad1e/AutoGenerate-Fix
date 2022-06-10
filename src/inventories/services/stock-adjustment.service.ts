@@ -100,8 +100,8 @@ export class StockAdjustmentService {
 			filters.number = number;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusStockAdjustment[status]) {
+			filters.status = StatusStockAdjustment[status];
 		}
 
 		if (warehouseId) {
@@ -160,7 +160,7 @@ export class StockAdjustmentService {
 	}
 
 	async create(
-		{ details, warehouseId, ...options }: CreateStockAdjustmentInput,
+		{ details, warehouseId, status, ...options }: CreateStockAdjustmentInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -168,8 +168,8 @@ export class StockAdjustmentService {
 			throw new BadRequestException('El ajuste no puede estar vacía');
 		}
 
-		if (options.status) {
-			if (options.status === StatusStockAdjustment.CANCELLED) {
+		if (StatusStockAdjustment[status]) {
+			if (StatusStockAdjustment[status] === StatusStockAdjustment.CANCELLED) {
 				throw new BadRequestException(
 					'El ajuste no puede ser creada, valide el estado del ajuste',
 				);
@@ -225,6 +225,7 @@ export class StockAdjustmentService {
 			details: detailsAdjustment,
 			total,
 			user,
+			status: StatusStockAdjustment[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
@@ -234,7 +235,7 @@ export class StockAdjustmentService {
 
 		const response = await (await newStockInput.save()).populate(populate);
 
-		if (options.status === StatusStockAdjustment.CONFIRMED) {
+		if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
 			const detailsDelete = response.details
 				.filter((detail) => detail.product.stock[0].quantity > detail.quantity)
 				.map((detail) => ({
@@ -278,7 +279,7 @@ export class StockAdjustmentService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockAdjustmentInput,
+		{ details, status, ...options }: UpdateStockAdjustmentInput,
 		user: User,
 		companyId: string,
 	) {
@@ -292,7 +293,7 @@ export class StockAdjustmentService {
 			);
 		}
 
-		if (options.status) {
+		if (StatusStockAdjustment[status]) {
 			if (!stockAdjustment) {
 				throw new BadRequestException('El ajuste no existe');
 			}
@@ -305,7 +306,7 @@ export class StockAdjustmentService {
 				throw new BadRequestException('El ajuste se encuentra confirmado');
 			}
 
-			if (options.status === stockAdjustment.status) {
+			if (StatusStockAdjustment[status] === stockAdjustment.status) {
 				throw new BadRequestException(
 					'El estado del ajuste debe cambiar o enviarse vacío',
 				);
@@ -314,7 +315,11 @@ export class StockAdjustmentService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === ActionDetailAdjustment.DELETE)
+				.filter(
+					(detail) =>
+						ActionDetailAdjustment[detail.action] ===
+						ActionDetailAdjustment.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockAdjustment.details
@@ -338,7 +343,7 @@ export class StockAdjustmentService {
 			for (let i = 0; i < details.length; i++) {
 				const { action, productId, quantity } = details[i];
 
-				if (action === ActionDetailAdjustment.CREATE) {
+				if (ActionDetailAdjustment[action] === ActionDetailAdjustment.CREATE) {
 					const productFind = stockAdjustment.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);
@@ -387,7 +392,7 @@ export class StockAdjustmentService {
 				},
 			);
 
-			if (options.status === StatusStockAdjustment.CONFIRMED) {
+			if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
 				const detailsDelete = response.details
 					.filter(
 						(detail) => detail.product.stock[0].quantity > detail.quantity,
@@ -445,7 +450,7 @@ export class StockAdjustmentService {
 				},
 			);
 
-			if (options.status === StatusStockAdjustment.CONFIRMED) {
+			if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
 				const detailsDelete = response.details
 					.filter(
 						(detail) => detail.product.stock[0].quantity > detail.quantity,
