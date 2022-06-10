@@ -145,6 +145,7 @@ export class StockHistoryService {
 					`No se puede eliminar productos con cantidades en 0`,
 				);
 			}
+
 			let document;
 			switch (documentType) {
 				case DocumentTypeStockHistory.TRANSFER:
@@ -193,6 +194,7 @@ export class StockHistoryService {
 
 			for (let i = 0; i < details.length; i++) {
 				const { productId, quantity } = details[i];
+
 				const product = await this.productsService.deleteStock(
 					productId,
 					quantity,

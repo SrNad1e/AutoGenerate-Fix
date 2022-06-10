@@ -383,7 +383,13 @@ export class StockAdjustmentService {
 			const response = await this.stockAdjustmetnModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, total, ...options, user },
+					$set: {
+						...options,
+						details: newDetails,
+						total,
+						status: StatusStockAdjustment[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -441,7 +447,7 @@ export class StockAdjustmentService {
 			const response = await this.stockAdjustmetnModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockAdjustment[status], user },
 				},
 				{
 					new: true,
@@ -451,7 +457,26 @@ export class StockAdjustmentService {
 			);
 
 			if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
-				const detailsDelete = response.details
+				//colsultar stock de productos
+
+				const newDetails = [];
+
+				for (let i = 0; i < response.details.length; i++) {
+					const {
+						product: { _id },
+					} = response.details[i];
+					const product = await this.productsService.findById(
+						_id.toString(),
+						response?.warehouse?._id?.toString(),
+					);
+
+					newDetails.push({
+						...response?.details[i],
+						product,
+					});
+				}
+
+				const detailsDelete = newDetails
 					.filter(
 						(detail) => detail.product.stock[0].quantity > detail.quantity,
 					)
@@ -460,7 +485,7 @@ export class StockAdjustmentService {
 						quantity: detail.product.stock[0].quantity - detail.quantity,
 					}));
 
-				const detailsAdd = response.details
+				const detailsAdd = newDetails
 					.filter(
 						(detail) => detail.product.stock[0].quantity < detail.quantity,
 					)
@@ -482,6 +507,7 @@ export class StockAdjustmentService {
 					documentId: response._id.toString(),
 					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
+
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					user,
