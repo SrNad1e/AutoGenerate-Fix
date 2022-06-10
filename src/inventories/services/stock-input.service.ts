@@ -12,7 +12,10 @@ import { Color } from 'src/products/entities/color.entity';
 import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { User } from 'src/configurations/entities/user.entity';
-import { CreateStockHistoryInput, DocumentTypeStockHistory } from '../dtos/create-stockHistory-input';
+import {
+	CreateStockHistoryInput,
+	DocumentTypeStockHistory,
+} from '../dtos/create-stockHistory-input';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
 import { FiltersStockInputsInput } from '../dtos/filters-stockInputs.input';
 import {
@@ -89,8 +92,8 @@ export class StockInputService {
 			filters.number = number;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusStockInput[status]) {
+			filters.status = StatusStockInput[status];
 		}
 
 		if (warehouseId) {
@@ -148,7 +151,7 @@ export class StockInputService {
 	}
 
 	async create(
-		{ details, warehouseId, ...options }: CreateStockInputInput,
+		{ details, warehouseId, status, ...options }: CreateStockInputInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -156,8 +159,8 @@ export class StockInputService {
 			throw new BadRequestException('La entrada no puede estar vacía');
 		}
 
-		if (options.status) {
-			if (options.status === StatusStockInput.CANCELLED) {
+		if (StatusStockInput[status]) {
+			if (StatusStockInput[status] === StatusStockInput.CANCELLED) {
 				throw new BadRequestException(
 					'La entrada no puede ser creada, valide el estado de la entrada',
 				);
@@ -217,6 +220,7 @@ export class StockInputService {
 			details: detailsInput,
 			total,
 			user,
+			status: StatusStockInput[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
@@ -226,7 +230,7 @@ export class StockInputService {
 
 		const response = await (await newStockInput.save()).populate(populate);
 
-		if (options.status === StatusStockInput.CONFIRMED) {
+		if (StatusStockInput[status] === StatusStockInput.CONFIRMED) {
 			const detailHistory = response.details.map((detail) => ({
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
@@ -249,7 +253,7 @@ export class StockInputService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockInputInput,
+		{ details, status, ...options }: UpdateStockInputInput,
 		user: User,
 		companyId: string,
 	) {
@@ -267,7 +271,7 @@ export class StockInputService {
 			);
 		}
 
-		if (options.status) {
+		if (StatusStockInput[status]) {
 			if (!stockInput) {
 				throw new BadRequestException('La entrada no existe');
 			}
@@ -280,7 +284,7 @@ export class StockInputService {
 				throw new BadRequestException('La entrada se encuentra confirmada');
 			}
 
-			if (options.status === stockInput.status) {
+			if (StatusStockInput[status] === stockInput.status) {
 				throw new BadRequestException(
 					'El estado de la entrada debe cambiar o enviarse vacío',
 				);
@@ -289,7 +293,10 @@ export class StockInputService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === ActionDetailInput.DELETE)
+				.filter(
+					(detail) =>
+						ActionDetailInput[detail.action] === ActionDetailInput.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockInput.details
@@ -317,7 +324,7 @@ export class StockInputService {
 					(item) => item.product._id.toString() === productId.toString(),
 				);
 
-				if (action === ActionDetailInput.CREATE) {
+				if (ActionDetailInput[action] === ActionDetailInput.CREATE) {
 					if (productFind) {
 						throw new BadRequestException(
 							`El producto ${productFind.product.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
@@ -359,7 +366,13 @@ export class StockInputService {
 			const response = await this.stockInputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, total, ...options, user },
+					$set: {
+						...options,
+						details: newDetails,
+						total,
+						status: StatusStockInput[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -368,7 +381,7 @@ export class StockInputService {
 				},
 			);
 
-			if (options.status === StatusStockInput.CONFIRMED) {
+			if (StatusStockInput[status] === StatusStockInput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -392,7 +405,7 @@ export class StockInputService {
 			const response = await this.stockInputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockInput[status], user },
 				},
 				{
 					new: true,
@@ -401,7 +414,7 @@ export class StockInputService {
 				},
 			);
 
-			if (options.status === StatusStockInput.CONFIRMED) {
+			if (StatusStockInput[status] === StatusStockInput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
