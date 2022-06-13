@@ -46,7 +46,12 @@ export class StockHistoryService {
 	) {
 		let item;
 		try {
+			if (details.length === 0) {
+				throw new BadRequestException(`No hay productos para continuar`);
+			}
+
 			const validateQuantity = details.find((item) => !(item.quantity > 0));
+
 			if (validateQuantity) {
 				throw new BadRequestException(
 					`No se puede agregar productos con cantidades en 0`,
@@ -91,11 +96,11 @@ export class StockHistoryService {
 				{
 					ids: products,
 					status: StatusProduct.ACTIVE,
-					limit: -1,
 				},
 				user,
 				companyId,
 			);
+
 			if (totalDocs !== products.length) {
 				throw new BadRequestException(
 					`Un producto no existe o se encuentra inactivo, revise la lista de productos`,
@@ -140,6 +145,10 @@ export class StockHistoryService {
 		let item;
 
 		try {
+			if (details.length === 0) {
+				throw new BadRequestException(`No hay productos para continuar`);
+			}
+
 			const validateQuantity = details.find((item) => !(item.quantity > 0));
 			if (validateQuantity) {
 				throw new BadRequestException(
@@ -181,7 +190,6 @@ export class StockHistoryService {
 				{
 					ids: products,
 					status: StatusProduct.ACTIVE,
-					limit: -1,
 				},
 				user,
 				companyId,

@@ -32,6 +32,7 @@ import { CategoryMysql } from 'src/products/entities/category-level1.entity';
 					w: 'majority',
 					connectionFactory: (connection) => {
 						connection.plugin(require('mongoose-paginate-v2'));
+						connection.plugin(require('mongoose-aggregate-paginate-v2'));
 						return connection;
 					},
 				};

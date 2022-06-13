@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import {
+	FilterQuery,
+	PaginateModel,
+	Types,
+	AggregatePaginateModel,
+	ProjectionType,
+} from 'mongoose';
 import { Repository } from 'typeorm';
 
 import {
@@ -47,11 +53,65 @@ const populate = [
 	{ path: 'images', model: Image.name },
 ];
 
+const lookup = [
+	{
+		$lookup: {
+			from: 'sizes',
+			localField: 'size',
+			foreignField: '_id',
+			as: 'size',
+		},
+	},
+	{
+		$lookup: {
+			from: 'colors',
+			localField: 'color',
+			foreignField: '_id',
+			as: 'color',
+		},
+	},
+	{
+		$lookup: {
+			from: 'references',
+			localField: 'reference',
+			foreignField: '_id',
+			as: 'reference',
+		},
+	},
+	{
+		$lookup: {
+			from: 'images',
+			localField: 'images',
+			foreignField: '_id',
+			as: 'images',
+		},
+	},
+];
+
+const project: ProjectionType<Product> = {
+	stock: 1,
+	user: 1,
+	status: 1,
+	images: 1,
+	barcode: 1,
+	createdAt: 1,
+	updatedAt: 1,
+	size: {
+		$arrayElemAt: ['$size', 0],
+	},
+	reference: {
+		$arrayElemAt: ['$reference', 0],
+	},
+	color: {
+		$arrayElemAt: ['$color', 0],
+	},
+};
+
 @Injectable()
 export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
-		private readonly productModel: PaginateModel<Product>,
+		private readonly productModel: AggregatePaginateModel<Product>,
 		@InjectModel(Image.name)
 		private readonly imageModel: PaginateModel<Image>,
 		@InjectRepository(ProductMysql)
@@ -84,10 +144,11 @@ export class ProductsService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Product> = {};
+		const aggregate = [];
 
 		if (ids) {
 			filters._id = {
-				$in: ids,
+				$in: ids.map((_id) => new Types.ObjectId(_id)),
 			};
 		}
 
@@ -125,11 +186,25 @@ export class ProductsService {
 			filters.reference = new Types.ObjectId(referenceId);
 		}
 
+		if (warehouseId) {
+			if (warehouseId !== 'all') {
+				filters['stock.warehouse'] = new Types.ObjectId(warehouseId);
+				aggregate.push({
+					$unwind: '$stock',
+				});
+				project['stock'] = ['$stock'];
+			}
+		}
+
 		if (withStock && warehouseId) {
 			filters['stock.warehouse'] = new Types.ObjectId(warehouseId);
 			filters['stock.quantity'] = {
 				$gt: 0,
 			};
+			aggregate.push({
+				$unwind: '$stock',
+			});
+			project['stock'] = ['$stock'];
 		}
 
 		const options = {
@@ -137,41 +212,20 @@ export class ProductsService {
 			page,
 			sort,
 			lean: true,
-			populate,
 		};
 
-		const response = await this.productModel.paginate(
+		const aggregateProduct = this.productModel.aggregate([
+			...aggregate,
 			{
-				...filters,
+				$match: filters,
 			},
-			options,
-		);
+			...lookup,
+			{
+				$project: project,
+			},
+		]);
 
-		const docs = response.docs.map((doc) => {
-			if (warehouseId) {
-				if (warehouseId === 'all') {
-					return doc;
-				}
-
-				const stock = doc.stock?.filter(
-					(item) => item?.warehouse?._id?.toString() === warehouseId,
-				);
-
-				return {
-					...doc,
-					stock,
-				};
-			}
-			return {
-				...doc,
-				stock: [],
-			};
-		});
-
-		return {
-			...response,
-			docs,
-		};
+		return this.productModel.aggregatePaginate(aggregateProduct, options);
 	}
 
 	async findOne({ warehouseId, ...params }: FiltersProductInput) {
