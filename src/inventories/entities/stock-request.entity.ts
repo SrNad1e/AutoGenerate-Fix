@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 
@@ -6,6 +6,15 @@ import { Company } from 'src/configurations/entities/company.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+
+export enum StatusStockRequest {
+	OPEN = 'open',
+	PENDING = 'pending',
+	USED = 'used',
+	CANCELLED = 'cancelled',
+}
+
+registerEnumType(StatusStockRequest, { name: 'StatusStockRequest' });
 
 @ObjectType()
 export class DetailRequest {
@@ -36,11 +45,11 @@ export class StockRequest extends Document {
 	@Prop({ type: Number, default: 0, unique: true })
 	number: number;
 
-	@Field(() => String, {
-		description: 'Estado de la solicitud (open, pending, used, cancelled )',
+	@Field(() => StatusStockRequest, {
+		description: 'Estado de la solicitud',
 	})
 	@Prop({ type: String, default: 'open' })
-	status: string;
+	status: StatusStockRequest;
 
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence la solicitud',

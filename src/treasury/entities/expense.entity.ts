@@ -1,10 +1,17 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Box } from './box.entity';
+
+export enum StatusExpense {
+	ACTIVE = 'active',
+	INACTIVE = 'inactive',
+}
+
+registerEnumType(StatusExpense, { name: 'StatusExpense' });
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Egreso de dinero' })
@@ -27,11 +34,11 @@ export class Expense extends Document {
 	@Prop({ type: String })
 	concept: string;
 
-	@Field(() => String, {
+	@Field(() => StatusExpense, {
 		description: 'Estado del egreso',
 	})
 	@Prop({ type: String, default: 'active' })
-	status: string;
+	status: StatusExpense;
 
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece el egreso',

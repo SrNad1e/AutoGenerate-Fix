@@ -8,6 +8,7 @@ import { CreateReferenceInput } from '../dtos/create-reference.input';
 import { FiltersReferencesInput } from '../dtos/filters-references.input';
 import { ResponseReferences, ReferenceData } from '../dtos/response-references';
 import { UpdateReferenceInput } from '../dtos/update-reference';
+import { StatusProduct } from '../entities/product.entity';
 import { Reference } from '../entities/reference.entity';
 import { ReferencesService } from '../services/references.service';
 
@@ -47,8 +48,13 @@ export class ReferencesResolver {
 	})
 	findById(
 		@Args('id', { description: 'Identificador de la referencia' }) id: string,
+		@Args('productsStatus', {
+			description: 'Estados de los productos que desea traer o nulo',
+			nullable: true,
+		})
+		productsStatus: string,
 	) {
-		return this.referencesService.findById(id);
+		return this.referencesService.findById(id, productsStatus);
 	}
 
 	@Mutation(() => Reference, {

@@ -86,13 +86,15 @@ export class RolesService {
 			permissions.push(permission?._id);
 		}
 
-		return this.roleModel.create({
+		const newRole = new this.roleModel({
 			active,
 			changeWarehouse,
 			permissions,
 			name,
 			user,
 		});
+
+		return (await newRole.save()).populate(populate);
 	}
 
 	async update(

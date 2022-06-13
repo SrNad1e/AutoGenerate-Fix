@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
@@ -8,6 +8,14 @@ import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
 import { Shop } from './shop.entity';
+
+export enum StatusUser {
+	ACTIVE = 'active',
+	INACTIVE = 'inactive',
+	SUSPEND = 'suspend',
+}
+
+registerEnumType(StatusUser, { name: 'StatusUser' });
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Usuario que manipula los datos de la aplicación' })
@@ -52,7 +60,7 @@ export class User extends Document {
 	shop: Types.ObjectId;
 
 	@Field(() => Customer, { description: 'Cliente asignado', nullable: true })
-	@Prop({ type: Types.ObjectId })
+	@Prop({ type: Types.ObjectId, ref: Customer.name })
 	customer: Types.ObjectId;
 
 	@Prop({
@@ -78,10 +86,10 @@ export class User extends Document {
 	companies: Types.ObjectId[];
 
 	@Prop({ type: String, default: 'active' })
-	@Field(() => String, {
-		description: 'Estado del usuario (active, inactive, suspend)',
+	@Field(() => StatusUser, {
+		description: 'Estado del usuario',
 	})
-	status: string;
+	status: StatusUser;
 
 	@Field(() => User, {
 		description: 'Usuario que creó el usuario',

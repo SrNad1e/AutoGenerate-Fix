@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
+import { StatusBoxHistory } from '../dtos/create-boxHistory.input';
 
 import { CreateReceiptInput } from '../dtos/create-receipt.input';
 import { Receipt } from '../entities/receipt.entity';
@@ -62,7 +63,7 @@ export class ReceiptsService {
 				{
 					boxId,
 					documentId: newReceipt?._id.toString(),
-					documentType: 'receipt',
+					documentType: StatusBoxHistory.RECEIPT,
 					value,
 				},
 				user,

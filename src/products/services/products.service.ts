@@ -5,14 +5,20 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import {
+	FilterQuery,
+	PaginateModel,
+	Types,
+	AggregatePaginateModel,
+	ProjectionType,
+} from 'mongoose';
 import { Repository } from 'typeorm';
 
 import {
 	FiltersProductInput,
 	FiltersProductsInput,
 } from '../dtos/filters-products.input';
-import { Product } from '../entities/product.entity';
+import { Product, StatusProduct } from '../entities/product.entity';
 import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
@@ -47,13 +53,65 @@ const populate = [
 	{ path: 'images', model: Image.name },
 ];
 
-const statusTypes = ['active', 'inactive'];
+const lookup = [
+	{
+		$lookup: {
+			from: 'sizes',
+			localField: 'size',
+			foreignField: '_id',
+			as: 'size',
+		},
+	},
+	{
+		$lookup: {
+			from: 'colors',
+			localField: 'color',
+			foreignField: '_id',
+			as: 'color',
+		},
+	},
+	{
+		$lookup: {
+			from: 'references',
+			localField: 'reference',
+			foreignField: '_id',
+			as: 'reference',
+		},
+	},
+	{
+		$lookup: {
+			from: 'images',
+			localField: 'images',
+			foreignField: '_id',
+			as: 'images',
+		},
+	},
+];
+
+const project: ProjectionType<Product> = {
+	stock: 1,
+	user: 1,
+	status: 1,
+	images: 1,
+	barcode: 1,
+	createdAt: 1,
+	updatedAt: 1,
+	size: {
+		$arrayElemAt: ['$size', 0],
+	},
+	reference: {
+		$arrayElemAt: ['$reference', 0],
+	},
+	color: {
+		$arrayElemAt: ['$color', 0],
+	},
+};
 
 @Injectable()
 export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
-		private readonly productModel: PaginateModel<Product>,
+		private readonly productModel: AggregatePaginateModel<Product>,
 		@InjectModel(Image.name)
 		private readonly imageModel: PaginateModel<Image>,
 		@InjectRepository(ProductMysql)
@@ -86,10 +144,11 @@ export class ProductsService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Product> = {};
+		const aggregate = [];
 
 		if (ids) {
 			filters._id = {
-				$in: ids,
+				$in: ids.map((_id) => new Types.ObjectId(_id)),
 			};
 		}
 
@@ -101,8 +160,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusProduct[status]) {
+			filters.status = StatusProduct[status];
 		}
 
 		if (name) {
@@ -127,11 +186,25 @@ export class ProductsService {
 			filters.reference = new Types.ObjectId(referenceId);
 		}
 
+		if (warehouseId) {
+			if (warehouseId !== 'all') {
+				filters['stock.warehouse'] = new Types.ObjectId(warehouseId);
+				aggregate.push({
+					$unwind: '$stock',
+				});
+				project['stock'] = ['$stock'];
+			}
+		}
+
 		if (withStock && warehouseId) {
 			filters['stock.warehouse'] = new Types.ObjectId(warehouseId);
 			filters['stock.quantity'] = {
 				$gt: 0,
 			};
+			aggregate.push({
+				$unwind: '$stock',
+			});
+			project['stock'] = ['$stock'];
 		}
 
 		const options = {
@@ -139,41 +212,20 @@ export class ProductsService {
 			page,
 			sort,
 			lean: true,
-			populate,
 		};
 
-		const response = await this.productModel.paginate(
+		const aggregateProduct = this.productModel.aggregate([
+			...aggregate,
 			{
-				...filters,
+				$match: filters,
 			},
-			options,
-		);
+			...lookup,
+			{
+				$project: project,
+			},
+		]);
 
-		const docs = response.docs.map((doc) => {
-			if (warehouseId) {
-				if (warehouseId === 'all') {
-					return doc;
-				}
-
-				const stock = doc.stock?.filter(
-					(item) => item?.warehouse?._id?.toString() === warehouseId,
-				);
-
-				return {
-					...doc,
-					stock,
-				};
-			}
-			return {
-				...doc,
-				stock: [],
-			};
-		});
-
-		return {
-			...response,
-			docs,
-		};
+		return this.productModel.aggregatePaginate(aggregateProduct, options);
 	}
 
 	async findOne({ warehouseId, ...params }: FiltersProductInput) {
@@ -338,12 +390,6 @@ export class ProductsService {
 			}
 		}
 
-		if (status) {
-			if (!statusTypes.includes(status)) {
-				throw new NotFoundException(`El estado ${status} no es válido`);
-			}
-		}
-
 		if (barcode) {
 			const productCodeBar = await this.findOne({ barcode });
 
@@ -354,14 +400,19 @@ export class ProductsService {
 			}
 		}
 
+		let newStatus;
+		if (StatusProduct[status]) {
+			newStatus = StatusProduct[status];
+		}
+
 		return this.productModel.findByIdAndUpdate(
 			id,
 			{
 				$set: {
 					color: color?._id,
 					size: size?._id,
-					status,
 					barcode,
+					status: newStatus,
 					images: imagesId?.map((item) => new Types.ObjectId(item)) || [],
 					user,
 				},
@@ -523,7 +574,7 @@ export class ProductsService {
 					barcode: product.barcode,
 					color: color._id,
 					size: size._id,
-					status: product.state ? 'active' : 'inactive',
+					status: product.state ? StatusProduct.ACTIVE : StatusProduct.INACTIVE,
 					user: user,
 					stock,
 					images,
@@ -600,7 +651,15 @@ export class ProductsService {
 	 * @returns si todo sale bien el producto actualizado
 	 */
 	async deleteStock(productId: string, quantity: number, warehouseId: string) {
-		const product = await this.productModel.findById(productId).lean();
+		const product = await this.productModel
+			.findById(productId)
+			.populate([
+				{
+					path: 'reference',
+					model: Reference.name,
+				},
+			])
+			.lean();
 
 		if (!product) {
 			throw new BadRequestException('El producto no existe');
@@ -609,9 +668,10 @@ export class ProductsService {
 		const stockSelected = product.stock.find(
 			(item) => item.warehouse._id.toString() === warehouseId,
 		);
+
 		if (stockSelected?.quantity < quantity) {
 			throw new BadRequestException(
-				`Inventario insuficiente para el producto ${product.reference} / ${product.barcode}, stock ${stockSelected.quantity}`,
+				`Inventario insuficiente para el producto ${product.reference['name']} / ${product.barcode}, stock ${stockSelected.quantity}`,
 			);
 		}
 
@@ -704,8 +764,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusProduct[status]) {
+			filters.status = StatusProduct[status];
 		}
 
 		const response = await this.referencesService.getReferences({ name });

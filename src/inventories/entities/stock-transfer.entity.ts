@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Product } from 'src/products/entities/product.entity';
@@ -8,6 +8,25 @@ import { StockRequest } from './stock-request.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Company } from 'src/configurations/entities/company.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+
+export enum StatusStockTransfer {
+	OPEN = 'open',
+	SENT = 'sent',
+	CONFIRMED = 'confirmed',
+	INCOMPLETE = 'incomplete',
+	CANCELLED = 'cancelled',
+	VERIFIED = 'verified',
+}
+
+registerEnumType(StatusStockTransfer, { name: 'StatusStockTransfer' });
+
+export enum StatusDetailTransfer {
+	NEW = 'new',
+	SENT = 'sent',
+	CONFIRMED = 'confirmed',
+}
+
+registerEnumType(StatusDetailTransfer, { name: 'StatusDetailTransfer' });
 
 @ObjectType({ description: 'Detalle del traslado de productos' })
 class DetailTransfer {
@@ -27,10 +46,10 @@ class DetailTransfer {
 	})
 	quantityConfirmed?: number;
 
-	@Field(() => String, {
-		description: 'Estado del producto (confirmed, new, sent)',
+	@Field(() => StatusDetailTransfer, {
+		description: 'Estado del producto',
 	})
-	status: string;
+	status: StatusDetailTransfer;
 
 	@Field(() => Date, {
 		description: 'Fecha de agregado el producto',
@@ -54,11 +73,10 @@ export class StockTransfer extends Document {
 	number: number;
 
 	@Prop({ type: String, default: 'open' })
-	@Field(() => String, {
-		description:
-			'Estado del traslado (open, sent, confirmed, incomplete, cancelled, verified )',
+	@Field(() => StatusStockTransfer, {
+		description: 'Estado del traslado',
 	})
-	status: string;
+	status: StatusStockTransfer;
 
 	@Prop({ type: Object, required: true })
 	@Field(() => Warehouse, { description: 'Bodega de origen del traslado' })

@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -13,13 +13,31 @@ import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
 
+export enum StatusOrder {
+	OPEN = 'open',
+	PENDING = 'pending',
+	CANCELLED = 'cancelled',
+	CLOSED = 'closed',
+	SENT = 'sent',
+	INVOICED = 'invoiced',
+}
+
+registerEnumType(StatusOrder, { name: 'StatusOrder' });
+
+export enum StatusOrderDetail {
+	NEW = 'new',
+	CONFIRMED = 'confirmed',
+}
+
+registerEnumType(StatusOrder, { name: 'StatusOrder' });
+
 @ObjectType({ description: 'Productos del pedido' })
 export class DetailOrder {
 	@Field(() => Product, { description: 'Producto agregado al pedido' })
 	product: Product;
 
-	@Field(() => String, { description: 'Estado del producto (new, confirmed)' })
-	status: string;
+	@Field(() => String, { description: 'Estado del producto' })
+	status: StatusOrderDetail;
 
 	@Field(() => Number, { description: 'Cantidad de productos en el pedido' })
 	quantity: number;
@@ -108,6 +126,13 @@ export class Order extends Document {
 	})
 	shop: Shop;
 
+	@Field(() => Boolean, { description: 'Pedido de POS' })
+	@Prop({
+		type: Boolean,
+		default: true,
+	})
+	orderPos: boolean;
+
 	@Field(() => [PaymentOrder], {
 		description: 'Métodos de pago usados en el pedido',
 		nullable: true,
@@ -118,15 +143,14 @@ export class Order extends Document {
 	})
 	payments: PaymentOrder[];
 
-	@Field(() => String, {
-		description:
-			'Estado del pedido (open, pending, cancelled, closed, sent, invoiced)',
+	@Field(() => StatusOrder, {
+		description: 'Estado del pedido',
 	})
 	@Prop({
 		type: String,
 		default: 'open',
 	})
-	status: string;
+	status: StatusOrder;
 
 	@Field(() => Invoice, {
 		description: 'Factura generada al facturar',

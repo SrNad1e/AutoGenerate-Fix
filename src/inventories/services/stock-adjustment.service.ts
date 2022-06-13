@@ -14,13 +14,23 @@ import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateStockAdjustmentInput } from '../dtos/create-stockAdjustment-input';
-import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
+import {
+	CreateStockHistoryInput,
+	DocumentTypeStockHistory,
+} from '../dtos/create-stockHistory-input';
 import { FiltersStockAdjustmentsInput } from '../dtos/filters-stockAdjustments.input';
-import { UpdateStockAdjustmentInput } from '../dtos/update-stockAdjustment-input';
-import { StockAdjustment } from '../entities/stock-adjustment.entity';
+import {
+	ActionDetailAdjustment,
+	UpdateStockAdjustmentInput,
+} from '../dtos/update-stockAdjustment-input';
+import {
+	StatusStockAdjustment,
+	StockAdjustment,
+} from '../entities/stock-adjustment.entity';
 import { StockHistoryService } from './stock-history.service';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { StatusProduct } from 'src/products/entities/product.entity';
 
 const populate = [
 	{
@@ -56,8 +66,6 @@ const populate = [
 	},
 ];
 
-const statusTypes = ['cancelled', 'open', 'confirmed'];
-
 @Injectable()
 export class StockAdjustmentService {
 	constructor(
@@ -92,8 +100,8 @@ export class StockAdjustmentService {
 			filters.number = number;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusStockAdjustment[status]) {
+			filters.status = StatusStockAdjustment[status];
 		}
 
 		if (warehouseId) {
@@ -152,7 +160,7 @@ export class StockAdjustmentService {
 	}
 
 	async create(
-		{ details, warehouseId, ...options }: CreateStockAdjustmentInput,
+		{ details, warehouseId, status, ...options }: CreateStockAdjustmentInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -160,14 +168,8 @@ export class StockAdjustmentService {
 			throw new BadRequestException('El ajuste no puede estar vacía');
 		}
 
-		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
-			if (options.status === 'cancelled') {
+		if (StatusStockAdjustment[status]) {
+			if (StatusStockAdjustment[status] === StatusStockAdjustment.CANCELLED) {
 				throw new BadRequestException(
 					'El ajuste no puede ser creada, valide el estado del ajuste',
 				);
@@ -195,7 +197,7 @@ export class StockAdjustmentService {
 				throw new BadRequestException('Uno de los productos no existe');
 			}
 
-			if (product?.status !== 'active') {
+			if (product?.status !== StatusProduct.ACTIVE) {
 				throw new BadRequestException(
 					`El producto ${product?.barcode} no se encuentra activo`,
 				);
@@ -223,6 +225,7 @@ export class StockAdjustmentService {
 			details: detailsAdjustment,
 			total,
 			user,
+			status: StatusStockAdjustment[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
@@ -232,7 +235,7 @@ export class StockAdjustmentService {
 
 		const response = await (await newStockInput.save()).populate(populate);
 
-		if (options.status === 'confirmed') {
+		if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
 			const detailsDelete = response.details
 				.filter((detail) => detail.product.stock[0].quantity > detail.quantity)
 				.map((detail) => ({
@@ -251,14 +254,14 @@ export class StockAdjustmentService {
 				details: detailsDelete,
 				warehouseId,
 				documentId: response._id.toString(),
-				documentType: 'adjustment',
+				documentType: DocumentTypeStockHistory.ADJUSTMENT,
 			};
 
 			const addStockHistoryInput: CreateStockHistoryInput = {
 				details: detailsAdd,
 				warehouseId,
 				documentId: response._id.toString(),
-				documentType: 'adjustment',
+				documentType: DocumentTypeStockHistory.ADJUSTMENT,
 			};
 			await this.stockHistoryService.deleteStock(
 				deleteStockHistoryInput,
@@ -276,7 +279,7 @@ export class StockAdjustmentService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockAdjustmentInput,
+		{ details, status, ...options }: UpdateStockAdjustmentInput,
 		user: User,
 		companyId: string,
 	) {
@@ -290,26 +293,20 @@ export class StockAdjustmentService {
 			);
 		}
 
-		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
+		if (StatusStockAdjustment[status]) {
 			if (!stockAdjustment) {
 				throw new BadRequestException('El ajuste no existe');
 			}
 
-			if (stockAdjustment.status === 'cancelled') {
+			if (stockAdjustment.status === StatusStockAdjustment.CANCELLED) {
 				throw new BadRequestException('El ajuste se encuenta cancelado');
 			}
 
-			if (stockAdjustment.status === 'confirmed') {
+			if (stockAdjustment.status === StatusStockAdjustment.CONFIRMED) {
 				throw new BadRequestException('El ajuste se encuentra confirmado');
 			}
 
-			if (options.status === stockAdjustment.status) {
+			if (StatusStockAdjustment[status] === stockAdjustment.status) {
 				throw new BadRequestException(
 					'El estado del ajuste debe cambiar o enviarse vacío',
 				);
@@ -318,7 +315,11 @@ export class StockAdjustmentService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === 'delete')
+				.filter(
+					(detail) =>
+						ActionDetailAdjustment[detail.action] ===
+						ActionDetailAdjustment.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockAdjustment.details
@@ -342,7 +343,7 @@ export class StockAdjustmentService {
 			for (let i = 0; i < details.length; i++) {
 				const { action, productId, quantity } = details[i];
 
-				if (action === 'create') {
+				if (ActionDetailAdjustment[action] === ActionDetailAdjustment.CREATE) {
 					const productFind = stockAdjustment.details.find(
 						(item) => item.product._id.toString() === productId.toString(),
 					);
@@ -359,7 +360,7 @@ export class StockAdjustmentService {
 						throw new BadRequestException('Uno de los productos no existe');
 					}
 
-					if (product?.status !== 'active') {
+					if (product?.status !== StatusProduct.ACTIVE) {
 						throw new BadRequestException(
 							`El producto ${product?.barcode} no se encuentra activo`,
 						);
@@ -382,7 +383,13 @@ export class StockAdjustmentService {
 			const response = await this.stockAdjustmetnModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, total, ...options, user },
+					$set: {
+						...options,
+						details: newDetails,
+						total,
+						status: StatusStockAdjustment[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -391,7 +398,7 @@ export class StockAdjustmentService {
 				},
 			);
 
-			if (options.status === 'confirmed') {
+			if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
 				const detailsDelete = response.details
 					.filter(
 						(detail) => detail.product.stock[0].quantity > detail.quantity,
@@ -414,14 +421,14 @@ export class StockAdjustmentService {
 					details: detailsDelete,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'adjustment',
+					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
 
 				const addStockHistoryInput: CreateStockHistoryInput = {
 					details: detailsAdd,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'adjustment',
+					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
@@ -440,7 +447,7 @@ export class StockAdjustmentService {
 			const response = await this.stockAdjustmetnModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockAdjustment[status], user },
 				},
 				{
 					new: true,
@@ -449,8 +456,27 @@ export class StockAdjustmentService {
 				},
 			);
 
-			if (options.status === 'confirmed') {
-				const detailsDelete = response.details
+			if (StatusStockAdjustment[status] === StatusStockAdjustment.CONFIRMED) {
+				//colsultar stock de productos
+
+				const newDetails = [];
+
+				for (let i = 0; i < response.details.length; i++) {
+					const {
+						product: { _id },
+					} = response.details[i];
+					const product = await this.productsService.findById(
+						_id.toString(),
+						response?.warehouse?._id?.toString(),
+					);
+
+					newDetails.push({
+						...response?.details[i],
+						product,
+					});
+				}
+
+				const detailsDelete = newDetails
 					.filter(
 						(detail) => detail.product.stock[0].quantity > detail.quantity,
 					)
@@ -459,7 +485,7 @@ export class StockAdjustmentService {
 						quantity: detail.product.stock[0].quantity - detail.quantity,
 					}));
 
-				const detailsAdd = response.details
+				const detailsAdd = newDetails
 					.filter(
 						(detail) => detail.product.stock[0].quantity < detail.quantity,
 					)
@@ -472,15 +498,16 @@ export class StockAdjustmentService {
 					details: detailsDelete,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'adjustment',
+					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
 
 				const addStockHistoryInput: CreateStockHistoryInput = {
 					details: detailsAdd,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'adjustment',
+					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
+
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
 					user,

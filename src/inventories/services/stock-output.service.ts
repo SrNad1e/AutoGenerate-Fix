@@ -12,14 +12,24 @@ import { ProductsService } from 'src/products/services/products.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateStockOutputInput } from '../dtos/create-stockOutput-input';
 import { FiltersStockOutputsInput } from '../dtos/filters-stockOutputs.input';
-import { UpdateStockOutputInput } from '../dtos/update-stockOutput-input';
-import { StockOutput } from '../entities/stock-output.entity';
+import {
+	ActionDetailOutput,
+	UpdateStockOutputInput,
+} from '../dtos/update-stockOutput-input';
+import {
+	StatusStockOutput,
+	StockOutput,
+} from '../entities/stock-output.entity';
 import { StockHistoryService } from './stock-history.service';
 import { Size } from 'src/products/entities/size.entity';
 import { Color } from 'src/products/entities/color.entity';
-import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
+import {
+	CreateStockHistoryInput,
+	DocumentTypeStockHistory,
+} from '../dtos/create-stockHistory-input';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { StatusProduct } from 'src/products/entities/product.entity';
 
 const populate = [
 	{
@@ -50,7 +60,6 @@ const populate = [
 		],
 	},
 ];
-const statusTypes = ['cancelled', 'open', 'confirmed'];
 
 @Injectable()
 export class StockOutputService {
@@ -86,8 +95,8 @@ export class StockOutputService {
 			filters.number = number;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusStockOutput[status]) {
+			filters.status = StatusStockOutput[status];
 		}
 
 		if (warehouseId) {
@@ -141,7 +150,7 @@ export class StockOutputService {
 	}
 
 	async create(
-		{ details, warehouseId, ...options }: CreateStockOutputInput,
+		{ details, warehouseId, status, ...options }: CreateStockOutputInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -149,16 +158,10 @@ export class StockOutputService {
 			throw new BadRequestException('La salida no puede estar vacía');
 		}
 
-		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
+		if (StatusStockOutput[status]) {
+			if (StatusStockOutput[status] === StatusStockOutput.CANCELLED) {
 				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
-			if (options.status === 'cancelled') {
-				throw new BadRequestException(
-					'La entrada no puede ser creada, valide el estado de la salida',
+					'La salida no puede ser creada, valide el estado de la salida',
 				);
 			}
 		}
@@ -188,7 +191,7 @@ export class StockOutputService {
 				throw new BadRequestException('Uno de los productos no existe');
 			}
 
-			if (product?.status !== 'active') {
+			if (product?.status !== StatusProduct.ACTIVE) {
 				throw new BadRequestException(
 					`El producto ${product?.barcode} no se encuentra activo`,
 				);
@@ -211,20 +214,21 @@ export class StockOutputService {
 			.sort({ _id: -1 });
 
 		const newStockInput = new this.stockOutputModel({
+			...options,
 			warehouse,
 			details: detailsInput,
 			total,
 			user,
+			status: StatusStockOutput[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
 			number: (stockOutput?.number || 0) + 1,
-			...options,
 		});
 
 		const response = await (await newStockInput.save()).populate(populate);
 
-		if (options.status === 'confirmed') {
+		if (StatusStockOutput[status] === StatusStockOutput.CONFIRMED) {
 			const detailHistory = response.details.map((detail) => ({
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
@@ -234,7 +238,7 @@ export class StockOutputService {
 				details: detailHistory,
 				warehouseId,
 				documentId: response._id.toString(),
-				documentType: 'output',
+				documentType: DocumentTypeStockHistory.OUTPUT,
 			};
 			await this.stockHistoryService.deleteStock(
 				deleteStockHistoryInput,
@@ -247,7 +251,7 @@ export class StockOutputService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockOutputInput,
+		{ details, status, ...options }: UpdateStockOutputInput,
 		user: User,
 		companyId: string,
 	) {
@@ -262,26 +266,20 @@ export class StockOutputService {
 			);
 		}
 
-		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
+		if (StatusStockOutput[status]) {
 			if (!stockOutput) {
 				throw new BadRequestException('La salida no existe');
 			}
 
-			if (stockOutput.status === 'cancelled') {
+			if (stockOutput.status === StatusStockOutput.CANCELLED) {
 				throw new BadRequestException('La salida se encuenta cancelada');
 			}
 
-			if (stockOutput.status === 'confirmed') {
+			if (stockOutput.status === StatusStockOutput.CONFIRMED) {
 				throw new BadRequestException('La salida se encuentra confirmada');
 			}
 
-			if (options.status === stockOutput.status) {
+			if (StatusStockOutput[status] === stockOutput.status) {
 				throw new BadRequestException(
 					'El estado de la salida debe cambiar o enviarse vacío',
 				);
@@ -290,7 +288,10 @@ export class StockOutputService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === 'delete')
+				.filter(
+					(detail) =>
+						ActionDetailOutput[detail.action] === ActionDetailOutput.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockOutput.details
@@ -325,13 +326,13 @@ export class StockOutputService {
 					throw new BadRequestException('Uno de los productos no existe');
 				}
 
-				if (product?.status !== 'active') {
+				if (product?.status !== StatusProduct.ACTIVE) {
 					throw new BadRequestException(
 						`El producto ${product?.barcode} no se encuentra activo`,
 					);
 				}
 
-				if (action === 'create') {
+				if (ActionDetailOutput[action] === ActionDetailOutput.CREATE) {
 					if (quantity <= 0) {
 						throw new BadRequestException('Los productos no pueden estar en 0');
 					}
@@ -362,7 +363,13 @@ export class StockOutputService {
 			const response = await this.stockOutputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, total, ...options, user },
+					$set: {
+						...options,
+						details: newDetails,
+						total,
+						status: StatusStockOutput[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -371,7 +378,7 @@ export class StockOutputService {
 				},
 			);
 
-			if (options.status === 'confirmed') {
+			if (StatusStockOutput[status] === StatusStockOutput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -381,7 +388,7 @@ export class StockOutputService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'output',
+					documentType: DocumentTypeStockHistory.OUTPUT,
 				};
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,
@@ -395,7 +402,7 @@ export class StockOutputService {
 			const response = await this.stockOutputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockOutput[status], user },
 				},
 				{
 					new: true,
@@ -404,7 +411,7 @@ export class StockOutputService {
 				},
 			);
 
-			if (options.status === 'confirmed') {
+			if (StatusStockOutput[status] === StatusStockOutput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -414,7 +421,7 @@ export class StockOutputService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'output',
+					documentType: DocumentTypeStockHistory.OUTPUT,
 				};
 				await this.stockHistoryService.deleteStock(
 					deleteStockHistoryInput,

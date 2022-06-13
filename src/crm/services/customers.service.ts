@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
-import { Order } from 'src/sales/entities/order.entity';
+import { Order, StatusOrder } from 'src/sales/entities/order.entity';
 import { CreateCustomerInput } from '../dtos/create-customer.input';
 import { FiltersCustomerInput } from '../dtos/filters-customer.input';
 import { FiltersCustomersInput } from '../dtos/filters-customers.input';
@@ -230,7 +230,7 @@ export class CustomersService {
 					$set: {
 						customer: id,
 						status: {
-							$in: ['open', 'pending'],
+							$in: [StatusOrder.OPEN, StatusOrder.PENDING],
 						},
 					},
 				},

@@ -12,14 +12,21 @@ import { Color } from 'src/products/entities/color.entity';
 import { Size } from 'src/products/entities/size.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { User } from 'src/configurations/entities/user.entity';
-import { CreateStockHistoryInput } from '../dtos/create-stockHistory-input';
+import {
+	CreateStockHistoryInput,
+	DocumentTypeStockHistory,
+} from '../dtos/create-stockHistory-input';
 import { CreateStockInputInput } from '../dtos/create-stockInput-input';
 import { FiltersStockInputsInput } from '../dtos/filters-stockInputs.input';
-import { UpdateStockInputInput } from '../dtos/update-stockInput-input';
-import { StockInput } from '../entities/stock-input.entity';
+import {
+	ActionDetailInput,
+	UpdateStockInputInput,
+} from '../dtos/update-stockInput-input';
+import { StatusStockInput, StockInput } from '../entities/stock-input.entity';
 import { StockHistoryService } from './stock-history.service';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { StatusProduct } from 'src/products/entities/product.entity';
 
 const populate = [
 	{
@@ -50,8 +57,6 @@ const populate = [
 		],
 	},
 ];
-
-const statusTypes = ['cancelled', 'open', 'confirmed'];
 
 @Injectable()
 export class StockInputService {
@@ -87,8 +92,8 @@ export class StockInputService {
 			filters.number = number;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusStockInput[status]) {
+			filters.status = StatusStockInput[status];
 		}
 
 		if (warehouseId) {
@@ -146,7 +151,7 @@ export class StockInputService {
 	}
 
 	async create(
-		{ details, warehouseId, ...options }: CreateStockInputInput,
+		{ details, warehouseId, status, ...options }: CreateStockInputInput,
 		user: Partial<User>,
 		companyId: string,
 	) {
@@ -154,14 +159,8 @@ export class StockInputService {
 			throw new BadRequestException('La entrada no puede estar vacía');
 		}
 
-		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
-			if (options.status === 'cancelled') {
+		if (StatusStockInput[status]) {
+			if (StatusStockInput[status] === StatusStockInput.CANCELLED) {
 				throw new BadRequestException(
 					'La entrada no puede ser creada, valide el estado de la entrada',
 				);
@@ -194,7 +193,7 @@ export class StockInputService {
 				throw new BadRequestException('Uno de los productos no existe');
 			}
 
-			if (product?.status !== 'active') {
+			if (product?.status !== StatusProduct.ACTIVE) {
 				throw new BadRequestException(
 					`El producto ${product?.barcode} no se encuentra activo`,
 				);
@@ -221,6 +220,7 @@ export class StockInputService {
 			details: detailsInput,
 			total,
 			user,
+			status: StatusStockInput[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
@@ -230,7 +230,7 @@ export class StockInputService {
 
 		const response = await (await newStockInput.save()).populate(populate);
 
-		if (options.status === 'confirmed') {
+		if (StatusStockInput[status] === StatusStockInput.CONFIRMED) {
 			const detailHistory = response.details.map((detail) => ({
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
@@ -240,7 +240,7 @@ export class StockInputService {
 				details: detailHistory,
 				warehouseId,
 				documentId: response._id.toString(),
-				documentType: 'input',
+				documentType: DocumentTypeStockHistory.INPUT,
 			};
 			await this.stockHistoryService.addStock(
 				addStockHistoryInput,
@@ -253,7 +253,7 @@ export class StockInputService {
 
 	async update(
 		id: string,
-		{ details, ...options }: UpdateStockInputInput,
+		{ details, status, ...options }: UpdateStockInputInput,
 		user: User,
 		companyId: string,
 	) {
@@ -271,26 +271,20 @@ export class StockInputService {
 			);
 		}
 
-		if (options.status) {
-			if (!statusTypes.includes(options.status)) {
-				throw new BadRequestException(
-					`Es estado ${options.status} no es un estado válido`,
-				);
-			}
-
+		if (StatusStockInput[status]) {
 			if (!stockInput) {
 				throw new BadRequestException('La entrada no existe');
 			}
 
-			if (stockInput.status === 'cancelled') {
+			if (stockInput.status === StatusStockInput.CANCELLED) {
 				throw new BadRequestException('La entrada se encuenta cancelada');
 			}
 
-			if (stockInput.status === 'confirmed') {
+			if (stockInput.status === StatusStockInput.CONFIRMED) {
 				throw new BadRequestException('La entrada se encuentra confirmada');
 			}
 
-			if (options.status === stockInput.status) {
+			if (StatusStockInput[status] === stockInput.status) {
 				throw new BadRequestException(
 					'El estado de la entrada debe cambiar o enviarse vacío',
 				);
@@ -299,7 +293,10 @@ export class StockInputService {
 
 		if (details && details.length > 0) {
 			const productsDelete = details
-				.filter((detail) => detail.action === 'delete')
+				.filter(
+					(detail) =>
+						ActionDetailInput[detail.action] === ActionDetailInput.DELETE,
+				)
 				.map((detail) => detail.productId.toString());
 
 			const newDetails = stockInput.details
@@ -327,7 +324,7 @@ export class StockInputService {
 					(item) => item.product._id.toString() === productId.toString(),
 				);
 
-				if (action === 'create') {
+				if (ActionDetailInput[action] === ActionDetailInput.CREATE) {
 					if (productFind) {
 						throw new BadRequestException(
 							`El producto ${productFind.product.reference['name']} / ${productFind.product.barcode} ya se encuentra registrado`,
@@ -346,7 +343,7 @@ export class StockInputService {
 						throw new BadRequestException('Uno de los productos no existe');
 					}
 
-					if (product?.status !== 'active') {
+					if (product?.status !== StatusProduct.ACTIVE) {
 						throw new BadRequestException(
 							`El producto ${product?.barcode} no se encuentra activo`,
 						);
@@ -369,7 +366,13 @@ export class StockInputService {
 			const response = await this.stockInputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { details: newDetails, total, ...options, user },
+					$set: {
+						...options,
+						details: newDetails,
+						total,
+						status: StatusStockInput[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -378,7 +381,7 @@ export class StockInputService {
 				},
 			);
 
-			if (options.status === 'confirmed') {
+			if (StatusStockInput[status] === StatusStockInput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -388,7 +391,7 @@ export class StockInputService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'input',
+					documentType: DocumentTypeStockHistory.INPUT,
 				};
 				await this.stockHistoryService.addStock(
 					addStockHistoryInput,
@@ -402,7 +405,7 @@ export class StockInputService {
 			const response = await this.stockInputModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, user },
+					$set: { ...options, status: StatusStockInput[status], user },
 				},
 				{
 					new: true,
@@ -411,7 +414,7 @@ export class StockInputService {
 				},
 			);
 
-			if (options.status === 'confirmed') {
+			if (StatusStockInput[status] === StatusStockInput.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
@@ -421,7 +424,7 @@ export class StockInputService {
 					details: detailHistory,
 					warehouseId: response.warehouse._id.toString(),
 					documentId: response._id.toString(),
-					documentType: 'input',
+					documentType: DocumentTypeStockHistory.INPUT,
 				};
 				await this.stockHistoryService.addStock(
 					addStockHistoryInput,

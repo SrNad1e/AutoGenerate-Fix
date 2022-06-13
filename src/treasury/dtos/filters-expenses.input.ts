@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusExpense } from '../entities/expense.entity';
 
 @InputType({ description: 'Ordenamiento de los egresos' })
 export class SortPayment {
@@ -31,11 +32,11 @@ export class FiltersExpensesInput {
 	})
 	boxId?: string;
 
-	@Field(() => String, {
-		description: 'Estado del egreso (active, inactive)',
+	@Field(() => StatusExpense, {
+		description: 'Estado del egreso',
 		nullable: true,
 	})
-	status?: string;
+	status?: StatusExpense;
 
 	@Field(() => String, {
 		description: 'Fecha inicial de la busqueda',

@@ -4,7 +4,6 @@ import { Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 
-
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Tipo de documento de identificación' })
 export class DocumentType {

@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusShop } from '../entities/shop.entity';
 
 @InputType({ description: 'Ordenamiento de la tienda' })
 export class SortShop {
@@ -32,11 +33,11 @@ export class FiltersShopsInput {
 	@Field(() => String, { description: 'Comodín de la tienda', nullable: true })
 	name?: string;
 
-	@Field(() => String, {
-		description: 'Estado de la tienda (active, inactive, suspend)',
+	@Field(() => StatusShop, {
+		description: 'Estado de la tienda',
 		nullable: true,
 	})
-	status?: string;
+	status?: StatusShop;
 
 	@Field(() => String, {
 		description: 'Dirección de la sucursal',

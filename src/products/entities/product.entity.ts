@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document, Schema as SchemaMongo } from 'mongoose';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
@@ -9,6 +9,13 @@ import { Reference } from './reference.entity';
 import { Image } from 'src/configurations/entities/image.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+
+export enum StatusProduct {
+	ACTIVE = 'active',
+	INACTIVE = 'inactive',
+}
+
+registerEnumType(StatusProduct, { name: 'StatusProduct' });
 
 @ObjectType({ description: 'Inventario por bodegas del producto' })
 export class Stock {
@@ -80,10 +87,10 @@ export class Product extends Document {
 	size: Types.ObjectId;
 
 	@Prop({ type: String, default: 'active' })
-	@Field(() => String, {
-		description: 'Estado del producto (active, inactive)',
+	@Field(() => StatusProduct, {
+		description: 'Estado del producto',
 	})
-	status: string;
+	status: StatusProduct;
 
 	@Prop({ type: Object, required: true })
 	@Field(() => User, { description: 'Usuario que crea el producto' })

@@ -7,40 +7,39 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
-import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { ProductsService } from 'src/products/services/products.service';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
-import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
+import {
+	ActionPaymentsOrder,
+	AddPaymentsOrderInput,
+} from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
-import { Order } from '../entities/order.entity';
+import {
+	Order,
+	StatusOrder,
+	StatusOrderDetail,
+} from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
-import { Product } from 'src/products/entities/product.entity';
+import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
+import { StatusProduct } from 'src/products/entities/product.entity';
+import { ActionProductsOrder } from '../dtos/add-products-order-input';
 
 const populate = [
 	{
 		path: 'invoice',
 		model: Invoice.name,
 	},
-];
-
-const statuTypes = [
-	'open',
-	'pending',
-	'cancelled',
-	'closed',
-	'sent',
-	'invoiced',
 ];
 
 @Injectable()
@@ -65,6 +64,7 @@ export class OrdersService {
 			dateInitial,
 			document,
 			number,
+			orderPOS,
 			sort,
 			limit = 10,
 			page = 1,
@@ -77,8 +77,12 @@ export class OrdersService {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusOrder[status]) {
+			filters.status = StatusOrder[status];
+		}
+
+		if (orderPOS !== undefined) {
+			filters.orderPOS = orderPOS;
 		}
 
 		if (dateInitial) {
@@ -124,11 +128,13 @@ export class OrdersService {
 	}
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
-		if (!['open', 'pending'].includes(status)) {
+		if (
+			![StatusOrder.OPEN, StatusOrder.PENDING].includes(StatusOrder[status])
+		) {
 			throw new BadRequestException('El estado del pedido no es correcto');
 		}
 
-		if (user?.pointOfSale && status === 'open') {
+		if (user?.pointOfSale && StatusOrder[status] === StatusOrder.OPEN) {
 			if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
 				throw new NotFoundException(
 					`El punto de venta se encuentra cerrado para el día ${dayjs(
@@ -185,17 +191,18 @@ export class OrdersService {
 		}
 
 		const address =
-			user?.customer['addresses'].length > 0
-				? user?.customer['addresses'].find((address) => address?.isMain)
+			user?.customer['addresses']?.length > 0
+				? user?.customer['addresses']?.find((address) => address?.isMain)
 				: undefined;
 
 		return this.orderModel.create({
 			customer: user.customer,
 			address,
 			shop,
+			orderPos: false,
 			user,
 			number,
-			status,
+			status: StatusOrder[status],
 			company: new Types.ObjectId(companyId),
 		});
 	}
@@ -232,10 +239,12 @@ export class OrdersService {
 				for (let i = 0; i < order?.details?.length; i++) {
 					const detail = order?.details[i];
 
-					const discount = await this.discountRulesService.getDiscountProduct({
-						customerId: customer._id.toString(),
-						product: detail?.product as Product,
-					});
+					const discount = await this.discountRulesService.getDiscountReference(
+						{
+							customerId: customer._id.toString(),
+							reference: detail?.product?.reference as any,
+						},
+					);
 
 					newDetails.push({
 						...detail,
@@ -271,35 +280,43 @@ export class OrdersService {
 			}
 		}
 
-		if (status) {
-			if (!statuTypes.includes(status)) {
-				throw new BadRequestException(
-					`El estado ${status} no es un estado válido`,
-				);
-			}
-
+		if (StatusOrder[status]) {
 			switch (order?.status) {
-				case 'open':
-					if (!['cancelled', 'invoiced', 'closed'].includes(status)) {
+				case StatusOrder.OPEN:
+					if (
+						![
+							StatusOrder.CANCELLED,
+							StatusOrder.INVOICED,
+							StatusOrder.CLOSED,
+						].includes(StatusOrder[status])
+					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
 					break;
-				case 'pending':
-					if (!['open'].includes(status)) {
+				case StatusOrder.PENDING:
+					if (
+						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(
+							StatusOrder[status],
+						)
+					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
 					}
 					break;
-				case 'invoiced':
-					if (!['sent', 'closed'].includes(status)) {
+				case StatusOrder.INVOICED:
+					if (
+						![StatusOrder.SENT, StatusOrder.CLOSED].includes(
+							StatusOrder[status],
+						)
+					) {
 						throw new BadRequestException('El pedido se encuentra facturado');
 					}
 					break;
-				case 'sent':
-					if (!['closed'].includes(status)) {
+				case StatusOrder.SENT:
+					if (![StatusOrder.CLOSED].includes(StatusOrder[status])) {
 						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
-				case 'cancelled' || 'closed':
+				case StatusOrder.CANCELLED || StatusOrder.CLOSED:
 					throw new BadRequestException('El pedido se encuentra finalizado');
 				default:
 					break;
@@ -307,7 +324,10 @@ export class OrdersService {
 
 			const payments = [];
 
-			if (order.status === 'open' && status === 'closed') {
+			if (
+				order.status === StatusOrder.OPEN &&
+				StatusOrder[status] === StatusOrder.CLOSED
+			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
 
@@ -337,7 +357,7 @@ export class OrdersService {
 				dataUpdate['payments'] = payments;
 			}
 
-			dataUpdate['status'] = status;
+			dataUpdate['status'] = StatusOrder[status];
 		}
 
 		let conveyor;
@@ -348,20 +368,38 @@ export class OrdersService {
 			}
 		}
 
-		if (status === 'cancelled') {
-			const details = order?.details?.map((detail) => ({
+		if (StatusOrder[status] === StatusOrder.CANCELLED) {
+			if (order?.status === StatusOrder.OPEN) {
+				const details = order?.details?.map((detail) => ({
+					productId: detail?.product?._id.toString(),
+					quantity: detail?.quantity,
+				}));
+
+				await this.stockHistoryService.addStock(
+					{
+						details,
+						warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
+						documentId: order?._id.toString(),
+						documentType: DocumentTypeStockHistory.ORDER,
+					},
+					user,
+					companyId,
+				);
+			}
+		}
+
+		if (StatusOrder[status] === StatusOrder.OPEN) {
+			const details = order.details.map((detail) => ({
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
 
-			//TODO: anular recibo de caja, actualizar la caja
-
-			await this.stockHistoryService.addStock(
+			await this.stockHistoryService.deleteStock(
 				{
 					details,
-					warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
-					documentId: order?._id.toString(),
-					documentType: 'order',
+					documentId: orderId,
+					documentType: DocumentTypeStockHistory.ORDER,
+					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
 				},
 				user,
 				companyId,
@@ -404,7 +442,7 @@ export class OrdersService {
 		return this.orderModel
 			.find({
 				pointOfSale: new Types.ObjectId(idPointOfSale),
-				status: 'open',
+				status: StatusOrder.OPEN,
 			})
 			.populate(populate)
 			.lean();
@@ -421,7 +459,7 @@ export class OrdersService {
 						$gte: dateIntial,
 						$lt: dateFinal,
 					},
-					status: 'cancelled',
+					status: StatusOrder.CANCELLED,
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
 			},
@@ -442,7 +480,7 @@ export class OrdersService {
 						$gte: dateIntial,
 						$lt: dateFinal,
 					},
-					status: 'open',
+					status: StatusOrder.OPEN,
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
 			},
@@ -466,7 +504,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: ['closed', 'sent', 'invoiced'],
+						$in: [StatusOrder.CLOSED, StatusOrder.SENT, StatusOrder.INVOICED],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -495,7 +533,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: ['closed', 'sent', 'invoiced'],
+						$in: [StatusOrder.CLOSED, StatusOrder.SENT, StatusOrder.INVOICED],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -542,7 +580,7 @@ export class OrdersService {
 			);
 		}
 
-		if (!['open', 'pending'].includes(order?.status)) {
+		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} no se encuentra abierto`,
 			);
@@ -550,7 +588,9 @@ export class OrdersService {
 
 		let newDetails = [...order.details];
 
-		const productsDelete = details?.filter((item) => item.action === 'delete');
+		const productsDelete = details?.filter(
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.DELETE,
+		);
 
 		if (productsDelete) {
 			for (let i = 0; i < productsDelete.length; i++) {
@@ -574,7 +614,9 @@ export class OrdersService {
 			);
 		}
 
-		const productsUpdate = details?.filter((item) => item.action === 'update');
+		const productsUpdate = details?.filter(
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.UPDATE,
+		);
 
 		if (productsUpdate) {
 			for (let i = 0; i < productsUpdate.length; i++) {
@@ -602,7 +644,7 @@ export class OrdersService {
 					throw new BadRequestException('Uno de los productos no existe');
 				}
 
-				if (product?.status !== 'active') {
+				if (product?.status !== StatusProduct.ACTIVE) {
 					throw new BadRequestException(
 						`El producto ${product?.barcode} no se encuentra activo`,
 					);
@@ -617,7 +659,9 @@ export class OrdersService {
 			}
 		}
 
-		const productsCreate = details?.filter((item) => item.action === 'create');
+		const productsCreate = details?.filter(
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.CREATE,
+		);
 
 		if (productsCreate) {
 			for (let i = 0; i < productsCreate.length; i++) {
@@ -643,20 +687,20 @@ export class OrdersService {
 					throw new BadRequestException('Uno de los productos no existe');
 				}
 
-				if (product?.status !== 'active') {
+				if (product?.status !== StatusProduct.ACTIVE) {
 					throw new BadRequestException(
 						`El producto ${product?.barcode} no se encuentra activo`,
 					);
 				}
 
-				const discount = await this.discountRulesService.getDiscountProduct({
+				const discount = await this.discountRulesService.getDiscountReference({
 					customerId: order?.customer?._id.toString(),
-					product: product as Product,
+					reference: product?.reference as any,
 				});
 
 				newDetails.push({
 					product,
-					status: 'new',
+					status: StatusOrderDetail.NEW,
 					quantity,
 					price: product.reference['price'] - discount,
 					discount,
@@ -678,27 +722,33 @@ export class OrdersService {
 			productsCreate.push(product);
 		}
 
-		await this.stockHistoryService.addStock(
-			{
-				details: productsDelete,
-				documentId: orderId,
-				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-			},
-			user,
-			companyId,
-		);
+		if (order?.status === StatusOrder.OPEN) {
+			if (productsDelete.length > 0) {
+				await this.stockHistoryService.addStock(
+					{
+						details: productsDelete,
+						documentId: orderId,
+						documentType: DocumentTypeStockHistory.ORDER,
+						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+					},
+					user,
+					companyId,
+				);
+			}
 
-		await this.stockHistoryService.deleteStock(
-			{
-				details: productsCreate,
-				documentId: orderId,
-				documentType: 'order',
-				warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-			},
-			user,
-			companyId,
-		);
+			if (productsCreate.length > 0) {
+				await this.stockHistoryService.deleteStock(
+					{
+						details: productsCreate,
+						documentId: orderId,
+						documentType: DocumentTypeStockHistory.ORDER,
+						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+					},
+					user,
+					companyId,
+				);
+			}
+		}
 
 		const total = newDetails.reduce(
 			(sum, detail) => sum + detail.price * detail.quantity,
@@ -747,15 +797,18 @@ export class OrdersService {
 				'El pedido que intenta actualizar no existe',
 			);
 		}
-		if (order?.status !== 'open') {
+
+		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
 			throw new BadRequestException(
-				`El pedido ${order.number} no se encuentra abierto`,
+				`El pedido ${order.number} ya se encuentra procesado`,
 			);
 		}
 
 		let newPayments = [...order.payments];
 
-		const paymentsDelete = payments?.filter((item) => item.action === 'delete');
+		const paymentsDelete = payments?.filter(
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.DELETE,
+		);
 
 		if (paymentsDelete) {
 			for (let i = 0; i < paymentsDelete.length; i++) {
@@ -779,7 +832,9 @@ export class OrdersService {
 			);
 		}
 
-		const paymentsUpdate = payments?.filter((item) => item.action === 'update');
+		const paymentsUpdate = payments?.filter(
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.UPDATE,
+		);
 
 		if (paymentsUpdate) {
 			for (let i = 0; i < paymentsUpdate.length; i++) {
@@ -810,7 +865,9 @@ export class OrdersService {
 			});
 		}
 
-		const paymentsCreate = payments?.filter((item) => item.action === 'create');
+		const paymentsCreate = payments?.filter(
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.CREATE,
+		);
 
 		if (paymentsCreate) {
 			for (let i = 0; i < paymentsCreate.length; i++) {

@@ -1,4 +1,18 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+
+export enum DocumentTypeStockHistory {
+	TRANSFER = 'transfer',
+	INPUT = 'input',
+	REFUND = 'refund',
+	ADJUSTMENT = 'adjustment',
+	OUTPUT = 'output',
+	ORDER = 'order',
+	RETURNORDER = 'returnOrder',
+}
+
+registerEnumType(DocumentTypeStockHistory, {
+	name: 'DocumentTypeStockHistory',
+});
 
 @InputType()
 export class DetailHistory {
@@ -20,9 +34,8 @@ export class CreateStockHistoryInput {
 	@Field(() => String, { description: 'Identificador del documento' })
 	documentId: string;
 
-	@Field(() => String, {
-		description:
-			'Tipo de documento que realiza el movimiento (transfer, input, refund, adjustment, output, order)',
+	@Field(() => DocumentTypeStockHistory, {
+		description: 'Tipo de documento que realiza el movimiento',
 	})
-	documentType: string;
+	documentType: DocumentTypeStockHistory;
 }

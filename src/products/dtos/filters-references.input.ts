@@ -83,6 +83,12 @@ export class FiltersReferencesInput {
 	})
 	changeable?: boolean;
 
+	@Field(() => String, {
+		description: 'Identificador del cliente para validar descuentos',
+		nullable: true,
+	})
+	customerId?: string;
+
 	@Field(() => SortReference, { description: 'Ordenamiento', nullable: true })
 	sort?: SortReference;
 }

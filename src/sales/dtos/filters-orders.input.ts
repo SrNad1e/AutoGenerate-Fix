@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusOrder } from '../entities/order.entity';
 
 @InputType({ description: 'Ordenamiento de pedidos' })
 export class SortOrder {
@@ -53,15 +54,18 @@ export class FiltersOrdersInput {
 	})
 	dateFinal: string;
 
-	@Field(() => String, {
+	@Field(() => StatusOrder, {
 		description: 'Estado del pedido',
 		nullable: true,
 	})
-	status?: string;
+	status?: StatusOrder;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 
 	@Field({ description: 'Desde donde arranca la página', nullable: true })
 	page?: number;
+
+	@Field({ description: 'Trae los pedidos POS solamente', nullable: true })
+	orderPOS?: boolean;
 }

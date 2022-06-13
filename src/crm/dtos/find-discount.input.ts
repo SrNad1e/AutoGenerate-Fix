@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-import { Product } from 'src/products/entities/product.entity';
+import { Reference } from 'src/products/entities/reference.entity';
 
 @InputType({ description: 'Datos para calcular el valor del descuento' })
 export class FindDiscountInput {
@@ -10,9 +10,9 @@ export class FindDiscountInput {
 	})
 	customerId: string;
 
-	@Field(() => String, {
-		description: 'Producto para validar el descuento',
+	@Field(() => Reference, {
+		description: 'Referencia para validar el descuento',
 		nullable: true,
 	})
-	product: Product;
+	reference: Reference;
 }

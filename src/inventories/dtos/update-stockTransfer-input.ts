@@ -1,14 +1,23 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { StatusStockTransfer } from '../entities/stock-transfer.entity';
+
+export enum ActionDetailTransfer {
+	DELETE = 'delete',
+	UPDATE = 'update',
+	CREATE = 'create',
+}
+
+registerEnumType(ActionDetailTransfer, { name: 'ActionDetailTransfer' });
 
 @InputType({ description: 'Detalle del traslado de productos' })
 export class DetailStockTransferInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
 	productId: string;
 
-	@Field(() => String, {
-		description: 'Acción a efectuar con el producto (delete, update, create)',
+	@Field(() => ActionDetailTransfer, {
+		description: 'Acción a efectuar con el producto',
 	})
-	action: string;
+	action: ActionDetailTransfer;
 
 	@Field(() => Number, { description: 'Cantidad de productos' })
 	quantity: number;
@@ -22,12 +31,11 @@ export class UpdateStockTransferInput {
 	})
 	details: DetailStockTransferInput[];
 
-	@Field(() => String, {
-		description:
-			'Estado del traslado (open, sent, confirmed, incomplete, cancelled)',
+	@Field(() => StatusStockTransfer, {
+		description: 'Estado del traslado',
 		nullable: true,
 	})
-	status: string;
+	status: StatusStockTransfer;
 
 	@Field(() => String, {
 		description: 'Observación del que envía el traslado',

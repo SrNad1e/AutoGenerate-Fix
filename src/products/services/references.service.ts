@@ -17,7 +17,7 @@ import { CategoryLevel2 } from '../entities/category-level2.entity';
 import { CategoryLevel3 } from '../entities/category-level3.entity';
 import { Company } from '../../configurations/entities/company.entity';
 import { Reference } from '../entities/reference.entity';
-import { Product } from '../entities/product.entity';
+import { Product, StatusProduct } from '../entities/product.entity';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
 import { Image } from 'src/configurations/entities/image.entity';
@@ -26,6 +26,7 @@ import { SizesService } from './sizes.service';
 import { AttribsService } from './attribs.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -49,6 +50,7 @@ export class ReferencesService {
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
 		private readonly attribsService: AttribsService,
+		private readonly discountRulesService: DiscountRulersService,
 	) {}
 
 	async findAll(
@@ -62,10 +64,10 @@ export class ReferencesService {
 			price,
 			active,
 			changeable,
+			customerId,
 		}: FiltersReferencesInput,
 		products: boolean,
-		companyId?: string,
-		user?: Partial<User>,
+		companyId: string,
 	) {
 		const filters: FilterQuery<Reference> = {};
 
@@ -95,7 +97,7 @@ export class ReferencesService {
 			};
 		}
 
-		if (user?.username !== 'admin' || companyId) {
+		if (companyId) {
 			filters.companies = {
 				$elemMatch: { $eq: new Types.ObjectId(companyId) },
 			};
@@ -112,14 +114,13 @@ export class ReferencesService {
 		const references = await this.referenceModel.paginate(filters, options);
 		let responseReferences = [];
 
-		//TODO: falta agregar precio de descuento
 		if (products) {
 			for (let i = 0; i < references?.docs?.length; i++) {
 				const reference = references?.docs[i];
 				const products = await this.productModel
 					.find({
 						reference: reference?._id,
-						status: 'active',
+						status: StatusProduct.ACTIVE,
 					})
 					.populate([
 						'size',
@@ -135,10 +136,17 @@ export class ReferencesService {
 							model: Image.name,
 						},
 					]);
-
+				let discount = 0;
+				if (customerId) {
+					discount = await this.discountRulesService.getDiscountReference({
+						customerId,
+						reference: reference,
+					});
+				}
 				responseReferences.push({
 					...reference,
 					products,
+					discountPrice: reference?.price - discount,
 				});
 			}
 		} else {
@@ -151,7 +159,7 @@ export class ReferencesService {
 		};
 	}
 
-	async findById(_id: string) {
+	async findById(_id: string, productsStatus?: string) {
 		const filters: FilterQuery<Reference> = { _id };
 
 		const reference = await this.referenceModel
@@ -162,25 +170,26 @@ export class ReferencesService {
 			throw new NotFoundException('La referencia no existe');
 		}
 
-		const products = await this.productModel
-			.find({
-				reference: reference?._id,
-				status: 'active',
-			})
-			.populate([
-				'size',
-				{
-					path: 'color',
-					populate: {
-						path: 'image',
-						model: Image.name,
-					},
-				},
-				{
-					path: 'images',
+		const filtersProduct: FilterQuery<Product> = { reference: reference?._id };
+
+		if (!productsStatus) {
+			filters.status = StatusProduct[productsStatus];
+		}
+
+		const products = await this.productModel.find(filtersProduct).populate([
+			'size',
+			{
+				path: 'color',
+				populate: {
+					path: 'image',
 					model: Image.name,
 				},
-			]);
+			},
+			{
+				path: 'images',
+				model: Image.name,
+			},
+		]);
 
 		return {
 			...reference,

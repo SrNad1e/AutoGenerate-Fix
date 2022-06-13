@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusStockAdjustment } from '../entities/stock-adjustment.entity';
 
 @InputType({ description: 'Ordenamiento del ajuste de productos' })
 export class SortStockAdjustment {
@@ -47,11 +48,11 @@ export class FiltersStockAdjustmentsInput {
 	})
 	number: number;
 
-	@Field(() => String, {
-		description: 'Estado del ajuste (open, confirmed, cancelled)',
+	@Field(() => StatusStockAdjustment, {
+		description: 'Estado del ajuste',
 		nullable: true,
 	})
-	status: string;
+	status: StatusStockAdjustment;
 
 	@Field(() => String, {
 		description: 'Id de la bodega',

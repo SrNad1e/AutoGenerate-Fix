@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -6,6 +6,14 @@ import { Company } from 'src/configurations/entities/company.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+
+export enum StatusStockAdjustment {
+	OPEN = 'open',
+	CONFIRMED = 'confirmed',
+	CANCELLED = 'cancelled',
+}
+
+registerEnumType(StatusStockAdjustment, { name: 'StatusStockAdjustment' });
 
 @ObjectType({ description: 'Detalle de ajuste de productos' })
 export class DetailAdjustment {
@@ -40,11 +48,11 @@ export class StockAdjustment extends Document {
 	@Prop({ type: Array, required: true })
 	details: DetailAdjustment[];
 
-	@Field(() => String, {
-		description: 'Estado del ajuste (open, confirmed, cancelled)',
+	@Field(() => StatusStockAdjustment, {
+		description: 'Estado del ajuste',
 	})
 	@Prop({ type: String, default: 'open' })
-	status: string;
+	status: StatusStockAdjustment;
 
 	@Field(() => Number, { description: 'Costo total del ajuste' })
 	@Prop({ type: Number, required: true })

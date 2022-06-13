@@ -1,4 +1,12 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+
+export enum ActionProductsOrder {
+	CREATE = 'create',
+	UPDATE = 'update',
+	DELETE = 'delete',
+}
+
+registerEnumType(ActionProductsOrder, { name: 'ActionProductsOrder' });
 
 @InputType({ description: 'Producto que se va a agregar' })
 export class DetailAddProductsOrderInput {
@@ -10,10 +18,10 @@ export class DetailAddProductsOrderInput {
 	@Field(() => Number, { description: 'Cantidad de producto agregado' })
 	quantity: number;
 
-	@Field(() => String, {
-		description: 'Acción a realizar con el producto (create, update, delete)',
+	@Field(() => ActionProductsOrder, {
+		description: 'Acción a realizar con el producto',
 	})
-	action: string;
+	action: ActionProductsOrder;
 }
 
 @InputType({ description: 'Datos para agregar productos al pedido' })

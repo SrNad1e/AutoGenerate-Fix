@@ -9,7 +9,11 @@ import { CreateShopInput } from '../dtos/create-shop.input';
 import { FiltersShopInput } from '../dtos/filters-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { UpdateShopInput } from '../dtos/update-shop.input';
-import { Shop, ShopMysql } from '../../configurations/entities/shop.entity';
+import {
+	Shop,
+	ShopMysql,
+	StatusShop,
+} from '../../configurations/entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
 
@@ -35,9 +39,12 @@ export class ShopsService {
 		private readonly companiesService: CompaniesService,
 	) {}
 
-	async findAll(params: FiltersShopsInput, user: User, companyId: string) {
+	async findAll(
+		{ limit = 20, page = 1, name, status, sort, _id }: FiltersShopsInput,
+		user: User,
+		companyId: string,
+	) {
 		const filters: FilterQuery<Shop> = {};
-		const { limit = 20, page = 1, name, status, sort, _id } = params;
 
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -51,8 +58,8 @@ export class ShopsService {
 			filters._id = _id;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusShop[status]) {
+			filters.status = StatusShop[status];
 		}
 
 		const options: PaginateOptions = {
@@ -85,12 +92,17 @@ export class ShopsService {
 			defaultWarehouseId,
 			companyId,
 			warehouseMainId,
+			status,
 			...props
 		}: UpdateShopInput,
 	) {
 		const params: Partial<Shop> = {
 			...props,
 		};
+
+		if (StatusShop[status]) {
+			params.status = StatusShop[status];
+		}
 
 		if (defaultWarehouseId) {
 			const defaultWarehouse = await this.warehouseModel.findById(
