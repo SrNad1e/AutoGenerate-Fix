@@ -637,7 +637,7 @@ export class OrdersService {
 					quantity > newDetails[index].quantity
 						? quantity - newDetails[index].quantity
 						: quantity,
-					order?.shop?.defaultWarehouse.toString(),
+					order?.shop?.defaultWarehouse._id.toString(),
 				);
 
 				if (!product) {
@@ -680,7 +680,7 @@ export class OrdersService {
 				const product = await this.productsService.validateStock(
 					productId,
 					quantity,
-					order?.shop?.defaultWarehouse.toString(),
+					order?.shop?.defaultWarehouse?._id?.toString(),
 				);
 
 				if (!product) {
