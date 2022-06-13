@@ -723,27 +723,31 @@ export class OrdersService {
 		}
 
 		if (order?.status === StatusOrder.OPEN) {
-			await this.stockHistoryService.addStock(
-				{
-					details: productsDelete,
-					documentId: orderId,
-					documentType: DocumentTypeStockHistory.ORDER,
-					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-				},
-				user,
-				companyId,
-			);
+			if (productsDelete.length > 0) {
+				await this.stockHistoryService.addStock(
+					{
+						details: productsDelete,
+						documentId: orderId,
+						documentType: DocumentTypeStockHistory.ORDER,
+						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+					},
+					user,
+					companyId,
+				);
+			}
 
-			await this.stockHistoryService.deleteStock(
-				{
-					details: productsCreate,
-					documentId: orderId,
-					documentType: DocumentTypeStockHistory.ORDER,
-					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-				},
-				user,
-				companyId,
-			);
+			if (productsCreate.length > 0) {
+				await this.stockHistoryService.deleteStock(
+					{
+						details: productsCreate,
+						documentId: orderId,
+						documentType: DocumentTypeStockHistory.ORDER,
+						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+					},
+					user,
+					companyId,
+				);
+			}
 		}
 
 		const total = newDetails.reduce(
