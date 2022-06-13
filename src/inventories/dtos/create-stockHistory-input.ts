@@ -1,7 +1,7 @@
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 
 export enum DocumentTypeStockHistory {
-	TRANSFER = 'order',
+	TRANSFER = 'transfer',
 	INPUT = 'input',
 	REFUND = 'refund',
 	ADJUSTMENT = 'adjustment',

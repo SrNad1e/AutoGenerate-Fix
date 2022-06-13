@@ -52,6 +52,7 @@ export class StockHistoryService {
 					`No se puede agregar productos con cantidades en 0`,
 				);
 			}
+
 			let document;
 			switch (documentType) {
 				case DocumentTypeStockHistory.TRANSFER:

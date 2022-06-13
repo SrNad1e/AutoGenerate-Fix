@@ -77,8 +77,8 @@ export class OrdersService {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusOrder[status]) {
+			filters.status = StatusOrder[status];
 		}
 
 		if (orderPOS !== undefined) {
@@ -128,11 +128,13 @@ export class OrdersService {
 	}
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
-		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(status)) {
+		if (
+			![StatusOrder.OPEN, StatusOrder.PENDING].includes(StatusOrder[status])
+		) {
 			throw new BadRequestException('El estado del pedido no es correcto');
 		}
 
-		if (user?.pointOfSale && status === StatusOrder.OPEN) {
+		if (user?.pointOfSale && StatusOrder[status] === StatusOrder.OPEN) {
 			if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
 				throw new NotFoundException(
 					`El punto de venta se encuentra cerrado para el día ${dayjs(
@@ -200,7 +202,7 @@ export class OrdersService {
 			orderPos: false,
 			user,
 			number,
-			status,
+			status: StatusOrder[status],
 			company: new Types.ObjectId(companyId),
 		});
 	}
@@ -278,7 +280,7 @@ export class OrdersService {
 			}
 		}
 
-		if (status) {
+		if (StatusOrder[status]) {
 			switch (order?.status) {
 				case StatusOrder.OPEN:
 					if (
@@ -286,23 +288,31 @@ export class OrdersService {
 							StatusOrder.CANCELLED,
 							StatusOrder.INVOICED,
 							StatusOrder.CLOSED,
-						].includes(status)
+						].includes(StatusOrder[status])
 					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
 					break;
 				case StatusOrder.PENDING:
-					if (![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(status)) {
+					if (
+						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(
+							StatusOrder[status],
+						)
+					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
 					}
 					break;
 				case StatusOrder.INVOICED:
-					if (![StatusOrder.SENT, StatusOrder.CLOSED].includes(status)) {
+					if (
+						![StatusOrder.SENT, StatusOrder.CLOSED].includes(
+							StatusOrder[status],
+						)
+					) {
 						throw new BadRequestException('El pedido se encuentra facturado');
 					}
 					break;
 				case StatusOrder.SENT:
-					if (![StatusOrder.CLOSED].includes(status)) {
+					if (![StatusOrder.CLOSED].includes(StatusOrder[status])) {
 						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
@@ -314,7 +324,10 @@ export class OrdersService {
 
 			const payments = [];
 
-			if (order.status === StatusOrder.OPEN && status === StatusOrder.CLOSED) {
+			if (
+				order.status === StatusOrder.OPEN &&
+				StatusOrder[status] === StatusOrder.CLOSED
+			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
 
@@ -344,7 +357,7 @@ export class OrdersService {
 				dataUpdate['payments'] = payments;
 			}
 
-			dataUpdate['status'] = status;
+			dataUpdate['status'] = StatusOrder[status];
 		}
 
 		let conveyor;
@@ -355,7 +368,7 @@ export class OrdersService {
 			}
 		}
 
-		if (status === StatusOrder.CANCELLED) {
+		if (StatusOrder[status] === StatusOrder.CANCELLED) {
 			if (order?.status === StatusOrder.OPEN) {
 				const details = order?.details?.map((detail) => ({
 					productId: detail?.product?._id.toString(),
@@ -375,7 +388,7 @@ export class OrdersService {
 			}
 		}
 
-		if (status === StatusOrder.OPEN) {
+		if (StatusOrder[status] === StatusOrder.OPEN) {
 			const details = order.details.map((detail) => ({
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
@@ -576,7 +589,7 @@ export class OrdersService {
 		let newDetails = [...order.details];
 
 		const productsDelete = details?.filter(
-			(item) => item.action === ActionProductsOrder.DELETE,
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.DELETE,
 		);
 
 		if (productsDelete) {
@@ -602,7 +615,7 @@ export class OrdersService {
 		}
 
 		const productsUpdate = details?.filter(
-			(item) => item.action === ActionProductsOrder.UPDATE,
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.UPDATE,
 		);
 
 		if (productsUpdate) {
@@ -647,7 +660,7 @@ export class OrdersService {
 		}
 
 		const productsCreate = details?.filter(
-			(item) => item.action === ActionProductsOrder.CREATE,
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.CREATE,
 		);
 
 		if (productsCreate) {
@@ -780,7 +793,8 @@ export class OrdersService {
 				'El pedido que intenta actualizar no existe',
 			);
 		}
-		if ([StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
+
+		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} ya se encuentra procesado`,
 			);
@@ -789,7 +803,7 @@ export class OrdersService {
 		let newPayments = [...order.payments];
 
 		const paymentsDelete = payments?.filter(
-			(item) => item.action === ActionPaymentsOrder.DELETE,
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.DELETE,
 		);
 
 		if (paymentsDelete) {
@@ -815,7 +829,7 @@ export class OrdersService {
 		}
 
 		const paymentsUpdate = payments?.filter(
-			(item) => item.action === ActionPaymentsOrder.UPDATE,
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.UPDATE,
 		);
 
 		if (paymentsUpdate) {
@@ -848,7 +862,7 @@ export class OrdersService {
 		}
 
 		const paymentsCreate = payments?.filter(
-			(item) => item.action === ActionPaymentsOrder.CREATE,
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.CREATE,
 		);
 
 		if (paymentsCreate) {
