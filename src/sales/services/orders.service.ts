@@ -804,6 +804,16 @@ export class OrdersService {
 			);
 		}
 
+		for (let i = 0; i < payments.length; i++) {
+			const payment = payments[i];
+
+			if (payment?.total <= 0) {
+				throw new BadRequestException(
+					`Los medios de pago no pueden ser menores o iguales a 0`,
+				);
+			}
+		}
+
 		let newPayments = [...order.payments];
 
 		const paymentsDelete = payments?.filter(
