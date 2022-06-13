@@ -159,7 +159,7 @@ export class ReferencesService {
 		};
 	}
 
-	async findById(_id: string) {
+	async findById(_id: string, productsStatus?: string) {
 		const filters: FilterQuery<Reference> = { _id };
 
 		const reference = await this.referenceModel
@@ -170,25 +170,26 @@ export class ReferencesService {
 			throw new NotFoundException('La referencia no existe');
 		}
 
-		const products = await this.productModel
-			.find({
-				reference: reference?._id,
-				status: StatusProduct.ACTIVE,
-			})
-			.populate([
-				'size',
-				{
-					path: 'color',
-					populate: {
-						path: 'image',
-						model: Image.name,
-					},
-				},
-				{
-					path: 'images',
+		const filtersProduct: FilterQuery<Product> = { reference: reference?._id };
+
+		if (!productsStatus) {
+			filters.status = StatusProduct[productsStatus];
+		}
+
+		const products = await this.productModel.find(filtersProduct).populate([
+			'size',
+			{
+				path: 'color',
+				populate: {
+					path: 'image',
 					model: Image.name,
 				},
-			]);
+			},
+			{
+				path: 'images',
+				model: Image.name,
+			},
+		]);
 
 		return {
 			...reference,

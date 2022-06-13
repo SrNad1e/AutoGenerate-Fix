@@ -5,11 +5,6 @@ export class DetailConfirmStockTransferInput {
 	@Field(() => String, { description: 'Identificador de mongo del producto' })
 	productId: string;
 
-	@Field(() => String, {
-		description: 'Acción a efectuar con el producto (delete, update, create)',
-	})
-	action: string;
-
 	@Field(() => Number, { description: 'Cantidad de productos' })
 	quantity: number;
 }

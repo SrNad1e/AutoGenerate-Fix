@@ -13,7 +13,7 @@ import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { FiltersUsersInput } from '../dtos/filters-users.input';
 import { UpdateUserInput } from '../dtos/update-user.input';
 import { Role } from '../entities/role.entity';
-import { User } from '../entities/user.entity';
+import { StatusUser, User } from '../entities/user.entity';
 import { AuthorizationDian } from 'src/sales/entities/authorization.entity';
 import { Permission } from '../../configurations/entities/permission.entity';
 import { CreateUserInput } from '../dtos/create-user.input';
@@ -107,8 +107,8 @@ export class UsersService {
 			filters.role = new Types.ObjectId(roleId);
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusUser[status]) {
+			filters.status = StatusUser[status];
 		}
 
 		if (user?.companies) {
@@ -249,6 +249,10 @@ export class UsersService {
 			const hashedPassword = await bcrypt.hash(user.password, salt);
 
 			updateUserInput.password = hashedPassword;
+		}
+
+		if (StatusUser[updateUserInput.status]) {
+			updateUserInput.status = StatusUser[updateUserInput.status];
 		}
 
 		return this.userModel

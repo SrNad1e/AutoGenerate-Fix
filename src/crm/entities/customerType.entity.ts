@@ -4,7 +4,6 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 
-
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Tipos de clientes' })
 export class CustomerType extends Document {

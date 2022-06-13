@@ -4,7 +4,6 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 
-
 @ObjectType({ description: 'Ciudad de la dirección' })
 @Schema({ timestamps: true })
 export class City extends Document {

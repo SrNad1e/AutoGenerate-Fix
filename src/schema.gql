@@ -2,6 +2,12 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+enum ActionDetailAdjustment {
+  CREATE
+  DELETE
+  UPDATE
+}
+
 enum ActionDetailInput {
   CREATE
   DELETE
@@ -1094,9 +1100,6 @@ type DetailAdjustment {
 
 """Producto a confirmar en el traslado"""
 input DetailConfirmStockTransferInput {
-  """Acción a efectuar con el producto (delete, update, create)"""
-  action: String!
-
   """Identificador de mongo del producto"""
   productId: String!
 
@@ -1220,7 +1223,7 @@ input DetailStockAdjustmentCreateInput {
 """Detalle del ajuste de productos"""
 input DetailStockAdjustmentInput {
   """Acción a efectuar con el producto"""
-  action: String!
+  action: ActionDetailAdjustment!
 
   """Identificador de mongo del producto"""
   productId: String!
@@ -2979,6 +2982,9 @@ type Query {
   referenceId(
     """Identificador de la referencia"""
     id: String!
+
+    """Estados de los productos que desea traer o nulo"""
+    productsStatus: String
   ): ReferenceData!
 
   """Listado de las referencias"""

@@ -99,8 +99,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusProduct[status]) {
+			filters.status = StatusProduct[status];
 		}
 
 		if (name) {
@@ -346,14 +346,19 @@ export class ProductsService {
 			}
 		}
 
+		let newStatus;
+		if (StatusProduct[status]) {
+			newStatus = StatusProduct[status];
+		}
+
 		return this.productModel.findByIdAndUpdate(
 			id,
 			{
 				$set: {
 					color: color?._id,
 					size: size?._id,
-					status,
 					barcode,
+					status: newStatus,
 					images: imagesId?.map((item) => new Types.ObjectId(item)) || [],
 					user,
 				},
@@ -592,7 +597,15 @@ export class ProductsService {
 	 * @returns si todo sale bien el producto actualizado
 	 */
 	async deleteStock(productId: string, quantity: number, warehouseId: string) {
-		const product = await this.productModel.findById(productId).lean();
+		const product = await this.productModel
+			.findById(productId)
+			.populate([
+				{
+					path: 'reference',
+					model: Reference.name,
+				},
+			])
+			.lean();
 
 		if (!product) {
 			throw new BadRequestException('El producto no existe');
@@ -601,9 +614,10 @@ export class ProductsService {
 		const stockSelected = product.stock.find(
 			(item) => item.warehouse._id.toString() === warehouseId,
 		);
+
 		if (stockSelected?.quantity < quantity) {
 			throw new BadRequestException(
-				`Inventario insuficiente para el producto ${product.reference} / ${product.barcode}, stock ${stockSelected.quantity}`,
+				`Inventario insuficiente para el producto ${product.reference['name']} / ${product.barcode}, stock ${stockSelected.quantity}`,
 			);
 		}
 
@@ -696,8 +710,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (status) {
-			filters.status = status;
+		if (StatusProduct[status]) {
+			filters.status = StatusProduct[status];
 		}
 
 		const response = await this.referencesService.getReferences({ name });
