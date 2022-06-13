@@ -598,49 +598,45 @@ export class ProductsService {
 	 * @returns si todo sale bien el producto actualizado
 	 */
 	async addStock(productId: string, quantity: number, warehouseId: string) {
-		try {
-			const product = await this.productModel.findById(productId).lean();
+		const product = await this.productModel.findById(productId).lean();
 
-			if (!product) {
-				throw new BadRequestException('El producto no existe');
+		if (!product) {
+			throw new BadRequestException('El producto no existe');
+		}
+
+		const stock = product.stock.map((item) => {
+			if (item.warehouse._id.toString() === warehouseId) {
+				return {
+					warehouse: item.warehouse._id,
+					quantity: item.quantity + quantity,
+				};
 			}
 
-			const stock = product.stock.map((item) => {
-				if (item.warehouse._id.toString() === warehouseId) {
-					return {
-						warehouse: item.warehouse._id,
-						quantity: item.quantity + quantity,
-					};
-				}
+			return item;
+		});
 
-				return item;
-			});
-
-			const response = await this.productModel.findByIdAndUpdate(
-				productId,
-				{
-					$set: {
-						stock,
-					},
+		const response = await this.productModel.findByIdAndUpdate(
+			productId,
+			{
+				$set: {
+					stock,
 				},
-				{
-					lean: true,
-					new: true,
-					populate,
-				},
-			);
+			},
+			{
+				lean: true,
+				new: true,
+				populate,
+			},
+		);
 
-			const newStock = response.stock.filter(
-				(item) => item.warehouse._id.toString() === warehouseId,
-			);
+		const newStock = response.stock.filter(
+			(item) => item.warehouse._id.toString() === warehouseId,
+		);
 
-			return {
-				...response,
-				stock: newStock,
-			};
-		} catch (error) {
-			return error;
-		}
+		return {
+			...response,
+			stock: newStock,
+		};
 	}
 
 	/**
@@ -729,9 +725,16 @@ export class ProductsService {
 				throw new NotFoundException(`El producto no existe`);
 			}
 
-			if (product?.stock[0]?.quantity < quantity) {
+			if (
+				product?.stock.length <= 0 ||
+				product?.stock[0]?.quantity < quantity
+			) {
 				throw new BadRequestException(
-					`El producto ${product?.reference['name']}/${product?.barcode} no tiene suficientes unidades, stock: ${product?.stock[0].quantity}`,
+					`El producto ${product?.reference['name']}/${
+						product?.barcode
+					} no tiene suficientes unidades, stock: ${
+						product?.stock[0]?.quantity || 0
+					}`,
 				);
 			}
 
