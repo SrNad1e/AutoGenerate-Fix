@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
+import * as shortid from 'shortid';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
@@ -160,17 +161,20 @@ export class UsersService {
 			pointOfSaleId,
 			roleId,
 			customerId,
+			password,
 			...params
 		}: CreateUserInput,
 		userCreate: User,
 		idCompany: string,
 	): Promise<User> {
-		const user = await this.findOne({ username });
+		if (username) {
+			const user = await this.findOne({ username });
 
-		if (user) {
-			throw new NotFoundException(
-				`El usuario ${username} ya se encuentra registrado`,
-			);
+			if (user) {
+				throw new NotFoundException(
+					`El usuario ${username} ya se encuentra registrado`,
+				);
+			}
 		}
 
 		const role = await this.rolesService.findById(roleId);
@@ -211,8 +215,31 @@ export class UsersService {
 			}
 		}
 
+		let passwordGenerate = password;
+		if (!password) {
+			passwordGenerate = shortid.generate();
+		}
+
+		let usernameGenerate = username;
+		if (!username) {
+			const usernameArray = params.name.split(' ');
+			const newUsername = `${usernameArray[0]}.${
+				usernameArray[usernameArray.length - 1]
+			}`;
+			const user = await this.findOne({
+				username: newUsername,
+			});
+
+			if (!user) {
+				usernameGenerate = newUsername;
+			}else{
+				usernameGenerate = `${newUsername}${Math.floor(Math.random()* 999)}`
+			}
+		}
+
 		const newUser = new this.userModel({
-			username,
+			username: usernameGenerate,
+			password: passwordGenerate,
 			role: role._id,
 			shop: shop._id,
 			customer: customer._id,
