@@ -3140,8 +3140,8 @@ type Query {
   """Consulta todos los usuarios con base a los filtros"""
   users(
     """Filtros para consultar los usuarios"""
-    filtersUsersInput: FiltersUsersInput!
-  ): [User!]!
+    filtersUsersInput: FiltersUsersInput
+  ): ResponseUsers!
 
   """Se encarga de traer bodega por identificador"""
   warehouseId(
@@ -4111,6 +4111,39 @@ type ResponseStockRequests {
 type ResponseStockTransfers {
   """Lista de traslados"""
   docs: [StockTransfer!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de usuarios"""
+type ResponseUsers {
+  """Lista de usuarios"""
+  docs: [User!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
