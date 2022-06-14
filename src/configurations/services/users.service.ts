@@ -162,6 +162,7 @@ export class UsersService {
 			roleId,
 			customerId,
 			password,
+			status,
 			...params
 		}: CreateUserInput,
 		userCreate: User,
@@ -238,12 +239,13 @@ export class UsersService {
 		}
 
 		const newUser = new this.userModel({
-			username: usernameGenerate,
+			username: usernameGenerate.toLocaleLowerCase(),
 			password: passwordGenerate,
 			role: role?._id,
 			shop: shop?._id,
 			customer: customer?._id,
 			companies: [company?._id],
+			status: StatusUser[status],
 			...params,
 			user: userCreate,
 		});
