@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { StatusUser } from '../entities/user.entity';
 
 @InputType({ description: 'Datos para la creación de un usuario' })
 export class CreateUserInput {
@@ -36,4 +37,10 @@ export class CreateUserInput {
 		nullable: true,
 	})
 	companyId?: string;
+
+	@Field(() => StatusUser, {
+		description: 'Estado del usuario',
+		nullable: true,
+	})
+	status?: StatusUser;
 }
