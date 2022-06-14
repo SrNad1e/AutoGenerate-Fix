@@ -969,9 +969,6 @@ input CreateStockTransferInput {
 
 """Datos para la creación de un usuario"""
 input CreateUserInput {
-  """Identificador de la empresa a la que pertenece el usuario"""
-  companyId: String
-
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
@@ -5381,9 +5378,6 @@ input UpdateStockTransferInput {
 
 """Datos para actualizar el usuario"""
 input UpdateUserInput {
-  """Identificador de la empresa a la que pertenece el usuario"""
-  companyId: String
-
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
