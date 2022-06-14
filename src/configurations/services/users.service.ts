@@ -185,7 +185,7 @@ export class UsersService {
 
 		const shop = await this.shopModel.findById(shopId);
 
-		if (!shop || shop?.company?.toString() !== companyId) {
+		if (!shop || shop?.company?.toString() !== idCompany) {
 			throw new NotFoundException('La tienda no se encuentra registrada');
 		}
 
@@ -240,17 +240,17 @@ export class UsersService {
 		const newUser = new this.userModel({
 			username: usernameGenerate,
 			password: passwordGenerate,
-			role: role._id,
-			shop: shop._id,
-			customer: customer._id,
-			companies: [company._id],
+			role: role?._id,
+			shop: shop?._id,
+			customer: customer?._id,
+			companies: [company?._id],
 			...params,
 			user: userCreate,
 		});
 
 		const response = await (await newUser.save()).populate(populate);
 
-		return { ...response, password: passwordGenerate };
+		return { ...response['_doc'], password: passwordGenerate };
 	}
 
 	async update(
