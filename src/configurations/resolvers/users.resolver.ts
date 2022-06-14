@@ -57,7 +57,7 @@ export class UsersResolver {
 		@Context() context,
 	) {
 		return this.usersService.create(
-			context.req.input,
+			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
 		);

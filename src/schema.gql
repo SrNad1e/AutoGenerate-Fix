@@ -990,6 +990,9 @@ input CreateUserInput {
   """Identificador de la tienda asignada al usuario"""
   shopId: String!
 
+  """Estado del usuario"""
+  status: StatusUser
+
   """Usuario registrado"""
   username: String
 }
