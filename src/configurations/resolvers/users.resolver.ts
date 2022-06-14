@@ -11,12 +11,13 @@ import {
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateUserInput } from '../dtos/create-user.input';
+import { ResponseUsers } from '../dtos/response-users.input';
 
 @Resolver(() => User)
 export class UsersResolver {
 	constructor(private readonly usersService: UsersService) {}
 
-	@Query(() => [User], {
+	@Query(() => ResponseUsers, {
 		name: 'users',
 		description: 'Consulta todos los usuarios con base a los filtros',
 	})
@@ -24,6 +25,7 @@ export class UsersResolver {
 	findAll(
 		@Args('filtersUsersInput', {
 			description: 'Filtros para consultar los usuarios',
+			nullable: true,
 		})
 		_: FiltersUsersInput,
 		@Context() context,
@@ -55,7 +57,7 @@ export class UsersResolver {
 		@Context() context,
 	) {
 		return this.usersService.create(
-			context.req.input,
+			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
 		);

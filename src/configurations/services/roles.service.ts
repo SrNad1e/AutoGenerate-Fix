@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { CreateRoleInput } from '../dtos/create-role.input';
 import { FiltersRoleInput } from '../dtos/filters-role.input';
@@ -26,6 +26,7 @@ export class RolesService {
 	) {}
 
 	async findAll({
+		_id,
 		active,
 		name,
 		limit = 10,
@@ -33,6 +34,10 @@ export class RolesService {
 		sort,
 	}: FiltersRolesInput) {
 		const filters: FilterQuery<Role> = {};
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
+		}
 
 		if (active !== undefined) {
 			filters.active = active;

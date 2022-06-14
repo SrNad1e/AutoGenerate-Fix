@@ -969,9 +969,6 @@ input CreateStockTransferInput {
 
 """Datos para la creación de un usuario"""
 input CreateUserInput {
-  """Identificador de la empresa a la que pertenece el usuario"""
-  companyId: String
-
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
@@ -979,7 +976,7 @@ input CreateUserInput {
   name: String!
 
   """Contraseña de usuario"""
-  password: String!
+  password: String
 
   """Identificador del punto de venta asignado al usuario"""
   pointOfSaleId: String
@@ -990,8 +987,11 @@ input CreateUserInput {
   """Identificador de la tienda asignada al usuario"""
   shopId: String!
 
+  """Estado del usuario"""
+  status: StatusUser
+
   """Usuario registrado"""
-  username: String!
+  username: String
 }
 
 """Crédito del cliente"""
@@ -1900,6 +1900,9 @@ input FiltersReturnsOrderInput {
 
 """Filtros para consultar los roles"""
 input FiltersRolesInput {
+  """Identificador del rol"""
+  _id: String
+
   """El rol se encuentra activo"""
   active: Boolean
 
@@ -3140,8 +3143,8 @@ type Query {
   """Consulta todos los usuarios con base a los filtros"""
   users(
     """Filtros para consultar los usuarios"""
-    filtersUsersInput: FiltersUsersInput!
-  ): [User!]!
+    filtersUsersInput: FiltersUsersInput
+  ): ResponseUsers!
 
   """Se encarga de traer bodega por identificador"""
   warehouseId(
@@ -4111,6 +4114,39 @@ type ResponseStockRequests {
 type ResponseStockTransfers {
   """Lista de traslados"""
   docs: [StockTransfer!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de usuarios"""
+type ResponseUsers {
+  """Lista de usuarios"""
+  docs: [User!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -5345,9 +5381,6 @@ input UpdateStockTransferInput {
 
 """Datos para actualizar el usuario"""
 input UpdateUserInput {
-  """Identificador de la empresa a la que pertenece el usuario"""
-  companyId: String
-
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
