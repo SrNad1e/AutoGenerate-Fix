@@ -166,7 +166,7 @@ export class UsersService {
 		}: CreateUserInput,
 		userCreate: User,
 		idCompany: string,
-	): Promise<User> {
+	) {
 		if (username) {
 			const user = await this.findOne({ username });
 
@@ -232,8 +232,8 @@ export class UsersService {
 
 			if (!user) {
 				usernameGenerate = newUsername;
-			}else{
-				usernameGenerate = `${newUsername}${Math.floor(Math.random()* 999)}`
+			} else {
+				usernameGenerate = `${newUsername}${Math.floor(Math.random() * 999)}`;
 			}
 		}
 
@@ -247,7 +247,10 @@ export class UsersService {
 			...params,
 			user: userCreate,
 		});
-		return (await newUser.save()).populate(populate);
+
+		const response = await (await newUser.save()).populate(populate);
+
+		return { ...response, password: passwordGenerate };
 	}
 
 	async update(

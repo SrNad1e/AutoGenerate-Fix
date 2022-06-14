@@ -104,5 +104,25 @@ export class CreditsService {
 					break;
 			}
 		}
+
+		return this.creditModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					status,
+					amount,
+					available,
+					balance,
+					frozenAmount,
+					details,
+					user,
+				},
+			},
+			{
+				lean: true,
+				populate,
+				new: true,
+			},
+		);
 	}
 }
