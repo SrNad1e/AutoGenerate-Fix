@@ -979,7 +979,7 @@ input CreateUserInput {
   name: String!
 
   """Contraseña de usuario"""
-  password: String!
+  password: String
 
   """Identificador del punto de venta asignado al usuario"""
   pointOfSaleId: String
@@ -991,7 +991,7 @@ input CreateUserInput {
   shopId: String!
 
   """Usuario registrado"""
-  username: String!
+  username: String
 }
 
 """Crédito del cliente"""

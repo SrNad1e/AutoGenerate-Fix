@@ -27,4 +27,10 @@ export class UpdateCreditInput {
 		nullable: true,
 	})
 	status?: StatusCredit;
+
+	@Field(() => Number, {
+		description: 'Monto aprobado para el crédito',
+		nullable: true,
+	})
+	amount: number;
 }
