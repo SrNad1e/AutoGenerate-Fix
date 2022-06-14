@@ -125,4 +125,37 @@ export class CreditsService {
 			},
 		);
 	}
+
+	async validateCredit(
+		customerId: string,
+		amount: number,
+		type: TypeCreditHistory,
+	) {
+		switch (type) {
+			case TypeCreditHistory.CREDIT || TypeCreditHistory.FROZEN:
+				return this.creditModel.findOne({
+					customer: new Types.ObjectId(customerId),
+					available: {
+						$gte: amount,
+					},
+				});
+			case TypeCreditHistory.DEBIT:
+				return this.creditModel.findOne({
+					customer: new Types.ObjectId(customerId),
+					balance: {
+						$gte: amount,
+					},
+				});
+			case TypeCreditHistory.THAWED:
+				return this.creditModel.findOne({
+					customer: new Types.ObjectId(customerId),
+					frozenAmount: {
+						$gte: amount,
+					},
+				});
+
+			default:
+				break;
+		}
+	}
 }

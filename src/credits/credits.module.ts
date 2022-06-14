@@ -7,6 +7,7 @@ import {
 import { Credit, CreditSchema } from './entities/credit.entity';
 import { CreditsService } from './services/credits.service';
 import { CreditHistoryService } from './services/credit-history.service';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 
 @Module({
 	imports: [
@@ -18,6 +19,10 @@ import { CreditHistoryService } from './services/credit-history.service';
 			{
 				name: CreditHistory.name,
 				schema: CreditHistorySchema,
+			},
+			{
+				name: Order.name,
+				schema: OrderSchema,
 			},
 		]),
 	],

@@ -1900,6 +1900,9 @@ input FiltersReturnsOrderInput {
 
 """Filtros para consultar los roles"""
 input FiltersRolesInput {
+  """Identificador del rol"""
+  _id: String
+
   """El rol se encuentra activo"""
   active: Boolean
 
