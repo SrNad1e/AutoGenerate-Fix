@@ -115,7 +115,6 @@ export class AuthService {
 				password,
 				roleId: role._id.toString(),
 				shopId: shop._id.toString(),
-				companyId,
 				customerId: customer._id.toString(),
 			},
 			{

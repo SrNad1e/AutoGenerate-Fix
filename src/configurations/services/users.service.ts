@@ -157,7 +157,7 @@ export class UsersService {
 		{
 			username,
 			shopId,
-			companyId,
+			//companyId,
 			pointOfSaleId,
 			roleId,
 			customerId,
@@ -190,9 +190,7 @@ export class UsersService {
 			throw new NotFoundException('La tienda no se encuentra registrada');
 		}
 
-		const company = await this.companiesService.findById(
-			companyId || idCompany,
-		);
+		const company = await this.companiesService.findById(idCompany);
 
 		if (!company) {
 			throw new NotFoundException('La empresa no se encuentra registrada');
@@ -257,9 +255,18 @@ export class UsersService {
 
 	async update(
 		id: string,
-		updateUserInput: UpdateUserInput,
+		{
+			status,
+			customerId,
+			password,
+			name,
+			pointOfSaleId,
+			roleId,
+			shopId,
+			username,
+		}: UpdateUserInput,
 		userUpdate: User,
-		companyId: string,
+		idCompany: string,
 	): Promise<User> {
 		const user = await this.findById(id);
 		if (!user) {
@@ -268,21 +275,58 @@ export class UsersService {
 
 		const companies = user.companies.map((company) => company.toString());
 
-		if (userUpdate.username !== 'admin' && !companies.includes(companyId)) {
+		if (userUpdate.username !== 'admin' && !companies.includes(idCompany)) {
 			throw new UnauthorizedException(
 				'El usuario no puede ser modificado, consulta al administrador',
 			);
 		}
-
-		if (updateUserInput.password) {
+		let newPassword;
+		if (password) {
 			const salt = await bcrypt.genSalt(10);
 			const hashedPassword = await bcrypt.hash(user.password, salt);
 
-			updateUserInput.password = hashedPassword;
+			newPassword = hashedPassword;
 		}
 
-		if (StatusUser[updateUserInput.status]) {
-			updateUserInput.status = StatusUser[updateUserInput.status];
+		let newStatus;
+		if (StatusUser[status]) {
+			newStatus = StatusUser[status];
+		}
+
+		let customer;
+		if (customerId) {
+			customer = await this.customersService.findById(customerId);
+			if (!customer) {
+				throw new NotFoundException('Cliente no existe');
+			}
+		}
+
+		let pointOfSale;
+		if (pointOfSaleId) {
+			pointOfSale = await this.pointOfSaleModel.findById(pointOfSaleId).lean();
+			if (!pointOfSale || pointOfSale?.shop.toString() !== shopId) {
+				throw new NotFoundException(
+					'El punto de venta no existe o no esta asignado a la tienda',
+				);
+			}
+		}
+		let role;
+		if (roleId) {
+			role = await this.rolesService.findById(roleId);
+
+			if (!role) {
+				throw new NotFoundException('El rol seleccionado no existe');
+			}
+		}
+
+		if (username) {
+			const user = this.findOne({ username });
+
+			if (user) {
+				throw new NotFoundException(
+					'El nombre de usuario ya se encuentra asignado',
+				);
+			}
 		}
 
 		return this.userModel
@@ -290,7 +334,13 @@ export class UsersService {
 				id,
 				{
 					$set: {
-						...updateUserInput,
+						status: newStatus,
+						password: newPassword,
+						name,
+						customer: customer?._id,
+						pointOfSale: pointOfSale?._id,
+						role: role?._id,
+						username,
 						user: userUpdate,
 					},
 				},

@@ -32,11 +32,11 @@ export class CreateUserInput {
 	})
 	pointOfSaleId?: string;
 
-	@Field(() => String, {
+	/*@Field(() => String, {
 		description: 'Identificador de la empresa a la que pertenece el usuario',
 		nullable: true,
 	})
-	companyId?: string;
+	companyId?: string;*/
 
 	@Field(() => StatusUser, {
 		description: 'Estado del usuario',
