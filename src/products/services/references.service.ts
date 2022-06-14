@@ -172,8 +172,8 @@ export class ReferencesService {
 
 		const filtersProduct: FilterQuery<Product> = { reference: reference?._id };
 
-		if (!productsStatus) {
-			filters.status = StatusProduct[productsStatus];
+		if (productsStatus) {
+			filtersProduct.status = StatusProduct[productsStatus];
 		}
 
 		const products = await this.productModel.find(filtersProduct).populate([
@@ -320,8 +320,8 @@ export class ReferencesService {
 					);
 				}
 
-				const total = () => {
-					const totalData = products.totalDocs + i;
+				const total = (quantity = 0) => {
+					const totalData = products.totalDocs + i + quantity;
 					if (totalData < 10) {
 						return `00000${totalData}`;
 					}
@@ -347,7 +347,15 @@ export class ReferencesService {
 					}
 				};
 
-				const barcode = `7700000${total()}`;
+				let productFind = true;
+				let r = 0;
+
+				let barcode;
+				do {
+					barcode = `7700000${total(r)}`;
+					productFind = !!(await this.productModel.findOne({ barcode }));
+					r++;
+				} while (productFind);
 
 				const newProduct = new this.productModel({
 					reference: responseReference._id,

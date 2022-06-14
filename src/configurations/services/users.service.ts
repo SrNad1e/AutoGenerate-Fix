@@ -88,9 +88,7 @@ export class UsersService {
 		user: User,
 		companyId: string,
 	) {
-		const filters: FilterQuery<User> = {
-			customer: null,
-		};
+		const filters: FilterQuery<User> = {};
 
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -112,7 +110,7 @@ export class UsersService {
 		}
 
 		if (user?.companies) {
-			filters.company = { $in: user?.companies };
+			filters.company = { $in: user?.companies?.map((company) => company._id) };
 		}
 
 		const options: PaginateOptions = {

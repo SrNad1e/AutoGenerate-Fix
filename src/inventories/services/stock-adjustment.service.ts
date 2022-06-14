@@ -263,16 +263,21 @@ export class StockAdjustmentService {
 				documentId: response._id.toString(),
 				documentType: DocumentTypeStockHistory.ADJUSTMENT,
 			};
-			await this.stockHistoryService.deleteStock(
-				deleteStockHistoryInput,
-				user,
-				companyId,
-			);
-			await this.stockHistoryService.addStock(
-				addStockHistoryInput,
-				user,
-				companyId,
-			);
+
+			if (deleteStockHistoryInput?.details?.length > 0) {
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+					companyId,
+				);
+			}
+			if (addStockHistoryInput?.details?.length > 0) {
+				await this.stockHistoryService.addStock(
+					addStockHistoryInput,
+					user,
+					companyId,
+				);
+			}
 		}
 		return response;
 	}
@@ -430,16 +435,22 @@ export class StockAdjustmentService {
 					documentId: response._id.toString(),
 					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
-				await this.stockHistoryService.addStock(
-					addStockHistoryInput,
-					user,
-					companyId,
-				);
+
+				if (deleteStockHistoryInput?.details?.length > 0) {
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
+
+				if (addStockHistoryInput?.details?.length > 0) {
+					await this.stockHistoryService.addStock(
+						addStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
 			return response;
@@ -508,16 +519,21 @@ export class StockAdjustmentService {
 					documentType: DocumentTypeStockHistory.ADJUSTMENT,
 				};
 
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
-				await this.stockHistoryService.addStock(
-					addStockHistoryInput,
-					user,
-					companyId,
-				);
+				if (deleteStockHistoryInput?.details?.length > 0) {
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
+
+				if (addStockHistoryInput?.details?.length > 0) {
+					await this.stockHistoryService.addStock(
+						addStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
 			return response;

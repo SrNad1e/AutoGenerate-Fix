@@ -34,6 +34,7 @@ import { DiscountRulersService } from 'src/crm/services/discount-rulers.service'
 import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ActionProductsOrder } from '../dtos/add-products-order-input';
+import { TypePayment } from 'src/treasury/entities/payment.entity';
 
 const populate = [
 	{
@@ -330,27 +331,32 @@ export class OrdersService {
 			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
+					if (payment?.type !== TypePayment.CREDIT) {
+						const valuesReceipt = {
+							value: total,
+							paymentId: payment?._id?.toString(),
+							concept: `Abono a pedido ${order?.number}`,
+							boxId:
+								payment?.type === 'cash'
+									? order?.pointOfSale['box']?.toString()
+									: undefined,
+						};
 
-					const valuesReceipt = {
-						value: total,
-						paymentId: payment?._id?.toString(),
-						concept: `Abono a pedido ${order?.number}`,
-						boxId:
-							payment?.type === 'cash'
-								? order?.pointOfSale['box']?.toString()
-								: undefined,
-					};
+						const receipt = await this.receiptsService.create(
+							valuesReceipt,
+							user,
+							companyId,
+						);
 
-					const receipt = await this.receiptsService.create(
-						valuesReceipt,
-						user,
-						companyId,
-					);
+						payments.push({
+							...order?.payments[i],
+							receipt: receipt?._id,
+						});
+					} else {
+						payments.push(order?.payments[i]);
 
-					payments.push({
-						...order?.payments[i],
-						receipt: receipt?._id,
-					});
+						//TODO: agregar todo lo correspondiente al crédito
+					}
 				}
 			}
 			if (payments.length > 0) {
@@ -374,17 +380,18 @@ export class OrdersService {
 					productId: detail?.product?._id.toString(),
 					quantity: detail?.quantity,
 				}));
-
-				await this.stockHistoryService.addStock(
-					{
-						details,
-						warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
-						documentId: order?._id.toString(),
-						documentType: DocumentTypeStockHistory.ORDER,
-					},
-					user,
-					companyId,
-				);
+				if (details.length > 0) {
+					await this.stockHistoryService.addStock(
+						{
+							details,
+							warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
+							documentId: order?._id.toString(),
+							documentType: DocumentTypeStockHistory.ORDER,
+						},
+						user,
+						companyId,
+					);
+				}
 			}
 		}
 
@@ -637,7 +644,7 @@ export class OrdersService {
 					quantity > newDetails[index].quantity
 						? quantity - newDetails[index].quantity
 						: quantity,
-					order?.shop?.defaultWarehouse.toString(),
+					order?.shop?.defaultWarehouse._id.toString(),
 				);
 
 				if (!product) {
@@ -680,7 +687,7 @@ export class OrdersService {
 				const product = await this.productsService.validateStock(
 					productId,
 					quantity,
-					order?.shop?.defaultWarehouse.toString(),
+					order?.shop?.defaultWarehouse?._id?.toString(),
 				);
 
 				if (!product) {
@@ -802,6 +809,16 @@ export class OrdersService {
 			throw new BadRequestException(
 				`El pedido ${order.number} ya se encuentra procesado`,
 			);
+		}
+
+		for (let i = 0; i < payments.length; i++) {
+			const payment = payments[i];
+
+			if (payment?.total <= 0) {
+				throw new BadRequestException(
+					`Los medios de pago no pueden ser menores o iguales a 0`,
+				);
+			}
 		}
 
 		let newPayments = [...order.payments];

@@ -14,6 +14,7 @@ import { AppGateway } from './app.gateway';
 import { SalesModule } from './sales/sales.module';
 import { CrmModule } from './crm/crm.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
+import { CreditsModule } from './credits/credits.module';
 
 @Module({
 	imports: [
@@ -52,6 +53,7 @@ import { ConfigurationsModule } from './configurations/configurations.module';
 		ProductsModule,
 		SalesModule,
 		TreasuryModule,
+		CreditsModule,
 	],
 	providers: [AppGateway],
 })
