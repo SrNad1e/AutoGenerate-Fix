@@ -44,7 +44,10 @@ export class RolesService {
 		}
 
 		if (name) {
-			filters.name = name;
+			filters.name = {
+				$regex: name,
+				$options: 'i',
+			};
 		}
 
 		const options = {

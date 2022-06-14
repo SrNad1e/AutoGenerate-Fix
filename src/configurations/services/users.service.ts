@@ -100,6 +100,10 @@ export class UsersService {
 		}
 
 		if (name) {
+			filters.name = {
+				$regex: name,
+				$options: 'i',
+			};
 		}
 
 		if (roleId) {
@@ -128,7 +132,10 @@ export class UsersService {
 	async findOne({ username, customerId }: FiltersUserInput): Promise<User> {
 		const filters: FilterQuery<User> = {};
 		if (username) {
-			filters.username = username;
+			filters.username = {
+				$regex: username,
+				$options: 'i',
+			};
 		}
 
 		if (customerId) {
