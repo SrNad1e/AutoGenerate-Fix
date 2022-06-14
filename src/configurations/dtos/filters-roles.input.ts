@@ -20,6 +20,9 @@ export class SortRole {
 
 @InputType({ description: 'Filtros para consultar los roles' })
 export class FiltersRolesInput {
+	@Field(() => String, { description: 'Identificador del rol', nullable: true })
+	_id?: string;
+
 	@Field(() => String, { description: 'Nombre del rol', nullable: true })
 	name: string;
 
