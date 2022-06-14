@@ -214,8 +214,6 @@ export class ProductsService {
 			lean: true,
 		};
 
-		console.log(filters);
-
 		const aggregateProduct = this.productModel.aggregate([
 			...aggregate,
 			{
