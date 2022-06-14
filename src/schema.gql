@@ -994,6 +994,45 @@ input CreateUserInput {
   username: String!
 }
 
+"""Crédito del cliente"""
+type Credit {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Monto habilitado para el crédito"""
+  amount: Float!
+
+  """Monto disponible para el crédito"""
+  available: Float!
+
+  """Monto usado del crédito"""
+  balance: Float!
+
+  """Compañía a la que pertenece el crédito"""
+  company: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Cliente al que pertenece el crédito"""
+  customer: Customer!
+
+  """Detalle de la afectación del crédito"""
+  details: [DetailCredit!]
+
+  """Monto congelado que no ha sido finalizado"""
+  frozenAmount: Float!
+
+  """Estado del crédito"""
+  status: StatusCredit!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la cartera"""
+  user: User!
+}
+
 """Cliente"""
 type Customer {
   """Identificador de mongo"""
@@ -1105,6 +1144,18 @@ input DetailConfirmStockTransferInput {
 
   """Cantidad de productos"""
   quantity: Float!
+}
+
+"""Detalle del crédito"""
+type DetailCredit {
+  """Monto pendiente en el pedido"""
+  balance: Float!
+
+  """Pedido que reporta el crédito"""
+  orderId: String!
+
+  """Monto total del pedido en crédito"""
+  total: Float!
 }
 
 """Detalle de la salida de productos"""
@@ -4667,6 +4718,12 @@ input SortWarehouse {
   isMain: Float
   name: Float
   updatedAt: Float
+}
+
+enum StatusCredit {
+  ACTIVE
+  FINISH
+  SUSPEND
 }
 
 enum StatusDetailTransfer {
