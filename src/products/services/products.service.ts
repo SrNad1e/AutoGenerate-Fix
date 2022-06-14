@@ -153,11 +153,11 @@ export class ProductsService {
 		}
 
 		if (colorId) {
-			filters.color = colorId;
+			filters.color = new Types.ObjectId(colorId);
 		}
 
 		if (sizeId) {
-			filters.size = sizeId;
+			filters.size = new Types.ObjectId(sizeId);
 		}
 
 		if (StatusProduct[status]) {
@@ -213,6 +213,8 @@ export class ProductsService {
 			sort,
 			lean: true,
 		};
+
+		console.log(filters);
 
 		const aggregateProduct = this.productModel.aggregate([
 			...aggregate,
