@@ -29,7 +29,7 @@ export class User extends Document {
 	})
 	name: string;
 
-	@Prop({ type: String, required: true, trim: true })
+	@Prop({ type: String, required: true, trim: true, lowercase: true })
 	@Field(() => String, { description: 'Cuenta de usuario' })
 	username: string;
 
