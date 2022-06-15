@@ -132,10 +132,7 @@ export class UsersService {
 	async findOne({ username, customerId }: FiltersUserInput): Promise<User> {
 		const filters: FilterQuery<User> = {};
 		if (username) {
-			filters.username = {
-				$regex: username,
-				$options: 'i',
-			};
+			filters.username = username.toLocaleLowerCase();
 		}
 
 		if (customerId) {
