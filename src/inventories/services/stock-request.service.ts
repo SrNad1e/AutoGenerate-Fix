@@ -199,7 +199,7 @@ export class StockRequestService {
 		}
 
 		const warehouseOrigin = await this.warehousesService.findById(
-			warehouseOriginId.toString(),
+			warehouseOriginId?.toString(),
 		);
 
 		const warehouseDestination = await this.warehousesService.findById(
@@ -495,6 +495,12 @@ export class StockRequestService {
 			throw new NotFoundException('La tienda no existe');
 		}
 
+		if (shop.isMain) {
+			throw new NotFoundException(
+				'La tienda esta marcada como principal y no puede autogenerar devoluciones',
+			);
+		}
+
 		const warehouse = await this.warehousesService.findById(
 			shop.defaultWarehouse._id.toString(),
 		);
@@ -530,7 +536,7 @@ export class StockRequestService {
 			const total = warehouse.min - (detail.stock.quantity || 0);
 
 			if (total > 0) {
-				if (product.stock[0].quantity < total) {
+				if (product.stock[0]?.quantity < total) {
 					if (product.stock[0].quantity > 0) {
 						details.push({
 							productId: detail._id.toString(),
