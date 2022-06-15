@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AggregatePaginateModel, Types } from 'mongoose';
+import { AggregatePaginateModel, FilterQuery, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
+import { FiltersCreditInput } from '../dtos/filters-credit.input';
 import { UpdateCreditInput } from '../dtos/update-credit.input';
 import { TypeCreditHistory } from '../entities/credit-history.entity';
 import { Credit, StatusCredit } from '../entities/credit.entity';
@@ -21,6 +22,16 @@ export class CreditsService {
 		@InjectModel(Credit.name)
 		private readonly creditModel: AggregatePaginateModel<Credit>,
 	) {}
+
+	async findOne({ customerId }: FiltersCreditInput) {
+		const filters: FilterQuery<Credit> = {};
+
+		if (customerId) {
+			filters.customer = new Types.ObjectId(customerId);
+		}
+
+		return this.creditModel.findOne(filters).populate(populate).lean();
+	}
 
 	async update(
 		id: string,

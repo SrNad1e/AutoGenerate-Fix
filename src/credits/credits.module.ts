@@ -27,6 +27,6 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 		]),
 	],
 	providers: [CreditsService, CreditHistoryService],
-	exports: [CreditHistoryService],
+	exports: [CreditHistoryService, CreditsService],
 })
 export class CreditsModule {}

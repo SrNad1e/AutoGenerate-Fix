@@ -2277,13 +2277,13 @@ type Mutation {
   addPaymentsOrder(
     """Medios de pago y orden a actualizar"""
     addPaymentsOrderInput: AddPaymentsOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Se encarga de agregar productos a un pedido"""
   addProductsOrder(
     """Productos del pedido para actualizar"""
     addProductsOrderInput: AddProductsOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Confirma los productos del traslado"""
   confirmProductsStockTransfer(
@@ -2340,7 +2340,7 @@ type Mutation {
   createOrder(
     """Parámetros para la creación del pedido"""
     createOrderInput: CreateOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Crea un producto"""
   createProduct(
@@ -2476,7 +2476,7 @@ type Mutation {
 
     """Parámetros para actualizar el pedido"""
     updateOrderInput: UpdateOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -3679,6 +3679,15 @@ type ResponseInvoices {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Respuesta para obtener la orden"""
+type ResponseOrder {
+  """Crédito que tiene el cliente"""
+  credit: Credit
+
+  """Pedido actualizado"""
+  order: Order!
 }
 
 """Lista de predidos"""

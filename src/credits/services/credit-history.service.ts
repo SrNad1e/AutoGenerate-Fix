@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AggregatePaginateModel } from 'mongoose';
-import { Order } from 'src/sales/entities/order.entity';
 
-import { CreditHistory } from '../entities/credit-history.entity';
+import { User } from 'src/configurations/entities/user.entity';
+import { Order } from 'src/sales/entities/order.entity';
+import {
+	CreditHistory,
+	TypeCreditHistory,
+} from '../entities/credit-history.entity';
 import { CreditsService } from './credits.service';
 
 @Injectable()
@@ -16,47 +20,147 @@ export class CreditHistoryService {
 		private readonly creditsService: CreditsService,
 	) {}
 
-	async addCreditHistory(orderId: string, amount: number) {
+	async addCreditHistory(orderId: string, amount: number, user: User) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
 		}
-		//validar monto
-		//actualizar la cartera
-		//crear el registro
+
+		const credit = await this.creditsService.validateCredit(
+			order?.customer.toString(),
+			amount,
+			TypeCreditHistory.CREDIT,
+		);
+
+		const newCredit = await this.creditsService.update(
+			credit?._id.toString(),
+			{
+				amount,
+				detailAddCredit: {
+					orderId: order?._id.toString(),
+					total: amount,
+					type: TypeCreditHistory.CREDIT,
+				},
+			},
+			user,
+		);
+
+		const newCreditHistory = new this.creditHistoryModel({
+			type: TypeCreditHistory.CREDIT,
+			amount,
+			credit: newCredit,
+			user,
+		});
+
+		return newCreditHistory.save();
 	}
 
-	async deleteCreditHistory(orderId: string, amount: number) {
+	async deleteCreditHistory(orderId: string, amount: number, user: User) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
 		}
-		//validar monto para debitar
-		//actualiar la cartera
-		//crear el registro
+
+		const credit = await this.creditsService.validateCredit(
+			order?.customer.toString(),
+			amount,
+			TypeCreditHistory.DEBIT,
+		);
+
+		const newCredit = await this.creditsService.update(
+			credit?._id.toString(),
+			{
+				amount,
+				detailAddCredit: {
+					orderId: order?._id.toString(),
+					total: amount,
+					type: TypeCreditHistory.DEBIT,
+				},
+			},
+			user,
+		);
+
+		const newCreditHistory = new this.creditHistoryModel({
+			type: TypeCreditHistory.DEBIT,
+			amount,
+			credit: newCredit,
+			user,
+		});
+
+		return newCreditHistory.save();
 	}
 
-	async frozenCreditHistory(orderId: string, amount: number) {
+	async frozenCreditHistory(orderId: string, amount: number, user: User) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
 		}
-		//validar monto a congelar
-		//actualiar la cartera
-		//crear el registro
+
+		const credit = await this.creditsService.validateCredit(
+			order?.customer.toString(),
+			amount,
+			TypeCreditHistory.CREDIT,
+		);
+
+		const newCredit = await this.creditsService.update(
+			credit?._id.toString(),
+			{
+				amount,
+				detailAddCredit: {
+					orderId: order?._id.toString(),
+					total: amount,
+					type: TypeCreditHistory.FROZEN,
+				},
+			},
+			user,
+		);
+
+		const newCreditHistory = new this.creditHistoryModel({
+			type: TypeCreditHistory.FROZEN,
+			amount,
+			credit: newCredit,
+			user,
+		});
+
+		return newCreditHistory.save();
 	}
 
-	async thawedCreditHistory(orderId: string, amount: number) {
+	async thawedCreditHistory(orderId: string, amount: number, user: User) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
 		}
-		//validar monto a descongelar
-		//actualiar la cartera
-		//crear el registro
+
+		const credit = await this.creditsService.validateCredit(
+			order?.customer.toString(),
+			amount,
+			TypeCreditHistory.THAWED,
+		);
+
+		const newCredit = await this.creditsService.update(
+			credit?._id.toString(),
+			{
+				amount,
+				detailAddCredit: {
+					orderId: order?._id.toString(),
+					total: amount,
+					type: TypeCreditHistory.THAWED,
+				},
+			},
+			user,
+		);
+
+		const newCreditHistory = new this.creditHistoryModel({
+			type: TypeCreditHistory.THAWED,
+			amount,
+			credit: newCredit,
+			user,
+		});
+
+		return newCreditHistory.save();
 	}
 }
