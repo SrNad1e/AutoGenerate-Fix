@@ -666,6 +666,34 @@
 			"name": "Consultar",
 			"description": "Permite consultar los medios de pago",
 			"action": "READ_TREASURY_PAYMENTS"
+		},
+		{
+			"module": "Cartera",
+			"option": "Crédito",
+			"name": "Acceder",
+			"description": "Permite acceder a los créditos",
+			"action": "ACCESS_CREDITS"
+		},
+		{
+			"module": "Cartera",
+			"option": "Crédito",
+			"name": "Consultar",
+			"description": "Permite consultar los créditos",
+			"action": "READ_CREDITS"
+		},
+		{
+			"module": "Cartera",
+			"option": "Crédito",
+			"name": "Crear",
+			"description": "Permite crear el crédito de un cliente",
+			"action": "CREATE_CREDIT"
+		},
+		{
+			"module": "Cartera",
+			"option": "Crédito",
+			"name": "Actualizar",
+			"description": "Permite actualizar los créditos",
+			"action": "UPDATE_CREDIT"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
