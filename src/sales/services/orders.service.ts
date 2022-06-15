@@ -381,6 +381,7 @@ export class OrdersService {
 								order?._id?.toString(),
 								total,
 								user,
+								companyId,
 							);
 						credit = creditHistory?.credit;
 					}

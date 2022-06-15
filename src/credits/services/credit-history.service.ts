@@ -20,7 +20,12 @@ export class CreditHistoryService {
 		private readonly creditsService: CreditsService,
 	) {}
 
-	async addCreditHistory(orderId: string, amount: number, user: User) {
+	async addCreditHistory(
+		orderId: string,
+		amount: number,
+		user: User,
+		companyId: string,
+	) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
@@ -44,6 +49,7 @@ export class CreditHistoryService {
 				},
 			},
 			user,
+			companyId,
 		);
 
 		const newCreditHistory = new this.creditHistoryModel({
@@ -56,7 +62,12 @@ export class CreditHistoryService {
 		return newCreditHistory.save();
 	}
 
-	async deleteCreditHistory(orderId: string, amount: number, user: User) {
+	async deleteCreditHistory(
+		orderId: string,
+		amount: number,
+		user: User,
+		companyId: string,
+	) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
@@ -80,6 +91,7 @@ export class CreditHistoryService {
 				},
 			},
 			user,
+			companyId,
 		);
 
 		const newCreditHistory = new this.creditHistoryModel({
@@ -92,7 +104,12 @@ export class CreditHistoryService {
 		return newCreditHistory.save();
 	}
 
-	async frozenCreditHistory(orderId: string, amount: number, user: User) {
+	async frozenCreditHistory(
+		orderId: string,
+		amount: number,
+		user: User,
+		companyId: string,
+	) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
@@ -116,6 +133,7 @@ export class CreditHistoryService {
 				},
 			},
 			user,
+			companyId,
 		);
 
 		const newCreditHistory = new this.creditHistoryModel({
@@ -128,7 +146,12 @@ export class CreditHistoryService {
 		return newCreditHistory.save();
 	}
 
-	async thawedCreditHistory(orderId: string, amount: number, user: User) {
+	async thawedCreditHistory(
+		orderId: string,
+		amount: number,
+		user: User,
+		companyId: string,
+	) {
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
@@ -152,6 +175,7 @@ export class CreditHistoryService {
 				},
 			},
 			user,
+			companyId,
 		);
 
 		const newCreditHistory = new this.creditHistoryModel({
