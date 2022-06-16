@@ -740,15 +740,6 @@ input CreateColorInput {
   name_internal: String!
 }
 
-"""Datos para crear un crédito"""
-input CreateCreditInput {
-  """Monto de crédigo aprobado"""
-  amount: Float!
-
-  """Identificador del cliente al que se le va a asignar el crédito"""
-  customerId: String!
-}
-
 """Datos para crear un cliente"""
 input CreateCustomerInput {
   """Direcciones del cliente"""
@@ -1639,27 +1630,6 @@ input FiltersConveyorsInput {
   sort: SortConveyor
 }
 
-"""Filtros para consultar los créditos de los clientes"""
-input FiltersCreditsInput {
-  """Monto aprobado al cliente"""
-  amount: Float
-
-  """Identificador del cliente"""
-  customerId: String
-
-  """Cantidad de registros"""
-  limit: Float
-
-  """Página actual"""
-  page: Float
-
-  """Ordenamiento"""
-  sort: SortCredit
-
-  """Estado del crédito"""
-  status: StatusCredit
-}
-
 """Filtros de listado de clientes"""
 input FiltersCustomersInput {
   """Si el cliente se encuentra activo"""
@@ -2307,13 +2277,13 @@ type Mutation {
   addPaymentsOrder(
     """Medios de pago y orden a actualizar"""
     addPaymentsOrderInput: AddPaymentsOrderInput!
-  ): ResponseOrder!
+  ): Order!
 
   """Se encarga de agregar productos a un pedido"""
   addProductsOrder(
     """Productos del pedido para actualizar"""
     addProductsOrderInput: AddProductsOrderInput!
-  ): ResponseOrder!
+  ): Order!
 
   """Confirma los productos del traslado"""
   confirmProductsStockTransfer(
@@ -2360,12 +2330,6 @@ type Mutation {
     createColorInput: CreateColorInput!
   ): Color!
 
-  """Asigna el crédito a un cliente"""
-  createCredit(
-    """Datos para crear un crédito"""
-    createCreditInput: CreateCreditInput!
-  ): Credit!
-
   """Se encarga crear un cliente"""
   createCustomer(
     """Parámetros para actualizar el cliente"""
@@ -2376,7 +2340,7 @@ type Mutation {
   createOrder(
     """Parámetros para la creación del pedido"""
     createOrderInput: CreateOrderInput!
-  ): ResponseOrder!
+  ): Order!
 
   """Crea un producto"""
   createProduct(
@@ -2496,15 +2460,6 @@ type Mutation {
     updateColorInput: UpdateColorInput!
   ): Color!
 
-  """Actualiza el crédito de un cliente"""
-  updateCredit(
-    """Datos para crear un crédito"""
-    createCreditInput: CreateCreditInput!
-
-    """Identificador del cliente a actualizar"""
-    id: String!
-  ): Credit!
-
   """Se encarga actualizar un cliente"""
   updateCustomer(
     """Identificador del cliente"""
@@ -2521,7 +2476,7 @@ type Mutation {
 
     """Parámetros para actualizar el pedido"""
     updateOrderInput: UpdateOrderInput!
-  ): ResponseOrder!
+  ): Order!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -2790,7 +2745,6 @@ enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
   ACCESS_CONFIGURATION_USERS
-  ACCESS_CREDITS
   ACCESS_CRM_CITIES
   ACCESS_CRM_CUSTOMERS
   ACCESS_ERP
@@ -2814,7 +2768,6 @@ enum Permissions {
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
   CREATE_CONFIGURATION_USER
-  CREATE_CREDIT
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
@@ -2847,7 +2800,6 @@ enum Permissions {
   READ_CONFIGURATION_SHOPS
   READ_CONFIGURATION_USERS
   READ_CONFIGURATION_WAREHOUSES
-  READ_CREDITS
   READ_CRM_CITIES
   READ_CRM_CUSTOMERS
   READ_INVENTORY_ADJUSTMENTS
@@ -2871,7 +2823,6 @@ enum Permissions {
   READ_TREASURY_PAYMENTS
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_USER
-  UPDATE_CREDIT
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
   UPDATE_INVENTORY_ATTRIB
@@ -3008,18 +2959,6 @@ type Query {
     """Filtros de lista de las transportadoras"""
     filtersConveyorsInput: FiltersConveyorsInput = {}
   ): ResponseConveyors!
-
-  """Creadito"""
-  creditId(
-    """Identificador del crédito"""
-    id: String!
-  ): Credit!
-
-  """Lista de créditos"""
-  credits(
-    """Filtros de lista de créditos"""
-    filtersCreditsInput: FiltersCreditsInput = {}
-  ): ResponseCredits!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
@@ -3643,39 +3582,6 @@ type ResponseConveyors {
   totalPages: Float!
 }
 
-"""Respuesta al listado de los créditos"""
-type ResponseCredits {
-  """Lista de créditos"""
-  docs: [Credit!]!
-
-  """¿Encuentra página siguiente?"""
-  hasNextPage: Boolean!
-
-  """¿Encuentra página anterior?"""
-  hasPrevPage: Boolean!
-
-  """Total de docuementos solicitados"""
-  limit: Float!
-
-  """Página siguente"""
-  nextPage: Float!
-
-  """Página actual"""
-  page: Float!
-
-  """"""
-  pagingCounter: Float!
-
-  """Página anterior"""
-  prevPage: Float!
-
-  """Total de documentos"""
-  totalDocs: Float!
-
-  """Total de páginas"""
-  totalPages: Float!
-}
-
 """Respuesta del listado de clientes"""
 type ResponseCustomers {
   """Lista de clientes"""
@@ -3773,15 +3679,6 @@ type ResponseInvoices {
 
   """Total de páginas"""
   totalPages: Float!
-}
-
-"""Respuesta para obtener la orden"""
-type ResponseOrder {
-  """Crédito que tiene el cliente"""
-  credit: Credit
-
-  """Pedido actualizado"""
-  order: Order!
 }
 
 """Lista de predidos"""
@@ -4605,30 +4502,6 @@ input SortConveyor {
 
   """Ordenamiento por fecha de creación"""
   updatedAt: Float
-}
-
-"""Ordenamiento de los créditos"""
-input SortCredit {
-  """Ordenamiento por monto aprobado"""
-  amount: Float!
-
-  """Ordenamiento por monto disponible"""
-  available: Float!
-
-  """Ordenamiento por monto ocupado"""
-  balance: Float!
-
-  """Ordenamiento por fecha de creación"""
-  createdAt: Float!
-
-  """Ordenamiento por monto congelado"""
-  frozenAmount: Float!
-
-  """Ordenamiento por estado"""
-  status: Float!
-
-  """Ordenamiento por fecha de actualización"""
-  updatedAt: Float!
 }
 
 """Ordenamiento del cliente"""

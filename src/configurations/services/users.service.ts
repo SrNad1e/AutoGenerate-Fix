@@ -334,14 +334,6 @@ export class UsersService {
 			}
 		}
 
-		let shop;
-		if (shopId) {
-			shop = await this.shopModel.findById(shopId);
-			if (!shop) {
-				throw new NotFoundException('La tienda no existe');
-			}
-		}
-
 		return this.userModel
 			.findByIdAndUpdate(
 				id,
@@ -350,7 +342,6 @@ export class UsersService {
 						status: newStatus,
 						password: newPassword,
 						name,
-						shop: shop._id,
 						customer: customer?._id,
 						pointOfSale: pointOfSale?._id || null,
 						role: role?._id,
