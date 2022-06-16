@@ -310,7 +310,7 @@ export class OrdersService {
 		let credit;
 		if (order?.customer || customerId) {
 			await this.creditsService.findOne({
-				customerId: order?.customer?.toString() || customerId,
+				customerId: customerId || order?.customer?._id?.toString(),
 			});
 		}
 
