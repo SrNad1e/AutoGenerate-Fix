@@ -107,7 +107,7 @@ export class ReturnsOrderService {
 		user: User,
 		companyId: string,
 	) {
-		const order = await this.ordersService.findById(orderId);
+		const { order } = await this.ordersService.findById(orderId);
 
 		if (!order) {
 			throw new BadRequestException('El pedido no existe');
