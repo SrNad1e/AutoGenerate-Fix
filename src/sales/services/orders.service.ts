@@ -416,6 +416,31 @@ export class OrdersService {
 			);
 		}
 
+		if (StatusOrder[status] === StatusOrder.CLOSED) {
+			for (let i = 0; i < order?.payments?.length; i++) {
+				const payment = order?.payments[i];
+
+				if (payment?.payment?.type === TypePayment.BONUS) {
+					const coupon = await this.couponsService.findOne(
+						{
+							code: payment?.code,
+						},
+						user,
+						companyId,
+					);
+
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.REDEEMED,
+						},
+						user,
+						order.company.toString(),
+					);
+				}
+			}
+		}
+
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
@@ -844,7 +869,21 @@ export class OrdersService {
 					);
 				}
 				if (newPayments[index]?.payment?.type === TypePayment.BONUS) {
-					//TODO: activar el bono nuevamente
+					const coupon = await this.couponsService.findOne(
+						{
+							code: newPayments[index]?.code,
+						},
+						user,
+						order.company.toString(),
+					);
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.ACTIVE,
+						},
+						user,
+						order.company.toString(),
+					);
 				}
 			}
 
@@ -938,7 +977,14 @@ export class OrdersService {
 					if (dayjs().isAfter(coupon?.expiration)) {
 						throw new BadRequestException('El cupón ya se encuentra vencido');
 					}
-					//TODO: inactivar el bono el bono
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.INACTIVE,
+						},
+						user,
+						order.company.toString(),
+					);
 				}
 			}
 		}
