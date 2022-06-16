@@ -2683,6 +2683,9 @@ type PaymentInvoice {
 
 """Medio de pago usado en el pedido"""
 type PaymentOrder {
+  """Cupón solo válido para el medio de pago tipo coupon"""
+  code: String
+
   """Fecha de agregado del pago al pedido"""
   createdAt: DateTime!
 
@@ -2715,6 +2718,9 @@ type PaymentOrderClose {
 input PaymentsOrderInput {
   """Acción a realizar con el medio de pago"""
   action: ActionPaymentsOrder!
+
+  """Código del cupón, válido para medios de pago tipo coupon"""
+  code: String
 
   """Identificador medio de pago agregado al pedido"""
   paymentId: String!

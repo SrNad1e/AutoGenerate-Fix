@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types, FilterQuery } from 'mongoose';
 import * as shortid from 'shortid';
@@ -6,7 +10,8 @@ import * as shortid from 'shortid';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateCouponInput } from '../dtos/create-coupon.input';
 import { FiltersCouponInput } from '../dtos/filters-coupon.input';
-import { Coupon } from '../entities/coupon.entity';
+import { UpdateCouponInput } from '../dtos/update-coupon.input';
+import { Coupon, StatusCoupon } from '../entities/coupon.entity';
 
 @Injectable()
 export class CouponsService {
@@ -62,6 +67,36 @@ export class CouponsService {
 			value,
 			title,
 			message,
+			user,
+		});
+	}
+
+	async update(
+		id: string,
+		{ status }: UpdateCouponInput,
+		user: User,
+		companyId: string,
+	) {
+		const coupon = await this.couponModel.findById(id);
+
+		if (!coupon) {
+			throw new BadRequestException(
+				'El cupón que intenta actualizar no existe',
+			);
+		}
+
+		if (coupon.company.toString() !== companyId && user.username !== 'admin') {
+			throw new UnauthorizedException(
+				'Usuario no tiene permisos para actualizar el cupón',
+			);
+		}
+
+		if (coupon.status === StatusCoupon.REDEEMED) {
+			throw new BadRequestException('El cupón ya fue redimido');
+		}
+
+		return this.couponModel.findByIdAndUpdate(id, {
+			status: StatusCoupon[status],
 			user,
 		});
 	}

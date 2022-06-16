@@ -15,6 +15,12 @@ export class PaymentsOrderInput {
 	})
 	paymentId: string;
 
+	@Field(() => String, {
+		description: 'Código del cupón, válido para medios de pago tipo coupon',
+		nullable: true,
+	})
+	code?: string;
+
 	@Field(() => Number, { description: 'Valor total agregado' })
 	total: number;
 

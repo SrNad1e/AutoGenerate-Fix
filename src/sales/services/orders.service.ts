@@ -35,6 +35,8 @@ import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHisto
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ActionProductsOrder } from '../dtos/add-products-order-input';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
+import { CouponsService } from 'src/crm/services/coupons.service';
+import { StatusCoupon } from 'src/crm/entities/coupon.entity';
 
 const populate = [
 	{
@@ -56,6 +58,7 @@ export class OrdersService {
 		private readonly discountRulesService: DiscountRulersService,
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
+		private readonly couponsService: CouponsService,
 	) {}
 
 	async findAll(
@@ -840,6 +843,9 @@ export class OrdersService {
 						`El método de pago ${payment.paymentId} no existe en el pedido ${order?.number}`,
 					);
 				}
+				if (newPayments[index]?.payment?.type === TypePayment.BONUS) {
+					//TODO: activar el bono nuevamente
+				}
 			}
 
 			const payments = paymentsDelete.map((item) => item.paymentId);
@@ -908,10 +914,32 @@ export class OrdersService {
 				);
 				newPayments.push({
 					payment,
+					code: detailPayment.code,
 					total: detailPayment.total,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
+				if (payment?.type === TypePayment.BONUS) {
+					const coupon = await this.couponsService.findOne(
+						{
+							code: detailPayment.code,
+							status: StatusCoupon.ACTIVE,
+						},
+						user,
+						order?.company?._id?.toString(),
+					);
+
+					if (!coupon) {
+						throw new BadRequestException(
+							'El cupón no existe o no puede usarse en esta factura',
+						);
+					}
+
+					if (dayjs().isAfter(coupon?.expiration)) {
+						throw new BadRequestException('El cupón ya se encuentra vencido');
+					}
+					//TODO: inactivar el bono el bono
+				}
 			}
 		}
 
