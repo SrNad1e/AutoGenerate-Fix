@@ -1770,6 +1770,27 @@ input FiltersOrdersInput {
   status: StatusOrder
 }
 
+"""Filtros para obtener el listado de tipos de medios de pago"""
+input FiltersPaymentsInput {
+  """Estado del tipo de los médios de pago"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre del medio de pago"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortPayment
+
+  """Tipo de medio de pago (cash, bank, credit, bonus)"""
+  type: String
+}
+
 """Filtros para obtener los puntos de venta"""
 input FiltersPointOfSalesInput {
   """Identificador del punto de venta"""
@@ -3109,9 +3130,9 @@ type Query {
 
   """Se encarga de listar los metodos de pago"""
   payments(
-    """Filtros para consultar los recibos de caja"""
-    filtersReceiptsInput: FiltersReceiptsInput = {}
-  ): ResponseReceipts!
+    """Filtros para consultar los métodos de pagos"""
+    filtersPaymentsInput: FiltersPaymentsInput = {}
+  ): ResponsePayments!
 
   """Se encarga de listar los permisos"""
   permissions: [PermissionData!]!
@@ -3133,6 +3154,12 @@ type Query {
     """Filtros para consoltar los productos"""
     filtersProductsInput: FiltersProductsInput = {}
   ): ResponseProducts!
+
+  """Se encarga de listar los metodos de pago"""
+  receipts(
+    """Filtros para consultar los recibos de caja"""
+    filtersReceiptsInput: FiltersReceiptsInput = {}
+  ): ResponseReceipts!
 
   """Obtiene la referencia por el identificador"""
   referenceId(
@@ -4755,6 +4782,15 @@ input SortOrder {
   number: Float
 
   """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de la teinda"""
+input SortPayment {
+  active: Float
+  createdAt: Float
+  name: Float
+  type: Float
   updatedAt: Float
 }
 

@@ -16,7 +16,7 @@ export class ReceiptsResolver {
 	constructor(private readonly receiptsServices: ReceiptsService) {}
 
 	@Query(() => ResponseReceipts, {
-		name: 'payments',
+		name: 'receipts',
 		description: 'Se encarga de listar los metodos de pago',
 	})
 	@RequirePermissions(Permissions.READ_TREASURY_RECEIPTS)
