@@ -5480,7 +5480,7 @@ input UpdateProductInput {
 
 """Datos para actualizar el recibo"""
 input UpdateReceiptInput {
-  """Estado del pedido"""
+  """Estado del recibo"""
   status: StatusReceipt
 }
 

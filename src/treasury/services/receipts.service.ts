@@ -163,7 +163,7 @@ export class ReceiptsService {
 
 		if (!receipt) {
 			throw new BadRequestException(
-				'El pedido que intenta actualizar no existe',
+				'El recibo que intenta actualizar no existe',
 			);
 		}
 

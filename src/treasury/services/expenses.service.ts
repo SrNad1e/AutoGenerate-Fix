@@ -11,8 +11,9 @@ import { User } from 'src/configurations/entities/user.entity';
 import { StatusBoxHistory } from '../dtos/create-boxHistory.input';
 import { CreateExpenseInput } from '../dtos/create-expense.input';
 import { FiltersExpensesInput } from '../dtos/filters-expenses.input';
+import { UpdateExpenseInput } from '../dtos/update-expense.input';
 import { Box } from '../entities/box.entity';
-import { Expense } from '../entities/expense.entity';
+import { Expense, StatusExpense } from '../entities/expense.entity';
 import { BoxHistoryService } from './box-history.service';
 import { BoxService } from './box.service';
 
@@ -146,5 +147,47 @@ export class ExpensesService {
 		return (await newExpense.save()).populate(populate);
 	}
 
-	async update() {}
+	async update(
+		id: string,
+		{ status }: UpdateExpenseInput,
+		user: User,
+		companyId: string,
+	) {
+		const expense = await this.expenseModel.findById(id).lean();
+
+		if (!expense) {
+			throw new BadRequestException(
+				'El egreso que intenta actualizar no existe',
+			);
+		}
+
+		if (
+			expense?.company.toString() !== companyId &&
+			user.username !== 'admin'
+		) {
+			throw new UnauthorizedException(
+				`El usuario no tiene permisos para actualizar este egreso`,
+			);
+		}
+
+		if (status === StatusExpense.CANCELLED) {
+			await this.boxHistoryService.addCash(
+				{
+					boxId: expense?.box.toString(),
+					documentId: id,
+					documentType: StatusBoxHistory.EXPENSE,
+					value: expense?.value,
+				},
+				user,
+				companyId,
+			);
+		}
+
+		return this.expenseModel.findByIdAndUpdate(id, {
+			$set: {
+				status: StatusExpense[status],
+				user,
+			},
+		});
+	}
 }
