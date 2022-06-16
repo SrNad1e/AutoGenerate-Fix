@@ -241,9 +241,6 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
-		let credit = await this.creditsService.findOne({
-			customerId: order?.customer.toString(),
-		});
 
 		if (!order) {
 			throw new BadRequestException(
@@ -308,6 +305,13 @@ export class OrdersService {
 				dataUpdate['summary'] = summary;
 				dataUpdate['details'] = newDetails;
 			}
+		}
+
+		let credit;
+		if (order?.customer || customerId) {
+			await this.creditsService.findOne({
+				customerId: order?.customer?.toString() || customerId,
+			});
 		}
 
 		if (StatusOrder[status]) {
