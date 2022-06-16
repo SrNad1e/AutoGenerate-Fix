@@ -13,6 +13,7 @@ import { BoxHistory, BoxHistorySchema } from './entities/box-history.entity';
 import { BoxService } from './services/box.service';
 import { ExpensesService } from './services/expenses.service';
 import { ReceiptsResolver } from './resolvers/receipts.resolver';
+import { ExpensesResolver } from './resolvers/expenses.resolver';
 
 @Module({
 	imports: [
@@ -61,6 +62,7 @@ import { ReceiptsResolver } from './resolvers/receipts.resolver';
 		BoxService,
 		ExpensesService,
 		ReceiptsResolver,
+		ExpensesResolver,
 	],
 	exports: [PaymentsService, ReceiptsService, ExpensesService],
 })

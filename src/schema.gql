@@ -785,6 +785,18 @@ input CreateCustomerInput {
   phone: String
 }
 
+"""Datos para crear Egreso"""
+input CreateExpenseInput {
+  """Identificador de la caja"""
+  boxId: String!
+
+  """Descripción del pago"""
+  concept: String
+
+  """Valor del egreso"""
+  value: Float!
+}
+
 """Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido"""
@@ -1704,6 +1716,30 @@ input FiltersDocumentTypesInput {
   name: String
 }
 
+"""Filtros para obtener el listado de egresos"""
+input FiltersExpensesInput {
+  """Caja a la que afecta el egreso"""
+  boxId: String
+
+  """Fecha final de la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial de la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortExpense
+
+  """Estado del egreso"""
+  status: StatusExpense
+}
+
 """Filtros para la lista de imagenes"""
 input FiltersImagesInput {
   """Cantidad de registros"""
@@ -2414,6 +2450,12 @@ type Mutation {
     createCustomerInput: CreateCustomerInput!
   ): Customer!
 
+  """Crea un egreso"""
+  createExpense(
+    """Datos para la creación del egreso"""
+    createExpenseInput: CreateExpenseInput!
+  ): Expense!
+
   """Se encarga de crear el pedido"""
   createOrder(
     """Parámetros para la creación del pedido"""
@@ -2561,6 +2603,15 @@ type Mutation {
     """Parámetros para actualizar el cliente"""
     updateCustomerInput: UpdateCustomerInput!
   ): Customer!
+
+  """Actualiza un egreso"""
+  updateExpense(
+    """Identificador del egreso"""
+    id: String!
+
+    """Datos para actualizar el egreso"""
+    updateExpenseInput: UpdateExpenseInput!
+  ): Expense!
 
   """Se encarga actualizar un pedido"""
   updateOrder(
@@ -2867,6 +2918,7 @@ enum Permissions {
   ACCESS_INVOICING_CLOSESZ
   ACCESS_INVOICING_RETURNS
   ACCESS_POS
+  ACCESS_TREASURY_EXPENSES
   ACCESS_TREASURY_PAYMENTS
   ACCESS_TREASURY_RECEIPTS
   AUTOGENERATE_INVENTORY_REQUEST
@@ -2891,6 +2943,7 @@ enum Permissions {
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
   CREATE_INVOICING_RETURN
+  CREATE_TREASURY_EXPENSE
   CREATE_TREASURY_RECEIPT
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
@@ -2928,6 +2981,7 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_TREASURY_EXPENSES
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
@@ -2947,6 +3001,7 @@ enum Permissions {
   UPDATE_INVENTORY_SIZE
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_ORDER
+  UPDATE_TREASURY_EXPENSE
   UPDATE_TREASURY_RECEIPT
 }
 
@@ -3097,6 +3152,12 @@ type Query {
     """Filtros para consultar el listado de tipos de documento"""
     filtersDocumentTypesInput: FiltersDocumentTypesInput = {}
   ): [DocumentType!]!
+
+  """Se encarga de listar los egresos"""
+  expenses(
+    """Filtros para consultar los egresos"""
+    filtersExpensesInput: FiltersExpensesInput = {}
+  ): ResponseExpenses!
 
   """Listado de imagenes"""
   images(
@@ -3756,6 +3817,39 @@ type ResponseCustomers {
   hasPrevPage: Boolean!
 
   """Total de documentos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de egresos"""
+type ResponseExpenses {
+  """Lista de egresos"""
+  docs: [Expense!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
   limit: Float!
 
   """Página siguente"""
@@ -4759,6 +4853,16 @@ input SortCustomer {
   phone: Float!
 }
 
+"""Ordenamiento de los egresos"""
+input SortExpense {
+  createdAt: Float
+  number: Float
+  status: Float
+  type: Float
+  updatedAt: Float
+  value: Float
+}
+
 """Ordenamiento para el listado de imagenes"""
 input SortImage {
   name: Float
@@ -5443,6 +5547,12 @@ input UpdateCustomerInput {
 
   """Número de teléfono"""
   phone: String
+}
+
+"""Datos para actualizar el egreso"""
+input UpdateExpenseInput {
+  """Estado del egreso"""
+  status: StatusExpense
 }
 
 """Datos para actualizar el pedido"""
