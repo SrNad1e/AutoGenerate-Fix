@@ -118,7 +118,7 @@ export class RolesService {
 		if (name) {
 			const role = await this.findOne({ name });
 
-			if (role) {
+			if (role && role._id.toString() !== roleId) {
 				throw new BadRequestException(
 					`El nombre del rol '${name}', ya se encuentra asignado`,
 				);

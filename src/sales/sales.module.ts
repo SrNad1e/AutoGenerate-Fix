@@ -34,6 +34,7 @@ import {
 	CloseZInvoicingSchema,
 } from './entities/close-z-invoicing.entity';
 import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver';
+import { CreditsModule } from 'src/credits/credits.module';
 
 @Module({
 	imports: [
@@ -42,6 +43,7 @@ import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver
 		ProductsModule,
 		TreasuryModule,
 		ConfigurationsModule,
+		CreditsModule,
 		MongooseModule.forFeatureAsync([
 			{
 				name: Order.name,
