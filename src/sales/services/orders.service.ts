@@ -35,8 +35,6 @@ import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHisto
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ActionProductsOrder } from '../dtos/add-products-order-input';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
-import { CreditHistoryService } from 'src/credits/services/credit-history.service';
-import { CreditsService } from 'src/credits/services/credits.service';
 
 const populate = [
 	{
@@ -58,8 +56,6 @@ export class OrdersService {
 		private readonly discountRulesService: DiscountRulersService,
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
-		private readonly creditHistoryService: CreditHistoryService,
-		private readonly creditsService: CreditsService,
 	) {}
 
 	async findAll(
@@ -165,8 +161,7 @@ export class OrdersService {
 			if (lastOrder) {
 				number = lastOrder.number + 1;
 			}
-
-			const newOrder = await this.orderModel.create({
+			return this.orderModel.create({
 				customer,
 				shop,
 				number,
@@ -174,11 +169,6 @@ export class OrdersService {
 				user,
 				pointOfSale: user.pointOfSale._id,
 			});
-
-			return {
-				order: newOrder,
-				credit: null,
-			};
 		} else {
 			if (!user.customer) {
 				throw new BadRequestException('El usuario no pertenece a un cliente');
@@ -206,7 +196,7 @@ export class OrdersService {
 				? user?.customer['addresses']?.find((address) => address?.isMain)
 				: undefined;
 
-		const newOrder = await this.orderModel.create({
+		return this.orderModel.create({
 			customer: user.customer,
 			address,
 			shop,
@@ -216,15 +206,6 @@ export class OrdersService {
 			status: StatusOrder[status],
 			company: new Types.ObjectId(companyId),
 		});
-
-		const credit = await this.creditsService.findOne({
-			customerId: user.customer?._id.toString(),
-		});
-
-		return {
-			order: newOrder,
-			credit,
-		};
 	}
 
 	async update(
@@ -234,9 +215,6 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
-		let credit = await this.creditsService.findOne({
-			customerId: order?.customer.toString(),
-		});
 
 		if (!order) {
 			throw new BadRequestException(
@@ -376,14 +354,8 @@ export class OrdersService {
 						});
 					} else {
 						payments.push(order?.payments[i]);
-						const creditHistory =
-							await this.creditHistoryService.addCreditHistory(
-								order?._id?.toString(),
-								total,
-								user,
-								companyId,
-							);
-						credit = creditHistory?.credit;
+
+						//TODO: agregar todo lo correspondiente al crédito
 					}
 				}
 			}
@@ -428,21 +400,20 @@ export class OrdersService {
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
-			if (details) {
-				await this.stockHistoryService.deleteStock(
-					{
-						details,
-						documentId: orderId,
-						documentType: DocumentTypeStockHistory.ORDER,
-						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-					},
-					user,
-					companyId,
-				);
-			}
+
+			await this.stockHistoryService.deleteStock(
+				{
+					details,
+					documentId: orderId,
+					documentType: DocumentTypeStockHistory.ORDER,
+					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+				},
+				user,
+				companyId,
+			);
 		}
 
-		const newOrder = await this.orderModel.findByIdAndUpdate(
+		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
 				$set: { ...dataUpdate, user, conveyor },
@@ -453,11 +424,6 @@ export class OrdersService {
 				lean: true,
 			},
 		);
-
-		return {
-			order: newOrder,
-			credit,
-		};
 	}
 
 	/**
@@ -813,7 +779,7 @@ export class OrdersService {
 			tax,
 		};
 
-		const newOrder = await this.orderModel.findByIdAndUpdate(
+		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
 				$set: {
@@ -828,15 +794,6 @@ export class OrdersService {
 				lean: true,
 			},
 		);
-
-		const credit = await this.creditsService.findOne({
-			customerId: user.customer?._id.toString(),
-		});
-
-		return {
-			order: newOrder,
-			credit,
-		};
 	}
 
 	async addPayments({ orderId, payments }: AddPaymentsOrderInput, user: User) {
@@ -992,7 +949,7 @@ export class OrdersService {
 			change,
 		};
 
-		const newOrder = await this.orderModel.findByIdAndUpdate(
+		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
 				$set: {
@@ -1007,14 +964,5 @@ export class OrdersService {
 				new: true,
 			},
 		);
-
-		const credit = await this.creditsService.findOne({
-			customerId: user.customer?._id.toString(),
-		});
-
-		return {
-			order: newOrder,
-			credit,
-		};
 	}
 }
