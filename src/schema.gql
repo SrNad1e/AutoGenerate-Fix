@@ -658,6 +658,9 @@ type Coupon {
   """Consecutivo del cupón"""
   number: Float!
 
+  """Estado del cupón"""
+  status: StatusCoupon!
+
   """Título del cupón"""
   title: String!
 
@@ -1634,6 +1637,9 @@ input FiltersConveyorsInput {
 input FiltersCouponInput {
   """Código del cupón"""
   code: String
+
+  """Estado del cupón"""
+  status: StatusCoupon
 }
 
 """Filtros de listado de clientes"""
@@ -4768,6 +4774,12 @@ input SortWarehouse {
   isMain: Float
   name: Float
   updatedAt: Float
+}
+
+enum StatusCoupon {
+  ACTIVE
+  INACTIVE
+  REDEEMED
 }
 
 enum StatusCredit {
