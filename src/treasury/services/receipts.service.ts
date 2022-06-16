@@ -18,7 +18,6 @@ import { BoxHistoryService } from './box-history.service';
 import { BoxService } from './box.service';
 import { PaymentsService } from './payments.service';
 import { UpdateReceiptInput } from '../dtos/update-receipt.input';
-import { TypeCreditHistory } from 'src/credits/entities/credit-history.entity';
 import { TypePayment } from '../entities/payment.entity';
 
 const populate = [
