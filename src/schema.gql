@@ -4916,7 +4916,7 @@ enum StatusProduct {
 
 enum StatusReceipt {
   ACTIVE
-  INACTIVE
+  CANCELLED
 }
 
 enum StatusShop {

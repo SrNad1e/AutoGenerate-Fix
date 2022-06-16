@@ -1,14 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import * as dayjs from 'dayjs';
+
 import { User } from 'src/configurations/entities/user.entity';
 import { StatusBoxHistory } from '../dtos/create-boxHistory.input';
-
 import { CreateReceiptInput } from '../dtos/create-receipt.input';
-import { Receipt } from '../entities/receipt.entity';
+import { FiltersReceiptsInput } from '../dtos/filters-receipts.input';
+import { Box } from '../entities/box.entity';
+import { Receipt, StatusReceipt } from '../entities/receipt.entity';
 import { BoxHistoryService } from './box-history.service';
 import { BoxService } from './box.service';
 import { PaymentsService } from './payments.service';
+import { UpdateReceiptInput } from '../dtos/update-receipt.input';
+import { TypeCreditHistory } from 'src/credits/entities/credit-history.entity';
+import { TypePayment } from '../entities/payment.entity';
+
+const populate = [
+	{
+		path: 'box',
+		model: Box.name,
+	},
+];
 
 @Injectable()
 export class ReceiptsService {
@@ -19,6 +37,68 @@ export class ReceiptsService {
 		private readonly paymentsService: PaymentsService,
 		private readonly boxHistoryService: BoxHistoryService,
 	) {}
+
+	async findAll(
+		{
+			dateFinal,
+			dateInitial,
+			limit = 10,
+			page = 1,
+			number,
+			paymentId,
+			sort,
+			status,
+		}: FiltersReceiptsInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<Receipt> = {};
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (number) {
+			filters.number = number;
+		}
+
+		if (paymentId) {
+			filters.payment = new Types.ObjectId(paymentId);
+		}
+
+		if (status) {
+			filters.status = StatusReceipt[status];
+		}
+
+		if (dateInitial) {
+			if (!dateFinal) {
+				throw new BadRequestException('Debe enviarse una fecha final');
+			}
+
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		} else if (dateFinal) {
+			if (!dateInitial) {
+				throw new BadRequestException('Debe enviarse una fecha inicial');
+			}
+			filters['createdAt'] = {
+				$gte: new Date(dateInitial),
+				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+			};
+		}
+
+		const options = {
+			page,
+			limit,
+			sort,
+			populate,
+			lean: true,
+		};
+
+		return this.receiptModel.paginate(options, filters);
+	}
 
 	async create(
 		{ concept, paymentId, value, boxId }: CreateReceiptInput,
@@ -72,5 +152,52 @@ export class ReceiptsService {
 		}
 
 		return newReceipt.save();
+	}
+
+	async update(
+		id: string,
+		{ status }: UpdateReceiptInput,
+		user: User,
+		companyId: string,
+	) {
+		const receipt = await this.receiptModel.findById(id).lean();
+
+		if (!receipt) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (
+			receipt?.company.toString() !== companyId &&
+			user.username !== 'admin'
+		) {
+			throw new UnauthorizedException(
+				`El usuario no tiene permisos para actualizar este recibo`,
+			);
+		}
+
+		if (
+			status === StatusReceipt.CANCELLED &&
+			receipt?.payment?.type === TypePayment.CASH
+		) {
+			await this.boxHistoryService.deleteCash(
+				{
+					boxId: receipt?.box.toString(),
+					documentId: id,
+					documentType: StatusBoxHistory.RECEIPT,
+					value: receipt?.value,
+				},
+				user,
+				companyId,
+			);
+		}
+
+		return this.receiptModel.findByIdAndUpdate(id, {
+			$set: {
+				status: StatusReceipt[status],
+				user,
+			},
+		});
 	}
 }
