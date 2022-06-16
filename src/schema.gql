@@ -1630,6 +1630,12 @@ input FiltersConveyorsInput {
   sort: SortConveyor
 }
 
+"""Filtros para consultar un cupón"""
+input FiltersCouponInput {
+  """Código del cupón"""
+  code: String
+}
+
 """Filtros de listado de clientes"""
 input FiltersCustomersInput {
   """Si el cliente se encuentra activo"""
@@ -2746,6 +2752,7 @@ enum Permissions {
   ACCESS_CONFIGURATION_ROLES
   ACCESS_CONFIGURATION_USERS
   ACCESS_CRM_CITIES
+  ACCESS_CRM_COUPONS
   ACCESS_CRM_CUSTOMERS
   ACCESS_ERP
   ACCESS_INVENTORY_ADJUSTMENTS
@@ -2801,6 +2808,7 @@ enum Permissions {
   READ_CONFIGURATION_USERS
   READ_CONFIGURATION_WAREHOUSES
   READ_CRM_CITIES
+  READ_CRM_COUPONS
   READ_CRM_CUSTOMERS
   READ_INVENTORY_ADJUSTMENTS
   READ_INVENTORY_ATTRIBS
@@ -2959,6 +2967,12 @@ type Query {
     """Filtros de lista de las transportadoras"""
     filtersConveyorsInput: FiltersConveyorsInput = {}
   ): ResponseConveyors!
+
+  """Consultar cupón"""
+  coupon(
+    """Filtros para consultar un cupón"""
+    filtersCouponInput: FiltersCouponInput!
+  ): Coupon!
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
