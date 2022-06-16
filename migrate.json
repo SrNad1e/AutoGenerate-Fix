@@ -729,6 +729,34 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar los recibos de caja",
 			"action": "UPDATE_TREASURY_RECEIPT"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Egreso",
+			"name": "Acceder",
+			"description": "Permite acceder a los egresos",
+			"action": "ACCESS_TREASURY_EXPENSES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Egreso",
+			"name": "Consultar",
+			"description": "Permite consultar los egresos",
+			"action": "READ_TREASURY_EXPENSES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Egreso",
+			"name": "Crear",
+			"description": "Permite crear el egreso",
+			"action": "CREATE_TREASURY_EXPENSE"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Egreso",
+			"name": "Actualizar",
+			"description": "Permite actualizar el egreso",
+			"action": "UPDATE_TREASURY_EXPENSE"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
