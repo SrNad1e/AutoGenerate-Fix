@@ -662,7 +662,7 @@
 		},
 		{
 			"module": "Tesorería",
-			"option": "Médio de pago",
+			"option": "Medio de pago",
 			"name": "Consultar",
 			"description": "Permite consultar los medios de pago",
 			"action": "READ_TREASURY_PAYMENTS"
@@ -694,6 +694,41 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar los créditos",
 			"action": "UPDATE_CREDIT"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Medio de pago",
+			"name": "Acceder",
+			"description": "Permite acceder a los medios de pago",
+			"action": "ACCESS_TREASURY_PAYMENTS"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Recibo de caja",
+			"name": "Acceder",
+			"description": "Permite acceder a los recibos de caja",
+			"action": "ACCESS_TREASURY_PAYMENTS"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Recibo de caja",
+			"name": "Consultar",
+			"description": "Permite consultar los recibos de caja",
+			"action": "READ_TREASURY_RECEIPTS"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Recibo de caja",
+			"name": "Crear",
+			"description": "Permite crear los recibos de caja",
+			"action": "CREATE_TREASURY_RECEIPT"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Recibo de caja",
+			"name": "Actualizar",
+			"description": "Permite actualizar los recibos de caja",
+			"action": "UPDATE_TREASURY_RECEIPT"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS

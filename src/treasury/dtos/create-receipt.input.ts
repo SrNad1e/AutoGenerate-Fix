@@ -1,6 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
-@ObjectType({ description: 'Datos para crear un recibo de caja' })
+@InputType({ description: 'Datos para crear un recibo de caja' })
 export class CreateReceiptInput {
 	@Field(() => String, {
 		description: 'Identificador de la caja que va a afectar',

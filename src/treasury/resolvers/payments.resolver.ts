@@ -22,7 +22,7 @@ export class PaymentsResolver {
 			name: 'filtersPaymentsInput',
 			nullable: true,
 			defaultValue: {},
-			description: 'Filtros para consultar los metodos de pagos',
+			description: 'Filtros para consultar los métodos de pagos',
 		})
 		_: FiltersPaymentsInput,
 		@Context() context,
