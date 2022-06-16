@@ -8,7 +8,7 @@ import { Box } from './box.entity';
 
 export enum StatusExpense {
 	ACTIVE = 'active',
-	INACTIVE = 'inactive',
+	CANCELLED = 'cancelled',
 }
 
 registerEnumType(StatusExpense, { name: 'StatusExpense' });

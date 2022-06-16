@@ -5016,7 +5016,7 @@ enum StatusDetailTransfer {
 
 enum StatusExpense {
   ACTIVE
-  INACTIVE
+  CANCELLED
 }
 
 enum StatusOrder {
