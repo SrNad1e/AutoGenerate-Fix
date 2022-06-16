@@ -49,7 +49,7 @@ export class OrdersResolver {
 		return this.ordersService.getByPointOfSales(idPointOfSale);
 	}
 
-	@Query(() => Order, {
+	@Query(() => ResponseOrder, {
 		name: 'orderId',
 		description: 'Obtiene la orden por el id',
 	})

@@ -3052,7 +3052,7 @@ type Query {
   orderId(
     """identificador del pedido"""
     id: String!
-  ): Order!
+  ): ResponseOrder!
 
   """Obtener las ordenes"""
   orders(
