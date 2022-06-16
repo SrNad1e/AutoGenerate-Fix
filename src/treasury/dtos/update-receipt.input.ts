@@ -4,7 +4,7 @@ import { StatusReceipt } from '../entities/receipt.entity';
 @InputType({ description: 'Datos para actualizar el recibo' })
 export class UpdateReceiptInput {
 	@Field(() => StatusReceipt, {
-		description: 'Estado del pedido',
+		description: 'Estado del recibo',
 		nullable: true,
 	})
 	status?: StatusReceipt;
