@@ -421,6 +421,12 @@ export class OrdersService {
 				const payment = order?.payments[i];
 
 				if (payment?.payment?.type === TypePayment.BONUS) {
+					if (!payment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+
 					const coupon = await this.couponsService.findOne(
 						{
 							code: payment?.code,
@@ -869,6 +875,11 @@ export class OrdersService {
 					);
 				}
 				if (newPayments[index]?.payment?.type === TypePayment.BONUS) {
+					if (!payment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
 					const coupon = await this.couponsService.findOne(
 						{
 							code: newPayments[index]?.code,
@@ -959,6 +970,11 @@ export class OrdersService {
 					updatedAt: new Date(),
 				});
 				if (payment?.type === TypePayment.BONUS) {
+					if (!detailPayment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
 					const coupon = await this.couponsService.findOne(
 						{
 							code: detailPayment.code,

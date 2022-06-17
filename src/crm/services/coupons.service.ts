@@ -4,6 +4,7 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { log } from 'console';
 import { PaginateModel, Types, FilterQuery } from 'mongoose';
 import * as shortid from 'shortid';
 
@@ -91,7 +92,10 @@ export class CouponsService {
 			);
 		}
 
-		if (coupon.company.toString() !== companyId && user.username !== 'admin') {
+		if (
+			coupon?.company?.toString() !== companyId &&
+			user.username !== 'admin'
+		) {
 			throw new UnauthorizedException(
 				'Usuario no tiene permisos para actualizar el cupón',
 			);
@@ -100,10 +104,20 @@ export class CouponsService {
 		if (coupon.status === StatusCoupon.REDEEMED) {
 			throw new BadRequestException('El cupón ya fue redimido');
 		}
+		const response = await this.couponModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					status,
+					user,
+				},
+			},
+			{
+				lean: true,
+				new: true,
+			},
+		);
 
-		return this.couponModel.findByIdAndUpdate(id, {
-			status: StatusCoupon[status],
-			user,
-		});
+		return response;
 	}
 }
