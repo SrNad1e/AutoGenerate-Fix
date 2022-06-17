@@ -38,6 +38,12 @@ export class FiltersExpensesInput {
 	})
 	status?: StatusExpense;
 
+	@Field(() => Number, {
+		description: 'Número consecutivo del egreso',
+		nullable: true,
+	})
+	number?: number;
+
 	@Field(() => String, {
 		description: 'Fecha inicial de la busqueda',
 		nullable: true,

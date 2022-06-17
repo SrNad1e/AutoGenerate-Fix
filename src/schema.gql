@@ -1504,6 +1504,21 @@ input FiltersAttribsInput {
   sort: SortAttrib
 }
 
+"""Filtros para consultar la cajas"""
+input FiltersBoxesInput {
+  """Identificador de la caja"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la caja para buscar coincidencias"""
+  name: String
+
+  """Página actual"""
+  page: Float
+}
+
 """Filtros para la lista de marcas"""
 input FiltersBrandsInput {
   """Identificador de la marcas"""
@@ -1729,6 +1744,9 @@ input FiltersExpensesInput {
 
   """Cantidad de registros"""
   limit: Float
+
+  """Número consecutivo del egreso"""
+  number: Float
 
   """Página actual"""
   page: Float
@@ -2918,6 +2936,7 @@ enum Permissions {
   ACCESS_INVOICING_CLOSESZ
   ACCESS_INVOICING_RETURNS
   ACCESS_POS
+  ACCESS_TREASURY_BOXES
   ACCESS_TREASURY_EXPENSES
   ACCESS_TREASURY_PAYMENTS
   ACCESS_TREASURY_RECEIPTS
@@ -2982,6 +3001,7 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_TREASURY_BOXES
   READ_TREASURY_EXPENSES
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
@@ -3078,6 +3098,12 @@ type Query {
     """Filtros para listar los atributos"""
     filtersAttribsInput: FiltersAttribsInput = {}
   ): ResponseAttribs!
+
+  """Se encarga de listar las cajas"""
+  boxes(
+    """Filtros para consultar las cajas"""
+    filtersBoxesInput: FiltersBoxesInput = {}
+  ): ResponseBoxes!
 
   """Listado de marcas"""
   brands(
@@ -3513,6 +3539,39 @@ type RefundOrderClose {
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de cajas"""
+type ResponseBoxes {
+  """Lista de cajas"""
+  docs: [Box!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!

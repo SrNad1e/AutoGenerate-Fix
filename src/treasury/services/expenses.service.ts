@@ -38,6 +38,7 @@ export class ExpensesService {
 			boxId,
 			dateFinal,
 			dateInitial,
+			number,
 			limit = 10,
 			page = 1,
 			sort,
@@ -52,12 +53,16 @@ export class ExpensesService {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
+		if (number) {
+			filters.number = number;
+		}
+
 		if (boxId) {
 			filters.box = new Types.ObjectId(boxId);
 		}
 
 		if (status) {
-			filters.status = status;
+			filters.status = StatusExpense[status];
 		}
 
 		if (dateInitial) {
