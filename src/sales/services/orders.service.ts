@@ -35,6 +35,8 @@ import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHisto
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ActionProductsOrder } from '../dtos/add-products-order-input';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
+import { CouponsService } from 'src/crm/services/coupons.service';
+import { StatusCoupon } from 'src/crm/entities/coupon.entity';
 
 const populate = [
 	{
@@ -56,6 +58,7 @@ export class OrdersService {
 		private readonly discountRulesService: DiscountRulersService,
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
+		private readonly couponsService: CouponsService,
 	) {}
 
 	async findAll(
@@ -411,6 +414,37 @@ export class OrdersService {
 				user,
 				companyId,
 			);
+		}
+
+		if (StatusOrder[status] === StatusOrder.CLOSED) {
+			for (let i = 0; i < order?.payments?.length; i++) {
+				const payment = order?.payments[i];
+
+				if (payment?.payment?.type === TypePayment.BONUS) {
+					if (!payment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+
+					const coupon = await this.couponsService.findOne(
+						{
+							code: payment?.code,
+						},
+						user,
+						companyId,
+					);
+
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.REDEEMED,
+						},
+						user,
+						order.company.toString(),
+					);
+				}
+			}
 		}
 
 		return this.orderModel.findByIdAndUpdate(
@@ -840,6 +874,28 @@ export class OrdersService {
 						`El método de pago ${payment.paymentId} no existe en el pedido ${order?.number}`,
 					);
 				}
+				if (newPayments[index]?.payment?.type === TypePayment.BONUS) {
+					if (!payment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+					const coupon = await this.couponsService.findOne(
+						{
+							code: newPayments[index]?.code,
+						},
+						user,
+						order.company.toString(),
+					);
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.ACTIVE,
+						},
+						user,
+						order.company.toString(),
+					);
+				}
 			}
 
 			const payments = paymentsDelete.map((item) => item.paymentId);
@@ -908,10 +964,44 @@ export class OrdersService {
 				);
 				newPayments.push({
 					payment,
+					code: detailPayment.code,
 					total: detailPayment.total,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
+				if (payment?.type === TypePayment.BONUS) {
+					if (!detailPayment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+					const coupon = await this.couponsService.findOne(
+						{
+							code: detailPayment.code,
+							status: StatusCoupon.ACTIVE,
+						},
+						user,
+						order?.company?._id?.toString(),
+					);
+
+					if (!coupon) {
+						throw new BadRequestException(
+							'El cupón no existe o no puede usarse en esta factura',
+						);
+					}
+
+					if (dayjs().isAfter(coupon?.expiration)) {
+						throw new BadRequestException('El cupón ya se encuentra vencido');
+					}
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.INACTIVE,
+						},
+						user,
+						order.company.toString(),
+					);
+				}
 			}
 		}
 
