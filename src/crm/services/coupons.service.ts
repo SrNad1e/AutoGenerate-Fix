@@ -31,7 +31,13 @@ export class CouponsService {
 			filters.code = code;
 		}
 
-		return this.couponModel.findOne(filters).lean();
+		const response = await this.couponModel.findOne(filters).lean();
+
+		if (!response) {
+			throw new BadRequestException('El cupón no existe');
+		}
+
+		return response;
 	}
 
 	async create(
