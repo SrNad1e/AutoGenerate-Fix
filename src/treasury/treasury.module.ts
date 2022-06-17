@@ -14,6 +14,7 @@ import { BoxService } from './services/box.service';
 import { ExpensesService } from './services/expenses.service';
 import { ReceiptsResolver } from './resolvers/receipts.resolver';
 import { ExpensesResolver } from './resolvers/expenses.resolver';
+import { BoxesResolver } from './resolvers/boxes.resolver';
 
 @Module({
 	imports: [
@@ -63,6 +64,7 @@ import { ExpensesResolver } from './resolvers/expenses.resolver';
 		ExpensesService,
 		ReceiptsResolver,
 		ExpensesResolver,
+		BoxesResolver,
 	],
 	exports: [PaymentsService, ReceiptsService, ExpensesService],
 })
