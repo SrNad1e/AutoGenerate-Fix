@@ -760,6 +760,13 @@
 		},
 		{
 			"module": "Tesorería",
+			"option": "Egreso",
+			"name": "Imprimir",
+			"description": "Permite imprimir el egreso",
+			"action": "PRINT_TREASURY_EXPENSE"
+		},
+		{
+			"module": "Tesorería",
 			"option": "Caja",
 			"name": "Consultar",
 			"description": "Permite consultar las cajas",
