@@ -757,6 +757,13 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar el egreso",
 			"action": "UPDATE_TREASURY_EXPENSE"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Egreso",
+			"name": "Imprimir",
+			"description": "Permite imprimir el egreso",
+			"action": "PRINT_TREASURY_EXPENSE"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
