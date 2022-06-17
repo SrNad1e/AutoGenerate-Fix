@@ -757,6 +757,20 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar el egreso",
 			"action": "UPDATE_TREASURY_EXPENSE"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Consultar",
+			"description": "Permite consultar las cajas",
+			"action": "READ_TREASURY_BOXES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Acceder",
+			"description": "Permite acceder a las cajas",
+			"action": "ACCESS_TREASURY_BOXES"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
