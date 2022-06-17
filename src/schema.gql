@@ -1745,6 +1745,9 @@ input FiltersExpensesInput {
   """Cantidad de registros"""
   limit: Float
 
+  """Número consecutivo del egreso"""
+  number: Float
+
   """Página actual"""
   page: Float
 
