@@ -19,6 +19,8 @@ import { BoxService } from './box.service';
 import { PaymentsService } from './payments.service';
 import { UpdateReceiptInput } from '../dtos/update-receipt.input';
 import { TypePayment } from '../entities/payment.entity';
+import { CreditHistoryService } from 'src/credits/services/credit-history.service';
+import { Order } from 'src/sales/entities/order.entity';
 
 const populate = [
 	{
@@ -32,9 +34,12 @@ export class ReceiptsService {
 	constructor(
 		@InjectModel(Receipt.name)
 		private readonly receiptModel: PaginateModel<Receipt>,
+		@InjectModel(Order.name)
+		private readonly orderModel: PaginateModel<Order>,
 		private readonly boxService: BoxService,
 		private readonly paymentsService: PaymentsService,
 		private readonly boxHistoryService: BoxHistoryService,
+		private readonly creditHistoryService: CreditHistoryService,
 	) {}
 
 	async findAll(
@@ -100,7 +105,7 @@ export class ReceiptsService {
 	}
 
 	async create(
-		{ concept, paymentId, value, boxId }: CreateReceiptInput,
+		{ concept, paymentId, value, boxId, details }: CreateReceiptInput,
 		user: User,
 		companyId: string,
 	) {
@@ -116,6 +121,17 @@ export class ReceiptsService {
 
 		if (!payment) {
 			throw new NotFoundException('El medio de pago no existe');
+		}
+
+		if (details) {
+			for (let i = 0; i < details.length; i++) {
+				const { orderId } = details[i];
+				const order = await this.orderModel.findById(orderId);
+
+				if (!order) {
+					throw new NotFoundException('Uno de los pedidos no existe');
+				}
+			}
 		}
 
 		const receipt = await this.receiptModel
@@ -136,6 +152,7 @@ export class ReceiptsService {
 			company: companyId,
 			user,
 		});
+		let credit;
 
 		if (boxId) {
 			await this.boxHistoryService.addCash(
@@ -150,7 +167,24 @@ export class ReceiptsService {
 			);
 		}
 
-		return newReceipt.save();
+		if (details) {
+			for (let i = 0; i < details.length; i++) {
+				const { orderId, amount } = details[i];
+				credit = await this.creditHistoryService.deleteCreditHistory(
+					orderId,
+					amount,
+					user,
+					companyId,
+				);
+			}
+		}
+
+		const receiptNew = await newReceipt.save();
+
+		return {
+			receipt: receiptNew,
+			credit,
+		};
 	}
 
 	async update(

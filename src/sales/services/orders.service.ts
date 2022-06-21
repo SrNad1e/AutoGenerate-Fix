@@ -374,7 +374,7 @@ export class OrdersService {
 									: undefined,
 						};
 
-						const receipt = await this.receiptsService.create(
+						const { receipt } = await this.receiptsService.create(
 							valuesReceipt,
 							user,
 							companyId,
