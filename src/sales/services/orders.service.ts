@@ -346,8 +346,11 @@ export class OrdersService {
 						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
-				case StatusOrder.CANCELLED || StatusOrder.CLOSED:
+				case StatusOrder.CANCELLED:
+					throw new BadRequestException('El pedido se encuentra cancelado');
+				case StatusOrder.CLOSED:
 					throw new BadRequestException('El pedido se encuentra finalizado');
+					break;
 				default:
 					break;
 			}
