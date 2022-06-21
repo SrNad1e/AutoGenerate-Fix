@@ -13,9 +13,8 @@ export class DetailReceiptOrder {
 export class CreateReceiptInput {
 	@Field(() => String, {
 		description: 'Identificador de la caja que va a afectar',
-		nullable: true,
 	})
-	boxId?: string;
+	boxId: string;
 
 	@Field(() => Number, { description: 'Valor del recibo' })
 	value: number;
