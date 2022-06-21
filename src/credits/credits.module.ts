@@ -8,12 +8,9 @@ import { Credit, CreditSchema } from './entities/credit.entity';
 import { CreditsService } from './services/credits.service';
 import { CreditHistoryService } from './services/credit-history.service';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
-import { CreditsResolver } from './resolvers/credits.resolver';
-import { CrmModule } from 'src/crm/crm.module';
 
 @Module({
 	imports: [
-		CrmModule,
 		MongooseModule.forFeature([
 			{
 				name: Credit.name,
@@ -29,7 +26,7 @@ import { CrmModule } from 'src/crm/crm.module';
 			},
 		]),
 	],
-	providers: [CreditsService, CreditHistoryService, CreditsResolver],
-	exports: [CreditHistoryService, CreditsService],
+	providers: [CreditsService, CreditHistoryService],
+	exports: [CreditHistoryService],
 })
 export class CreditsModule {}

@@ -70,6 +70,12 @@ export class PaymentOrder {
 	@Field(() => Receipt, { description: 'Total pagado', nullable: true })
 	receipt?: Types.ObjectId;
 
+	@Field(() => String, {
+		description: 'Cupón solo válido para el medio de pago tipo coupon',
+		nullable: true,
+	})
+	code?: string;
+
 	@Field(() => Date, {
 		description: 'Fecha de agregado del pago al pedido',
 	})

@@ -8,7 +8,6 @@ import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
-import { ResponseOrder } from '../dtos/response-order';
 import { ResponseOrders } from '../dtos/response-orders';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Order } from '../entities/order.entity';
@@ -60,7 +59,7 @@ export class OrdersResolver {
 		return this.ordersService.findById(id);
 	}
 
-	@Mutation(() => ResponseOrder, {
+	@Mutation(() => Order, {
 		name: 'createOrder',
 		description: 'Se encarga de crear el pedido',
 	})
@@ -79,7 +78,7 @@ export class OrdersResolver {
 		);
 	}
 
-	@Mutation(() => ResponseOrder, {
+	@Mutation(() => Order, {
 		name: 'updateOrder',
 		description: 'Se encarga actualizar un pedido',
 	})
@@ -100,7 +99,7 @@ export class OrdersResolver {
 		);
 	}
 
-	@Mutation(() => ResponseOrder, {
+	@Mutation(() => Order, {
 		name: 'addProductsOrder',
 		description: 'Se encarga de agregar productos a un pedido',
 	})
@@ -119,7 +118,7 @@ export class OrdersResolver {
 		);
 	}
 
-	@Mutation(() => ResponseOrder, {
+	@Mutation(() => Order, {
 		name: 'addPaymentsOrder',
 		description: 'Se encarga de agregar medios de pago',
 	})

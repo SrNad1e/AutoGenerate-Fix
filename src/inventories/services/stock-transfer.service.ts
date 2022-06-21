@@ -467,9 +467,10 @@ export class StockTransferService {
 					requests,
 					status: StatusStockRequest.USED,
 				});
+
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
+					quantity: detail.quantityConfirmed,
 				}));
 
 				const deleteStockHistoryInput: CreateStockHistoryInput = {
@@ -582,6 +583,15 @@ export class StockTransferService {
 
 		if (!stockTransfer) {
 			throw new BadRequestException('El traslado no existe');
+		}
+
+		if (
+			user.username !== 'admin' &&
+			stockTransfer?.company?._id.toString() !== companyId
+		) {
+			throw new UnauthorizedException(
+				`El usuario no se encuentra autorizado para hacer cambios en el traslado`,
+			);
 		}
 
 		if (stockTransfer.status !== StatusStockTransfer.SENT) {
