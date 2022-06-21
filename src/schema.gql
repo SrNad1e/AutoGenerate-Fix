@@ -821,21 +821,6 @@ input CreateProductInput {
   sizeId: String!
 }
 
-"""Datos para crear un recibo de caja"""
-input CreateReceiptInput {
-  """Identificador de la caja que va a afectar"""
-  boxId: String
-
-  """Concepto del recibo"""
-  concept: String!
-
-  """Identificador del medio de pago"""
-  paymentId: String!
-
-  """Valor del recibo"""
-  value: Float!
-}
-
 """Datos para crear una referencia"""
 input CreateReferenceInput {
   """Estado de la referencia"""
@@ -2503,12 +2488,6 @@ type Mutation {
     """Datos para crear un producto"""
     createProductInput: CreateProductInput!
   ): Product!
-
-  """Crea una recibo de caja"""
-  createReceipt(
-    """Datos para la creación del recibo de caja"""
-    createReceiptInput: CreateReceiptInput!
-  ): Receipt!
 
   """Crea una referencia"""
   createReference(

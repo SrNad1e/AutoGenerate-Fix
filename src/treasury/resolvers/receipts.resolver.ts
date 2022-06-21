@@ -38,25 +38,6 @@ export class ReceiptsResolver {
 	}
 
 	@Mutation(() => Receipt, {
-		name: 'createReceipt',
-		description: 'Crea una recibo de caja',
-	})
-	@RequirePermissions(Permissions.CREATE_TREASURY_RECEIPT)
-	create(
-		@Args('createReceiptInput', {
-			description: 'Datos para la creación del recibo de caja',
-		})
-		_: CreateReceiptInput,
-		@Context() context,
-	) {
-		return this.receiptsServices.create(
-			context.req.body.variables.input,
-			context.req.user.user,
-			context.req.user.companyId,
-		);
-	}
-
-	@Mutation(() => Receipt, {
 		name: 'updateReceipt',
 		description: 'Actualiza un recibo de caja',
 	})
