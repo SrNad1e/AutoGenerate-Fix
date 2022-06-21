@@ -14,6 +14,7 @@ import {
 import { User } from 'src/configurations/entities/user.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
 import { CustomersService } from 'src/crm/services/customers.service';
+import { Order } from 'src/sales/entities/order.entity';
 import { CreateCreditInput } from '../dtos/create-credit.input';
 import { FiltersCreditInput } from '../dtos/filters-credit.input';
 import { FiltersCreditsInput } from '../dtos/filters-credits.input';
@@ -25,6 +26,13 @@ const populate = [
 	{
 		path: 'customer',
 		model: Customer.name,
+	},
+	{
+		path: 'details',
+		populate: {
+			path: 'order',
+			model: Order.name,
+		},
 	},
 ];
 
@@ -155,7 +163,7 @@ export class CreditsService {
 					available = available - detailAddCredit?.total;
 					balance = balance + detailAddCredit?.total;
 					details.push({
-						orderId: new Types.ObjectId(detailAddCredit?.orderId),
+						order: new Types.ObjectId(detailAddCredit?.orderId),
 						balance: detailAddCredit?.total,
 						total: detailAddCredit?.total,
 					});
@@ -169,7 +177,7 @@ export class CreditsService {
 					available = available + detailAddCredit?.total;
 					balance = balance - detailAddCredit?.total;
 					const newDetails = details.map((detail) => {
-						if (detail.orderId.toString() === detailAddCredit.orderId) {
+						if (detail.order.toString() === detailAddCredit.orderId) {
 							return {
 								...detail,
 								balance: detail.balance - detailAddCredit?.total,

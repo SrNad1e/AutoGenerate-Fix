@@ -1191,7 +1191,7 @@ type DetailCredit {
   balance: Float!
 
   """Pedido que reporta el crédito"""
-  orderId: String!
+  order: Order!
 
   """Monto total del pedido en crédito"""
   total: Float!
@@ -1691,6 +1691,12 @@ input FiltersCouponInput {
 
   """Estado del cupón"""
   status: StatusCoupon
+}
+
+"""Filtros para obtener un crédito"""
+input FiltersCreditInput {
+  """Cliente que tiene asignado el crédito"""
+  customerId: String
 }
 
 """Filtros para consultar los créditos de los clientes"""
@@ -3179,7 +3185,13 @@ type Query {
     filtersCouponInput: FiltersCouponInput!
   ): Coupon!
 
-  """Creadito"""
+  """Crédito"""
+  credit(
+    """Filtros para buscar el crédito"""
+    filtersCreditInput: FiltersCreditInput!
+  ): Credit!
+
+  """Crédito"""
   creditId(
     """Identificador del crédito"""
     id: String!
