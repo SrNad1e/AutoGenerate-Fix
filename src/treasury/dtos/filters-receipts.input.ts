@@ -42,7 +42,10 @@ export class FiltersReceiptsInput {
 	})
 	number?: number;
 
-	@Field(() => StatusReceipt, { description: 'Estado del recibo' })
+	@Field(() => StatusReceipt, {
+		description: 'Estado del recibo',
+		nullable: true,
+	})
 	status?: StatusReceipt;
 
 	@Field(() => String, {

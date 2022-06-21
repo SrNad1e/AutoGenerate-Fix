@@ -1982,7 +1982,7 @@ input FiltersReceiptsInput {
   sort: SortReceipt
 
   """Estado del recibo"""
-  status: StatusReceipt!
+  status: StatusReceipt
 }
 
 """Filtros para la lista de referencias"""
