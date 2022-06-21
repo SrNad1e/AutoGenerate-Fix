@@ -3431,8 +3431,8 @@ type Receipt {
   """Identificador de mongo"""
   _id: String!
 
-  """Método de pago del recibo de caja"""
-  box: Box!
+  """Caja afectada por el recibo si es efectivo"""
+  box: Box
 
   """Empresa a la que pertenece el recibo de caja"""
   company: Company!
