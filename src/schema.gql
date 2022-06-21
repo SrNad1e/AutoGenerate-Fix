@@ -658,6 +658,9 @@ type Coupon {
   """Consecutivo del cupón"""
   number: Float!
 
+  """Estado del cupón"""
+  status: StatusCoupon!
+
   """Título del cupón"""
   title: String!
 
@@ -1188,7 +1191,7 @@ type DetailCredit {
   balance: Float!
 
   """Pedido que reporta el crédito"""
-  orderId: String!
+  order: Order!
 
   """Monto total del pedido en crédito"""
   total: Float!
@@ -1679,6 +1682,21 @@ input FiltersConveyorsInput {
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortConveyor
+}
+
+"""Filtros para consultar un cupón"""
+input FiltersCouponInput {
+  """Código del cupón"""
+  code: String
+
+  """Estado del cupón"""
+  status: StatusCoupon
+}
+
+"""Filtros para obtener un crédito"""
+input FiltersCreditInput {
+  """Cliente que tiene asignado el crédito"""
+  customerId: String
 }
 
 """Filtros para consultar los créditos de los clientes"""
@@ -2842,6 +2860,9 @@ type PaymentInvoice {
 
 """Medio de pago usado en el pedido"""
 type PaymentOrder {
+  """Cupón solo válido para el medio de pago tipo coupon"""
+  code: String
+
   """Fecha de agregado del pago al pedido"""
   createdAt: DateTime!
 
@@ -2874,6 +2895,9 @@ type PaymentOrderClose {
 input PaymentsOrderInput {
   """Acción a realizar con el medio de pago"""
   action: ActionPaymentsOrder!
+
+  """Código del cupón, válido para medios de pago tipo coupon"""
+  code: String
 
   """Identificador medio de pago agregado al pedido"""
   paymentId: String!
@@ -2918,6 +2942,7 @@ enum Permissions {
   ACCESS_CONFIGURATION_USERS
   ACCESS_CREDITS
   ACCESS_CRM_CITIES
+  ACCESS_CRM_COUPONS
   ACCESS_CRM_CUSTOMERS
   ACCESS_ERP
   ACCESS_INVENTORY_ADJUSTMENTS
@@ -2982,6 +3007,7 @@ enum Permissions {
   READ_CONFIGURATION_WAREHOUSES
   READ_CREDITS
   READ_CRM_CITIES
+  READ_CRM_COUPONS
   READ_CRM_CUSTOMERS
   READ_INVENTORY_ADJUSTMENTS
   READ_INVENTORY_ATTRIBS
@@ -3153,7 +3179,19 @@ type Query {
     filtersConveyorsInput: FiltersConveyorsInput = {}
   ): ResponseConveyors!
 
-  """Creadito"""
+  """Consultar cupón"""
+  coupon(
+    """Filtros para consultar un cupón"""
+    filtersCouponInput: FiltersCouponInput!
+  ): Coupon!
+
+  """Crédito"""
+  credit(
+    """Filtros para buscar el crédito"""
+    filtersCreditInput: FiltersCreditInput!
+  ): Credit!
+
+  """Crédito"""
   creditId(
     """Identificador del crédito"""
     id: String!
@@ -5164,6 +5202,12 @@ input SortWarehouse {
   isMain: Float
   name: Float
   updatedAt: Float
+}
+
+enum StatusCoupon {
+  ACTIVE
+  INACTIVE
+  REDEEMED
 }
 
 enum StatusCredit {

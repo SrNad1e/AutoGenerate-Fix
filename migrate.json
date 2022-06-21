@@ -668,18 +668,18 @@
 			"action": "READ_TREASURY_PAYMENTS"
 		},
 		{
-			"module": "Cartera",
-			"option": "Crédito",
-			"name": "Acceder",
-			"description": "Permite acceder a los créditos",
-			"action": "ACCESS_CREDITS"
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Consultar",
+			"description": "Permite consultar los cupones",
+			"action": "READ_CRM_COUPONS"
 		},
 		{
-			"module": "Cartera",
-			"option": "Crédito",
-			"name": "Consultar",
-			"description": "Permite consultar los créditos",
-			"action": "READ_CREDITS"
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Acceder",
+			"description": "Permite acceder a los cupones",
+			"action": "ACCESS_CRM_COUPONS"
 		},
 		{
 			"module": "Cartera",
@@ -779,6 +779,7 @@
 			"description": "Permite acceder a las cajas",
 			"action": "ACCESS_TREASURY_BOXES"
 		}
+		
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
 	"roles": [

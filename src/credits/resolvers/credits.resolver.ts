@@ -5,6 +5,7 @@ import {
 	RequirePermissions,
 } from 'src/configurations/libs/permissions.decorator';
 import { CreateCreditInput } from '../dtos/create-credit.input';
+import { FiltersCreditInput } from '../dtos/filters-credit.input';
 import { FiltersCreditsInput } from '../dtos/filters-credits.input';
 import { ResponseCredits } from '../dtos/response-credits';
 import { Credit } from '../entities/credit.entity';
@@ -38,7 +39,7 @@ export class CreditsResolver {
 
 	@Query(() => Credit, {
 		name: 'creditId',
-		description: 'Creadito',
+		description: 'Crédito',
 	})
 	@RequirePermissions(Permissions.READ_CREDITS)
 	findById(
@@ -49,6 +50,22 @@ export class CreditsResolver {
 		id: string,
 	) {
 		return this.creditsService.findById(id);
+	}
+
+	@Query(() => Credit, {
+		name: 'credit',
+		description: 'Crédito',
+	})
+	@RequirePermissions(Permissions.READ_CREDITS)
+	findOne(
+		@Args({
+			name: 'filtersCreditInput',
+			description: 'Filtros para buscar el crédito',
+		})
+		_: FiltersCreditInput,
+		@Context() context,
+	) {
+		return this.creditsService.findOne(context.req.body.variables.input);
 	}
 
 	@Mutation(() => Credit, {

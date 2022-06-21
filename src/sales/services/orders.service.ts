@@ -35,8 +35,10 @@ import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHisto
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ActionProductsOrder } from '../dtos/add-products-order-input';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
-import { CreditHistoryService } from 'src/credits/services/credit-history.service';
+import { CouponsService } from 'src/crm/services/coupons.service';
+import { StatusCoupon } from 'src/crm/entities/coupon.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
+import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 
 const populate = [
 	{
@@ -58,6 +60,7 @@ export class OrdersService {
 		private readonly discountRulesService: DiscountRulersService,
 		private readonly conveyorsService: ConveyorsService,
 		private readonly pointOfSalesService: PointOfSalesService,
+		private readonly couponsService: CouponsService,
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
 	) {}
@@ -224,13 +227,9 @@ export class OrdersService {
 			company: new Types.ObjectId(companyId),
 		});
 
-		const credit = await this.creditsService.findOne({
-			customerId: user.customer?._id.toString(),
-		});
-
 		return {
+			credit: null,
 			order: newOrder,
-			credit,
 		};
 	}
 
@@ -241,6 +240,9 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
+		let credit = await this.creditsService.findOne({
+			customerId: order?.customer.toString(),
+		});
 
 		if (!order) {
 			throw new BadRequestException(
@@ -305,13 +307,6 @@ export class OrdersService {
 				dataUpdate['summary'] = summary;
 				dataUpdate['details'] = newDetails;
 			}
-		}
-
-		let credit;
-		if (order?.customer || customerId) {
-			await this.creditsService.findOne({
-				customerId: customerId || order?.customer?._id?.toString(),
-			});
 		}
 
 		if (StatusOrder[status]) {
@@ -387,6 +382,7 @@ export class OrdersService {
 						});
 					} else {
 						payments.push(order?.payments[i]);
+
 						const creditHistory =
 							await this.creditHistoryService.addCreditHistory(
 								order?._id?.toString(),
@@ -439,17 +435,47 @@ export class OrdersService {
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
-			if (details) {
-				await this.stockHistoryService.deleteStock(
-					{
-						details,
-						documentId: orderId,
-						documentType: DocumentTypeStockHistory.ORDER,
-						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-					},
-					user,
-					companyId,
-				);
+
+			await this.stockHistoryService.deleteStock(
+				{
+					details,
+					documentId: orderId,
+					documentType: DocumentTypeStockHistory.ORDER,
+					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+				},
+				user,
+				companyId,
+			);
+		}
+
+		if (StatusOrder[status] === StatusOrder.CLOSED) {
+			for (let i = 0; i < order?.payments?.length; i++) {
+				const payment = order?.payments[i];
+
+				if (payment?.payment?.type === TypePayment.BONUS) {
+					if (!payment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+
+					const coupon = await this.couponsService.findOne(
+						{
+							code: payment?.code,
+						},
+						user,
+						companyId,
+					);
+
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.REDEEMED,
+						},
+						user,
+						order.company.toString(),
+					);
+				}
 			}
 		}
 
@@ -466,8 +492,8 @@ export class OrdersService {
 		);
 
 		return {
-			order: newOrder,
 			credit,
+			newOrder,
 		};
 	}
 
@@ -841,12 +867,12 @@ export class OrdersService {
 		);
 
 		const credit = await this.creditsService.findOne({
-			customerId: user.customer?._id.toString(),
+			customerId: newOrder?.customer?._id.toString(),
 		});
 
 		return {
-			order: newOrder,
 			credit,
+			newOrder,
 		};
 	}
 
@@ -892,6 +918,28 @@ export class OrdersService {
 				if (index < 0) {
 					throw new BadRequestException(
 						`El método de pago ${payment.paymentId} no existe en el pedido ${order?.number}`,
+					);
+				}
+				if (newPayments[index]?.payment?.type === TypePayment.BONUS) {
+					if (!payment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+					const coupon = await this.couponsService.findOne(
+						{
+							code: newPayments[index]?.code,
+						},
+						user,
+						order.company.toString(),
+					);
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.ACTIVE,
+						},
+						user,
+						order.company.toString(),
 					);
 				}
 			}
@@ -962,10 +1010,44 @@ export class OrdersService {
 				);
 				newPayments.push({
 					payment,
+					code: detailPayment.code,
 					total: detailPayment.total,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
+				if (payment?.type === TypePayment.BONUS) {
+					if (!detailPayment?.code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+					const coupon = await this.couponsService.findOne(
+						{
+							code: detailPayment.code,
+							status: StatusCoupon.ACTIVE,
+						},
+						user,
+						order?.company?._id?.toString(),
+					);
+
+					if (!coupon) {
+						throw new BadRequestException(
+							'El cupón no existe o no puede usarse en esta factura',
+						);
+					}
+
+					if (dayjs().isAfter(coupon?.expiration)) {
+						throw new BadRequestException('El cupón ya se encuentra vencido');
+					}
+					await this.couponsService.update(
+						coupon?._id?.toString(),
+						{
+							status: StatusCoupon.INACTIVE,
+						},
+						user,
+						order.company.toString(),
+					);
+				}
 			}
 		}
 
@@ -1020,12 +1102,12 @@ export class OrdersService {
 		);
 
 		const credit = await this.creditsService.findOne({
-			customerId: user.customer?._id.toString(),
+			customerId: newOrder?.customer?._id.toString(),
 		});
 
 		return {
-			order: newOrder,
 			credit,
+			order: newOrder,
 		};
 	}
 }

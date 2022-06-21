@@ -1,9 +1,17 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/configurations/entities/user.entity';
+
+export enum StatusCoupon {
+	ACTIVE = 'active',
+	INACTIVE = 'inactive',
+	REDEEMED = 'redeemed',
+}
+
+registerEnumType(StatusCoupon, { name: 'StatusCoupon' });
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Cupones para pagos' })
@@ -22,6 +30,12 @@ export class Coupon extends Document {
 	})
 	@Prop({ type: Number, required: true })
 	number: number;
+
+	@Field(() => StatusCoupon, {
+		description: 'Estado del cupón',
+	})
+	@Prop({ type: String, default: 'active' })
+	status: StatusCoupon;
 
 	@Field(() => Company, {
 		description: 'Consecutivo del cupón',

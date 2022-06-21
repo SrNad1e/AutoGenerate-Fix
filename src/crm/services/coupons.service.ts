@@ -1,11 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel, Types } from 'mongoose';
+import { log } from 'console';
+import { PaginateModel, Types, FilterQuery } from 'mongoose';
 import * as shortid from 'shortid';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateCouponInput } from '../dtos/create-coupon.input';
-import { Coupon } from '../entities/coupon.entity';
+import { FiltersCouponInput } from '../dtos/filters-coupon.input';
+import { UpdateCouponInput } from '../dtos/update-coupon.input';
+import { Coupon, StatusCoupon } from '../entities/coupon.entity';
 
 @Injectable()
 export class CouponsService {
@@ -13,6 +20,26 @@ export class CouponsService {
 		@InjectModel(Coupon.name)
 		private readonly couponModel: PaginateModel<Coupon>,
 	) {}
+
+	async findOne({ code }: FiltersCouponInput, user: User, companyId: string) {
+		const filters: FilterQuery<Coupon> = {};
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (code) {
+			filters.code = code;
+		}
+
+		const response = await this.couponModel.findOne(filters).lean();
+
+		if (!response) {
+			throw new BadRequestException('El cupón no existe');
+		}
+
+		return response;
+	}
 
 	async create(
 		{ expiration, message, title, value }: CreateCouponInput,
@@ -49,5 +76,48 @@ export class CouponsService {
 			message,
 			user,
 		});
+	}
+
+	async update(
+		id: string,
+		{ status }: UpdateCouponInput,
+		user: User,
+		companyId: string,
+	) {
+		const coupon = await this.couponModel.findById(id);
+
+		if (!coupon) {
+			throw new BadRequestException(
+				'El cupón que intenta actualizar no existe',
+			);
+		}
+
+		if (
+			coupon?.company?.toString() !== companyId &&
+			user.username !== 'admin'
+		) {
+			throw new UnauthorizedException(
+				'Usuario no tiene permisos para actualizar el cupón',
+			);
+		}
+
+		if (coupon.status === StatusCoupon.REDEEMED) {
+			throw new BadRequestException('El cupón ya fue redimido');
+		}
+		const response = await this.couponModel.findByIdAndUpdate(
+			id,
+			{
+				$set: {
+					status,
+					user,
+				},
+			},
+			{
+				lean: true,
+				new: true,
+			},
+		);
+
+		return response;
 	}
 }
