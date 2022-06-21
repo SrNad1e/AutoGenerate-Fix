@@ -285,18 +285,19 @@ export class StockTransferService {
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
 			}));
-
-			const deleteStockHistoryInput: CreateStockHistoryInput = {
-				details: detailHistory,
-				warehouseId: warehouseOriginId,
-				documentId: response._id.toString(),
-				documentType: DocumentTypeStockHistory.TRANSFER,
-			};
-			await this.stockHistoryService.deleteStock(
-				deleteStockHistoryInput,
-				user,
-				companyId,
-			);
+			if (detailHistory?.length > 0) {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
+					details: detailHistory,
+					warehouseId: warehouseOriginId,
+					documentId: response._id.toString(),
+					documentType: DocumentTypeStockHistory.TRANSFER,
+				};
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+					companyId,
+				);
+			}
 		}
 
 		return response.populate(populate);
@@ -470,20 +471,23 @@ export class StockTransferService {
 
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
-					quantity: detail.quantityConfirmed,
+					quantity: detail.quantity,
 				}));
 
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
+						documentId: response._id.toString(),
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
@@ -498,20 +502,22 @@ export class StockTransferService {
 
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
+					quantity: detail.quantityConfirmed,
 				}));
 
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseDestination._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.addStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseDestination._id.toString(),
+						documentId: response._id.toString(),
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+					await this.stockHistoryService.addStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
 			return response;
@@ -536,37 +542,39 @@ export class StockTransferService {
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
 				}));
-
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
+						documentId: response._id.toString(),
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
 				const detailHistory = response.details.map((detail) => ({
 					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
+					quantity: detail.quantityConfirmed,
 				}));
-
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseDestination._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.addStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseDestination._id.toString(),
+						documentId: response._id.toString(),
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+					await this.stockHistoryService.addStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
 			return response;
