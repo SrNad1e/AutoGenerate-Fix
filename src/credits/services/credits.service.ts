@@ -216,7 +216,6 @@ export class CreditsService {
 			{
 				$set: {
 					status,
-					amount,
 					available,
 					balance,
 					frozenAmount,
