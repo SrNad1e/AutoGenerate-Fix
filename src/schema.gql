@@ -824,7 +824,7 @@ input CreateProductInput {
 """Datos para crear un recibo de caja"""
 input CreateReceiptInput {
   """Identificador de la caja que va a afectar"""
-  boxId: String
+  boxId: String!
 
   """Concepto del recibo"""
   concept: String!
