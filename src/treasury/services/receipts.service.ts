@@ -18,7 +18,7 @@ import { BoxHistoryService } from './box-history.service';
 import { BoxService } from './box.service';
 import { PaymentsService } from './payments.service';
 import { UpdateReceiptInput } from '../dtos/update-receipt.input';
-import { TypePayment } from '../entities/payment.entity';
+import { Payment, TypePayment } from '../entities/payment.entity';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { Order } from 'src/sales/entities/order.entity';
 
@@ -26,6 +26,10 @@ const populate = [
 	{
 		path: 'box',
 		model: Box.name,
+	},
+	{
+		path: 'payment',
+		model: Payment.name,
 	},
 ];
 
