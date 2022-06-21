@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { Payment } from '../entities/payment.entity';
+import { Receipt } from '../entities/receipt.entity';
 
-@ObjectType({ description: 'Respuesta a la consulta de metodos de pago' })
-export class ResponsePayments {
-	@Field(() => [Payment], { description: 'Lista de metodos de pago' })
-	docs: Payment[];
+@ObjectType({ description: 'Respuesta a la consulta de recibos de caja' })
+export class ResponseReceipts {
+	@Field(() => [Receipt], { description: 'Lista de recibos de caja' })
+	docs: Receipt[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
 	totalDocs: number;

@@ -2,7 +2,7 @@ import { Field, InputType } from '@nestjs/graphql';
 import { StatusExpense } from '../entities/expense.entity';
 
 @InputType({ description: 'Ordenamiento de los egresos' })
-export class SortPayment {
+export class SortExpense {
 	@Field(() => Number, { nullable: true })
 	number?: number;
 
@@ -38,6 +38,12 @@ export class FiltersExpensesInput {
 	})
 	status?: StatusExpense;
 
+	@Field(() => Number, {
+		description: 'Número consecutivo del egreso',
+		nullable: true,
+	})
+	number?: number;
+
 	@Field(() => String, {
 		description: 'Fecha inicial de la busqueda',
 		nullable: true,
@@ -56,6 +62,6 @@ export class FiltersExpensesInput {
 	@Field({ description: 'Página actual', nullable: true })
 	page?: number;
 
-	@Field(() => SortPayment, { description: 'Ordenamiento', nullable: true })
-	sort?: SortPayment;
+	@Field(() => SortExpense, { description: 'Ordenamiento', nullable: true })
+	sort?: SortExpense;
 }

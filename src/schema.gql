@@ -779,6 +779,18 @@ input CreateCustomerInput {
   phone: String
 }
 
+"""Datos para crear Egreso"""
+input CreateExpenseInput {
+  """Identificador de la caja"""
+  boxId: String!
+
+  """Descripción del pago"""
+  concept: String
+
+  """Valor del egreso"""
+  value: Float!
+}
+
 """Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido"""
@@ -798,6 +810,21 @@ input CreateProductInput {
 
   """Identificador del producto"""
   sizeId: String!
+}
+
+"""Datos para crear un recibo de caja"""
+input CreateReceiptInput {
+  """Identificador de la caja que va a afectar"""
+  boxId: String
+
+  """Concepto del recibo"""
+  concept: String!
+
+  """Identificador del medio de pago"""
+  paymentId: String!
+
+  """Valor del recibo"""
+  value: Float!
 }
 
 """Datos para crear una referencia"""
@@ -1471,6 +1498,21 @@ input FiltersAttribsInput {
   sort: SortAttrib
 }
 
+"""Filtros para consultar la cajas"""
+input FiltersBoxesInput {
+  """Identificador de la caja"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la caja para buscar coincidencias"""
+  name: String
+
+  """Página actual"""
+  page: Float
+}
+
 """Filtros para la lista de marcas"""
 input FiltersBrandsInput {
   """Identificador de la marcas"""
@@ -1671,6 +1713,33 @@ input FiltersDocumentTypesInput {
   name: String
 }
 
+"""Filtros para obtener el listado de egresos"""
+input FiltersExpensesInput {
+  """Caja a la que afecta el egreso"""
+  boxId: String
+
+  """Fecha final de la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial de la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del egreso"""
+  number: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortExpense
+
+  """Estado del egreso"""
+  status: StatusExpense
+}
+
 """Filtros para la lista de imagenes"""
 input FiltersImagesInput {
   """Cantidad de registros"""
@@ -1839,6 +1908,33 @@ input FiltersProductsInput {
 
   """Se usa para seleccionar solo los productos que tengan inventario"""
   withStock: Boolean
+}
+
+"""Filtros para consultar los recibos de caja"""
+input FiltersReceiptsInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del recibo"""
+  number: Float
+
+  """Página actual"""
+  page: Float
+
+  """Identificador del medio de pago"""
+  paymentId: String
+
+  """Ordenamiento"""
+  sort: SortReceipt
+
+  """Estado del recibo"""
+  status: StatusReceipt!
 }
 
 """Filtros para la lista de referencias"""
@@ -2348,6 +2444,12 @@ type Mutation {
     createCustomerInput: CreateCustomerInput!
   ): Customer!
 
+  """Crea un egreso"""
+  createExpense(
+    """Datos para la creación del egreso"""
+    createExpenseInput: CreateExpenseInput!
+  ): Expense!
+
   """Se encarga de crear el pedido"""
   createOrder(
     """Parámetros para la creación del pedido"""
@@ -2359,6 +2461,12 @@ type Mutation {
     """Datos para crear un producto"""
     createProductInput: CreateProductInput!
   ): Product!
+
+  """Crea una recibo de caja"""
+  createReceipt(
+    """Datos para la creación del recibo de caja"""
+    createReceiptInput: CreateReceiptInput!
+  ): Receipt!
 
   """Crea una referencia"""
   createReference(
@@ -2481,6 +2589,15 @@ type Mutation {
     updateCustomerInput: UpdateCustomerInput!
   ): Customer!
 
+  """Actualiza un egreso"""
+  updateExpense(
+    """Identificador del egreso"""
+    id: String!
+
+    """Datos para actualizar el egreso"""
+    updateExpenseInput: UpdateExpenseInput!
+  ): Expense!
+
   """Se encarga actualizar un pedido"""
   updateOrder(
     """Identificador del pedido"""
@@ -2498,6 +2615,15 @@ type Mutation {
     """Datos a actualizar en el producto"""
     updateProductInput: UpdateProductInput!
   ): Product!
+
+  """Actualiza un recibo de caja"""
+  updateReceipt(
+    """Identificador del recibo de caja para actualizar"""
+    id: String!
+
+    """Datos para actualizar el recibo de caja"""
+    updateReceiptInput: UpdateReceiptInput!
+  ): Receipt!
 
   """Actualiza una referencia"""
   updateReference(
@@ -2783,6 +2909,10 @@ enum Permissions {
   ACCESS_INVOICING_CLOSESZ
   ACCESS_INVOICING_RETURNS
   ACCESS_POS
+  ACCESS_TREASURY_BOXES
+  ACCESS_TREASURY_EXPENSES
+  ACCESS_TREASURY_PAYMENTS
+  ACCESS_TREASURY_RECEIPTS
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
@@ -2804,6 +2934,8 @@ enum Permissions {
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
   CREATE_INVOICING_RETURN
+  CREATE_TREASURY_EXPENSE
+  CREATE_TREASURY_RECEIPT
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
   PRINT_INVENTORY_OUTPUT
@@ -2840,7 +2972,10 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_TREASURY_BOXES
+  READ_TREASURY_EXPENSES
   READ_TREASURY_PAYMENTS
+  READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_USER
   UPDATE_CRM_CUSTOMER
@@ -2857,6 +2992,8 @@ enum Permissions {
   UPDATE_INVENTORY_SIZE
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_ORDER
+  UPDATE_TREASURY_EXPENSE
+  UPDATE_TREASURY_RECEIPT
 }
 
 """Punto de venta de la tienda"""
@@ -2932,6 +3069,12 @@ type Query {
     filtersAttribsInput: FiltersAttribsInput = {}
   ): ResponseAttribs!
 
+  """Se encarga de listar las cajas"""
+  boxes(
+    """Filtros para consultar las cajas"""
+    filtersBoxesInput: FiltersBoxesInput = {}
+  ): ResponseBoxes!
+
   """Listado de marcas"""
   brands(
     """Filtros para listar las marcas"""
@@ -3001,6 +3144,12 @@ type Query {
     filtersDocumentTypesInput: FiltersDocumentTypesInput = {}
   ): [DocumentType!]!
 
+  """Se encarga de listar los egresos"""
+  expenses(
+    """Filtros para consultar los egresos"""
+    filtersExpensesInput: FiltersExpensesInput = {}
+  ): ResponseExpenses!
+
   """Listado de imagenes"""
   images(
     """Filtros para listar las imagenes"""
@@ -3033,7 +3182,7 @@ type Query {
 
   """Se encarga de listar los metodos de pago"""
   payments(
-    """Filtros para consultar los metodos de pagos"""
+    """Filtros para consultar los métodos de pagos"""
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
 
@@ -3057,6 +3206,12 @@ type Query {
     """Filtros para consoltar los productos"""
     filtersProductsInput: FiltersProductsInput = {}
   ): ResponseProducts!
+
+  """Se encarga de listar los metodos de pago"""
+  receipts(
+    """Filtros para consultar los recibos de caja"""
+    filtersReceiptsInput: FiltersReceiptsInput = {}
+  ): ResponseReceipts!
 
   """Obtiene la referencia por el identificador"""
   referenceId(
@@ -3377,6 +3532,39 @@ type ResponseAttribs {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de cajas"""
+type ResponseBoxes {
+  """Lista de cajas"""
+  docs: [Box!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de las marcas"""
 type ResponseBrands {
   """Lista de marcas"""
@@ -3641,6 +3829,39 @@ type ResponseCustomers {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de egresos"""
+type ResponseExpenses {
+  """Lista de egresos"""
+  docs: [Expense!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta al listado de las imagenes"""
 type ResponseImages {
   """Lista de imagenes"""
@@ -3810,6 +4031,39 @@ type ResponsePointOfSales {
 type ResponseProducts {
   """Lista de productos"""
   docs: [Product!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de recibos de caja"""
+type ResponseReceipts {
+  """Lista de recibos de caja"""
+  docs: [Receipt!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -4557,6 +4811,16 @@ input SortCustomer {
   phone: Float!
 }
 
+"""Ordenamiento de los egresos"""
+input SortExpense {
+  createdAt: Float
+  number: Float
+  status: Float
+  type: Float
+  updatedAt: Float
+  value: Float
+}
+
 """Ordenamiento para el listado de imagenes"""
 input SortImage {
   name: Float
@@ -4609,6 +4873,24 @@ input SortProduct {
   price: Float
   reference: Float
   status: Float
+}
+
+"""Ordenamiento de los recibos de caja"""
+input SortReceipt {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por consecutivo"""
+  number: Float
+
+  """Ordenamiento por estado del recibo"""
+  status: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+
+  """Ordenamiento por valor del recibo"""
+  value: Float
 }
 
 """Ordenamiento para el listado de referencias"""
@@ -4802,7 +5084,7 @@ enum StatusDetailTransfer {
 
 enum StatusExpense {
   ACTIVE
-  INACTIVE
+  CANCELLED
 }
 
 enum StatusOrder {
@@ -4821,7 +5103,7 @@ enum StatusProduct {
 
 enum StatusReceipt {
   ACTIVE
-  INACTIVE
+  CANCELLED
 }
 
 enum StatusShop {
@@ -5231,6 +5513,12 @@ input UpdateCustomerInput {
   phone: String
 }
 
+"""Datos para actualizar el egreso"""
+input UpdateExpenseInput {
+  """Estado del egreso"""
+  status: StatusExpense
+}
+
 """Datos para actualizar el pedido"""
 input UpdateOrderInput {
   """Dirección de envío para el pedido"""
@@ -5262,6 +5550,12 @@ input UpdateProductInput {
 
   """Estado del producto"""
   status: StatusProduct
+}
+
+"""Datos para actualizar el recibo"""
+input UpdateReceiptInput {
+  """Estado del recibo"""
+  status: StatusReceipt
 }
 
 """Datos para actualizar referencia"""

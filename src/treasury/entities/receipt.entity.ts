@@ -9,7 +9,7 @@ import { Payment } from './payment.entity';
 
 export enum StatusReceipt {
 	ACTIVE = 'active',
-	INACTIVE = 'inactive',
+	CANCELLED = 'cancelled',
 }
 
 registerEnumType(StatusReceipt, { name: 'StatusReceipt' });

@@ -128,7 +128,14 @@ export class OrdersService {
 	}
 
 	async findById(id: string) {
-		return this.orderModel.findById(id).populate(populate).lean();
+		const order = await this.orderModel.findById(id).populate(populate).lean();
+		const credit = await this.creditsService.findOne({
+			customerId: order?.customer?._id.toString(),
+		});
+		return {
+			order,
+			credit,
+		};
 	}
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
@@ -282,6 +289,13 @@ export class OrdersService {
 				dataUpdate['summary'] = summary;
 				dataUpdate['details'] = newDetails;
 			}
+		}
+
+		let credit;
+		if (order?.customer || customerId) {
+			await this.creditsService.findOne({
+				customerId: customerId || order?.customer?._id?.toString(),
+			});
 		}
 
 		if (StatusOrder[status]) {
