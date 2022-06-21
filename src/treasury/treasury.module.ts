@@ -15,9 +15,12 @@ import { ExpensesService } from './services/expenses.service';
 import { ReceiptsResolver } from './resolvers/receipts.resolver';
 import { ExpensesResolver } from './resolvers/expenses.resolver';
 import { BoxesResolver } from './resolvers/boxes.resolver';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { CreditsModule } from 'src/credits/credits.module';
 
 @Module({
 	imports: [
+		CreditsModule,
 		MongooseModule.forFeatureAsync([
 			{
 				name: Box.name,
@@ -52,6 +55,10 @@ import { BoxesResolver } from './resolvers/boxes.resolver';
 			{
 				name: BoxHistory.name,
 				schema: BoxHistorySchema,
+			},
+			{
+				name: Order.name,
+				schema: OrderSchema,
 			},
 		]),
 	],

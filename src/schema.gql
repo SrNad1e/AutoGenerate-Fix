@@ -821,6 +821,24 @@ input CreateProductInput {
   sizeId: String!
 }
 
+"""Datos para crear un recibo de caja"""
+input CreateReceiptInput {
+  """Identificador de la caja que va a afectar"""
+  boxId: String
+
+  """Concepto del recibo"""
+  concept: String!
+
+  """Pedidos a los que afecta el recibo"""
+  details: [DetailReceiptOrder!]
+
+  """Identificador del medio de pago"""
+  paymentId: String!
+
+  """Valor del recibo"""
+  value: Float!
+}
+
 """Datos para crear una referencia"""
 input CreateReferenceInput {
   """Estado de la referencia"""
@@ -1249,6 +1267,15 @@ type DetailOutput {
 
   """Fecha de actualización del detalle a la salida"""
   updatedAt: DateTime!
+}
+
+"""Detalles de cruce de la cartera"""
+input DetailReceiptOrder {
+  """Monto para abonar al pedido"""
+  amount: Float!
+
+  """Identificador del pedido"""
+  orderId: String!
 }
 
 type DetailRequest {
@@ -2488,6 +2515,12 @@ type Mutation {
     """Datos para crear un producto"""
     createProductInput: CreateProductInput!
   ): Product!
+
+  """Crea una recibo de caja"""
+  createReceipt(
+    """Datos para la creación del recibo de caja"""
+    createReceiptInput: CreateReceiptInput!
+  ): ResponseReceipt!
 
   """Crea una referencia"""
   createReference(
@@ -4153,6 +4186,15 @@ type ResponseProducts {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Resultado al crear un recibo de caja"""
+type ResponseReceipt {
+  """Crédito afectado por el recibo de caja"""
+  credit: Credit!
+
+  """Recibo de caja generado"""
+  receipt: Receipt!
 }
 
 """Respuesta a la consulta de recibos de caja"""

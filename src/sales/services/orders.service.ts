@@ -227,8 +227,12 @@ export class OrdersService {
 			company: new Types.ObjectId(companyId),
 		});
 
+		const credit = this.creditsService.findOne({
+			customerId: newOrder?.customer?.toString(),
+		});
+
 		return {
-			credit: null,
+			credit,
 			order: newOrder,
 		};
 	}
@@ -240,10 +244,7 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
-		let credit = await this.creditsService.findOne({
-			customerId: order?.customer.toString(),
-		});
-
+		let credit;
 		if (!order) {
 			throw new BadRequestException(
 				'El pedido que intenta actualizar no existe',
@@ -345,8 +346,11 @@ export class OrdersService {
 						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
-				case StatusOrder.CANCELLED || StatusOrder.CLOSED:
+				case StatusOrder.CANCELLED:
+					throw new BadRequestException('El pedido se encuentra cancelado');
+				case StatusOrder.CLOSED:
 					throw new BadRequestException('El pedido se encuentra finalizado');
+					break;
 				default:
 					break;
 			}
@@ -370,7 +374,7 @@ export class OrdersService {
 									: undefined,
 						};
 
-						const receipt = await this.receiptsService.create(
+						const { receipt } = await this.receiptsService.create(
 							valuesReceipt,
 							user,
 							companyId,
@@ -382,7 +386,6 @@ export class OrdersService {
 						});
 					} else {
 						payments.push(order?.payments[i]);
-
 						const creditHistory =
 							await this.creditHistoryService.addCreditHistory(
 								order?._id?.toString(),
@@ -491,9 +494,13 @@ export class OrdersService {
 			},
 		);
 
+		credit = await this.creditsService.findOne({
+			customerId: newOrder?.customer?._id?.toString(),
+		});
+
 		return {
 			credit,
-			newOrder,
+			order: newOrder,
 		};
 	}
 
@@ -872,7 +879,7 @@ export class OrdersService {
 
 		return {
 			credit,
-			newOrder,
+			order: newOrder,
 		};
 	}
 

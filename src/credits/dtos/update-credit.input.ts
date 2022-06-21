@@ -32,5 +32,5 @@ export class UpdateCreditInput {
 		description: 'Monto aprobado para el crédito',
 		nullable: true,
 	})
-	amount: number;
+	amount?: number;
 }
