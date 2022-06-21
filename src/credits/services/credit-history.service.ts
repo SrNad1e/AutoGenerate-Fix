@@ -83,7 +83,6 @@ export class CreditHistoryService {
 		const newCredit = await this.creditsService.update(
 			credit?._id.toString(),
 			{
-				amount,
 				detailAddCredit: {
 					orderId: order?._id.toString(),
 					total: amount,
@@ -125,7 +124,6 @@ export class CreditHistoryService {
 		const newCredit = await this.creditsService.update(
 			credit?._id.toString(),
 			{
-				amount,
 				detailAddCredit: {
 					orderId: order?._id.toString(),
 					total: amount,
