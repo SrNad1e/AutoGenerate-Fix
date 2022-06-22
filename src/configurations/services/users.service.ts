@@ -350,7 +350,7 @@ export class UsersService {
 						status: newStatus,
 						password: newPassword,
 						name,
-						shop: shop._id,
+						shop: shop?._id,
 						customer: customer?._id,
 						pointOfSale: pointOfSale?._id || null,
 						role: role?._id,
