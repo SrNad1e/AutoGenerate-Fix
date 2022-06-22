@@ -696,6 +696,20 @@
 			"action": "UPDATE_CREDIT"
 		},
 		{
+			"module": "Cartera",
+			"option": "Crédito",
+			"name": "Acceder",
+			"description": "Permite acceder a los créditos",
+			"action": "ACCESS_CREDITS"
+		},
+		{
+			"module": "Cartera",
+			"option": "Crédito",
+			"name": "Consultar",
+			"description": "Permite consultar los créditos",
+			"action": "READ_CREDITS"
+		},
+		{
 			"module": "Tesorería",
 			"option": "Medio de pago",
 			"name": "Acceder",

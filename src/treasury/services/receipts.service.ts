@@ -93,6 +93,8 @@ export class ReceiptsService {
 			};
 		}
 
+		console.log(filters);
+
 		const options = {
 			page,
 			limit,
@@ -101,7 +103,7 @@ export class ReceiptsService {
 			lean: true,
 		};
 
-		return this.receiptModel.paginate(options, filters);
+		return this.receiptModel.paginate(filters, options);
 	}
 
 	async create(
