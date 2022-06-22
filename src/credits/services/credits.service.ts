@@ -96,8 +96,15 @@ export class CreditsService {
 		if (customerId) {
 			filters.customer = new Types.ObjectId(customerId);
 		}
+		const response = await this.creditModel
+			.findOne(filters)
+			.populate(populate)
+			.lean();
 
-		return this.creditModel.findOne(filters).populate(populate).lean();
+		if (!response) {
+			throw new BadRequestException('El usuario no tiene crédito');
+		}
+		return response;
 	}
 
 	async create(
@@ -176,8 +183,9 @@ export class CreditsService {
 					}
 					available = available + detailAddCredit?.total;
 					balance = balance - detailAddCredit?.total;
+
 					const newDetails = details.map((detail) => {
-						if (detail.order.toString() === detailAddCredit.orderId) {
+						if (detail.order?._id?.toString() === detailAddCredit.orderId) {
 							return {
 								...detail,
 								balance: detail.balance - detailAddCredit?.total,

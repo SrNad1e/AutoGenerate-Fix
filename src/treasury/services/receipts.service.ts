@@ -93,8 +93,6 @@ export class ReceiptsService {
 			};
 		}
 
-		console.log(filters);
-
 		const options = {
 			page,
 			limit,
@@ -151,10 +149,9 @@ export class ReceiptsService {
 			value,
 			concept,
 			payment: payment,
-			company: companyId,
+			company: new Types.ObjectId(companyId),
 			user,
 		});
-		let credit;
 
 		if (boxId) {
 			await this.boxHistoryService.addCash(
@@ -168,11 +165,13 @@ export class ReceiptsService {
 				companyId,
 			);
 		}
+		let creditHistory;
 
 		if (details) {
 			for (let i = 0; i < details.length; i++) {
 				const { orderId, amount } = details[i];
-				credit = await this.creditHistoryService.deleteCreditHistory(
+
+				creditHistory = await this.creditHistoryService.deleteCreditHistory(
 					orderId,
 					amount,
 					user,
@@ -185,7 +184,7 @@ export class ReceiptsService {
 
 		return {
 			receipt: receiptNew,
-			credit,
+			credit: creditHistory?.credit,
 		};
 	}
 
