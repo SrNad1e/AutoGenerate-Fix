@@ -567,7 +567,12 @@ export class StockTransferService {
 			return this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, status: StatusStockTransfer[status], user },
+					$set: {
+						...options,
+						observationOrigin,
+						status: StatusStockTransfer[status],
+						user,
+					},
 				},
 				{
 					new: true,
