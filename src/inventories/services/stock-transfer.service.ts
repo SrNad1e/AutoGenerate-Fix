@@ -444,32 +444,13 @@ export class StockTransferService {
 				}
 			}
 
-			const response = await this.stockTransferModel.findByIdAndUpdate(
-				id,
-				{
-					$set: {
-						...options,
-						status: StatusStockTransfer[status],
-						details: newDetails,
-						requests: requests?.map((request) => new Types.ObjectId(request)),
-						observationOrigin,
-						user,
-					},
-				},
-				{
-					new: true,
-					lean: true,
-					populate,
-				},
-			);
-
 			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
 					status: StatusStockRequest.USED,
 				});
 
-				const detailHistory = response.details.map((detail) => ({
+				const detailHistory = newDetails.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
 				}));
@@ -478,7 +459,7 @@ export class StockTransferService {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
-						documentId: response._id.toString(),
+						documentId: id,
 						documentType: DocumentTypeStockHistory.TRANSFER,
 					};
 
@@ -500,7 +481,7 @@ export class StockTransferService {
 					);
 				}
 
-				const detailHistory = response.details.map((detail) => ({
+				const detailHistory = newDetails.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantityConfirmed,
 				}));
@@ -509,7 +490,7 @@ export class StockTransferService {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseDestination._id.toString(),
-						documentId: response._id.toString(),
+						documentId: id,
 						documentType: DocumentTypeStockHistory.TRANSFER,
 					};
 					await this.stockHistoryService.addStock(
@@ -520,12 +501,17 @@ export class StockTransferService {
 				}
 			}
 
-			return response;
-		} else {
-			const response = await this.stockTransferModel.findByIdAndUpdate(
+			return this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, status: StatusStockTransfer[status], user },
+					$set: {
+						...options,
+						status: StatusStockTransfer[status],
+						details: newDetails,
+						requests: requests?.map((request) => new Types.ObjectId(request)),
+						observationOrigin,
+						user,
+					},
 				},
 				{
 					new: true,
@@ -533,12 +519,13 @@ export class StockTransferService {
 					populate,
 				},
 			);
+		} else {
 			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
 					status: StatusStockRequest.USED,
 				});
-				const detailHistory = response.details.map((detail) => ({
+				const detailHistory = stockTransfer?.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
 				}));
@@ -546,7 +533,7 @@ export class StockTransferService {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
-						documentId: response._id.toString(),
+						documentId: id,
 						documentType: DocumentTypeStockHistory.TRANSFER,
 					};
 					await this.stockHistoryService.deleteStock(
@@ -558,7 +545,7 @@ export class StockTransferService {
 			}
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
-				const detailHistory = response.details.map((detail) => ({
+				const detailHistory = stockTransfer?.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantityConfirmed,
 				}));
@@ -566,7 +553,7 @@ export class StockTransferService {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
 						warehouseId: stockTransfer.warehouseDestination._id.toString(),
-						documentId: response._id.toString(),
+						documentId: id,
 						documentType: DocumentTypeStockHistory.TRANSFER,
 					};
 					await this.stockHistoryService.addStock(
@@ -577,7 +564,17 @@ export class StockTransferService {
 				}
 			}
 
-			return response;
+			return this.stockTransferModel.findByIdAndUpdate(
+				id,
+				{
+					$set: { ...options, status: StatusStockTransfer[status], user },
+				},
+				{
+					new: true,
+					lean: true,
+					populate,
+				},
+			);
 		}
 	}
 
