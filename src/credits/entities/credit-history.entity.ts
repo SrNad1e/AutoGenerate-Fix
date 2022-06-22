@@ -6,8 +6,8 @@ import { User } from 'src/configurations/entities/user.entity';
 import { Credit } from './credit.entity';
 
 export enum TypeCreditHistory {
-	CREDIT = 'debit',
-	DEBIT = 'credit',
+	CREDIT = 'credit',
+	DEBIT = 'debit',
 	FROZEN = 'frozen',
 	THAWED = 'thawed',
 }
