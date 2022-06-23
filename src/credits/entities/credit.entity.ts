@@ -68,6 +68,7 @@ export class Credit extends Document {
 	@Field(() => Number, {
 		description: 'Monto congelado que no ha sido finalizado',
 	})
+	@Prop({ type: Number, default: 0 })
 	frozenAmount: number;
 
 	@Field(() => User, { description: 'Usuario que creó o editó la cartera' })
