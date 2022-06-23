@@ -285,18 +285,19 @@ export class StockTransferService {
 				productId: detail.product._id.toString(),
 				quantity: detail.quantity,
 			}));
-
-			const deleteStockHistoryInput: CreateStockHistoryInput = {
-				details: detailHistory,
-				warehouseId: warehouseOriginId,
-				documentId: response._id.toString(),
-				documentType: DocumentTypeStockHistory.TRANSFER,
-			};
-			await this.stockHistoryService.deleteStock(
-				deleteStockHistoryInput,
-				user,
-				companyId,
-			);
+			if (detailHistory?.length > 0) {
+				const deleteStockHistoryInput: CreateStockHistoryInput = {
+					details: detailHistory,
+					warehouseId: warehouseOriginId,
+					documentId: response._id.toString(),
+					documentType: DocumentTypeStockHistory.TRANSFER,
+				};
+				await this.stockHistoryService.deleteStock(
+					deleteStockHistoryInput,
+					user,
+					companyId,
+				);
+			}
 		}
 
 		return response.populate(populate);
@@ -443,7 +444,64 @@ export class StockTransferService {
 				}
 			}
 
-			const response = await this.stockTransferModel.findByIdAndUpdate(
+			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
+				await this.stockRequestService.updateMany({
+					requests,
+					status: StatusStockRequest.USED,
+				});
+
+				const detailHistory = newDetails.map((detail) => ({
+					productId: detail.product._id.toString(),
+					quantity: detail.quantity,
+				}));
+
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
+						documentId: id,
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
+			}
+
+			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
+				const confirmedProducts = stockTransfer.details.find(
+					(detail) => detail.status === StatusDetailTransfer.NEW,
+				);
+				if (confirmedProducts) {
+					throw new BadRequestException(
+						'Debe confirmar todos los productos para confirmar el traslado',
+					);
+				}
+
+				const detailHistory = newDetails.map((detail) => ({
+					productId: detail.product._id.toString(),
+					quantity: detail.quantityConfirmed,
+				}));
+
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseDestination._id.toString(),
+						documentId: id,
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+					await this.stockHistoryService.addStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
+			}
+
+			return this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
 					$set: {
@@ -461,65 +519,60 @@ export class StockTransferService {
 					populate,
 				},
 			);
-
+		} else {
 			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
 				await this.stockRequestService.updateMany({
 					requests,
 					status: StatusStockRequest.USED,
 				});
-
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantityConfirmed,
-				}));
-
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
-			}
-
-			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
-				const confirmedProducts = stockTransfer.details.find(
-					(detail) => detail.status === StatusDetailTransfer.NEW,
-				);
-				if (confirmedProducts) {
-					throw new BadRequestException(
-						'Debe confirmar todos los productos para confirmar el traslado',
-					);
-				}
-
-				const detailHistory = response.details.map((detail) => ({
+				const detailHistory = stockTransfer?.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
 				}));
-
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseDestination._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.addStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
+						documentId: id,
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+					await this.stockHistoryService.deleteStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
 			}
 
-			return response;
-		} else {
-			const response = await this.stockTransferModel.findByIdAndUpdate(
+			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
+				const detailHistory = stockTransfer?.details.map((detail) => ({
+					productId: detail.product._id.toString(),
+					quantity: detail.quantityConfirmed,
+				}));
+				if (detailHistory?.length > 0) {
+					const deleteStockHistoryInput: CreateStockHistoryInput = {
+						details: detailHistory,
+						warehouseId: stockTransfer.warehouseDestination._id.toString(),
+						documentId: id,
+						documentType: DocumentTypeStockHistory.TRANSFER,
+					};
+					await this.stockHistoryService.addStock(
+						deleteStockHistoryInput,
+						user,
+						companyId,
+					);
+				}
+			}
+
+			return this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
-					$set: { ...options, status: StatusStockTransfer[status], user },
+					$set: {
+						...options,
+						observationOrigin,
+						status: StatusStockTransfer[status],
+						user,
+					},
 				},
 				{
 					new: true,
@@ -527,49 +580,6 @@ export class StockTransferService {
 					populate,
 				},
 			);
-			if (StatusStockTransfer[status] === StatusStockTransfer.SENT) {
-				await this.stockRequestService.updateMany({
-					requests,
-					status: StatusStockRequest.USED,
-				});
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-				}));
-
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.deleteStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
-			}
-
-			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
-				const detailHistory = response.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-				}));
-
-				const deleteStockHistoryInput: CreateStockHistoryInput = {
-					details: detailHistory,
-					warehouseId: stockTransfer.warehouseDestination._id.toString(),
-					documentId: response._id.toString(),
-					documentType: DocumentTypeStockHistory.TRANSFER,
-				};
-				await this.stockHistoryService.addStock(
-					deleteStockHistoryInput,
-					user,
-					companyId,
-				);
-			}
-
-			return response;
 		}
 	}
 

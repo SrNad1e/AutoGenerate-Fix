@@ -93,7 +93,7 @@ export class StockAdjustmentService {
 		const filters: FilterQuery<StockAdjustment> = {};
 
 		if (user.username !== 'admin') {
-			filters.company = new Types.ObjectId(companyId);
+			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
 		if (number) {
@@ -146,7 +146,7 @@ export class StockAdjustmentService {
 		const filters: FilterQuery<StockAdjustment> = { _id };
 
 		if (user.username !== 'admin') {
-			filters.company = new Types.ObjectId(companyId);
+			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
 		const response = await this.stockAdjustmetnModel
@@ -156,7 +156,7 @@ export class StockAdjustmentService {
 		if (response) {
 			return response;
 		}
-		throw new NotFoundException('La entrada no existe');
+		throw new NotFoundException('El ajuste no existe');
 	}
 
 	async create(

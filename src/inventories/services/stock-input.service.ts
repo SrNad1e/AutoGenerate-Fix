@@ -85,7 +85,7 @@ export class StockInputService {
 		const filters: FilterQuery<StockInput> = {};
 
 		if (user.username !== 'admin') {
-			filters.company = new Types.ObjectId(companyId);
+			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
 		if (number) {
@@ -137,7 +137,7 @@ export class StockInputService {
 		const filters: FilterQuery<StockInput> = { _id };
 
 		if (user.username !== 'admin') {
-			filters.company = companyId;
+			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
 		const response = await this.stockInputModel

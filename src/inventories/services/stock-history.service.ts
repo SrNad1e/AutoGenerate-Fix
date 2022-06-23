@@ -104,7 +104,6 @@ export class StockHistoryService {
 				`Un producto no existe o se encuentra inactivo, revise la lista de productos`,
 			);
 		}
-		//agregar al inventario
 		for (let i = 0; i < details.length; i++) {
 			const { productId, quantity } = details[i];
 			const product = await this.productsService.addStock(
@@ -186,6 +185,15 @@ export class StockHistoryService {
 		if (totalDocs !== products.length) {
 			throw new BadRequestException(
 				`Un producto no existe o se encuentra inactivo, revise la lista de productos`,
+			);
+		}
+
+		for (let i = 0; i < details.length; i++) {
+			const { productId, quantity } = details[i];
+			await this.productsService.validateStock(
+				productId,
+				quantity,
+				warehouseId,
 			);
 		}
 

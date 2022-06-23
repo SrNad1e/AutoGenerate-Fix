@@ -88,7 +88,7 @@ export class StockOutputService {
 		const filters: FilterQuery<StockOutput> = {};
 
 		if (user.username !== 'admin') {
-			filters.company = companyId;
+			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
 		if (number) {
@@ -137,7 +137,7 @@ export class StockOutputService {
 	async findById(_id: string, user: Partial<User>, companyId: string) {
 		const filters: FilterQuery<StockOutput> = { _id };
 		if (user.username !== 'admin') {
-			filters.company = companyId;
+			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 		const response = await this.stockOutputModel
 			.findById(filters)
@@ -146,7 +146,7 @@ export class StockOutputService {
 		if (response) {
 			return response;
 		}
-		throw new NotFoundException('La entrada no existe');
+		throw new NotFoundException('La salida no existe');
 	}
 
 	async create(
