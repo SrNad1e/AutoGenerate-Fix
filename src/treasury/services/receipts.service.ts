@@ -148,12 +148,13 @@ export class ReceiptsService {
 			number,
 			value,
 			concept,
+			box: box?._id,
 			payment: payment,
 			company: new Types.ObjectId(companyId),
 			user,
 		});
 
-		if (boxId) {
+		if (payment?.type === TypePayment.CASH) {
 			await this.boxHistoryService.addCash(
 				{
 					boxId,
