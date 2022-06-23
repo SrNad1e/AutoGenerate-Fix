@@ -792,6 +792,13 @@
 			"name": "Acceder",
 			"description": "Permite acceder a las cajas",
 			"action": "ACCESS_TREASURY_BOXES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Recibo",
+			"name": "Imprimir",
+			"description": "Permite imprimir el recibo de caja",
+			"action": "PRINT_TREASURY_RECEIPT"
 		}
 		
 	],
