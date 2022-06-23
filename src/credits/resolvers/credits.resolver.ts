@@ -8,6 +8,7 @@ import { CreateCreditInput } from '../dtos/create-credit.input';
 import { FiltersCreditInput } from '../dtos/filters-credit.input';
 import { FiltersCreditsInput } from '../dtos/filters-credits.input';
 import { ResponseCredits } from '../dtos/response-credits';
+import { UpdateCreditInput } from '../dtos/update-credit.input';
 import { Credit } from '../entities/credit.entity';
 import { CreditsService } from '../services/credits.service';
 
@@ -96,14 +97,14 @@ export class CreditsResolver {
 	update(
 		@Args({
 			name: 'id',
-			description: 'Identificador del cliente a actualizar',
+			description: 'Identificador del crédito a actualizar',
 		})
 		id: string,
 		@Args({
-			name: 'createCreditInput',
-			description: 'Datos para crear un crédito',
+			name: 'updateCreditInput',
+			description: 'Datos para actualizar un crédito',
 		})
-		_: CreateCreditInput,
+		_: UpdateCreditInput,
 		@Context() context,
 	) {
 		return this.creditsService.update(
