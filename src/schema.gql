@@ -1176,6 +1176,18 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Detalle para agregar al crédito"""
+input DetailAddCredit {
+  """Pedido que afecta la cartera"""
+  orderId: String!
+
+  """Valor que afecta la cartera"""
+  total: Float!
+
+  """Tipo de movimiento"""
+  type: TypeCreditHistory!
+}
+
 """Producto que se va a agregar"""
 input DetailAddProductsOrderInput {
   """Acción a realizar con el producto"""
@@ -2684,11 +2696,11 @@ type Mutation {
 
   """Actualiza el crédito de un cliente"""
   updateCredit(
-    """Datos para crear un crédito"""
-    createCreditInput: CreateCreditInput!
-
-    """Identificador del cliente a actualizar"""
+    """Identificador del crédito a actualizar"""
     id: String!
+
+    """Datos para actualizar un crédito"""
+    updateCreditInput: UpdateCreditInput!
   ): Credit!
 
   """Se encarga actualizar un cliente"""
@@ -5746,6 +5758,18 @@ input UpdateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String
+}
+
+"""Datos para actualizar un crédito"""
+input UpdateCreditInput {
+  """Monto aprobado para el crédito"""
+  amount: Float
+
+  """Detalles para agregar al crédito"""
+  detailAddCredit: DetailAddCredit
+
+  """Estado del crédito"""
+  status: StatusCredit
 }
 
 """Datos para actualizar un cliente"""
