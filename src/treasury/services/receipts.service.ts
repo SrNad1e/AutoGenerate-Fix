@@ -181,10 +181,10 @@ export class ReceiptsService {
 			}
 		}
 
-		const receiptNew = await newReceipt.save();
+		const receiptNew = await (await newReceipt.save()).populate(populate);
 
 		return {
-			receipt: receiptNew,
+			receipt: receiptNew['_doc'],
 			credit: creditHistory?.credit,
 		};
 	}
