@@ -52,11 +52,11 @@ export class FiltersCreditHistoryInput {
 	})
 	type?: TypeCreditHistory;
 
-	@Field(() => StatusCredit, {
+	@Field(() => String, {
 		description: 'Identificador del crédito',
 		nullable: true,
 	})
-	creditId?: StatusCredit;
+	creditId?: string;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
