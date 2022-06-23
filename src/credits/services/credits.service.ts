@@ -223,7 +223,7 @@ export class CreditsService {
 			id,
 			{
 				$set: {
-					status,
+					status: StatusCredit[status],
 					amount,
 					available,
 					balance,
