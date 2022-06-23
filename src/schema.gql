@@ -5012,40 +5012,40 @@ input SortConveyor {
 """Ordenamiento de los créditos"""
 input SortCredit {
   """Ordenamiento por monto aprobado"""
-  amount: Float!
+  amount: Float
 
   """Ordenamiento por monto disponible"""
-  available: Float!
+  available: Float
 
   """Ordenamiento por monto ocupado"""
-  balance: Float!
+  balance: Float
 
   """Ordenamiento por fecha de creación"""
-  createdAt: Float!
+  createdAt: Float
 
   """Ordenamiento por monto congelado"""
-  frozenAmount: Float!
+  frozenAmount: Float
 
   """Ordenamiento por estado"""
-  status: Float!
+  status: Float
 
   """Ordenamiento por fecha de actualización"""
-  updatedAt: Float!
+  updatedAt: Float
 }
 
 """Ordenamiento de los créditos"""
 input SortCreditHistory {
   """Ordenamiento por monto aprobado"""
-  amount: Float!
+  amount: Float
 
   """Ordenamiento por fecha de creación"""
-  createdAt: Float!
+  createdAt: Float
 
   """Tipo de historico de créditos"""
-  type: Float!
+  type: Float
 
   """Ordenamiento por fecha de actualización"""
-  updatedAt: Float!
+  updatedAt: Float
 }
 
 """Ordenamiento del cliente"""

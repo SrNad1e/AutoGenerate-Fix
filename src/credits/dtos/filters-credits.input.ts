@@ -4,28 +4,47 @@ import { StatusCredit } from '../entities/credit.entity';
 
 @InputType({ description: 'Ordenamiento de los créditos' })
 export class SortCredit {
-	@Field(() => Number, { description: 'Ordenamiento por monto aprobado' })
-	amount: number;
+	@Field(() => Number, {
+		description: 'Ordenamiento por monto aprobado',
+		nullable: true,
+	})
+	amount?: number;
 
-	@Field(() => Number, { description: 'Ordenamiento por estado' })
-	status: number;
+	@Field(() => Number, {
+		description: 'Ordenamiento por estado',
+		nullable: true,
+	})
+	status?: number;
 
-	@Field(() => Number, { description: 'Ordenamiento por monto disponible' })
-	available: number;
+	@Field(() => Number, {
+		description: 'Ordenamiento por monto disponible',
+		nullable: true,
+	})
+	available?: number;
 
-	@Field(() => Number, { description: 'Ordenamiento por monto ocupado' })
-	balance: number;
+	@Field(() => Number, {
+		description: 'Ordenamiento por monto ocupado',
+		nullable: true,
+	})
+	balance?: number;
 
-	@Field(() => Number, { description: 'Ordenamiento por monto congelado' })
-	frozenAmount: number;
+	@Field(() => Number, {
+		description: 'Ordenamiento por monto congelado',
+		nullable: true,
+	})
+	frozenAmount?: number;
 
-	@Field(() => Number, { description: 'Ordenamiento por fecha de creación' })
-	createdAt: number;
+	@Field(() => Number, {
+		description: 'Ordenamiento por fecha de creación',
+		nullable: true,
+	})
+	createdAt?: number;
 
 	@Field(() => Number, {
 		description: 'Ordenamiento por fecha de actualización',
+		nullable: true,
 	})
-	updatedAt: number;
+	updatedAt?: number;
 }
 
 @InputType({
