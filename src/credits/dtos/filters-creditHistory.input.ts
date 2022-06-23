@@ -1,9 +1,10 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { TypeCreditHistory } from '../entities/credit-history.entity';
 
 import { StatusCredit } from '../entities/credit.entity';
 
 @InputType({ description: 'Ordenamiento de los créditos' })
-export class SortCredit {
+export class SortCreditHistory {
 	@Field(() => Number, {
 		description: 'Ordenamiento por monto aprobado',
 		nullable: true,
@@ -11,28 +12,10 @@ export class SortCredit {
 	amount?: number;
 
 	@Field(() => Number, {
-		description: 'Ordenamiento por estado',
+		description: 'Tipo de historico de créditos',
 		nullable: true,
 	})
-	status?: number;
-
-	@Field(() => Number, {
-		description: 'Ordenamiento por monto disponible',
-		nullable: true,
-	})
-	available?: number;
-
-	@Field(() => Number, {
-		description: 'Ordenamiento por monto ocupado',
-		nullable: true,
-	})
-	balance?: number;
-
-	@Field(() => Number, {
-		description: 'Ordenamiento por monto congelado',
-		nullable: true,
-	})
-	frozenAmount?: number;
+	type?: number;
 
 	@Field(() => Number, {
 		description: 'Ordenamiento por fecha de creación',
@@ -50,7 +33,7 @@ export class SortCredit {
 @InputType({
 	description: 'Filtros para consultar los créditos de los clientes',
 })
-export class FiltersCreditsInput {
+export class FiltersCreditHistoryInput {
 	@Field(() => String, {
 		description: 'Identificador del cliente',
 		nullable: true,
@@ -58,16 +41,22 @@ export class FiltersCreditsInput {
 	customerId?: string;
 
 	@Field(() => Number, {
-		description: 'Monto aprobado al cliente',
+		description: 'Monto del movimiento',
 		nullable: true,
 	})
 	amount?: number;
 
-	@Field(() => StatusCredit, {
-		description: 'Estado del crédito',
+	@Field(() => TypeCreditHistory, {
+		description: 'Tipo del histórico de movimiento',
 		nullable: true,
 	})
-	status?: StatusCredit;
+	type?: TypeCreditHistory;
+
+	@Field(() => StatusCredit, {
+		description: 'Identificador del crédito',
+		nullable: true,
+	})
+	creditId?: StatusCredit;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
@@ -75,6 +64,9 @@ export class FiltersCreditsInput {
 	@Field({ description: 'Página actual', nullable: true })
 	page?: number;
 
-	@Field(() => SortCredit, { description: 'Ordenamiento', nullable: true })
-	sort?: SortCredit;
+	@Field(() => SortCreditHistory, {
+		description: 'Ordenamiento',
+		nullable: true,
+	})
+	sort?: SortCreditHistory;
 }

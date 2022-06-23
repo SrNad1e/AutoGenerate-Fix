@@ -1075,6 +1075,30 @@ type Credit {
   user: User!
 }
 
+"""Crédito del cliente"""
+type CreditHistory {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Valor del movimiento"""
+  amount: Float!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Crédito que genera el movimiento"""
+  credit: Credit!
+
+  """Tipo de movimiento de cartera"""
+  type: TypeCreditHistory!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o edito el historial"""
+  user: User!
+}
+
 """Cliente"""
 type Customer {
   """Identificador de mongo"""
@@ -1703,6 +1727,30 @@ input FiltersCouponInput {
 
   """Estado del cupón"""
   status: StatusCoupon
+}
+
+"""Filtros para consultar los créditos de los clientes"""
+input FiltersCreditHistoryInput {
+  """Monto del movimiento"""
+  amount: Float
+
+  """Identificador del crédito"""
+  creditId: StatusCredit
+
+  """Identificador del cliente"""
+  customerId: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortCreditHistory
+
+  """Tipo del histórico de movimiento"""
+  type: TypeCreditHistory
 }
 
 """Filtros para obtener un crédito"""
@@ -3204,6 +3252,12 @@ type Query {
     filtersCreditInput: FiltersCreditInput!
   ): Credit!
 
+  """Historico de crédito"""
+  creditHistory(
+    """Filtros para el histórico de créditos"""
+    FiltersCreditHistoryInput: FiltersCreditHistoryInput!
+  ): ResponseCreditHistory!
+
   """Crédito"""
   creditId(
     """Identificador del crédito"""
@@ -3854,6 +3908,39 @@ type ResponseColors {
 type ResponseConveyors {
   """Lista de transportadoras"""
   docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado del historial de créditos"""
+type ResponseCreditHistory {
+  """Lista del historial de créditos"""
+  docs: [CreditHistory!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -4925,25 +5012,40 @@ input SortConveyor {
 """Ordenamiento de los créditos"""
 input SortCredit {
   """Ordenamiento por monto aprobado"""
-  amount: Float!
+  amount: Float
 
   """Ordenamiento por monto disponible"""
-  available: Float!
+  available: Float
 
   """Ordenamiento por monto ocupado"""
-  balance: Float!
+  balance: Float
 
   """Ordenamiento por fecha de creación"""
-  createdAt: Float!
+  createdAt: Float
 
   """Ordenamiento por monto congelado"""
-  frozenAmount: Float!
+  frozenAmount: Float
 
   """Ordenamiento por estado"""
-  status: Float!
+  status: Float
 
   """Ordenamiento por fecha de actualización"""
-  updatedAt: Float!
+  updatedAt: Float
+}
+
+"""Ordenamiento de los créditos"""
+input SortCreditHistory {
+  """Ordenamiento por monto aprobado"""
+  amount: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Tipo de historico de créditos"""
+  type: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
 }
 
 """Ordenamiento del cliente"""
@@ -5582,6 +5684,13 @@ type SummaryOrderClose {
 
   """Valor de las ordenes finalizadas"""
   value: Float!
+}
+
+enum TypeCreditHistory {
+  CREDIT
+  DEBIT
+  FROZEN
+  THAWED
 }
 
 enum TypePayment {

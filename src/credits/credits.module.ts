@@ -10,6 +10,7 @@ import { CreditHistoryService } from './services/credit-history.service';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { CreditsResolver } from './resolvers/credits.resolver';
 import { CrmModule } from 'src/crm/crm.module';
+import { CreditHistoryResolver } from './resolvers/credit-history.resolver';
 
 @Module({
 	imports: [
@@ -29,7 +30,7 @@ import { CrmModule } from 'src/crm/crm.module';
 			},
 		]),
 	],
-	providers: [CreditsService, CreditHistoryService, CreditsResolver],
+	providers: [CreditsService, CreditHistoryService, CreditsResolver, CreditHistoryResolver],
 	exports: [CreditHistoryService, CreditsService],
 })
 export class CreditsModule {}
