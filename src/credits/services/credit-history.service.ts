@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AggregatePaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Order } from 'src/sales/entities/order.entity';
+import { FiltersCreditHistoryInput } from '../dtos/filters-creditHistory.input';
 import {
 	CreditHistory,
 	TypeCreditHistory,
@@ -14,11 +15,56 @@ import { CreditsService } from './credits.service';
 export class CreditHistoryService {
 	constructor(
 		@InjectModel(CreditHistory.name)
-		private readonly creditHistoryModel: AggregatePaginateModel<CreditHistory>,
+		private readonly creditHistoryModel: PaginateModel<CreditHistory>,
 		@InjectModel(Order.name)
-		private readonly orderModel: AggregatePaginateModel<Order>,
+		private readonly orderModel: PaginateModel<Order>,
 		private readonly creditsService: CreditsService,
 	) {}
+
+	async findOne(
+		{
+			amount,
+			creditId,
+			customerId,
+			limit = 10,
+			page = 1,
+			sort,
+			type,
+		}: FiltersCreditHistoryInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<CreditHistory> = {};
+
+		if (user?.username !== 'admin') {
+			filters['credit.company'] = new Types.ObjectId(companyId);
+		}
+
+		if (amount) {
+			filters.amount = amount;
+		}
+
+		if (creditId) {
+			filters['credit._id'] = new Types.ObjectId(creditId);
+		}
+
+		if (customerId) {
+			filters['credit.customer'] = new Types.ObjectId(customerId);
+		}
+
+		if (type) {
+			filters.type = TypeCreditHistory[type];
+		}
+
+		const options = {
+			lean: true,
+			sort,
+			page,
+			limit,
+		};
+
+		return this.creditHistoryModel.paginate(filters, options);
+	}
 
 	async addCreditHistory(
 		orderId: string,
