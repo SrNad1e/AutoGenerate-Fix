@@ -27,6 +27,7 @@ import {
 	DiscountRulerSchema,
 } from './entities/discountRuler.entity';
 import { DiscountRulersService } from './services/discount-rulers.service';
+import { CustomerTypesResolver } from './resolvers/customer-types.resolver';
 
 @Module({
 	imports: [
@@ -86,6 +87,7 @@ import { DiscountRulersService } from './services/discount-rulers.service';
 		CouponsService,
 		CouponsResolver,
 		DiscountRulersService,
+		CustomerTypesResolver,
 	],
 	exports: [
 		CustomersService,
