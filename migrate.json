@@ -799,6 +799,13 @@
 			"name": "Imprimir",
 			"description": "Permite imprimir el recibo de caja",
 			"action": "PRINT_TREASURY_RECEIPT"
+		},
+		{
+			"module": "Crm",
+			"option": "Tipo de cliente",
+			"name": "Consultar",
+			"description": "Permite consultar el tipo de cliente",
+			"action": "READ_CRM_CUSTOMERTYPES"
 		}
 		
 	],

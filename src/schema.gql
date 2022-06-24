@@ -1747,7 +1747,7 @@ input FiltersCreditHistoryInput {
   amount: Float
 
   """Identificador del crédito"""
-  creditId: StatusCredit
+  creditId: String
 
   """Identificador del cliente"""
   customerId: String
@@ -1790,6 +1790,21 @@ input FiltersCreditsInput {
 
   """Estado del crédito"""
   status: StatusCredit
+}
+
+"""Filtros para obtener los tipos de cliente"""
+input FiltersCustomerTypesInput {
+  """Identificador del tipo de documento"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre comodín para la busqueda de tipos de cliente"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
 }
 
 """Filtros de listado de clientes"""
@@ -3082,6 +3097,7 @@ enum Permissions {
   READ_CRM_CITIES
   READ_CRM_COUPONS
   READ_CRM_CUSTOMERS
+  READ_CRM_CUSTOMERTYPES
   READ_INVENTORY_ADJUSTMENTS
   READ_INVENTORY_ATTRIBS
   READ_INVENTORY_BRANDS
@@ -3284,6 +3300,12 @@ type Query {
 
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
+
+  """Listado de tipos de cliente"""
+  customerTypes(
+    """Filtros para consultar el listado de tipos de cliente"""
+    filtersCustomerTypesInput: FiltersCustomerTypesInput!
+  ): ResponseCustomerTypes!
 
   """Listado de clientes"""
   customers(
@@ -3994,6 +4016,39 @@ type ResponseCredits {
   hasPrevPage: Boolean!
 
   """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de tipos de cliente"""
+type ResponseCustomerTypes {
+  """Lista de tipos de cliente"""
+  docs: [CustomerType!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de documentos solicitados"""
   limit: Float!
 
   """Página siguente"""
@@ -5063,28 +5118,28 @@ input SortCreditHistory {
 """Ordenamiento del cliente"""
 input SortCustomer {
   """ordernamiento por estado del cliente"""
-  active: Float!
+  active: Float
 
   """ordernamiento por documento"""
-  document: Float!
+  document: Float
 
   """ordernamiento por correo"""
-  email: Float!
+  email: Float
 
   """ordernamiento por nombre"""
-  firstName: Float!
+  firstName: Float
 
   """ordernamiento por si es por defecto"""
-  isDefault: Float!
+  isDefault: Float
 
   """ordernamiento por si tiene whatsapp"""
-  isWhatsapp: Float!
+  isWhatsapp: Float
 
   """ordernamiento por apellido"""
-  lastName: Float!
+  lastName: Float
 
   """ordernamiento por teléfono"""
-  phone: Float!
+  phone: Float
 }
 
 """Ordenamiento de los egresos"""
