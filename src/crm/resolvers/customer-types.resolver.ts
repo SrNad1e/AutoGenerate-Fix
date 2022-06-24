@@ -16,12 +16,10 @@ export class CustomerTypesResolver {
 		name: 'customerTypes',
 		description: 'Listado de tipos de cliente',
 	})
-	@RequirePermissions(Permissions.READ_CRM_CUSTOMERS)
+	@RequirePermissions(Permissions.READ_CRM_CUSTOMERTYPES)
 	findAll(
 		@Args({
 			name: 'filtersCustomerTypesInput',
-			nullable: true,
-			defaultValue: {},
 			description: 'Filtros para consultar el listado de tipos de cliente',
 		})
 		_: FiltersCustomerTypesInput,

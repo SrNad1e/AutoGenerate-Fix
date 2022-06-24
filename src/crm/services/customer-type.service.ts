@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
+
 import { FiltersCustomerTypesInput } from '../dtos/filters-customer-types.input';
 import { CustomerType } from '../entities/customerType.entity';
 
@@ -29,13 +30,13 @@ export class CustomerTypeService {
 			};
 		}
 
-		const options = {
+		const options: PaginateOptions = {
 			limit,
 			page,
 			lean: true,
 		};
 
-		this.customerTypeModel.paginate(filters, options);
+		return this.customerTypeModel.paginate(filters, options);
 	}
 
 	async findById(id: string) {
