@@ -231,7 +231,6 @@ export class OrdersService {
 			if (!customer?._id) {
 				throw new NotFoundException('El cliente seleccionado no existe');
 			}
-
 			dataUpdate['customer'] = customer;
 
 			if (
