@@ -481,10 +481,12 @@ export class StockTransferService {
 					);
 				}
 
-				const detailHistory = newDetails.map((detail) => ({
+				let detailHistory = newDetails.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantityConfirmed,
 				}));
+
+				detailHistory = detailHistory.filter((item) => item.quantity > 0);
 
 				if (detailHistory?.length > 0) {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
@@ -510,6 +512,7 @@ export class StockTransferService {
 						details: newDetails,
 						requests: requests?.map((request) => new Types.ObjectId(request)),
 						observationOrigin,
+						userDestination: user,
 						user,
 					},
 				},
@@ -525,10 +528,12 @@ export class StockTransferService {
 					requests,
 					status: StatusStockRequest.USED,
 				});
+
 				const detailHistory = stockTransfer?.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantity,
 				}));
+
 				if (detailHistory?.length > 0) {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
@@ -545,10 +550,13 @@ export class StockTransferService {
 			}
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
-				const detailHistory = stockTransfer?.details.map((detail) => ({
+				let detailHistory = stockTransfer?.details.map((detail) => ({
 					productId: detail.product._id.toString(),
 					quantity: detail.quantityConfirmed,
 				}));
+
+				detailHistory = detailHistory.filter((item) => item.quantity > 0);
+
 				if (detailHistory?.length > 0) {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
@@ -571,6 +579,7 @@ export class StockTransferService {
 						...options,
 						observationOrigin,
 						status: StatusStockTransfer[status],
+						userDestination: user,
 						user,
 					},
 				},
