@@ -446,10 +446,6 @@ export class OrdersService {
 			}
 		}
 
-		console.log('Pasando algo', dataUpdate);
-		console.log('Pasando algo', user);
-		console.log('Pasando algo', conveyor);
-
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
