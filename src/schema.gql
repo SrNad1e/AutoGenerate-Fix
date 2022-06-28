@@ -3353,10 +3353,7 @@ type Query {
   ): ResponseOrders!
 
   """Obtener las ordenes por punto de venta"""
-  ordersByPointOfSale(
-    """Identificador del punto de venta"""
-    idPointOfSale: String!
-  ): [Order!]!
+  ordersByPointOfSale: [Order!]!
 
   """Se encarga de listar los metodos de pago"""
   payments(
