@@ -1635,6 +1635,9 @@ input FiltersCategoriesLevelInput {
 
 """Filtros para obtener las ciudades"""
 input FiltersCitiesInput {
+  """Identificador de la ciudad"""
+  _id: String
+
   """Nombre del país"""
   country: String
 
@@ -5829,6 +5832,9 @@ input UpdateCreditInput {
 
 """Datos para actualizar un cliente"""
 input UpdateCustomerInput {
+  """Cliente activo"""
+  active: Boolean
+
   """Direcciones del cliente"""
   addresses: [AddressInput!]
 
