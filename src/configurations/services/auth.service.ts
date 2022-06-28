@@ -144,17 +144,17 @@ export class AuthService {
 		username: string,
 		passwordOld: string,
 	): Promise<Partial<User>> {
-		const user = await this.usersService.findOne({ username });
+		const userFind = await this.usersService.findOne({ username });
 
-		if (!user) {
+		if (!userFind) {
 			throw new UnauthorizedException(`Usuario no existe`);
 		}
 
-		if (!bcrypt.compareSync(passwordOld, user.password)) {
+		if (!bcrypt.compareSync(passwordOld, userFind.password)) {
 			throw new UnauthorizedException(`Usuario o contraseña incorrectos`);
 		}
 
-		const { password, ...userSent } = user;
+		const { password, user, ...userSent } = userFind;
 
 		return userSent;
 	}
