@@ -37,10 +37,16 @@ export class FiltersOrdersInput {
 	number: number;
 
 	@Field(() => String, {
-		description: 'Documento del cliente que registra en el pedidod',
+		description: 'Identificador del cliente',
 		nullable: true,
 	})
-	document: string;
+	customerId?: string;
+
+	@Field(() => String, {
+		description: 'Identificador del medio de pago',
+		nullable: true,
+	})
+	paymentId?: string;
 
 	@Field(() => String, {
 		description: 'Fecha inicial para la busqueda',

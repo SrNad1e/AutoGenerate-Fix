@@ -70,9 +70,10 @@ export class OrdersService {
 			status,
 			dateFinal,
 			dateInitial,
-			document,
+			customerId,
 			number,
 			orderPOS,
+			paymentId,
 			sort,
 			limit = 10,
 			page = 1,
@@ -116,8 +117,12 @@ export class OrdersService {
 			filters.number = number;
 		}
 
-		if (document) {
-			filters['customer.document'] = document;
+		if (customerId) {
+			filters['customer._id'] = new Types.ObjectId(customerId);
+		}
+
+		if (paymentId) {
+			filters['payments._id'] = new Types.ObjectId(paymentId);
 		}
 
 		const options = {
