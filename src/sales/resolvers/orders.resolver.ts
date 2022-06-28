@@ -41,11 +41,8 @@ export class OrdersResolver {
 		description: 'Obtener las ordenes por punto de venta',
 	})
 	@RequirePermissions(Permissions.ACCESS_POS)
-	getByPointOfSales(
-		@Args('idPointOfSale', { description: 'Identificador del punto de venta' })
-		idPointOfSale: string,
-	) {
-		return this.ordersService.getByPointOfSales(idPointOfSale);
+	getByPointOfSales(@Context() context) {
+		return this.ordersService.getByPointOfSales(context.req.user.user);
 	}
 
 	@Query(() => Order, {
