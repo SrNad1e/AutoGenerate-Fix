@@ -233,8 +233,6 @@ export class OrdersService {
 			}
 			dataUpdate['customer'] = customer;
 
-			console.log(customer);
-
 			if (
 				customer.customerType._id.toString() !==
 				order.customer.customerType._id.toString()
@@ -447,6 +445,10 @@ export class OrdersService {
 				}
 			}
 		}
+
+		console.log('Pasando algo', dataUpdate);
+		console.log('Pasando algo', user);
+		console.log('Pasando algo', conveyor);
 
 		return this.orderModel.findByIdAndUpdate(
 			orderId,
