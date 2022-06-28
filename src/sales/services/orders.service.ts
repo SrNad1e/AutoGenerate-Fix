@@ -508,24 +508,24 @@ export class OrdersService {
 	 * @param idPointOfSale punto de venta
 	 * @returns pedidos del punto de venta
 	 */
-	async getByPointOfSales(idPointOfSale: string) {
-		const pointOfSale = await this.pointOfSalesService.findById(idPointOfSale);
-
-		if (!pointOfSale) {
-			throw new NotFoundException('El punto de venta no existe');
+	async getByPointOfSales(user: User) {
+		if (!user?.pointOfSale?._id) {
+			throw new NotFoundException(
+				'El usuario no tiene punto de venta asignado',
+			);
 		}
 
-		if (dayjs().isBefore(dayjs(pointOfSale?.closeDate).add(1, 'd'))) {
+		if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
 			throw new NotFoundException(
 				`El punto de venta se encuentra cerrado para el día ${dayjs(
-					pointOfSale?.closeDate,
+					user?.pointOfSale['closeDate'],
 				).format('DD/MM/YYYY')}`,
 			);
 		}
 
 		return this.orderModel
 			.find({
-				pointOfSale: new Types.ObjectId(idPointOfSale),
+				pointOfSale: user.pointOfSale?._id,
 				status: StatusOrder.OPEN,
 			})
 			.populate(populate)
