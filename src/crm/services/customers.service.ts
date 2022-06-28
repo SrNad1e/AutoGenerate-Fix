@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Order, StatusOrder } from 'src/sales/entities/order.entity';
@@ -209,9 +209,9 @@ export class CustomersService {
 			{ _id: id },
 			{
 				$set: {
-					customerTypeId,
+					customerType: new Types.ObjectId(customerTypeId),
 					document,
-					documentTypeId,
+					documentTypeId: new Types.ObjectId(documentTypeId),
 					user,
 					addresses: newAddresses.length > 0 ? newAddresses : undefined,
 					...params,
@@ -228,7 +228,7 @@ export class CustomersService {
 			await this.orderModel.updateMany(
 				{
 					$set: {
-						customer: id,
+						'customer._id': new Types.ObjectId(id),
 						status: {
 							$in: [StatusOrder.OPEN, StatusOrder.PENDING],
 						},
@@ -236,10 +236,11 @@ export class CustomersService {
 				},
 				{
 					customer: newCustomer,
-					user,
 				},
 			);
 		}
+
+		console.log('Actualizado orders');
 
 		return newCustomer;
 	}

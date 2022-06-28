@@ -15,6 +15,9 @@ export class UpdateCustomerInput {
 	@Field(() => String, { description: 'Nombres del cliente', nullable: true })
 	firstName: string;
 
+	@Field(() => Boolean, { description: 'Cliente activo', nullable: true })
+	active: boolean;
+
 	@Field(() => String, { description: 'Apellidos del cliente', nullable: true })
 	lastName: string;
 
