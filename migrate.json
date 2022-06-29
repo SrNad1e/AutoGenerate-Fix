@@ -827,8 +827,27 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar la bodega",
 			"action": "UPDATE_CONFIGURATION_WAREHOUSE"
+		},
+		{
+			"option": "Tienda",
+			"name": "Acceder",
+			"description": "Permite acceder las tiendas",
+			"action": "ACCESS_CONFIGURATION_SHOPS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Tienda",
+			"name": "Crear",
+			"description": "Permite crear la tienda",
+			"action": "CREATE_CONFIGURATION_SHOP"
+		},
+		{
+			"module": "Configuración",
+			"option": "Tienda",
+			"name": "Actualizar",
+			"description": "Permite actualizar la tienda",
+			"action": "UPDATE_CONFIGURATION_SHOP"
 		}
-		
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
 	"roles": [

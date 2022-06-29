@@ -61,7 +61,7 @@ export class RolesResolver {
 		name: 'updateRole',
 		description: 'Actualiza un rol',
 	})
-	@RequirePermissions(Permissions.UPDATE_INVENTORY_REFERENCE)
+	@RequirePermissions(Permissions.UPDATE_CONFIGURATION_ROLE)
 	update(
 		@Args('id', {
 			description: 'Identificador del rol para actualizar',

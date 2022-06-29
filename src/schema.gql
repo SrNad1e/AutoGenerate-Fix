@@ -916,6 +916,30 @@ input CreateRoleInput {
   permissionIds: [String!]!
 }
 
+"""Datos para la creación de la tienda"""
+input CreateShopInput {
+  """Dirección de la tienda"""
+  address: String!
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String!
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String!
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
+}
+
 """Datos para crear una talla"""
 input CreateSizeInput {
   """Valor asignado a la talla"""
@@ -2633,6 +2657,12 @@ type Mutation {
     createRoleInput: CreateRoleInput!
   ): Role!
 
+  """Crea una tienda"""
+  createShop(
+    """Datos para la creación de la tienda"""
+    createShopInput: CreateShopInput!
+  ): Shop!
+
   """Crear una talla"""
   createSize(
     """Datos para crear la talla"""
@@ -2804,6 +2834,15 @@ type Mutation {
     """Datos para actualizar el rol"""
     updateRoleInput: UpdateRoleInput!
   ): Role!
+
+  """Actualiza una tienda"""
+  updateShop(
+    """Identificador de la tienda para actualizar"""
+    id: String!
+
+    """Datos para actualizar la tienda"""
+    updateShopInput: UpdateShopInput!
+  ): Shop!
 
   """Actualizar la talla"""
   updateSize(
@@ -3059,6 +3098,7 @@ type PermissionData {
 enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
+  ACCESS_CONFIGURATION_SHOPS
   ACCESS_CONFIGURATION_USERS
   ACCESS_CONFIGURATION_WAREHOUSES
   ACCESS_CREDITS
@@ -3089,6 +3129,7 @@ enum Permissions {
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
+  CREATE_CONFIGURATION_SHOP
   CREATE_CONFIGURATION_USER
   CREATE_CONFIGURATION_WAREHOUSE
   CREATE_CREDIT
@@ -3156,6 +3197,7 @@ enum Permissions {
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
+  UPDATE_CONFIGURATION_SHOP
   UPDATE_CONFIGURATION_USER
   UPDATE_CONFIGURATION_WAREHOUSE
   UPDATE_CREDIT
@@ -3456,6 +3498,12 @@ type Query {
     """Filtros para los roles"""
     filtersRolesInput: FiltersRolesInput = {}
   ): ResponseRoles!
+
+  """Obtiene la tienda por el identificador"""
+  shopId(
+    """Identificador de la tienda"""
+    id: String!
+  ): Shop!
 
   """Se encarga de listar las tiendas"""
   shops(
@@ -6008,6 +6056,36 @@ input UpdateRoleInput {
 
   """Identificadores de los permisos seleccionados"""
   permissionIds: [String!]
+}
+
+"""Datos para actualizar la tienda"""
+input UpdateShopInput {
+  """Dirección de la tienda"""
+  address: String
+
+  """Identificador de la empresa para la tienda"""
+  companyId: String
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Estado de la tienda"""
+  status: StatusShop
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
 }
 
 """Datos para actualizar la talla"""
