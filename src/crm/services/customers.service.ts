@@ -240,8 +240,6 @@ export class CustomersService {
 			);
 		}
 
-		console.log('Actualizado orders');
-
 		return newCustomer;
 	}
 

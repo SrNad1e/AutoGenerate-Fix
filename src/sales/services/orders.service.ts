@@ -26,7 +26,6 @@ import {
 	StatusOrder,
 	StatusOrderDetail,
 } from '../entities/order.entity';
-import { PointOfSalesService } from './point-of-sales.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
@@ -39,11 +38,16 @@ import { CouponsService } from 'src/crm/services/coupons.service';
 import { StatusCoupon } from 'src/crm/entities/coupon.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
+import { PointOfSale } from '../entities/pointOfSale.entity';
 
 const populate = [
 	{
 		path: 'invoice',
 		model: Invoice.name,
+	},
+	{
+		path: 'pointOfSale',
+		model: PointOfSale.name,
 	},
 ];
 
@@ -59,7 +63,6 @@ export class OrdersService {
 		private readonly receiptsService: ReceiptsService,
 		private readonly discountRulesService: DiscountRulersService,
 		private readonly conveyorsService: ConveyorsService,
-		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly couponsService: CouponsService,
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
@@ -254,7 +257,10 @@ export class OrdersService {
 		user: User,
 		companyId: string,
 	) {
-		const order = await this.orderModel.findById(orderId).lean();
+		const order = await this.orderModel
+			.findById(orderId)
+			.populate(populate)
+			.lean();
 		let credit;
 		if (!order) {
 			throw new BadRequestException(
