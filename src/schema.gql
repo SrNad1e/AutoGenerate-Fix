@@ -1036,6 +1036,18 @@ input CreateUserInput {
   username: String
 }
 
+"""Datos para la creacion de una bodega"""
+input CreateWarehouseInput {
+  """Inventario máximo de productos"""
+  max: Float!
+
+  """Inventario mínimo de productos"""
+  min: Float!
+
+  """Nombre de la bodega"""
+  name: String!
+}
+
 """Crédito del cliente"""
 type Credit {
   """Identificador de mongo"""
@@ -2661,6 +2673,12 @@ type Mutation {
     createUserInput: CreateUserInput!
   ): User!
 
+  """Crea una bodega"""
+  createWarehouse(
+    """Datos para la creación de la bodega"""
+    createWarehouseInput: CreateWarehouseInput!
+  ): Warehouse!
+
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
     """Tienda para validar el inventario"""
@@ -2847,6 +2865,15 @@ type Mutation {
     """Datos a actualizar en el usuario"""
     updateUserInput: UpdateUserInput!
   ): User!
+
+  """Actualiza una bodega"""
+  updateWarehouse(
+    """Identificador de la bodega para actualizar"""
+    id: String!
+
+    """Datos para actualizar la bodega"""
+    updateWarehouseInput: UpdateWarehouseInput!
+  ): Warehouse!
 }
 
 """Opción del permiso"""
@@ -3033,6 +3060,7 @@ enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
   ACCESS_CONFIGURATION_USERS
+  ACCESS_CONFIGURATION_WAREHOUSES
   ACCESS_CREDITS
   ACCESS_CRM_CITIES
   ACCESS_CRM_COUPONS
@@ -3062,6 +3090,7 @@ enum Permissions {
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
   CREATE_CONFIGURATION_USER
+  CREATE_CONFIGURATION_WAREHOUSE
   CREATE_CREDIT
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
@@ -3128,6 +3157,7 @@ enum Permissions {
   READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_USER
+  UPDATE_CONFIGURATION_WAREHOUSE
   UPDATE_CREDIT
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
@@ -6086,6 +6116,21 @@ input UpdateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para actualizar """
+input UpdateWarehouseInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Inventario máximo de productos"""
+  max: Float
+
+  """Inventario mínimo de productos"""
+  min: Float
+
+  """Nombre de la bodega"""
+  name: String
 }
 
 """Enlaces de diferences tipos"""

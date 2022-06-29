@@ -806,6 +806,27 @@
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
 			"action": "READ_CRM_CUSTOMERTYPES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Acceder",
+			"description": "Permite acceder a las bodegas",
+			"action": "ACCESS_CONFIGURATION_WAREHOUSES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Crear",
+			"description": "Permite crear la bodega",
+			"action": "CREATE_CONFIGURATION_WAREHOUSE"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Actualizar",
+			"description": "Permite actualizar la bodega",
+			"action": "UPDATE_CONFIGURATION_WAREHOUSE"
 		}
 		
 	],
