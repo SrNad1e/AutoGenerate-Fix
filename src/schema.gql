@@ -743,6 +743,15 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear un crédito"""
+input CreateCreditInput {
+  """Monto de crédigo aprobado"""
+  amount: Float!
+
+  """Identificador del cliente al que se le va a asignar el crédito"""
+  customerId: String!
+}
+
 """Datos para crear un cliente"""
 input CreateCustomerInput {
   """Direcciones del cliente"""
@@ -779,6 +788,18 @@ input CreateCustomerInput {
   phone: String
 }
 
+"""Datos para crear Egreso"""
+input CreateExpenseInput {
+  """Identificador de la caja"""
+  boxId: String!
+
+  """Descripción del pago"""
+  concept: String
+
+  """Valor del egreso"""
+  value: Float!
+}
+
 """Datos para crear el pedido"""
 input CreateOrderInput {
   """Estado del pedido"""
@@ -798,6 +819,24 @@ input CreateProductInput {
 
   """Identificador del producto"""
   sizeId: String!
+}
+
+"""Datos para crear un recibo de caja"""
+input CreateReceiptInput {
+  """Identificador de la caja que va a afectar"""
+  boxId: String!
+
+  """Concepto del recibo"""
+  concept: String!
+
+  """Pedidos a los que afecta el recibo"""
+  details: [DetailReceiptOrder!]
+
+  """Identificador del medio de pago"""
+  paymentId: String!
+
+  """Valor del recibo"""
+  value: Float!
 }
 
 """Datos para crear una referencia"""
@@ -1036,6 +1075,30 @@ type Credit {
   user: User!
 }
 
+"""Crédito del cliente"""
+type CreditHistory {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Valor del movimiento"""
+  amount: Float!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Crédito que genera el movimiento"""
+  credit: Credit!
+
+  """Tipo de movimiento de cartera"""
+  type: TypeCreditHistory!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o edito el historial"""
+  user: User!
+}
+
 """Cliente"""
 type Customer {
   """Identificador de mongo"""
@@ -1113,6 +1176,18 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Detalle para agregar al crédito"""
+input DetailAddCredit {
+  """Pedido que afecta la cartera"""
+  orderId: String!
+
+  """Valor que afecta la cartera"""
+  total: Float!
+
+  """Tipo de movimiento"""
+  type: TypeCreditHistory!
+}
+
 """Producto que se va a agregar"""
 input DetailAddProductsOrderInput {
   """Acción a realizar con el producto"""
@@ -1155,7 +1230,7 @@ type DetailCredit {
   balance: Float!
 
   """Pedido que reporta el crédito"""
-  orderId: String!
+  order: Order!
 
   """Monto total del pedido en crédito"""
   total: Float!
@@ -1228,6 +1303,15 @@ type DetailOutput {
 
   """Fecha de actualización del detalle a la salida"""
   updatedAt: DateTime!
+}
+
+"""Detalles de cruce de la cartera"""
+input DetailReceiptOrder {
+  """Monto para abonar al pedido"""
+  amount: Float!
+
+  """Identificador del pedido"""
+  orderId: String!
 }
 
 type DetailRequest {
@@ -1471,6 +1555,21 @@ input FiltersAttribsInput {
   sort: SortAttrib
 }
 
+"""Filtros para consultar la cajas"""
+input FiltersBoxesInput {
+  """Identificador de la caja"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la caja para buscar coincidencias"""
+  name: String
+
+  """Página actual"""
+  page: Float
+}
+
 """Filtros para la lista de marcas"""
 input FiltersBrandsInput {
   """Identificador de la marcas"""
@@ -1536,6 +1635,9 @@ input FiltersCategoriesLevelInput {
 
 """Filtros para obtener las ciudades"""
 input FiltersCitiesInput {
+  """Identificador de la ciudad"""
+  _id: String
+
   """Nombre del país"""
   country: String
 
@@ -1642,6 +1744,72 @@ input FiltersCouponInput {
   status: StatusCoupon
 }
 
+"""Filtros para consultar los créditos de los clientes"""
+input FiltersCreditHistoryInput {
+  """Monto del movimiento"""
+  amount: Float
+
+  """Identificador del crédito"""
+  creditId: String
+
+  """Identificador del cliente"""
+  customerId: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortCreditHistory
+
+  """Tipo del histórico de movimiento"""
+  type: TypeCreditHistory
+}
+
+"""Filtros para obtener un crédito"""
+input FiltersCreditInput {
+  """Cliente que tiene asignado el crédito"""
+  customerId: String
+}
+
+"""Filtros para consultar los créditos de los clientes"""
+input FiltersCreditsInput {
+  """Monto aprobado al cliente"""
+  amount: Float
+
+  """Identificador del cliente"""
+  customerId: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortCredit
+
+  """Estado del crédito"""
+  status: StatusCredit
+}
+
+"""Filtros para obtener los tipos de cliente"""
+input FiltersCustomerTypesInput {
+  """Identificador del tipo de documento"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre comodín para la busqueda de tipos de cliente"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+}
+
 """Filtros de listado de clientes"""
 input FiltersCustomersInput {
   """Si el cliente se encuentra activo"""
@@ -1669,6 +1837,33 @@ input FiltersDocumentTypesInput {
 
   """Nombre del tipo de documento"""
   name: String
+}
+
+"""Filtros para obtener el listado de egresos"""
+input FiltersExpensesInput {
+  """Caja a la que afecta el egreso"""
+  boxId: String
+
+  """Fecha final de la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial de la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del egreso"""
+  number: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortExpense
+
+  """Estado del egreso"""
+  status: StatusExpense
 }
 
 """Filtros para la lista de imagenes"""
@@ -1709,14 +1904,14 @@ input FiltersInvoicesInput {
 
 """Filtros del listado de pedidos"""
 input FiltersOrdersInput {
+  """Identificador del cliente"""
+  customerId: String
+
   """Fecha final para la busqueda"""
   dateFinal: String
 
   """Fecha inicial para la busqueda"""
   dateInitial: String
-
-  """Documento del cliente que registra en el pedidod"""
-  document: String
 
   """Cantidad de registros"""
   limit: Float
@@ -1729,6 +1924,9 @@ input FiltersOrdersInput {
 
   """Desde donde arranca la página"""
   page: Float
+
+  """Identificador del medio de pago"""
+  paymentId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortOrder
@@ -1839,6 +2037,33 @@ input FiltersProductsInput {
 
   """Se usa para seleccionar solo los productos que tengan inventario"""
   withStock: Boolean
+}
+
+"""Filtros para consultar los recibos de caja"""
+input FiltersReceiptsInput {
+  """Fecha final para la busqueda"""
+  dateFinal: String
+
+  """Fecha inicial para la busqueda"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del recibo"""
+  number: Float
+
+  """Página actual"""
+  page: Float
+
+  """Identificador del medio de pago"""
+  paymentId: String
+
+  """Ordenamiento"""
+  sort: SortReceipt
+
+  """Estado del recibo"""
+  status: StatusReceipt
 }
 
 """Filtros para la lista de referencias"""
@@ -2289,13 +2514,13 @@ type Mutation {
   addPaymentsOrder(
     """Medios de pago y orden a actualizar"""
     addPaymentsOrderInput: AddPaymentsOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Se encarga de agregar productos a un pedido"""
   addProductsOrder(
     """Productos del pedido para actualizar"""
     addProductsOrderInput: AddProductsOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Confirma los productos del traslado"""
   confirmProductsStockTransfer(
@@ -2342,23 +2567,41 @@ type Mutation {
     createColorInput: CreateColorInput!
   ): Color!
 
+  """Asigna el crédito a un cliente"""
+  createCredit(
+    """Datos para crear un crédito"""
+    createCreditInput: CreateCreditInput!
+  ): Credit!
+
   """Se encarga crear un cliente"""
   createCustomer(
     """Parámetros para actualizar el cliente"""
     createCustomerInput: CreateCustomerInput!
   ): Customer!
 
+  """Crea un egreso"""
+  createExpense(
+    """Datos para la creación del egreso"""
+    createExpenseInput: CreateExpenseInput!
+  ): Expense!
+
   """Se encarga de crear el pedido"""
   createOrder(
     """Parámetros para la creación del pedido"""
     createOrderInput: CreateOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Crea un producto"""
   createProduct(
     """Datos para crear un producto"""
     createProductInput: CreateProductInput!
   ): Product!
+
+  """Crea una recibo de caja"""
+  createReceipt(
+    """Datos para la creación del recibo de caja"""
+    createReceiptInput: CreateReceiptInput!
+  ): ResponseReceipt!
 
   """Crea una referencia"""
   createReference(
@@ -2472,6 +2715,15 @@ type Mutation {
     updateColorInput: UpdateColorInput!
   ): Color!
 
+  """Actualiza el crédito de un cliente"""
+  updateCredit(
+    """Identificador del crédito a actualizar"""
+    id: String!
+
+    """Datos para actualizar un crédito"""
+    updateCreditInput: UpdateCreditInput!
+  ): Credit!
+
   """Se encarga actualizar un cliente"""
   updateCustomer(
     """Identificador del cliente"""
@@ -2481,6 +2733,15 @@ type Mutation {
     updateCustomerInput: UpdateCustomerInput!
   ): Customer!
 
+  """Actualiza un egreso"""
+  updateExpense(
+    """Identificador del egreso"""
+    id: String!
+
+    """Datos para actualizar el egreso"""
+    updateExpenseInput: UpdateExpenseInput!
+  ): Expense!
+
   """Se encarga actualizar un pedido"""
   updateOrder(
     """Identificador del pedido"""
@@ -2488,7 +2749,7 @@ type Mutation {
 
     """Parámetros para actualizar el pedido"""
     updateOrderInput: UpdateOrderInput!
-  ): Order!
+  ): ResponseOrder!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -2498,6 +2759,15 @@ type Mutation {
     """Datos a actualizar en el producto"""
     updateProductInput: UpdateProductInput!
   ): Product!
+
+  """Actualiza un recibo de caja"""
+  updateReceipt(
+    """Identificador del recibo de caja para actualizar"""
+    id: String!
+
+    """Datos para actualizar el recibo de caja"""
+    updateReceiptInput: UpdateReceiptInput!
+  ): Receipt!
 
   """Actualiza una referencia"""
   updateReference(
@@ -2763,6 +3033,7 @@ enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
   ACCESS_CONFIGURATION_USERS
+  ACCESS_CREDITS
   ACCESS_CRM_CITIES
   ACCESS_CRM_COUPONS
   ACCESS_CRM_CUSTOMERS
@@ -2783,10 +3054,15 @@ enum Permissions {
   ACCESS_INVOICING_CLOSESZ
   ACCESS_INVOICING_RETURNS
   ACCESS_POS
+  ACCESS_TREASURY_BOXES
+  ACCESS_TREASURY_EXPENSES
+  ACCESS_TREASURY_PAYMENTS
+  ACCESS_TREASURY_RECEIPTS
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
   CREATE_CONFIGURATION_USER
+  CREATE_CREDIT
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
@@ -2804,6 +3080,8 @@ enum Permissions {
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
   CREATE_INVOICING_RETURN
+  CREATE_TREASURY_EXPENSE
+  CREATE_TREASURY_RECEIPT
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
   PRINT_INVENTORY_OUTPUT
@@ -2812,6 +3090,8 @@ enum Permissions {
   PRINT_INVOICING_CLOSEX
   PRINT_INVOICING_CLOSEZ
   PRINT_INVOICING_RETURN
+  PRINT_TREASURY_EXPENSE
+  PRINT_TREASURY_RECEIPT
   READ_CONFIGURATION_CONVEYORS
   READ_CONFIGURATION_IMAGES
   READ_CONFIGURATION_PERMISSIONS
@@ -2819,9 +3099,11 @@ enum Permissions {
   READ_CONFIGURATION_SHOPS
   READ_CONFIGURATION_USERS
   READ_CONFIGURATION_WAREHOUSES
+  READ_CREDITS
   READ_CRM_CITIES
   READ_CRM_COUPONS
   READ_CRM_CUSTOMERS
+  READ_CRM_CUSTOMERTYPES
   READ_INVENTORY_ADJUSTMENTS
   READ_INVENTORY_ATTRIBS
   READ_INVENTORY_BRANDS
@@ -2840,9 +3122,13 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_TREASURY_BOXES
+  READ_TREASURY_EXPENSES
   READ_TREASURY_PAYMENTS
+  READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_USER
+  UPDATE_CREDIT
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
   UPDATE_INVENTORY_ATTRIB
@@ -2857,6 +3143,8 @@ enum Permissions {
   UPDATE_INVENTORY_SIZE
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_ORDER
+  UPDATE_TREASURY_EXPENSE
+  UPDATE_TREASURY_RECEIPT
 }
 
 """Punto de venta de la tienda"""
@@ -2932,6 +3220,12 @@ type Query {
     filtersAttribsInput: FiltersAttribsInput = {}
   ): ResponseAttribs!
 
+  """Se encarga de listar las cajas"""
+  boxes(
+    """Filtros para consultar las cajas"""
+    filtersBoxesInput: FiltersBoxesInput = {}
+  ): ResponseBoxes!
+
   """Listado de marcas"""
   brands(
     """Filtros para listar las marcas"""
@@ -2986,8 +3280,38 @@ type Query {
     filtersCouponInput: FiltersCouponInput!
   ): Coupon!
 
+  """Crédito"""
+  credit(
+    """Filtros para buscar el crédito"""
+    filtersCreditInput: FiltersCreditInput!
+  ): Credit!
+
+  """Historico de crédito"""
+  creditHistory(
+    """Filtros para el histórico de créditos"""
+    FiltersCreditHistoryInput: FiltersCreditHistoryInput!
+  ): ResponseCreditHistory!
+
+  """Crédito"""
+  creditId(
+    """Identificador del crédito"""
+    id: String!
+  ): Credit!
+
+  """Lista de créditos"""
+  credits(
+    """Filtros de lista de créditos"""
+    filtersCreditsInput: FiltersCreditsInput = {}
+  ): ResponseCredits!
+
   """Se encarga de obtener el usuario dependiendo del token enviado"""
   currentUser: User!
+
+  """Listado de tipos de cliente"""
+  customerTypes(
+    """Filtros para consultar el listado de tipos de cliente"""
+    filtersCustomerTypesInput: FiltersCustomerTypesInput!
+  ): ResponseCustomerTypes!
 
   """Listado de clientes"""
   customers(
@@ -3000,6 +3324,12 @@ type Query {
     """Filtros para consultar el listado de tipos de documento"""
     filtersDocumentTypesInput: FiltersDocumentTypesInput = {}
   ): [DocumentType!]!
+
+  """Se encarga de listar los egresos"""
+  expenses(
+    """Filtros para consultar los egresos"""
+    filtersExpensesInput: FiltersExpensesInput = {}
+  ): ResponseExpenses!
 
   """Listado de imagenes"""
   images(
@@ -3017,7 +3347,7 @@ type Query {
   orderId(
     """identificador del pedido"""
     id: String!
-  ): Order!
+  ): ResponseOrder!
 
   """Obtener las ordenes"""
   orders(
@@ -3030,7 +3360,7 @@ type Query {
 
   """Se encarga de listar los metodos de pago"""
   payments(
-    """Filtros para consultar los metodos de pagos"""
+    """Filtros para consultar los métodos de pagos"""
     filtersPaymentsInput: FiltersPaymentsInput = {}
   ): ResponsePayments!
 
@@ -3054,6 +3384,12 @@ type Query {
     """Filtros para consoltar los productos"""
     filtersProductsInput: FiltersProductsInput = {}
   ): ResponseProducts!
+
+  """Se encarga de listar los metodos de pago"""
+  receipts(
+    """Filtros para consultar los recibos de caja"""
+    filtersReceiptsInput: FiltersReceiptsInput = {}
+  ): ResponseReceipts!
 
   """Obtiene la referencia por el identificador"""
   referenceId(
@@ -3187,8 +3523,8 @@ type Receipt {
   """Identificador de mongo"""
   _id: String!
 
-  """Método de pago del recibo de caja"""
-  box: Box!
+  """Caja afectada por el recibo si es efectivo"""
+  box: Box
 
   """Empresa a la que pertenece el recibo de caja"""
   company: Company!
@@ -3345,6 +3681,39 @@ type RefundOrderClose {
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de cajas"""
+type ResponseBoxes {
+  """Lista de cajas"""
+  docs: [Box!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3605,6 +3974,105 @@ type ResponseConveyors {
   totalPages: Float!
 }
 
+"""Respuesta al listado del historial de créditos"""
+type ResponseCreditHistory {
+  """Lista del historial de créditos"""
+  docs: [CreditHistory!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de los créditos"""
+type ResponseCredits {
+  """Lista de créditos"""
+  docs: [Credit!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de tipos de cliente"""
+type ResponseCustomerTypes {
+  """Lista de tipos de cliente"""
+  docs: [CustomerType!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de documentos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta del listado de clientes"""
 type ResponseCustomers {
   """Lista de clientes"""
@@ -3617,6 +4085,39 @@ type ResponseCustomers {
   hasPrevPage: Boolean!
 
   """Total de documentos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de egresos"""
+type ResponseExpenses {
+  """Lista de egresos"""
+  docs: [Expense!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
   limit: Float!
 
   """Página siguente"""
@@ -3702,6 +4203,15 @@ type ResponseInvoices {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Respuesta para obtener la orden"""
+type ResponseOrder {
+  """Crédito que tiene el cliente"""
+  credit: Credit
+
+  """Pedido actualizado"""
+  order: Order!
 }
 
 """Lista de predidos"""
@@ -3807,6 +4317,48 @@ type ResponsePointOfSales {
 type ResponseProducts {
   """Lista de productos"""
   docs: [Product!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Resultado al crear un recibo de caja"""
+type ResponseReceipt {
+  """Crédito afectado por el recibo de caja"""
+  credit: Credit!
+
+  """Recibo de caja generado"""
+  receipt: Receipt!
+}
+
+"""Respuesta a la consulta de recibos de caja"""
+type ResponseReceipts {
+  """Lista de recibos de caja"""
+  docs: [Receipt!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -4527,31 +5079,80 @@ input SortConveyor {
   updatedAt: Float
 }
 
+"""Ordenamiento de los créditos"""
+input SortCredit {
+  """Ordenamiento por monto aprobado"""
+  amount: Float
+
+  """Ordenamiento por monto disponible"""
+  available: Float
+
+  """Ordenamiento por monto ocupado"""
+  balance: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por monto congelado"""
+  frozenAmount: Float
+
+  """Ordenamiento por estado"""
+  status: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de los créditos"""
+input SortCreditHistory {
+  """Ordenamiento por monto aprobado"""
+  amount: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Tipo de historico de créditos"""
+  type: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento del cliente"""
 input SortCustomer {
   """ordernamiento por estado del cliente"""
-  active: Float!
+  active: Float
 
   """ordernamiento por documento"""
-  document: Float!
+  document: Float
 
   """ordernamiento por correo"""
-  email: Float!
+  email: Float
 
   """ordernamiento por nombre"""
-  firstName: Float!
+  firstName: Float
 
   """ordernamiento por si es por defecto"""
-  isDefault: Float!
+  isDefault: Float
 
   """ordernamiento por si tiene whatsapp"""
-  isWhatsapp: Float!
+  isWhatsapp: Float
 
   """ordernamiento por apellido"""
-  lastName: Float!
+  lastName: Float
 
   """ordernamiento por teléfono"""
-  phone: Float!
+  phone: Float
+}
+
+"""Ordenamiento de los egresos"""
+input SortExpense {
+  createdAt: Float
+  number: Float
+  status: Float
+  type: Float
+  updatedAt: Float
+  value: Float
 }
 
 """Ordenamiento para el listado de imagenes"""
@@ -4606,6 +5207,24 @@ input SortProduct {
   price: Float
   reference: Float
   status: Float
+}
+
+"""Ordenamiento de los recibos de caja"""
+input SortReceipt {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por consecutivo"""
+  number: Float
+
+  """Ordenamiento por estado del recibo"""
+  status: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+
+  """Ordenamiento por valor del recibo"""
+  value: Float
 }
 
 """Ordenamiento para el listado de referencias"""
@@ -4799,7 +5418,7 @@ enum StatusDetailTransfer {
 
 enum StatusExpense {
   ACTIVE
-  INACTIVE
+  CANCELLED
 }
 
 enum StatusOrder {
@@ -4818,7 +5437,7 @@ enum StatusProduct {
 
 enum StatusReceipt {
   ACTIVE
-  INACTIVE
+  CANCELLED
 }
 
 enum StatusShop {
@@ -5137,6 +5756,13 @@ type SummaryOrderClose {
   value: Float!
 }
 
+enum TypeCreditHistory {
+  CREDIT
+  DEBIT
+  FROZEN
+  THAWED
+}
+
 enum TypePayment {
   BANK
   BONUS
@@ -5192,8 +5818,23 @@ input UpdateColorInput {
   name_internal: String
 }
 
+"""Datos para actualizar un crédito"""
+input UpdateCreditInput {
+  """Monto aprobado para el crédito"""
+  amount: Float
+
+  """Detalles para agregar al crédito"""
+  detailAddCredit: DetailAddCredit
+
+  """Estado del crédito"""
+  status: StatusCredit
+}
+
 """Datos para actualizar un cliente"""
 input UpdateCustomerInput {
+  """Cliente activo"""
+  active: Boolean
+
   """Direcciones del cliente"""
   addresses: [AddressInput!]
 
@@ -5228,6 +5869,12 @@ input UpdateCustomerInput {
   phone: String
 }
 
+"""Datos para actualizar el egreso"""
+input UpdateExpenseInput {
+  """Estado del egreso"""
+  status: StatusExpense
+}
+
 """Datos para actualizar el pedido"""
 input UpdateOrderInput {
   """Dirección de envío para el pedido"""
@@ -5259,6 +5906,12 @@ input UpdateProductInput {
 
   """Estado del producto"""
   status: StatusProduct
+}
+
+"""Datos para actualizar el recibo"""
+input UpdateReceiptInput {
+  """Estado del recibo"""
+  status: StatusReceipt
 }
 
 """Datos para actualizar referencia"""

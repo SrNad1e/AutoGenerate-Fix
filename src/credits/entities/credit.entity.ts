@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Customer } from 'src/crm/entities/customer.entity';
+import { Order } from 'src/sales/entities/order.entity';
 
 export enum StatusCredit {
 	ACTIVE = 'active',
@@ -15,8 +16,8 @@ registerEnumType(StatusCredit, { name: 'StatusCredit' });
 
 @ObjectType({ description: 'Detalle del crédito' })
 export class DetailCredit {
-	@Field(() => String, { description: 'Pedido que reporta el crédito' })
-	orderId: Types.ObjectId;
+	@Field(() => Order, { description: 'Pedido que reporta el crédito' })
+	order: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Monto pendiente en el pedido' })
 	balance: number;
@@ -67,6 +68,7 @@ export class Credit extends Document {
 	@Field(() => Number, {
 		description: 'Monto congelado que no ha sido finalizado',
 	})
+	@Prop({ type: Number, default: 0 })
 	frozenAmount: number;
 
 	@Field(() => User, { description: 'Usuario que creó o editó la cartera' })

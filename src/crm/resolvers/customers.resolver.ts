@@ -19,7 +19,7 @@ export class CustomersResolver {
 		name: 'customers',
 		description: 'Listado de clientes',
 	})
-	@RequirePermissions(Permissions.READ_CRM_CITIES)
+	@RequirePermissions(Permissions.READ_CRM_CUSTOMERS)
 	findAll(
 		@Args({
 			name: 'filtersCustomerInput',

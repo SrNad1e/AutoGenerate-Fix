@@ -9,7 +9,7 @@ import { Payment } from './payment.entity';
 
 export enum StatusReceipt {
 	ACTIVE = 'active',
-	INACTIVE = 'inactive',
+	CANCELLED = 'cancelled',
 }
 
 registerEnumType(StatusReceipt, { name: 'StatusReceipt' });
@@ -50,13 +50,14 @@ export class Receipt extends Document {
 	payment: Payment;
 
 	@Field(() => Box, {
-		description: 'Método de pago del recibo de caja',
+		description: 'Caja afectada por el recibo si es efectivo',
+		nullable: true,
 	})
 	@Prop({
 		type: Types.ObjectId,
 		ref: 'Box',
 	})
-	box: Types.ObjectId;
+	box?: Types.ObjectId;
 
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece el recibo de caja',

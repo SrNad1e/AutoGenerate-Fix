@@ -12,9 +12,15 @@ import { BoxHistoryService } from './services/box-history.service';
 import { BoxHistory, BoxHistorySchema } from './entities/box-history.entity';
 import { BoxService } from './services/box.service';
 import { ExpensesService } from './services/expenses.service';
+import { ReceiptsResolver } from './resolvers/receipts.resolver';
+import { ExpensesResolver } from './resolvers/expenses.resolver';
+import { BoxesResolver } from './resolvers/boxes.resolver';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { CreditsModule } from 'src/credits/credits.module';
 
 @Module({
 	imports: [
+		CreditsModule,
 		MongooseModule.forFeatureAsync([
 			{
 				name: Box.name,
@@ -50,6 +56,10 @@ import { ExpensesService } from './services/expenses.service';
 				name: BoxHistory.name,
 				schema: BoxHistorySchema,
 			},
+			{
+				name: Order.name,
+				schema: OrderSchema,
+			},
 		]),
 	],
 	providers: [
@@ -59,6 +69,9 @@ import { ExpensesService } from './services/expenses.service';
 		BoxHistoryService,
 		BoxService,
 		ExpensesService,
+		ReceiptsResolver,
+		ExpensesResolver,
+		BoxesResolver,
 	],
 	exports: [PaymentsService, ReceiptsService, ExpensesService],
 })

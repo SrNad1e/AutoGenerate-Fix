@@ -2,28 +2,52 @@ import { Field, InputType } from '@nestjs/graphql';
 
 @InputType({ description: 'Ordenamiento del cliente' })
 export class SortCustomer {
-	@Field(() => Number, { description: 'ordernamiento por documento' })
+	@Field(() => Number, {
+		description: 'ordernamiento por documento',
+		nullable: true,
+	})
 	document: number;
 
-	@Field(() => Number, { description: 'ordernamiento por nombre' })
+	@Field(() => Number, {
+		description: 'ordernamiento por nombre',
+		nullable: true,
+	})
 	firstName: number;
 
-	@Field(() => Number, { description: 'ordernamiento por apellido' })
+	@Field(() => Number, {
+		description: 'ordernamiento por apellido',
+		nullable: true,
+	})
 	lastName: number;
 
-	@Field(() => Number, { description: 'ordernamiento por teléfono' })
+	@Field(() => Number, {
+		description: 'ordernamiento por teléfono',
+		nullable: true,
+	})
 	phone: number;
 
-	@Field(() => Number, { description: 'ordernamiento por si tiene whatsapp' })
+	@Field(() => Number, {
+		description: 'ordernamiento por si tiene whatsapp',
+		nullable: true,
+	})
 	isWhatsapp: number;
 
-	@Field(() => Number, { description: 'ordernamiento por correo' })
+	@Field(() => Number, {
+		description: 'ordernamiento por correo',
+		nullable: true,
+	})
 	email: number;
 
-	@Field(() => Number, { description: 'ordernamiento por si es por defecto' })
+	@Field(() => Number, {
+		description: 'ordernamiento por si es por defecto',
+		nullable: true,
+	})
 	isDefault: number;
 
-	@Field(() => Number, { description: 'ordernamiento por estado del cliente' })
+	@Field(() => Number, {
+		description: 'ordernamiento por estado del cliente',
+		nullable: true,
+	})
 	active: number;
 }
 

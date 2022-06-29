@@ -35,6 +35,12 @@ export class SortCity {
 
 @InputType({ description: 'Filtros para obtener las ciudades' })
 export class FiltersCitiesInput {
+	@Field(() => String, {
+		description: 'Identificador de la ciudad',
+		nullable: true,
+	})
+	_id?: string;
+
 	@Field(() => String, { description: 'Nombre de la ciudad', nullable: true })
 	name: string;
 
