@@ -47,7 +47,7 @@ export class CustomersResolver {
 	) {
 		return this.customersService.create(
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 
@@ -67,7 +67,7 @@ export class CustomersResolver {
 		return this.customersService.update(
 			id,
 			context.req.body.variables.input,
-			context.req.user,
+			context.req.user.user,
 		);
 	}
 }
