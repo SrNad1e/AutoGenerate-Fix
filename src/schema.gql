@@ -4423,7 +4423,7 @@ type ResponseReferences {
 
 """Lista de devoluciones de ordenes"""
 type ResponseReturnsOrder {
-  """Lista de ajustes"""
+  """Lista de devoluci0nes"""
   docs: [ReturnOrder!]!
 
   """¿Encuentra página siguiente?"""
