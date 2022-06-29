@@ -4,7 +4,7 @@ import { ReturnOrder } from '../entities/return-order.entity';
 
 @ObjectType({ description: 'Lista de devoluciones de ordenes' })
 export class ResponseReturnsOrder {
-	@Field(() => [ReturnOrder], { description: 'Lista de ajustes' })
+	@Field(() => [ReturnOrder], { description: 'Lista de devoluci0nes' })
 	docs: ReturnOrder[];
 
 	@Field(() => Number, { description: 'Total de documentos' })
