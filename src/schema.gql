@@ -1920,7 +1920,7 @@ input FiltersOrdersInput {
   number: Float
 
   """Trae los pedidos POS solamente"""
-  orderPOS: Boolean
+  orderPos: Boolean
 
   """Desde donde arranca la página"""
   page: Float

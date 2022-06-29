@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, trusted, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
@@ -75,7 +75,7 @@ export class OrdersService {
 			dateInitial,
 			customerId,
 			number,
-			orderPOS,
+			orderPos,
 			paymentId,
 			sort,
 			limit = 10,
@@ -93,8 +93,8 @@ export class OrdersService {
 			filters.status = StatusOrder[status];
 		}
 
-		if (orderPOS !== undefined) {
-			filters.orderPOS = orderPOS;
+		if (orderPos !== undefined) {
+			filters.orderPos = orderPos;
 		}
 
 		if (dateInitial) {
@@ -546,6 +546,7 @@ export class OrdersService {
 			.find({
 				pointOfSale: user.pointOfSale?._id,
 				status: StatusOrder.OPEN,
+				orderPos: true,
 			})
 			.populate(populate)
 			.lean();
