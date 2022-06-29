@@ -19,9 +19,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	async validate(
 		payload: any,
 	): Promise<{ user: Partial<User>; companyId: string }> {
-		const { password, user, ...userLoad } = await this.usersService.findById(
-			payload.sub,
-		);
+		const { password, user, role, ...userLoad } =
+			await this.usersService.findById(payload.sub);
 		return { user: userLoad, companyId: payload?.companyId };
 	}
 }
