@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
@@ -81,8 +86,12 @@ export class ShopsService {
 		return this.shopModel.findOne(filters).lean();
 	}
 
-	async create(params: CreateShopInput) {
-		const newShop = new this.shopModel(params);
+	async create(params: CreateShopInput, user: User, companyId: string) {
+		const newShop = new this.shopModel({
+			...params,
+			user,
+			company: new Types.ObjectId(companyId),
+		});
 		return newShop.save();
 	}
 
@@ -90,15 +99,29 @@ export class ShopsService {
 		id: string,
 		{
 			defaultWarehouseId,
-			companyId,
 			warehouseMainId,
 			status,
+			companyId,
 			...props
 		}: UpdateShopInput,
+		user: User,
+		idCompany: string,
 	) {
 		const params: Partial<Shop> = {
 			...props,
 		};
+
+		const shop = await this.findById(id);
+
+		if (!shop) {
+			throw new BadRequestException('La tienda no existe');
+		}
+
+		if (user.username !== 'admin' && shop.company.toString() !== idCompany) {
+			throw new UnauthorizedException(
+				'No tiene permisos para hacer cambios en esta tienda',
+			);
+		}
 
 		if (StatusShop[status]) {
 			params.status = StatusShop[status];
