@@ -98,7 +98,6 @@ export class ReturnsOrderService {
 			populate,
 			lean: true,
 		};
-
 		return this.returnOrderModel.paginate(filters, options);
 	}
 
