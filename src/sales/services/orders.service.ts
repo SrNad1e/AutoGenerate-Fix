@@ -70,9 +70,10 @@ export class OrdersService {
 			status,
 			dateFinal,
 			dateInitial,
-			document,
+			customerId,
 			number,
 			orderPOS,
+			paymentId,
 			sort,
 			limit = 10,
 			page = 1,
@@ -116,8 +117,12 @@ export class OrdersService {
 			filters.number = number;
 		}
 
-		if (document) {
-			filters['customer.document'] = document;
+		if (customerId) {
+			filters['customer._id'] = new Types.ObjectId(customerId);
+		}
+
+		if (paymentId) {
+			filters['payments._id'] = new Types.ObjectId(paymentId);
 		}
 
 		const options = {
@@ -133,9 +138,13 @@ export class OrdersService {
 
 	async findById(id: string) {
 		const order = await this.orderModel.findById(id).populate(populate).lean();
-		const credit = await this.creditsService.findOne({
-			customerId: order?.customer?._id.toString(),
-		});
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: order?.customer?._id.toString(),
+			});
+		} catch {}
+
 		return {
 			order,
 			credit,
@@ -226,10 +235,12 @@ export class OrdersService {
 			status: StatusOrder[status],
 			company: new Types.ObjectId(companyId),
 		});
-
-		const credit = this.creditsService.findOne({
-			customerId: newOrder?.customer?.toString(),
-		});
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?.toString(),
+			});
+		} catch {}
 
 		return {
 			credit,
@@ -493,9 +504,11 @@ export class OrdersService {
 			},
 		);
 
-		credit = await this.creditsService.findOne({
-			customerId: newOrder?.customer?._id?.toString(),
-		});
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?._id?.toString(),
+			});
+		} catch {}
 
 		return {
 			credit,
@@ -872,9 +885,12 @@ export class OrdersService {
 			},
 		);
 
-		const credit = await this.creditsService.findOne({
-			customerId: newOrder?.customer?._id.toString(),
-		});
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?._id.toString(),
+			});
+		} catch {}
 
 		return {
 			credit,
@@ -1106,10 +1122,12 @@ export class OrdersService {
 				new: true,
 			},
 		);
-
-		const credit = await this.creditsService.findOne({
-			customerId: newOrder?.customer?._id.toString(),
-		});
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?._id.toString(),
+			});
+		} catch {}
 
 		return {
 			credit,

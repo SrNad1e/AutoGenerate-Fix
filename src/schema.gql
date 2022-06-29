@@ -1904,14 +1904,14 @@ input FiltersInvoicesInput {
 
 """Filtros del listado de pedidos"""
 input FiltersOrdersInput {
+  """Identificador del cliente"""
+  customerId: String
+
   """Fecha final para la busqueda"""
   dateFinal: String
 
   """Fecha inicial para la busqueda"""
   dateInitial: String
-
-  """Documento del cliente que registra en el pedidod"""
-  document: String
 
   """Cantidad de registros"""
   limit: Float
@@ -1924,6 +1924,9 @@ input FiltersOrdersInput {
 
   """Desde donde arranca la página"""
   page: Float
+
+  """Identificador del medio de pago"""
+  paymentId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortOrder
