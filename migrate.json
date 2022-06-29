@@ -801,7 +801,7 @@
 			"action": "PRINT_TREASURY_RECEIPT"
 		},
 		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Tipo de cliente",
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
