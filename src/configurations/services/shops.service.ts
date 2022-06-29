@@ -86,7 +86,35 @@ export class ShopsService {
 		return this.shopModel.findOne(filters).lean();
 	}
 
-	async create(params: CreateShopInput, user: User, companyId: string) {
+	async create(
+		{ defaultWarehouseId, warehouseMainId, ...props }: CreateShopInput,
+		user: User,
+		companyId: string,
+	) {
+		const params: Partial<Shop> = {
+			...props,
+		};
+
+		if (defaultWarehouseId) {
+			const defaultWarehouse = await this.warehouseModel.findById(
+				defaultWarehouseId,
+			);
+
+			if (!defaultWarehouse) {
+				throw new NotFoundException('La bodega por defecto no exite');
+			}
+			params.defaultWarehouse = new Types.ObjectId(defaultWarehouseId);
+		}
+
+		if (warehouseMainId) {
+			const warehouseMain = await this.warehouseModel.findById(warehouseMainId);
+
+			if (!warehouseMain) {
+				throw new NotFoundException('La bodega principal');
+			}
+			params.warehouseMain = new Types.ObjectId(warehouseMainId);
+		}
+
 		const newShop = new this.shopModel({
 			...params,
 			user,
