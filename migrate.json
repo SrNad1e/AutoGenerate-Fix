@@ -847,6 +847,13 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar la tienda",
 			"action": "UPDATE_CONFIGURATION_SHOP"
+		},
+		{
+			"module": "Facturación",
+			"option": "Pedido",
+			"name": "Imprimir",
+			"description": "Permite imprimir el pedido de facturación",
+			"action": "PRINT_INVOICING_ORDER"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
