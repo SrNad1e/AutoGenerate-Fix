@@ -808,6 +808,20 @@
 			"action": "READ_CRM_CUSTOMERTYPES"
 		},
 		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Crear",
+			"description": "Permite crear la ciudad",
+			"action": "CREATE_CRM_CITY"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Actualizar",
+			"description": "Permite actualizar la ciudad",
+			"action": "UPDATE_CRM_CITY"
+		},
+		{
 			"module": "Configuración",
 			"option": "Bodega",
 			"name": "Acceder",
