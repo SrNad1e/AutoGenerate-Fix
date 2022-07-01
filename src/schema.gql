@@ -806,6 +806,21 @@ input CreateOrderInput {
   status: StatusOrder!
 }
 
+"""Datos para crear un método de pago"""
+input CreatePaymentInput {
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logo: String
+
+  """Nombre del método de pago"""
+  name: String!
+
+  """Tipo de método de pago"""
+  type: TypePayment!
+}
+
 """Datos para crear un producto"""
 input CreateProductInput {
   """Identificador del producto"""
@@ -2627,6 +2642,12 @@ type Mutation {
     createOrderInput: CreateOrderInput!
   ): ResponseOrder!
 
+  """Crea un método de pago"""
+  createPayment(
+    """Datos para la creación del método de pago"""
+    createPaymentInput: CreatePaymentInput!
+  ): Payment!
+
   """Crea un producto"""
   createProduct(
     """Datos para crear un producto"""
@@ -2798,6 +2819,15 @@ type Mutation {
     """Parámetros para actualizar el pedido"""
     updateOrderInput: UpdateOrderInput!
   ): ResponseOrder!
+
+  """Actualiza un método de pago"""
+  updatePayment(
+    """Identificador del método de pago para actualizar"""
+    id: String!
+
+    """Datos para actualizar el método de pago"""
+    updatePaymentInput: UpdatePaymentInput!
+  ): Payment!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -3151,6 +3181,7 @@ enum Permissions {
   CREATE_INVOICING_ORDER
   CREATE_INVOICING_RETURN
   CREATE_TREASURY_EXPENSE
+  CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
@@ -3217,6 +3248,7 @@ enum Permissions {
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_ORDER
   UPDATE_TREASURY_EXPENSE
+  UPDATE_TREASURY_PAYMENT
   UPDATE_TREASURY_RECEIPT
 }
 
@@ -5967,6 +5999,24 @@ input UpdateOrderInput {
 
   """Estado del pedido"""
   status: StatusOrder
+}
+
+"""Datos para actualizar método de pago"""
+input UpdatePaymentInput {
+  """Estado del método de pago"""
+  active: Boolean!
+
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logo: String
+
+  """Nombre del método de pago"""
+  name: String
+
+  """Tipo de método de pago"""
+  type: TypePayment
 }
 
 """Datos para actualizar el producto"""
