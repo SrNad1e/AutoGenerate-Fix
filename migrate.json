@@ -801,7 +801,7 @@
 			"action": "PRINT_TREASURY_RECEIPT"
 		},
 		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Tipo de cliente",
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
@@ -809,6 +809,19 @@
 		},
 		{
 			"module": "CRM",
+			"option": "Cupón",
+			"name": "Crear",
+			"description": "Permite crear el cupón",
+			"action": "CREATE_CRM_COUPON"
+		},
+		{
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Actualizar",
+			"description": "Permite actualizar el cupón",
+			"action": "UPDATE_CRM_COUPON"
+		},
+		{
 			"option": "Ciudad",
 			"name": "Crear",
 			"description": "Permite crear la ciudad",
