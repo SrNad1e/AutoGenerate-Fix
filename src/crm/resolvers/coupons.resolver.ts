@@ -5,6 +5,7 @@ import {
 } from 'src/configurations/libs/permissions.decorator';
 import { CreateCouponInput } from '../dtos/create-coupon.input';
 import { FiltersCouponInput } from '../dtos/filters-coupon.input';
+import { FiltersCouponsInput } from '../dtos/filters-coupons.input';
 import { UpdateCouponInput } from '../dtos/update-coupon.input';
 
 import { Coupon } from '../entities/coupon.entity';
@@ -15,16 +16,16 @@ export class CouponsResolver {
 	constructor(private readonly couponsService: CouponsService) {}
 
 	@Query(() => Coupon, {
-		name: 'coupon',
-		description: 'Consultar cupón',
+		name: 'coupons',
+		description: 'Consultar cupones',
 	})
 	@RequirePermissions(Permissions.READ_CRM_COUPONS)
 	findAll(
 		@Args({
-			name: 'filtersCouponInput',
+			name: 'filtersCouponsInput',
 			description: 'Filtros para consultar un cupón',
 		})
-		_: FiltersCouponInput,
+		_: FiltersCouponsInput,
 		@Context() context,
 	) {
 		return this.couponsService.findAll(

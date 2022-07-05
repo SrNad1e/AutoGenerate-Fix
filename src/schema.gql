@@ -1861,6 +1861,27 @@ input FiltersCouponInput {
   status: StatusCoupon
 }
 
+"""Filtros para consultar los cupones"""
+input FiltersCouponsInput {
+  """Código del cupón"""
+  code: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del cupón"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCoupon
+
+  """Estado del cupón"""
+  status: StatusCoupon
+}
+
 """Filtros para consultar los créditos de los clientes"""
 input FiltersCreditHistoryInput {
   """Monto del movimiento"""
@@ -3504,6 +3525,12 @@ type Query {
   coupon(
     """Filtros para consultar un cupón"""
     filtersCouponInput: FiltersCouponInput!
+  ): Coupon!
+
+  """Consultar cupones"""
+  coupons(
+    """Filtros para consultar un cupón"""
+    filtersCouponInput: FiltersCouponsInput!
   ): Coupon!
 
   """Crédito"""
@@ -5359,6 +5386,24 @@ input SortConveyor {
   name: Float
 
   """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento del ccupón"""
+input SortCoupon {
+  """ordernamiento por fecha de creación"""
+  createdAt: Float
+
+  """ordernamiento por fecha de expiración"""
+  expiration: Float
+
+  """ordernamiento por consecutivo"""
+  number: Float
+
+  """ordernamiento por estado"""
+  status: Float
+
+  """ordernamiento por fecha de actualización"""
   updatedAt: Float
 }
 
