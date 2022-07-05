@@ -899,6 +899,21 @@ input CreatePaymentInput {
   type: TypePayment!
 }
 
+"""Datos para crear un punto de venta"""
+input CreatePointOfSaleInput {
+  """Identificador de la autorización de facturación"""
+  autorizationId: String!
+
+  """Identificador de la caja asignada"""
+  boxId: String!
+
+  """Nombre del punto de venta"""
+  name: String!
+
+  """Identificador de la tienda a la que pertence"""
+  shopId: String!
+}
+
 """Datos para crear un producto"""
 input CreateProductInput {
   """Identificador del producto"""
@@ -2810,6 +2825,12 @@ type Mutation {
     createPaymentInput: CreatePaymentInput!
   ): Payment!
 
+  """Se encarga de crear el punto de venta"""
+  createPointOfSale(
+    """Parámetros para la creación del punto de venta"""
+    createPointOfSaleInput: CreatePointOfSaleInput!
+  ): PointOfSale!
+
   """Crea un producto"""
   createProduct(
     """Datos para crear un producto"""
@@ -3026,6 +3047,15 @@ type Mutation {
     """Datos para actualizar el método de pago"""
     updatePaymentInput: UpdatePaymentInput!
   ): Payment!
+
+  """Se encarga actualizar un punto de venta"""
+  updatePointOfSale(
+    """Identificador deL punto de venta"""
+    id: String!
+
+    """Parámetros para actualizar el punto de venta"""
+    updatePointOfSaleInput: UpdatePointOfSaleInput!
+  ): PointOfSale!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -6442,6 +6472,12 @@ input UpdatePaymentInput {
 
   """Tipo de método de pago"""
   type: TypePayment
+}
+
+"""Datos para actualizar un punto de venta"""
+input UpdatePointOfSaleInput {
+  """Fecha de cierre del punto de venta"""
+  closeDate: String
 }
 
 """Datos para actualizar el producto"""
