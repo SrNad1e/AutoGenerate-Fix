@@ -899,6 +899,21 @@ input CreatePaymentInput {
   type: TypePayment!
 }
 
+"""Datos para crear un punto de venta"""
+input CreatePointOfSaleInput {
+  """Identificador de la autorización de facturación"""
+  autorizationId: String!
+
+  """Identificador de la caja asignada"""
+  boxId: String!
+
+  """Nombre del punto de venta"""
+  name: String!
+
+  """Identificador de la tienda a la que pertence"""
+  shopId: String!
+}
+
 """Datos para crear un producto"""
 input CreateProductInput {
   """Identificador del producto"""
@@ -2810,6 +2825,12 @@ type Mutation {
     createPaymentInput: CreatePaymentInput!
   ): Payment!
 
+  """Se encarga de crear el punto de venta"""
+  createPointOfSale(
+    """Parámetros para la creación del punto de venta"""
+    createPointOfSaleInput: CreatePointOfSaleInput!
+  ): PointOfSale!
+
   """Crea un producto"""
   createProduct(
     """Datos para crear un producto"""
@@ -3026,6 +3047,15 @@ type Mutation {
     """Datos para actualizar el método de pago"""
     updatePaymentInput: UpdatePaymentInput!
   ): Payment!
+
+  """Se encarga actualizar un punto de venta"""
+  updatePointOfSale(
+    """Identificador deL punto de venta"""
+    id: String!
+
+    """Parámetros para actualizar el punto de venta"""
+    updatePointOfSaleInput: UpdatePointOfSaleInput!
+  ): PointOfSale!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -3349,6 +3379,7 @@ enum Permissions {
   ACCESS_INVOICING_AUTHORIZATIONS
   ACCESS_INVOICING_CLOSESX
   ACCESS_INVOICING_CLOSESZ
+  ACCESS_INVOICING_POINTOFSALES
   ACCESS_INVOICING_RETURNS
   ACCESS_POS
   ACCESS_TREASURY_BOXES
@@ -3381,6 +3412,7 @@ enum Permissions {
   CREATE_INVOICING_CLOSEX
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
+  CREATE_INVOICING_POINTOFSALE
   CREATE_INVOICING_RETURN
   CREATE_TREASURY_BOX
   CREATE_TREASURY_EXPENSE
@@ -3455,6 +3487,7 @@ enum Permissions {
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_AUTHORIZATION
   UPDATE_INVOICING_ORDER
+  UPDATE_INVOICING_POINTOFSALE
   UPDATE_TREASURY_BOX
   UPDATE_TREASURY_EXPENSE
   UPDATE_TREASURY_PAYMENT
@@ -3474,6 +3507,9 @@ type PointOfSale {
 
   """Fecha de cierre"""
   closeDate: DateTime
+
+  """Compañia a la que pertenece el punto de venta"""
+  company: Company!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -6436,6 +6472,12 @@ input UpdatePaymentInput {
 
   """Tipo de método de pago"""
   type: TypePayment
+}
+
+"""Datos para actualizar un punto de venta"""
+input UpdatePointOfSaleInput {
+  """Fecha de cierre del punto de venta"""
+  closeDate: String
 }
 
 """Datos para actualizar el producto"""
