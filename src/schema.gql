@@ -199,8 +199,20 @@ type AuthorizationDian {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía a la que pertenece la autorización"""
+  company: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
   """Prefijo de autorización"""
   prefix: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la autorización de facturación"""
+  user: User!
 }
 
 """Caja donde se deposita el dinero"""
@@ -678,6 +690,12 @@ type Coupon {
 input CreateAttribInput {
   """Nombre del atributo"""
   name: String!
+}
+
+"""Datos para la creación de una autorización"""
+input CreateAuthorizationInput {
+  """Prefijo de facturación"""
+  prefix: String!
 }
 
 """Datos para crear la caja"""
@@ -1664,6 +1682,21 @@ input FiltersAttribsInput {
 
   """Ordenamiento"""
   sort: SortAttrib
+}
+
+"""Filtros para consultar las autorizaciones"""
+input FiltersAuthorizationInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Prefijo de facturación"""
+  prefix: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortAuthorization
 }
 
 """Filtros para consultar la cajas"""
@@ -2687,6 +2720,12 @@ type Mutation {
     createAttribInput: CreateAttribInput!
   ): Attrib!
 
+  """Crea una autorización de facturación"""
+  createAuthorization(
+    """Datos para crear la autorización de facturación"""
+    createAuthorization: CreateAuthorizationInput = {}
+  ): AuthorizationDian!
+
   """Crea una caja"""
   createBox(
     """Datos para la creación de la caja"""
@@ -3307,6 +3346,7 @@ enum Permissions {
   ACCESS_INVENTORY_REQUESTS
   ACCESS_INVENTORY_SIZES
   ACCESS_INVENTORY_TRANSFERS
+  ACCESS_INVOICING_AUTHORIZATIONS
   ACCESS_INVOICING_CLOSESX
   ACCESS_INVOICING_CLOSESZ
   ACCESS_INVOICING_RETURNS
@@ -3337,6 +3377,7 @@ enum Permissions {
   CREATE_INVENTORY_REQUEST
   CREATE_INVENTORY_SIZE
   CREATE_INVENTORY_TRANSFER
+  CREATE_INVOICING_AUTHORIZATION
   CREATE_INVOICING_CLOSEX
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
@@ -3380,6 +3421,7 @@ enum Permissions {
   READ_INVENTORY_REQUESTS
   READ_INVENTORY_SIZES
   READ_INVENTORY_TRANSFERS
+  READ_INVOICING_AUTHORIZATIONS
   READ_INVOICING_CLOSESX
   READ_INVOICING_CLOSESZ
   READ_INVOICING_INVOICES
@@ -3410,6 +3452,7 @@ enum Permissions {
   UPDATE_INVENTORY_REQUEST
   UPDATE_INVENTORY_SIZE
   UPDATE_INVENTORY_TRANSFER
+  UPDATE_INVOICING_AUTHORIZATION
   UPDATE_INVOICING_ORDER
   UPDATE_TREASURY_BOX
   UPDATE_TREASURY_EXPENSE
@@ -3489,6 +3532,12 @@ type Query {
     """Filtros para listar los atributos"""
     filtersAttribsInput: FiltersAttribsInput = {}
   ): ResponseAttribs!
+
+  """Lista de autorizaciones"""
+  authorizations(
+    """Filtros de lista de autorizaciones de facturación"""
+    filtersAuthorizations: FiltersAuthorizationInput = {}
+  ): ResponseAuthorizations!
 
   """Se encarga de listar las cajas"""
   boxes(
@@ -3969,6 +4018,39 @@ type RefundOrderClose {
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de autorizaciones de facturación"""
+type ResponseAuthorizations {
+  """Lista de autorización de facturación"""
+  docs: [AuthorizationDian!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -5347,6 +5429,12 @@ input SortAttrib {
   createdAt: Float
   name: Float
   updatedAt: Float
+}
+
+"""Ordenamiento de las autorizaciones"""
+input SortAuthorization {
+  """Ordenamiento por prefijo"""
+  prefix: Float
 }
 
 """Ordenamiento para el listado de marcas"""
