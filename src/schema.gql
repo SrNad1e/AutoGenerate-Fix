@@ -199,8 +199,20 @@ type AuthorizationDian {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía a la que pertenece la autorización"""
+  company: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
   """Prefijo de autorización"""
   prefix: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la autorización de facturación"""
+  user: User!
 }
 
 """Caja donde se deposita el dinero"""
