@@ -698,6 +698,18 @@ input CreateCategoryInput {
   parentId: String
 }
 
+"""Datos para crear una ciudad"""
+input CreateCityInput {
+  """Nombre del país"""
+  country: String!
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Nombre del departamento"""
+  state: String!
+}
+
 """Datos para crear un cierre X"""
 input CreateCloseXInvoicingInput {
   """Listado de cash reportado"""
@@ -821,6 +833,21 @@ input CreateOrderInput {
   status: StatusOrder!
 }
 
+"""Datos para crear un método de pago"""
+input CreatePaymentInput {
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logo: String
+
+  """Nombre del método de pago"""
+  name: String!
+
+  """Tipo de método de pago"""
+  type: TypePayment!
+}
+
 """Datos para crear un producto"""
 input CreateProductInput {
   """Identificador del producto"""
@@ -929,6 +956,30 @@ input CreateRoleInput {
 
   """Identificadores de los permisos asignados"""
   permissionIds: [String!]!
+}
+
+"""Datos para la creación de la tienda"""
+input CreateShopInput {
+  """Dirección de la tienda"""
+  address: String!
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String!
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String!
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
 }
 
 """Datos para crear una talla"""
@@ -1049,6 +1100,18 @@ input CreateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para la creacion de una bodega"""
+input CreateWarehouseInput {
+  """Inventario máximo de productos"""
+  max: Float!
+
+  """Inventario mínimo de productos"""
+  min: Float!
+
+  """Nombre de la bodega"""
+  name: String!
 }
 
 """Crédito del cliente"""
@@ -2564,6 +2627,12 @@ type Mutation {
     createCategoryInput: CreateCategoryInput!
   ): CategoryLevel1!
 
+  """Crea una ciudad"""
+  createCity(
+    """Datos para la creación de la ciudad"""
+    createCityInput: CreateCityInput!
+  ): City!
+
   """Crea un cierre X de facturación"""
   createCloseXInvoicing(
     """Datos para crear el cierre x de facturación"""
@@ -2612,6 +2681,12 @@ type Mutation {
     createOrderInput: CreateOrderInput!
   ): ResponseOrder!
 
+  """Crea un método de pago"""
+  createPayment(
+    """Datos para la creación del método de pago"""
+    createPaymentInput: CreatePaymentInput!
+  ): Payment!
+
   """Crea un producto"""
   createProduct(
     """Datos para crear un producto"""
@@ -2641,6 +2716,12 @@ type Mutation {
     """Datos para la creación del rol"""
     createRoleInput: CreateRoleInput!
   ): Role!
+
+  """Crea una tienda"""
+  createShop(
+    """Datos para la creación de la tienda"""
+    createShopInput: CreateShopInput!
+  ): Shop!
 
   """Crear una talla"""
   createSize(
@@ -2681,6 +2762,12 @@ type Mutation {
     """Datos a crear en el usuario"""
     createUserInput: CreateUserInput!
   ): User!
+
+  """Crea una bodega"""
+  createWarehouse(
+    """Datos para la creación de la bodega"""
+    createWarehouseInput: CreateWarehouseInput!
+  ): Warehouse!
 
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
@@ -2726,6 +2813,15 @@ type Mutation {
     """Datos para actualizar una categoría"""
     updateCategoryInput: UpdateCategoryInput!
   ): CategoryLevel1!
+
+  """Actualiza una ciudad"""
+  updateCity(
+    """Identificador de la ciudad para actualizar"""
+    id: String!
+
+    """Datos para actualizar la ciudad"""
+    updateCityInput: UpadteCityInput!
+  ): City!
 
   """Actualiza el color"""
   updateColor(
@@ -2781,6 +2877,15 @@ type Mutation {
     updateOrderInput: UpdateOrderInput!
   ): ResponseOrder!
 
+  """Actualiza un método de pago"""
+  updatePayment(
+    """Identificador del método de pago para actualizar"""
+    id: String!
+
+    """Datos para actualizar el método de pago"""
+    updatePaymentInput: UpdatePaymentInput!
+  ): Payment!
+
   """Se encarga actualizar un producto"""
   updateProduct(
     """Identificador del producto a actualizar"""
@@ -2816,6 +2921,15 @@ type Mutation {
     """Datos para actualizar el rol"""
     updateRoleInput: UpdateRoleInput!
   ): Role!
+
+  """Actualiza una tienda"""
+  updateShop(
+    """Identificador de la tienda para actualizar"""
+    id: String!
+
+    """Datos para actualizar la tienda"""
+    updateShopInput: UpdateShopInput!
+  ): Shop!
 
   """Actualizar la talla"""
   updateSize(
@@ -2877,6 +2991,15 @@ type Mutation {
     """Datos a actualizar en el usuario"""
     updateUserInput: UpdateUserInput!
   ): User!
+
+  """Actualiza una bodega"""
+  updateWarehouse(
+    """Identificador de la bodega para actualizar"""
+    id: String!
+
+    """Datos para actualizar la bodega"""
+    updateWarehouseInput: UpdateWarehouseInput!
+  ): Warehouse!
 }
 
 """Opción del permiso"""
@@ -3062,7 +3185,9 @@ type PermissionData {
 enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
+  ACCESS_CONFIGURATION_SHOPS
   ACCESS_CONFIGURATION_USERS
+  ACCESS_CONFIGURATION_WAREHOUSES
   ACCESS_CREDITS
   ACCESS_CRM_CITIES
   ACCESS_CRM_COUPONS
@@ -3091,8 +3216,11 @@ enum Permissions {
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
+  CREATE_CONFIGURATION_SHOP
   CREATE_CONFIGURATION_USER
+  CREATE_CONFIGURATION_WAREHOUSE
   CREATE_CREDIT
+  CREATE_CRM_CITY
   CREATE_CRM_COUPON
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
@@ -3112,6 +3240,7 @@ enum Permissions {
   CREATE_INVOICING_ORDER
   CREATE_INVOICING_RETURN
   CREATE_TREASURY_EXPENSE
+  CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
@@ -3120,6 +3249,7 @@ enum Permissions {
   PRINT_INVENTORY_TRANSFER
   PRINT_INVOICING_CLOSEX
   PRINT_INVOICING_CLOSEZ
+  PRINT_INVOICING_ORDER
   PRINT_INVOICING_RETURN
   PRINT_TREASURY_EXPENSE
   PRINT_TREASURY_RECEIPT
@@ -3158,8 +3288,11 @@ enum Permissions {
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
+  UPDATE_CONFIGURATION_SHOP
   UPDATE_CONFIGURATION_USER
+  UPDATE_CONFIGURATION_WAREHOUSE
   UPDATE_CREDIT
+  UPDATE_CRM_CITY
   UPDATE_CRM_COUPON
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
@@ -3176,6 +3309,7 @@ enum Permissions {
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_ORDER
   UPDATE_TREASURY_EXPENSE
+  UPDATE_TREASURY_PAYMENT
   UPDATE_TREASURY_RECEIPT
 }
 
@@ -3458,6 +3592,12 @@ type Query {
     """Filtros para los roles"""
     filtersRolesInput: FiltersRolesInput = {}
   ): ResponseRoles!
+
+  """Obtiene la tienda por el identificador"""
+  shopId(
+    """Identificador de la tienda"""
+    id: String!
+  ): Shop!
 
   """Se encarga de listar las tiendas"""
   shops(
@@ -5802,6 +5942,18 @@ enum TypePayment {
   CREDIT
 }
 
+"""Datos para actualizar la ciudad"""
+input UpadteCityInput {
+  """Nombre del país"""
+  country: String
+
+  """Nombre de la ciudad"""
+  name: String
+
+  """Nombre del departamento"""
+  state: String
+}
+
 """Datos para actualizar el atributo"""
 input UpdateAttribInput {
   """Se encuentra activa el atributo"""
@@ -5928,6 +6080,24 @@ input UpdateOrderInput {
   status: StatusOrder
 }
 
+"""Datos para actualizar método de pago"""
+input UpdatePaymentInput {
+  """Estado del método de pago"""
+  active: Boolean!
+
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logo: String
+
+  """Nombre del método de pago"""
+  name: String
+
+  """Tipo de método de pago"""
+  type: TypePayment
+}
+
 """Datos para actualizar el producto"""
 input UpdateProductInput {
   """Código de barras del producto"""
@@ -6016,6 +6186,36 @@ input UpdateRoleInput {
 
   """Identificadores de los permisos seleccionados"""
   permissionIds: [String!]
+}
+
+"""Datos para actualizar la tienda"""
+input UpdateShopInput {
+  """Dirección de la tienda"""
+  address: String
+
+  """Identificador de la empresa para la tienda"""
+  companyId: String
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Estado de la tienda"""
+  status: StatusShop
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
 }
 
 """Datos para actualizar la talla"""
@@ -6124,6 +6324,21 @@ input UpdateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para actualizar """
+input UpdateWarehouseInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Inventario máximo de productos"""
+  max: Float
+
+  """Inventario mínimo de productos"""
+  min: Float
+
+  """Nombre de la bodega"""
+  name: String
 }
 
 """Enlaces de diferences tipos"""
