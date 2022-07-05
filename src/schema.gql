@@ -680,6 +680,18 @@ input CreateAttribInput {
   name: String!
 }
 
+"""Datos para crear la caja"""
+input CreateBoxInput {
+  """Cantidad de la base para la caja"""
+  base: Float!
+
+  """Es caja principal de la compañía"""
+  isMain: Boolean
+
+  """Nombre de la caja"""
+  name: String!
+}
+
 """Datos para crear una marca"""
 input CreateBrandInput {
   """Nombre de la marca"""
@@ -2675,6 +2687,12 @@ type Mutation {
     createAttribInput: CreateAttribInput!
   ): Attrib!
 
+  """Crea una caja"""
+  createBox(
+    """Datos para la creación de la caja"""
+    createBoxInput: CreateBoxInput!
+  ): Box!
+
   """Crea una marca"""
   createBrand(
     """Datos para crear una marca"""
@@ -2861,6 +2879,15 @@ type Mutation {
     """Datos a actualizar en el atributo"""
     updateAttribInput: UpdateAttribInput!
   ): Attrib!
+
+  """Actualiza una caja"""
+  updateBox(
+    """Identificador de la caja"""
+    id: String!
+
+    """Datos para actualizar la caja"""
+    updateBoxInput: UpdateBoxInput!
+  ): Box!
 
   """Actualiza la marca"""
   updateBrand(
@@ -3314,6 +3341,7 @@ enum Permissions {
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
   CREATE_INVOICING_RETURN
+  CREATE_TREASURY_BOX
   CREATE_TREASURY_EXPENSE
   CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
@@ -3383,6 +3411,7 @@ enum Permissions {
   UPDATE_INVENTORY_SIZE
   UPDATE_INVENTORY_TRANSFER
   UPDATE_INVOICING_ORDER
+  UPDATE_TREASURY_BOX
   UPDATE_TREASURY_EXPENSE
   UPDATE_TREASURY_PAYMENT
   UPDATE_TREASURY_RECEIPT
@@ -3531,7 +3560,7 @@ type Query {
   coupons(
     """Filtros para consultar los cupones"""
     filtersCouponsInput: FiltersCouponsInput!
-  ): Coupon!
+  ): ResponseCoupons!
 
   """Crédito"""
   credit(
@@ -4237,6 +4266,39 @@ type ResponseCompanies {
 type ResponseConveyors {
   """Lista de transportadoras"""
   docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de cupones"""
+type ResponseCoupons {
+  """Lista de cupones"""
+  docs: [Coupon!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -6116,6 +6178,18 @@ input UpdateAttribInput {
   active: Boolean
 
   """Valor asignado al atributo"""
+  name: String
+}
+
+"""Datos para actualizar caja"""
+input UpdateBoxInput {
+  """Cantidad de la base para la caja"""
+  base: Float
+
+  """Es caja principal de la compañía"""
+  isMain: Boolean
+
+  """Nombre de la caja"""
   name: String
 }
 

@@ -809,6 +809,19 @@
 		},
 		{
 			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Crear",
+			"description": "Permite crear la caja",
+			"action": "CREATE_TREASURY_BOX"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Actualizar",
+			"description": "Permite actualizar la caja",
+			"action": "UPDATE_TREASURY_BOX"
+		},
+		{
 			"option": "Método de pago",
 			"name": "Crear",
 			"description": "Permite crear el método de pago",
