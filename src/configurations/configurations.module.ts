@@ -45,6 +45,7 @@ import { ShopsResolver } from './resolvers/shops.resolver';
 import { PermissionsService } from './services/permissions.service';
 import { PermissionsResolver } from './resolvers/permissions.resolver';
 import { RolesResolver } from './resolvers/roles.resolver';
+import { CompaniesResolver } from './resolvers/companies.resolver';
 
 @Module({
 	imports: [
@@ -131,6 +132,7 @@ import { RolesResolver } from './resolvers/roles.resolver';
 		PermissionsService,
 		PermissionsResolver,
 		RolesResolver,
+		CompaniesResolver,
 	],
 	controllers: [StaticfilesController, ShopsController],
 	exports: [

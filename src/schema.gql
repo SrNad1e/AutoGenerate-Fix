@@ -755,6 +755,27 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear empresa"""
+input CreateCompanyInput {
+  """Dirección de la empresa"""
+  address: String!
+
+  """Documento de la empresa"""
+  document: String!
+
+  """Url del logo de la empresa"""
+  logo: String!
+
+  """Nombre de la empresa"""
+  name: String!
+
+  """Teléfono de la empresa"""
+  phone: String!
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean
+}
+
 """Datos para la creación del cupón"""
 input CreateCouponInput {
   """Fecha de expiración para el cupón"""
@@ -1798,6 +1819,24 @@ input FiltersColorsInput {
   sort: SortColor
 }
 
+"""Filtros para obtener listado de compañías"""
+input FiltersCompaniesInput {
+  """Estado de la compañía"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comódin para buscar por nombre o documento"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCompany
+}
+
 """Filtros para obtener listado de transportadoras"""
 input FiltersConveyorsInput {
   """Cantidad de registros"""
@@ -2651,6 +2690,12 @@ type Mutation {
     createColorInput: CreateColorInput!
   ): Color!
 
+  """Crea una compañía"""
+  createCompany(
+    """Datos para la creación de la compañía"""
+    createCompanyInput: CreateCompanyInput!
+  ): Company!
+
   """Se encarga crear un cupón"""
   createCoupon(
     """Parámetros para actualizar el cupoón"""
@@ -2831,6 +2876,15 @@ type Mutation {
     """Datos para actualizar un color"""
     updateColorInput: UpdateColorInput!
   ): Color!
+
+  """Actualiza una compañía"""
+  updateCompany(
+    """Identificador de la compañía para actualizar"""
+    id: String!
+
+    """Datos para actualizar la compañía"""
+    updateCompanyInput: UpdateCompanyInput!
+  ): Company!
 
   """Se encarga actualizar un cupón"""
   updateCoupon(
@@ -3433,6 +3487,12 @@ type Query {
     """Filtros para obtener los colores"""
     filtersColorsInput: FiltersColorsInput = {}
   ): ResponseColors!
+
+  """Listado de las compañías"""
+  companies(
+    """Filtros para las compañías"""
+    filtersCompaniesInput: FiltersCompaniesInput = {}
+  ): ResponseCompanies!
 
   """Lista de ajustes de productos"""
   conveyors(
@@ -4084,6 +4144,39 @@ type ResponseClosesZInvoicing {
 type ResponseColors {
   """Lista de colores"""
   docs: [Color!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de compañías"""
+type ResponseCompanies {
+  """Lista de compañías"""
+  docs: [Company!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -5240,6 +5333,24 @@ input SortColor {
 }
 
 """Ordenamiento de la trasnportadora"""
+input SortCompany {
+  """Ordenamiento por nombre"""
+  active: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por nombre"""
+  name: Float
+
+  """Ordenamiento por nombre"""
+  regimenSimplify: Float
+
+  """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de la trasnportadora"""
 input SortConveyor {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -6000,6 +6111,27 @@ input UpdateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String
+}
+
+"""Datos para actualizar la compañía"""
+input UpdateCompanyInput {
+  """Dirección de la empresa"""
+  address: String
+
+  """Documento de la empresa"""
+  document: String
+
+  """Url del logo de la empresa"""
+  logo: String
+
+  """Nombre de la empresa"""
+  name: String
+
+  """Teléfono de la empresa"""
+  phone: String
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean
 }
 
 """Datos para actualizar el cupón"""
