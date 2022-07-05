@@ -23,7 +23,7 @@ export class CouponsResolver {
 	findAll(
 		@Args({
 			name: 'filtersCouponsInput',
-			description: 'Filtros para consultar un cupón',
+			description: 'Filtros para consultar los cupones',
 		})
 		_: FiltersCouponsInput,
 		@Context() context,
