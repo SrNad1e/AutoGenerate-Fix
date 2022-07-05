@@ -692,6 +692,12 @@ input CreateAttribInput {
   name: String!
 }
 
+"""Datos para la creación de una autorización"""
+input CreateAuthorizationInput {
+  """Prefijo de facturación"""
+  prefix: String!
+}
+
 """Datos para crear una marca"""
 input CreateBrandInput {
   """Nombre de la marca"""
@@ -1565,6 +1571,21 @@ input FiltersAttribsInput {
 
   """Ordenamiento"""
   sort: SortAttrib
+}
+
+"""Filtros para consultar las autorizaciones"""
+input FiltersAuthorizationInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Prefijo de facturación"""
+  prefix: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortAuthorization
 }
 
 """Filtros para consultar la cajas"""
@@ -2549,6 +2570,12 @@ type Mutation {
     createAttribInput: CreateAttribInput!
   ): Attrib!
 
+  """Crea una autorización de facturación"""
+  createAuthorization(
+    """Datos para crear la autorización de facturación"""
+    createAuthorization: CreateAuthorizationInput = {}
+  ): AuthorizationDian!
+
   """Crea una marca"""
   createBrand(
     """Datos para crear una marca"""
@@ -3236,6 +3263,12 @@ type Query {
     filtersAttribsInput: FiltersAttribsInput = {}
   ): ResponseAttribs!
 
+  """Lista de autorizaciones"""
+  authorizations(
+    """Filtros de lista de autorizaciones de facturación"""
+    filtersAuthorizations: FiltersAuthorizationInput = {}
+  ): ResponseAuthorizations!
+
   """Se encarga de listar las cajas"""
   boxes(
     """Filtros para consultar las cajas"""
@@ -3697,6 +3730,39 @@ type RefundOrderClose {
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de autorizaciones de facturación"""
+type ResponseAuthorizations {
+  """Lista de autorización de facturación"""
+  docs: [AuthorizationDian!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -5009,6 +5075,12 @@ input SortAttrib {
   createdAt: Float
   name: Float
   updatedAt: Float
+}
+
+"""Ordenamiento de las autorizaciones"""
+input SortAuthorization {
+  """Ordenamiento por prefijo"""
+  prefix: Float
 }
 
 """Ordenamiento para el listado de marcas"""

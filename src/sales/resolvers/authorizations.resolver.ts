@@ -1,53 +1,60 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+
+import {
+	Permissions,
+	RequirePermissions,
+} from 'src/configurations/libs/permissions.decorator';
+import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
+import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { ResponseAuthorizations } from '../dtos/response-authorizations';
+import { AuthorizationDian } from '../entities/authorization.entity';
 import { AuthorizationsService } from '../services/authorizations.service';
 
 @Resolver()
 export class AuthorizationsResolver {
 	constructor(private readonly authorizationsService: AuthorizationsService) {}
 
-	/*@Query(() => ResponseAuthorizations, {
-		name: 'closesXInvoicing',
-		description: 'Lista de cierres x',
+	@Query(() => ResponseAuthorizations, {
+		name: 'authorizations',
+		description: 'Lista de autorizaciones',
 	})
-	@RequirePermissions(Permissions.READ_INVOICING_CLOSESX)
+	@RequirePermissions(Permissions.READ_INVOICING_AUTHORIZATIONS)
 	findAll(
 		@Args({
-			name: 'filtersClosesXInvoicing',
+			name: 'filtersAuthorizations',
 			nullable: true,
 			defaultValue: {},
-			description: 'Filtros de lista de cierres x',
+			description: 'Filtros de lista de autorizaciones de facturación',
 		})
-		_: FiltersClosesXInvoicingInput,
+		_: FiltersAuthorizationInput,
 		@Context() context,
 	) {
-		return this.closesXInvoicingService.findAll(
+		return this.authorizationsService.findAll(
 			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
 		);
 	}
 
-	@Mutation(() => CloseXInvoicing, {
-		name: 'createCloseXInvoicing',
-		description: 'Crea un cierre X de facturación',
+	@Mutation(() => AuthorizationDian, {
+		name: 'createAuthorization',
+		description: 'Crea una autorización de facturación',
 	})
-	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSEX)
+	@RequirePermissions(Permissions.CREATE_INVOICING_AUTHORIZATION)
 	create(
 		@Args({
-			name: 'createCloseXInvoicing',
+			name: 'createAuthorization',
 			nullable: true,
 			defaultValue: {},
-			description: 'Datos para crear el cierre x de facturación',
+			description: 'Datos para crear la autorización de facturación',
 		})
-		_: CreateCloseXInvoicingInput,
+		_: CreateAuthorizationInput,
 		@Context() context,
 	) {
-		return this.closesXInvoicingService.create(
+		return this.authorizationsService.create(
 			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
 		);
 	}
-}*/
 }
