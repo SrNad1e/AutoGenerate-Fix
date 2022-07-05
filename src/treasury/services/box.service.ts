@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
+import { CreateBoxInput } from '../dtos/create-box.input';
 import { FiltersBoxesInput } from '../dtos/filters-boxes.input';
+import { UpdateBoxInput } from '../dtos/update-box.input';
 import { Box } from '../entities/box.entity';
 
 @Injectable()
@@ -61,5 +67,39 @@ export class BoxService {
 				lean: true,
 			},
 		);
+	}
+
+	async create(params: CreateBoxInput, user: User, companyId: string) {
+		return this.boxModel.create({
+			...params,
+			user,
+			company: new Types.ObjectId(companyId),
+		});
+	}
+
+	async update(
+		id: string,
+		params: UpdateBoxInput,
+		user: User,
+		companyId: string,
+	) {
+		const box = await this.findById(id);
+
+		if (!box) {
+			throw new BadRequestException('La caja no existe');
+		}
+
+		if (box.company.toString() !== companyId) {
+			throw new UnauthorizedException(
+				'El usuario no tiene permisos para actualizar esta caja',
+			);
+		}
+
+		return this.boxModel.findByIdAndUpdate(id, {
+			$set: {
+				...params,
+				user,
+			},
+		});
 	}
 }

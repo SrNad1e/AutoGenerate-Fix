@@ -806,6 +806,20 @@
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
 			"action": "READ_CRM_CUSTOMERTYPES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Crear",
+			"description": "Permite crear la caja",
+			"action": "CREATE_TREASURY_BOX"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Actualizar",
+			"description": "Permite actualizar la caja",
+			"action": "UPDATE_TREASURY_BOX"
 		}
 		
 	],
