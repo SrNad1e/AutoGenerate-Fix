@@ -32,21 +32,21 @@ export class CitiesService {
 		if (name) {
 			filters.name = {
 				$regex: name,
-				options: 'i',
+				$options: 'i',
 			};
 		}
 
 		if (state) {
 			filters.state = {
 				$regex: state,
-				options: 'i',
+				$options: 'i',
 			};
 		}
 
 		if (country) {
 			filters.country = {
 				$regex: country,
-				options: 'i',
+				$options: 'i',
 			};
 		}
 
