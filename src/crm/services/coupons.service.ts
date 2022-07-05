@@ -140,7 +140,7 @@ export class CouponsService {
 			id,
 			{
 				$set: {
-					status,
+					status: StatusCoupon[status],
 					user,
 				},
 			},
