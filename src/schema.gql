@@ -743,6 +743,21 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para la creación del cupón"""
+input CreateCouponInput {
+  """Fecha de expiración para el cupón"""
+  expiration: DateTime!
+
+  """Mensaje del cupón"""
+  message: String!
+
+  """Titulo del cupón"""
+  title: String!
+
+  """Monto para crear el cupón"""
+  value: Float!
+}
+
 """Datos para crear un crédito"""
 input CreateCreditInput {
   """Monto de crédigo aprobado"""
@@ -2567,6 +2582,12 @@ type Mutation {
     createColorInput: CreateColorInput!
   ): Color!
 
+  """Se encarga crear un cupón"""
+  createCoupon(
+    """Parámetros para actualizar el cupoón"""
+    createCouponInput: CreateCouponInput!
+  ): Coupon!
+
   """Asigna el crédito a un cliente"""
   createCredit(
     """Datos para crear un crédito"""
@@ -2714,6 +2735,15 @@ type Mutation {
     """Datos para actualizar un color"""
     updateColorInput: UpdateColorInput!
   ): Color!
+
+  """Se encarga actualizar un cupón"""
+  updateCoupon(
+    """Identificador del cupón"""
+    id: String!
+
+    """Parámetros para actualizar el cupón"""
+    updateCustomerInput: UpdateCouponInput!
+  ): Coupon!
 
   """Actualiza el crédito de un cliente"""
   updateCredit(
@@ -3063,6 +3093,7 @@ enum Permissions {
   CREATE_CONFIGURATION_ROLE
   CREATE_CONFIGURATION_USER
   CREATE_CREDIT
+  CREATE_CRM_COUPON
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
@@ -3129,6 +3160,7 @@ enum Permissions {
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_USER
   UPDATE_CREDIT
+  UPDATE_CRM_COUPON
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
   UPDATE_INVENTORY_ATTRIB
@@ -5816,6 +5848,12 @@ input UpdateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String
+}
+
+"""Datos para actualizar el cupón"""
+input UpdateCouponInput {
+  """Estado del cupón"""
+  status: StatusCoupon
 }
 
 """Datos para actualizar un crédito"""
