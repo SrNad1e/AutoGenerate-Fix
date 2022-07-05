@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,6 +13,8 @@ import { CompaniesService } from 'src/configurations/services/companies.service'
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { Warehouse, WarehouseMysql } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
+import { CreateWarehouseInput } from '../dtos/create-warehouse.input';
+import { UpdateWarehouseInput } from '../dtos/update-warehouse.input';
 
 @Injectable()
 export class WarehousesService {
@@ -74,6 +81,46 @@ export class WarehousesService {
 
 	async findById(id: string) {
 		return this.warehouseModel.findById(id).lean();
+	}
+
+	async create(params: CreateWarehouseInput, user: User, companyId: string) {
+		const newShop = new this.warehouseModel({
+			...params,
+			user,
+			company: new Types.ObjectId(companyId),
+		});
+		return newShop.save();
+	}
+
+	async update(
+		id: string,
+		params: UpdateWarehouseInput,
+		user: User,
+		idCompany: string,
+	) {
+		const warehouse = await this.findById(id);
+
+		if (!warehouse) {
+			throw new BadRequestException('La bodega no existe');
+		}
+
+		if (
+			user.username !== 'admin' &&
+			warehouse.company.toString() !== idCompany
+		) {
+			throw new UnauthorizedException(
+				'No tiene permisos para hacer cambios en esta bodega',
+			);
+		}
+
+		return this.warehouseModel.findByIdAndUpdate(
+			id,
+			{ $set: params },
+			{
+				new: true,
+				lean: true,
+			},
+		);
 	}
 
 	/**

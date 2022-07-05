@@ -710,6 +710,18 @@ input CreateCategoryInput {
   parentId: String
 }
 
+"""Datos para crear una ciudad"""
+input CreateCityInput {
+  """Nombre del país"""
+  country: String!
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Nombre del departamento"""
+  state: String!
+}
+
 """Datos para crear un cierre X"""
 input CreateCloseXInvoicingInput {
   """Listado de cash reportado"""
@@ -753,6 +765,42 @@ input CreateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String!
+}
+
+"""Datos para crear empresa"""
+input CreateCompanyInput {
+  """Dirección de la empresa"""
+  address: String!
+
+  """Documento de la empresa"""
+  document: String!
+
+  """Url del logo de la empresa"""
+  logo: String!
+
+  """Nombre de la empresa"""
+  name: String!
+
+  """Teléfono de la empresa"""
+  phone: String!
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean
+}
+
+"""Datos para la creación del cupón"""
+input CreateCouponInput {
+  """Fecha de expiración para el cupón"""
+  expiration: DateTime!
+
+  """Mensaje del cupón"""
+  message: String!
+
+  """Titulo del cupón"""
+  title: String!
+
+  """Monto para crear el cupón"""
+  value: Float!
 }
 
 """Datos para crear un crédito"""
@@ -816,6 +864,21 @@ input CreateExpenseInput {
 input CreateOrderInput {
   """Estado del pedido"""
   status: StatusOrder!
+}
+
+"""Datos para crear un método de pago"""
+input CreatePaymentInput {
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logoId: String
+
+  """Nombre del método de pago"""
+  name: String!
+
+  """Tipo de método de pago"""
+  type: TypePayment!
 }
 
 """Datos para crear un producto"""
@@ -926,6 +989,30 @@ input CreateRoleInput {
 
   """Identificadores de los permisos asignados"""
   permissionIds: [String!]!
+}
+
+"""Datos para la creación de la tienda"""
+input CreateShopInput {
+  """Dirección de la tienda"""
+  address: String!
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String!
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String!
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
 }
 
 """Datos para crear una talla"""
@@ -1046,6 +1133,18 @@ input CreateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para la creacion de una bodega"""
+input CreateWarehouseInput {
+  """Inventario máximo de productos"""
+  max: Float!
+
+  """Inventario mínimo de productos"""
+  min: Float!
+
+  """Nombre de la bodega"""
+  name: String!
 }
 
 """Crédito del cliente"""
@@ -1732,6 +1831,24 @@ input FiltersColorsInput {
   sort: SortColor
 }
 
+"""Filtros para obtener listado de compañías"""
+input FiltersCompaniesInput {
+  """Estado de la compañía"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comódin para buscar por nombre o documento"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCompany
+}
+
 """Filtros para obtener listado de transportadoras"""
 input FiltersConveyorsInput {
   """Cantidad de registros"""
@@ -1751,6 +1868,27 @@ input FiltersConveyorsInput {
 input FiltersCouponInput {
   """Código del cupón"""
   code: String
+
+  """Estado del cupón"""
+  status: StatusCoupon
+}
+
+"""Filtros para consultar los cupones"""
+input FiltersCouponsInput {
+  """Código del cupón"""
+  code: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del cupón"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCoupon
 
   """Estado del cupón"""
   status: StatusCoupon
@@ -2567,6 +2705,12 @@ type Mutation {
     createCategoryInput: CreateCategoryInput!
   ): CategoryLevel1!
 
+  """Crea una ciudad"""
+  createCity(
+    """Datos para la creación de la ciudad"""
+    createCityInput: CreateCityInput!
+  ): City!
+
   """Crea un cierre X de facturación"""
   createCloseXInvoicing(
     """Datos para crear el cierre x de facturación"""
@@ -2584,6 +2728,18 @@ type Mutation {
     """Datos para crear el color"""
     createColorInput: CreateColorInput!
   ): Color!
+
+  """Crea una compañía"""
+  createCompany(
+    """Datos para la creación de la compañía"""
+    createCompanyInput: CreateCompanyInput!
+  ): Company!
+
+  """Se encarga crear un cupón"""
+  createCoupon(
+    """Parámetros para actualizar el cupoón"""
+    createCouponInput: CreateCouponInput!
+  ): Coupon!
 
   """Asigna el crédito a un cliente"""
   createCredit(
@@ -2608,6 +2764,12 @@ type Mutation {
     """Parámetros para la creación del pedido"""
     createOrderInput: CreateOrderInput!
   ): ResponseOrder!
+
+  """Crea un método de pago"""
+  createPayment(
+    """Datos para la creación del método de pago"""
+    createPaymentInput: CreatePaymentInput!
+  ): Payment!
 
   """Crea un producto"""
   createProduct(
@@ -2638,6 +2800,12 @@ type Mutation {
     """Datos para la creación del rol"""
     createRoleInput: CreateRoleInput!
   ): Role!
+
+  """Crea una tienda"""
+  createShop(
+    """Datos para la creación de la tienda"""
+    createShopInput: CreateShopInput!
+  ): Shop!
 
   """Crear una talla"""
   createSize(
@@ -2678,6 +2846,12 @@ type Mutation {
     """Datos a crear en el usuario"""
     createUserInput: CreateUserInput!
   ): User!
+
+  """Crea una bodega"""
+  createWarehouse(
+    """Datos para la creación de la bodega"""
+    createWarehouseInput: CreateWarehouseInput!
+  ): Warehouse!
 
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
@@ -2733,6 +2907,15 @@ type Mutation {
     updateCategoryInput: UpdateCategoryInput!
   ): CategoryLevel1!
 
+  """Actualiza una ciudad"""
+  updateCity(
+    """Identificador de la ciudad para actualizar"""
+    id: String!
+
+    """Datos para actualizar la ciudad"""
+    updateCityInput: UpadteCityInput!
+  ): City!
+
   """Actualiza el color"""
   updateColor(
     """Identificador del color a actualizar"""
@@ -2741,6 +2924,24 @@ type Mutation {
     """Datos para actualizar un color"""
     updateColorInput: UpdateColorInput!
   ): Color!
+
+  """Actualiza una compañía"""
+  updateCompany(
+    """Identificador de la compañía para actualizar"""
+    id: String!
+
+    """Datos para actualizar la compañía"""
+    updateCompanyInput: UpdateCompanyInput!
+  ): Company!
+
+  """Se encarga actualizar un cupón"""
+  updateCoupon(
+    """Identificador del cupón"""
+    id: String!
+
+    """Parámetros para actualizar el cupón"""
+    updateCustomerInput: UpdateCouponInput!
+  ): Coupon!
 
   """Actualiza el crédito de un cliente"""
   updateCredit(
@@ -2778,6 +2979,15 @@ type Mutation {
     updateOrderInput: UpdateOrderInput!
   ): ResponseOrder!
 
+  """Actualiza un método de pago"""
+  updatePayment(
+    """Identificador del método de pago para actualizar"""
+    id: String!
+
+    """Datos para actualizar el método de pago"""
+    updatePaymentInput: UpdatePaymentInput!
+  ): Payment!
+
   """Se encarga actualizar un producto"""
   updateProduct(
     """Identificador del producto a actualizar"""
@@ -2813,6 +3023,15 @@ type Mutation {
     """Datos para actualizar el rol"""
     updateRoleInput: UpdateRoleInput!
   ): Role!
+
+  """Actualiza una tienda"""
+  updateShop(
+    """Identificador de la tienda para actualizar"""
+    id: String!
+
+    """Datos para actualizar la tienda"""
+    updateShopInput: UpdateShopInput!
+  ): Shop!
 
   """Actualizar la talla"""
   updateSize(
@@ -2874,6 +3093,15 @@ type Mutation {
     """Datos a actualizar en el usuario"""
     updateUserInput: UpdateUserInput!
   ): User!
+
+  """Actualiza una bodega"""
+  updateWarehouse(
+    """Identificador de la bodega para actualizar"""
+    id: String!
+
+    """Datos para actualizar la bodega"""
+    updateWarehouseInput: UpdateWarehouseInput!
+  ): Warehouse!
 }
 
 """Opción del permiso"""
@@ -3059,7 +3287,9 @@ type PermissionData {
 enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
+  ACCESS_CONFIGURATION_SHOPS
   ACCESS_CONFIGURATION_USERS
+  ACCESS_CONFIGURATION_WAREHOUSES
   ACCESS_CREDITS
   ACCESS_CRM_CITIES
   ACCESS_CRM_COUPONS
@@ -3088,8 +3318,12 @@ enum Permissions {
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
+  CREATE_CONFIGURATION_SHOP
   CREATE_CONFIGURATION_USER
+  CREATE_CONFIGURATION_WAREHOUSE
   CREATE_CREDIT
+  CREATE_CRM_CITY
+  CREATE_CRM_COUPON
   CREATE_CRM_CUSTOMER
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
@@ -3109,6 +3343,7 @@ enum Permissions {
   CREATE_INVOICING_RETURN
   CREATE_TREASURY_BOX
   CREATE_TREASURY_EXPENSE
+  CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
@@ -3117,6 +3352,7 @@ enum Permissions {
   PRINT_INVENTORY_TRANSFER
   PRINT_INVOICING_CLOSEX
   PRINT_INVOICING_CLOSEZ
+  PRINT_INVOICING_ORDER
   PRINT_INVOICING_RETURN
   PRINT_TREASURY_EXPENSE
   PRINT_TREASURY_RECEIPT
@@ -3155,8 +3391,12 @@ enum Permissions {
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
+  UPDATE_CONFIGURATION_SHOP
   UPDATE_CONFIGURATION_USER
+  UPDATE_CONFIGURATION_WAREHOUSE
   UPDATE_CREDIT
+  UPDATE_CRM_CITY
+  UPDATE_CRM_COUPON
   UPDATE_CRM_CUSTOMER
   UPDATE_INVENTORY_ADJUSTMENT
   UPDATE_INVENTORY_ATTRIB
@@ -3173,6 +3413,7 @@ enum Permissions {
   UPDATE_INVOICING_ORDER
   UPDATE_TREASURY_BOX
   UPDATE_TREASURY_EXPENSE
+  UPDATE_TREASURY_PAYMENT
   UPDATE_TREASURY_RECEIPT
 }
 
@@ -3297,6 +3538,12 @@ type Query {
     filtersColorsInput: FiltersColorsInput = {}
   ): ResponseColors!
 
+  """Listado de las compañías"""
+  companies(
+    """Filtros para las compañías"""
+    filtersCompaniesInput: FiltersCompaniesInput = {}
+  ): ResponseCompanies!
+
   """Lista de ajustes de productos"""
   conveyors(
     """Filtros de lista de las transportadoras"""
@@ -3308,6 +3555,12 @@ type Query {
     """Filtros para consultar un cupón"""
     filtersCouponInput: FiltersCouponInput!
   ): Coupon!
+
+  """Consultar cupones"""
+  coupons(
+    """Filtros para consultar los cupones"""
+    filtersCouponsInput: FiltersCouponsInput!
+  ): ResponseCoupons!
 
   """Crédito"""
   credit(
@@ -3455,6 +3708,12 @@ type Query {
     """Filtros para los roles"""
     filtersRolesInput: FiltersRolesInput = {}
   ): ResponseRoles!
+
+  """Obtiene la tienda por el identificador"""
+  shopId(
+    """Identificador de la tienda"""
+    id: String!
+  ): Shop!
 
   """Se encarga de listar las tiendas"""
   shops(
@@ -3970,10 +4229,76 @@ type ResponseColors {
   totalPages: Float!
 }
 
+"""Lista de compañías"""
+type ResponseCompanies {
+  """Lista de compañías"""
+  docs: [Company!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Lista de traslados de transportadoras"""
 type ResponseConveyors {
   """Lista de transportadoras"""
   docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de cupones"""
+type ResponseCoupons {
+  """Lista de cupones"""
+  docs: [Coupon!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -5097,6 +5422,24 @@ input SortColor {
 }
 
 """Ordenamiento de la trasnportadora"""
+input SortCompany {
+  """Ordenamiento por nombre"""
+  active: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por nombre"""
+  name: Float
+
+  """Ordenamiento por nombre"""
+  regimenSimplify: Float
+
+  """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de la trasnportadora"""
 input SortConveyor {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -5105,6 +5448,24 @@ input SortConveyor {
   name: Float
 
   """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento del ccupón"""
+input SortCoupon {
+  """ordernamiento por fecha de creación"""
+  createdAt: Float
+
+  """ordernamiento por fecha de expiración"""
+  expiration: Float
+
+  """ordernamiento por consecutivo"""
+  number: Float
+
+  """ordernamiento por estado"""
+  status: Float
+
+  """ordernamiento por fecha de actualización"""
   updatedAt: Float
 }
 
@@ -5799,6 +6160,18 @@ enum TypePayment {
   CREDIT
 }
 
+"""Datos para actualizar la ciudad"""
+input UpadteCityInput {
+  """Nombre del país"""
+  country: String
+
+  """Nombre de la ciudad"""
+  name: String
+
+  """Nombre del departamento"""
+  state: String
+}
+
 """Datos para actualizar el atributo"""
 input UpdateAttribInput {
   """Se encuentra activa el atributo"""
@@ -5857,6 +6230,33 @@ input UpdateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String
+}
+
+"""Datos para actualizar la compañía"""
+input UpdateCompanyInput {
+  """Dirección de la empresa"""
+  address: String
+
+  """Documento de la empresa"""
+  document: String
+
+  """Url del logo de la empresa"""
+  logo: String
+
+  """Nombre de la empresa"""
+  name: String
+
+  """Teléfono de la empresa"""
+  phone: String
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean
+}
+
+"""Datos para actualizar el cupón"""
+input UpdateCouponInput {
+  """Estado del cupón"""
+  status: StatusCoupon
 }
 
 """Datos para actualizar un crédito"""
@@ -5929,6 +6329,24 @@ input UpdateOrderInput {
 
   """Estado del pedido"""
   status: StatusOrder
+}
+
+"""Datos para actualizar método de pago"""
+input UpdatePaymentInput {
+  """Estado del método de pago"""
+  active: Boolean!
+
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logoId: String
+
+  """Nombre del método de pago"""
+  name: String
+
+  """Tipo de método de pago"""
+  type: TypePayment
 }
 
 """Datos para actualizar el producto"""
@@ -6019,6 +6437,36 @@ input UpdateRoleInput {
 
   """Identificadores de los permisos seleccionados"""
   permissionIds: [String!]
+}
+
+"""Datos para actualizar la tienda"""
+input UpdateShopInput {
+  """Dirección de la tienda"""
+  address: String
+
+  """Identificador de la empresa para la tienda"""
+  companyId: String
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Estado de la tienda"""
+  status: StatusShop
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
 }
 
 """Datos para actualizar la talla"""
@@ -6127,6 +6575,21 @@ input UpdateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para actualizar """
+input UpdateWarehouseInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Inventario máximo de productos"""
+  max: Float
+
+  """Inventario mínimo de productos"""
+  min: Float
+
+  """Nombre de la bodega"""
+  name: String
 }
 
 """Enlaces de diferences tipos"""
