@@ -19,6 +19,26 @@ export class CouponsResolver {
 		description: 'Consultar cupón',
 	})
 	@RequirePermissions(Permissions.READ_CRM_COUPONS)
+	findAll(
+		@Args({
+			name: 'filtersCouponInput',
+			description: 'Filtros para consultar un cupón',
+		})
+		_: FiltersCouponInput,
+		@Context() context,
+	) {
+		return this.couponsService.findAll(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
+	}
+
+	@Query(() => Coupon, {
+		name: 'coupon',
+		description: 'Consultar cupón',
+	})
+	@RequirePermissions(Permissions.READ_CRM_COUPONS)
 	findOne(
 		@Args({
 			name: 'filtersCouponInput',
