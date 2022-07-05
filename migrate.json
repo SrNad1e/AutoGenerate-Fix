@@ -662,9 +662,9 @@
 		},
 		{
 			"module": "Tesorería",
-			"option": "Medio de pago",
+			"option": "Método de pago",
 			"name": "Consultar",
-			"description": "Permite consultar los medios de pago",
+			"description": "Permite consultar los métodos de pago",
 			"action": "READ_TREASURY_PAYMENTS"
 		},
 		{
@@ -711,9 +711,9 @@
 		},
 		{
 			"module": "Tesorería",
-			"option": "Medio de pago",
+			"option": "Método de pago",
 			"name": "Acceder",
-			"description": "Permite acceder a los medios de pago",
+			"description": "Permite acceder a los métodos de pago",
 			"action": "ACCESS_TREASURY_PAYMENTS"
 		},
 		{
@@ -721,7 +721,7 @@
 			"option": "Recibo de caja",
 			"name": "Acceder",
 			"description": "Permite acceder a los recibos de caja",
-			"action": "ACCESS_TREASURY_PAYMENTS"
+			"action": "ACCESS_TREASURY_RECEIPT"
 		},
 		{
 			"module": "Tesorería",
@@ -801,7 +801,7 @@
 			"action": "PRINT_TREASURY_RECEIPT"
 		},
 		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Tipo de cliente",
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
@@ -834,6 +834,108 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar la autorización de facturación",
 			"action": "UPDATE_INVOICING_AUTHORIZATIONS"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Crear",
+			"description": "Permite crear la caja",
+			"action": "CREATE_TREASURY_BOX"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Caja",
+			"name": "Actualizar",
+			"description": "Permite actualizar la caja",
+			"action": "UPDATE_TREASURY_BOX"
+		},
+		{
+			"option": "Método de pago",
+			"name": "Crear",
+			"description": "Permite crear el método de pago",
+			"action": "CREATE_TREASURY_PAYMENT"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Método de pago",
+			"name": "Actualizar",
+			"description": "Permite actualizar el método de pago",
+			"action": "UPDATE_TREASURY_PAYMENT"
+		},
+		{
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Crear",
+			"description": "Permite crear el cupón",
+			"action": "CREATE_CRM_COUPON"
+		},
+		{
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Actualizar",
+			"description": "Permite actualizar el cupón",
+			"action": "UPDATE_CRM_COUPON"
+		},
+		{
+			"option": "Ciudad",
+			"name": "Crear",
+			"description": "Permite crear la ciudad",
+			"action": "CREATE_CRM_CITY"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Actualizar",
+			"description": "Permite actualizar la ciudad",
+			"action": "UPDATE_CRM_CITY"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Acceder",
+			"description": "Permite acceder a las bodegas",
+			"action": "ACCESS_CONFIGURATION_WAREHOUSES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Crear",
+			"description": "Permite crear la bodega",
+			"action": "CREATE_CONFIGURATION_WAREHOUSE"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Actualizar",
+			"description": "Permite actualizar la bodega",
+			"action": "UPDATE_CONFIGURATION_WAREHOUSE"
+		},
+		{
+			"option": "Tienda",
+			"name": "Acceder",
+			"description": "Permite acceder las tiendas",
+			"action": "ACCESS_CONFIGURATION_SHOPS"
+		},
+		{
+			"module": "Configuración",
+			"option": "Tienda",
+			"name": "Crear",
+			"description": "Permite crear la tienda",
+			"action": "CREATE_CONFIGURATION_SHOP"
+		},
+		{
+			"module": "Configuración",
+			"option": "Tienda",
+			"name": "Actualizar",
+			"description": "Permite actualizar la tienda",
+			"action": "UPDATE_CONFIGURATION_SHOP"
+		},
+		{
+			"module": "Facturación",
+			"option": "Pedido",
+			"name": "Imprimir",
+			"description": "Permite imprimir el pedido de facturación",
+			"action": "PRINT_INVOICING_ORDER"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS

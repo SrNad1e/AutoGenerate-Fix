@@ -10,4 +10,10 @@ export class UpdateShopInput extends PartialType(CreateShopInput) {
 		nullable: true,
 	})
 	status: StatusShop;
+
+	@Field(() => String, {
+		description: 'Identificador de la empresa para la tienda',
+		nullable: true,
+	})
+	companyId?: string;
 }

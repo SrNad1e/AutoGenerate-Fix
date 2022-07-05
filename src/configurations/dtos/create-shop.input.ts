@@ -22,11 +22,6 @@ export class CreateShopInput {
 	})
 	defaultWarehouseId: string;
 
-	@Field(() => String, {
-		description: 'Identificador de la empresa para la tienda',
-	})
-	companyId: string;
-
 	@Field(() => Boolean, {
 		description: 'Es centro de distribución',
 		nullable: true,
