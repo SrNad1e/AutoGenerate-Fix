@@ -19,5 +19,5 @@ export class CreatePaymentInput {
 		description: 'Identificador de la imagen del método de pago',
 		nullable: true,
 	})
-	logo?: string;
+	logoId?: string;
 }
