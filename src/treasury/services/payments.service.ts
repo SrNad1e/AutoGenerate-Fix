@@ -54,7 +54,10 @@ export class PaymentsService {
 		return this.paymentModel.findById(id).lean();
 	}
 
-	async create({ type, name, ...params }: CreatePaymentInput, user: User) {
+	async create(
+		{ type, name, logoId, ...params }: CreatePaymentInput,
+		user: User,
+	) {
 		const payment = await this.paymentModel.findOne({ name });
 
 		if (payment) {
@@ -65,6 +68,7 @@ export class PaymentsService {
 
 		return this.paymentModel.create({
 			type: TypePayment[type],
+			logo: new Types.ObjectId(logoId),
 			name,
 			...params,
 			user,
@@ -73,7 +77,7 @@ export class PaymentsService {
 
 	async update(
 		id: string,
-		{ type, ...params }: UpdatePaymentInput,
+		{ type, logoId, ...params }: UpdatePaymentInput,
 		user: User,
 	) {
 		const payment = await this.findById(id);
@@ -86,6 +90,7 @@ export class PaymentsService {
 			id,
 			{
 				type: TypePayment[type],
+				logo: new Types.ObjectId(logoId),
 				...params,
 				user,
 			},

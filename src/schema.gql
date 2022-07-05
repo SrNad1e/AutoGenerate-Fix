@@ -839,7 +839,7 @@ input CreatePaymentInput {
   color: String
 
   """Identificador de la imagen del método de pago"""
-  logo: String
+  logoId: String
 
   """Nombre del método de pago"""
   name: String!
@@ -6089,7 +6089,7 @@ input UpdatePaymentInput {
   color: String
 
   """Identificador de la imagen del método de pago"""
-  logo: String
+  logoId: String
 
   """Nombre del método de pago"""
   name: String
