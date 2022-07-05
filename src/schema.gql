@@ -3529,8 +3529,8 @@ type Query {
 
   """Consultar cupones"""
   coupons(
-    """Filtros para consultar un cupón"""
-    filtersCouponInput: FiltersCouponsInput!
+    """Filtros para consultar los cupones"""
+    filtersCouponsInput: FiltersCouponsInput!
   ): Coupon!
 
   """Crédito"""

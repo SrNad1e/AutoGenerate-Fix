@@ -6,6 +6,7 @@ import {
 import { CreateCouponInput } from '../dtos/create-coupon.input';
 import { FiltersCouponInput } from '../dtos/filters-coupon.input';
 import { FiltersCouponsInput } from '../dtos/filters-coupons.input';
+import { ResponseCoupons } from '../dtos/response-coupons';
 import { UpdateCouponInput } from '../dtos/update-coupon.input';
 
 import { Coupon } from '../entities/coupon.entity';
@@ -15,7 +16,7 @@ import { CouponsService } from '../services/coupons.service';
 export class CouponsResolver {
 	constructor(private readonly couponsService: CouponsService) {}
 
-	@Query(() => Coupon, {
+	@Query(() => ResponseCoupons, {
 		name: 'coupons',
 		description: 'Consultar cupones',
 	})
@@ -23,7 +24,7 @@ export class CouponsResolver {
 	findAll(
 		@Args({
 			name: 'filtersCouponsInput',
-			description: 'Filtros para consultar un cupón',
+			description: 'Filtros para consultar los cupones',
 		})
 		_: FiltersCouponsInput,
 		@Context() context,
