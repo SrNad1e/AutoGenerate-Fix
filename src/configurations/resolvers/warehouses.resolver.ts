@@ -1,11 +1,13 @@
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
 	Permissions,
 	RequirePermissions,
 } from 'src/configurations/libs/permissions.decorator';
+import { CreateWarehouseInput } from '../dtos/create-warehouse.input';
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { ResponseWarehouses } from '../dtos/response-warehouses';
+import { UpdateWarehouseInput } from '../dtos/update-warehouse.input';
 import { Warehouse } from '../entities/warehouse.entity';
 import { WarehousesService } from '../services/warehouses.service';
 
@@ -48,5 +50,48 @@ export class WarehousesResolver {
 		id: string,
 	) {
 		return this.warehousesService.findById(id);
+	}
+
+	@Mutation(() => Warehouse, {
+		name: 'createWarehouse',
+		description: 'Crea una bodega',
+	})
+	@RequirePermissions(Permissions.CREATE_CONFIGURATION_WAREHOUSE)
+	create(
+		@Args('createWarehouseInput', {
+			description: 'Datos para la creación de la bodega',
+		})
+		_: CreateWarehouseInput,
+		@Context() context,
+	) {
+		return this.warehousesService.create(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
+	}
+
+	@Mutation(() => Warehouse, {
+		name: 'updateWarehouse',
+		description: 'Actualiza una bodega',
+	})
+	@RequirePermissions(Permissions.UPDATE_CONFIGURATION_WAREHOUSE)
+	update(
+		@Args('id', {
+			description: 'Identificador de la bodega para actualizar',
+		})
+		id: string,
+		@Args('updateWarehouseInput', {
+			description: 'Datos para actualizar la bodega',
+		})
+		_: UpdateWarehouseInput,
+		@Context() context,
+	) {
+		return this.warehousesService.update(
+			id,
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
 	}
 }

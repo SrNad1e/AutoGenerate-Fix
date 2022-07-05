@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { User } from 'src/configurations/entities/user.entity';
+import { CreateCityInput } from '../dtos/create-city.input';
 import { FiltersCitiesInput } from '../dtos/filters-cities-input';
+import { UpadteCityInput } from '../dtos/update-city.input';
 import { City } from '../entities/city.entity';
 
 @Injectable()
@@ -29,21 +32,21 @@ export class CitiesService {
 		if (name) {
 			filters.name = {
 				$regex: name,
-				options: 'i',
+				$options: 'i',
 			};
 		}
 
 		if (state) {
 			filters.state = {
 				$regex: state,
-				options: 'i',
+				$options: 'i',
 			};
 		}
 
 		if (country) {
 			filters.country = {
 				$regex: country,
-				options: 'i',
+				$options: 'i',
 			};
 		}
 
@@ -59,5 +62,32 @@ export class CitiesService {
 
 	async findById(id: string) {
 		return this.cityModel.findById(id).lean();
+	}
+
+	async create(params: CreateCityInput, user: User) {
+		const city = await this.cityModel.findOne(params);
+
+		if (city) {
+			throw new BadGatewayException('La ciudad que intenta crear ya existe');
+		}
+
+		return this.cityModel.create({ ...params, user });
+	}
+
+	async update(id: string, params: UpadteCityInput, user: User) {
+		const city = await this.findById(id);
+
+		if (!city) {
+			throw new BadGatewayException('La ciudad no existe');
+		}
+
+		return this.cityModel.findByIdAndUpdate(
+			id,
+			{ ...params, user },
+			{
+				lean: true,
+				new: true,
+			},
+		);
 	}
 }
