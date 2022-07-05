@@ -3471,7 +3471,7 @@ type Query {
   coupons(
     """Filtros para consultar los cupones"""
     filtersCouponsInput: FiltersCouponsInput!
-  ): Coupon!
+  ): ResponseCoupons!
 
   """Crédito"""
   credit(
@@ -4144,6 +4144,39 @@ type ResponseColors {
 type ResponseConveyors {
   """Lista de transportadoras"""
   docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de cupones"""
+type ResponseCoupons {
+  """Lista de cupones"""
+  docs: [Coupon!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
