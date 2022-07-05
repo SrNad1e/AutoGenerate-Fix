@@ -806,8 +806,35 @@
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
 			"action": "READ_CRM_CUSTOMERTYPES"
+		},
+		{
+			"module": "Facturación",
+			"option": "Autorización DIAN",
+			"name": "Acceder",
+			"description": "Permite acceder a las autorizaciones de facturación",
+			"action": "ACCESS_INVOICING_AUTHORIZATIONS"
+		},
+		{
+			"module": "Facturación",
+			"option": "Autorización DIAN",
+			"name": "Consultar",
+			"description": "Permite consultarlas autorizaciones de facturación",
+			"action": "READ_INVOICING_AUTHORIZATIONS"
+		},
+		{
+			"module": "Facturación",
+			"option": "Autorización DIAN",
+			"name": "Crear",
+			"description": "Permite crear la autorización de facturación",
+			"action": "CREATE_INVOICING_AUTHORIZATIONS"
+		},
+		{
+			"module": "Facturación",
+			"option": "Autorización DIAN",
+			"name": "Actualizar",
+			"description": "Permite actualizar la autorización de facturación",
+			"action": "UPDATE_INVOICING_AUTHORIZATIONS"
 		}
-		
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
 	"roles": [

@@ -36,6 +36,7 @@ import {
 import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver';
 import { CreditsModule } from 'src/credits/credits.module';
 import { AuthorizationsService } from './services/authorizations.service';
+import { AuthorizationsResolver } from './resolvers/authorizations.resolver';
 
 @Module({
 	imports: [
@@ -112,6 +113,7 @@ import { AuthorizationsService } from './services/authorizations.service';
 		ClosesZinvoicingService,
 		ClosesZinvoicingResolver,
 		AuthorizationsService,
+		AuthorizationsResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
