@@ -881,6 +881,13 @@
 			"name": "Imprimir",
 			"description": "Permite imprimir el pedido de facturación",
 			"action": "PRINT_INVOICING_ORDER"
+		},
+		{
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Imprimir",
+			"description": "Permite imprimir el cupón",
+			"action": "PRINT_CRM_COUPON"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
