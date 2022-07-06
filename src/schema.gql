@@ -1679,6 +1679,9 @@ input FiltersBoxesInput {
 
   """Página actual"""
   page: Float
+
+  """Ordenamiento"""
+  sort: SortBox
 }
 
 """Filtros para la lista de marcas"""
@@ -5346,6 +5349,16 @@ input SortAttrib {
   active: Float
   createdAt: Float
   name: Float
+  updatedAt: Float
+}
+
+"""Ordenamiento de las cajas"""
+input SortBox {
+  base: Float
+  createdAt: Float
+  isMain: Float
+  name: Float
+  total: Float
   updatedAt: Float
 }
 

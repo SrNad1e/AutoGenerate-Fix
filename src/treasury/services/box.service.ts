@@ -19,7 +19,7 @@ export class BoxService {
 	) {}
 
 	async findAll(
-		{ _id, name, limit = 10, page = 1 }: FiltersBoxesInput,
+		{ _id, name, limit = 10, page = 1, sort }: FiltersBoxesInput,
 		user: User,
 		companyId: string,
 	) {
@@ -43,7 +43,7 @@ export class BoxService {
 		const options = {
 			limit,
 			page,
-
+			sort,
 			lean: true,
 		};
 
