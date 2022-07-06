@@ -2921,8 +2921,11 @@ type Mutation {
 
   """Actualiza una autorización de facturación"""
   updateAuthorization(
+    """Identificador de la autorización"""
+    id: String!
+
     """Datos para actualizar la autorización de facturación"""
-    updateAuthorizationInput: CreateAuthorizationInput = {}
+    updateAuthorizationInput: UpdateAuthorizationInput = {}
   ): AuthorizationDian!
 
   """Actualiza una caja"""
@@ -6273,6 +6276,12 @@ input UpdateAttribInput {
 
   """Valor asignado al atributo"""
   name: String
+}
+
+"""Datos para actualizar la autorización"""
+input UpdateAuthorizationInput {
+  """Prefijo de facturación"""
+  prefix: String
 }
 
 """Datos para actualizar caja"""
