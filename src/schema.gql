@@ -2723,7 +2723,7 @@ type Mutation {
   """Crea una autorización de facturación"""
   createAuthorization(
     """Datos para crear la autorización de facturación"""
-    createAuthorization: CreateAuthorizationInput = {}
+    createAuthorizationInput: CreateAuthorizationInput!
   ): AuthorizationDian!
 
   """Crea una caja"""
@@ -2918,6 +2918,12 @@ type Mutation {
     """Datos a actualizar en el atributo"""
     updateAttribInput: UpdateAttribInput!
   ): Attrib!
+
+  """Actualiza una autorización de facturación"""
+  updateAuthorization(
+    """Datos para actualizar la autorización de facturación"""
+    updateAuthorizationInput: CreateAuthorizationInput = {}
+  ): AuthorizationDian!
 
   """Actualiza una caja"""
   updateBox(

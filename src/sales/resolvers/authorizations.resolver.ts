@@ -7,6 +7,7 @@ import {
 import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
 import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { ResponseAuthorizations } from '../dtos/response-authorizations';
+import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
 import { AuthorizationsService } from '../services/authorizations.service';
 
@@ -43,15 +44,37 @@ export class AuthorizationsResolver {
 	@RequirePermissions(Permissions.CREATE_INVOICING_AUTHORIZATION)
 	create(
 		@Args({
-			name: 'createAuthorization',
-			nullable: true,
-			defaultValue: {},
+			name: 'createAuthorizationInput',
 			description: 'Datos para crear la autorización de facturación',
 		})
 		_: CreateAuthorizationInput,
 		@Context() context,
 	) {
 		return this.authorizationsService.create(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
+		);
+	}
+
+	@Mutation(() => AuthorizationDian, {
+		name: 'updateAuthorization',
+		description: 'Actualiza una autorización de facturación',
+	})
+	@RequirePermissions(Permissions.UPDATE_INVOICING_AUTHORIZATION)
+	update(
+		@Args('id', { description: 'Identificador de la autorización' }) id: string,
+		@Args({
+			name: 'updateAuthorizationInput',
+			nullable: true,
+			defaultValue: {},
+			description: 'Datos para actualizar la autorización de facturación',
+		})
+		_: UpdateAuthorizationInput,
+		@Context() context,
+	) {
+		return this.authorizationsService.update(
+			id,
 			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
