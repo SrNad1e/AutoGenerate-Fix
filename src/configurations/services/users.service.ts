@@ -274,6 +274,7 @@ export class UsersService {
 		idCompany: string,
 	): Promise<User> {
 		const user = await this.findById(id);
+
 		if (!user) {
 			throw new NotFoundException(`Usuario que intenta actualizar no existe`);
 		}
@@ -294,8 +295,8 @@ export class UsersService {
 		}
 
 		let newStatus;
-		if (StatusUser[status]) {
-			newStatus = StatusUser[status];
+		if (status) {
+			newStatus = status;
 		}
 
 		let customer;
