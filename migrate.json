@@ -70,14 +70,14 @@
 			"option": "Entrada",
 			"name": "Consultar",
 			"description": "Permite consultar las entradas de inventario",
-			"action": "READ_INVENTORY_OUTPUTS"
+			"action": "READ_INVENTORY_INPUTS"
 		},
 		{
 			"module": "Inventario",
 			"option": "Salida",
 			"name": "Consultar",
 			"description": "Permite consultar las salidas de inventario",
-			"action": "READ_INVENTORY_INPUTS"
+			"action": "READ_INVENTORY_OUTPUTS"
 		},
 		{
 			"module": "Inventario",
