@@ -62,7 +62,7 @@ export class Shop extends Document {
 	})
 	@Prop({
 		type: Types.ObjectId,
-		ref: Company.name,
+		ref: 'Company',
 		autopopulate: true,
 		required: true,
 	})
@@ -96,7 +96,7 @@ export class Shop extends Document {
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);
 
-@Entity({ name: 'shops' })
+/*@Entity({ name: 'shops' })
 export class ShopMysql {
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -118,4 +118,4 @@ export class ShopMysql {
 
 	@Column({ type: 'datetime' })
 	created_at: string;
-}
+}*/

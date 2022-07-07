@@ -45,7 +45,7 @@ export class Expense extends Document {
 	})
 	@Prop({
 		type: Types.ObjectId,
-		ref: Company.name,
+		ref: 'Company',
 		autopopulate: true,
 	})
 	company: Types.ObjectId;

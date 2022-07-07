@@ -12,7 +12,7 @@ export class ProductsController {
 		private readonly sizesService: SizesService,
 	) {}
 
-	@Get('migrate')
+	/*@Get('migrate')
 	async migrateMysql() {
 		return this.productsService.migration();
 	}
@@ -25,5 +25,5 @@ export class ProductsController {
 	@Get('migrate/sizes')
 	async migrateSizes() {
 		return this.sizesService.migration();
-	}
+	}*/
 }

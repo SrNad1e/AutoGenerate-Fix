@@ -1,7 +1,6 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document, Schema as SchemaMongo } from 'mongoose';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Color } from './color.entity';
 import { Size } from './size.entity';
@@ -112,7 +111,7 @@ export class Product extends Document {
 	updatedAt: Date;
 }
 export const ProductSchema = SchemaFactory.createForClass(Product);
-
+/*
 @Entity({ name: 'products' })
 export class ProductMysql {
 	@PrimaryGeneratedColumn()
@@ -171,4 +170,4 @@ export class ProductMysql {
 
 	@Column({ type: 'double' })
 	shipping_volume: number;
-}
+}*/
