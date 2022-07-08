@@ -150,7 +150,7 @@ export class AuthService {
 			throw new UnauthorizedException(`Usuario no existe`);
 		}
 
-		if (!bcrypt.compareSync(passwordOld, userFind.password)) {
+		if (bcrypt.compareSync(passwordOld, userFind.password)) {
 			throw new UnauthorizedException(`Usuario o contraseña incorrectos`);
 		}
 
