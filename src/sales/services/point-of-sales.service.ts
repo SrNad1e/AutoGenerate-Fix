@@ -10,6 +10,7 @@ import { Shop } from 'src/configurations/entities/shop.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Box } from 'src/treasury/entities/box.entity';
 import { CreatePointOfSaleInput } from '../dtos/create-pointOfSale.input';
+import { FiltersPointOfSalesInput } from '../dtos/filters-point-of-sales.input';
 import { UpdatePointOfSaleInput } from '../dtos/update-pointOfSale.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
@@ -37,7 +38,7 @@ export class PointOfSalesService {
 	) {}
 
 	async findAll(
-		{ shopId, sort, limit = 20, page = 1 }: any,
+		{ shopId, sort, name, _id, limit = 20, page = 1 }: FiltersPointOfSalesInput,
 		user: User,
 		companyId: string,
 	) {
@@ -48,6 +49,17 @@ export class PointOfSalesService {
 
 		if (shopId) {
 			filters.shop = new Types.ObjectId(shopId);
+		}
+
+		if (name) {
+			filters.name = {
+				$regex: name,
+				$options: 'i',
+			};
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {
