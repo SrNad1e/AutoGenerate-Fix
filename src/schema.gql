@@ -1501,6 +1501,7 @@ type DocumentType {
 
 enum DocumentTypesRuler {
   CATEGORIES
+  COMPANY
   CUSTOMERTYPES
 }
 

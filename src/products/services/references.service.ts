@@ -140,7 +140,8 @@ export class ReferencesService {
 				if (customerId) {
 					discount = await this.discountRulesService.getDiscountReference({
 						customerId,
-						reference: reference,
+						reference,
+						companyId,
 					});
 				}
 				responseReferences.push({

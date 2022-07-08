@@ -6,6 +6,7 @@ import { User } from 'src/configurations/entities/user.entity';
 export enum DocumentTypesRuler {
 	CUSTOMERTYPES = 'customerTypes',
 	CATEGORIES = 'categories',
+	COMPANY = 'company',
 }
 
 registerEnumType(DocumentTypesRuler, { name: 'DocumentTypesRuler' });

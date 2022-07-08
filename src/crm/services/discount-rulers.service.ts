@@ -17,7 +17,11 @@ export class DiscountRulersService {
 		private readonly customersService: CustomersService,
 	) {}
 
-	async getDiscountReference({ customerId, reference }: FindDiscountInput) {
+	async getDiscountReference({
+		customerId,
+		reference,
+		companyId,
+	}: FindDiscountInput) {
 		const discountRulers = await this.discountRuler.find({
 			dateInitial: {
 				$gt: new Date(),
@@ -67,6 +71,15 @@ export class DiscountRulersService {
 									pass = true;
 								}
 
+								break;
+
+							case DocumentTypesRuler.COMPANY:
+								if (!documentIds.includes(companyId)) {
+									pass = false;
+									i = rules?.length;
+								} else {
+									pass = true;
+								}
 								break;
 							default:
 								break;

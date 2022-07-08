@@ -292,6 +292,7 @@ export class OrdersService {
 						{
 							customerId: customer._id.toString(),
 							reference: detail?.product?.reference as any,
+							companyId,
 						},
 					);
 
@@ -802,6 +803,7 @@ export class OrdersService {
 				const discount = await this.discountRulesService.getDiscountReference({
 					customerId: order?.customer?._id.toString(),
 					reference: product?.reference as any,
+					companyId,
 				});
 
 				newDetails.push({
