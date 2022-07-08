@@ -14,11 +14,7 @@ import { CreateShopInput } from '../dtos/create-shop.input';
 import { FiltersShopInput } from '../dtos/filters-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { UpdateShopInput } from '../dtos/update-shop.input';
-import {
-	Shop,
-	ShopMysql,
-	StatusShop,
-} from '../../configurations/entities/shop.entity';
+import { Shop, StatusShop } from '../../configurations/entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
 
@@ -37,8 +33,8 @@ const populate = [
 export class ShopsService {
 	constructor(
 		@InjectModel(Shop.name) private readonly shopModel: PaginateModel<Shop>,
-		@InjectRepository(ShopMysql)
-		private readonly shopMysqlRepo: Repository<ShopMysql>,
+		/*@InjectRepository(ShopMysql)
+		private readonly shopMysqlRepo: Repository<ShopMysql>,*/
 		@InjectModel(Warehouse.name)
 		private readonly warehouseModel: PaginateModel<Warehouse>,
 		private readonly companiesService: CompaniesService,
@@ -215,7 +211,7 @@ export class ShopsService {
 			.lean();
 	}
 
-	async migrate() {
+	/*async migrate() {
 		try {
 			const shopsMysql = await this.shopMysqlRepo.find();
 			const companyDefault = await this.companiesService.findOne('Cirotex');
@@ -252,5 +248,5 @@ export class ShopsService {
 		} catch (e) {
 			return new NotFoundException(`Error al realizar la migración ${e}`);
 		}
-	}
+	}*/
 }

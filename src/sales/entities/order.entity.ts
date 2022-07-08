@@ -42,6 +42,9 @@ export class DetailOrder {
 	@Field(() => Number, { description: 'Cantidad de productos en el pedido' })
 	quantity: number;
 
+	@Field(() => Number, { description: 'Cantidad de productos devueltos' })
+	quantityReturn: number;
+
 	@Field(() => Number, { description: 'Descuento del producto en el pedido' })
 	discount: number;
 

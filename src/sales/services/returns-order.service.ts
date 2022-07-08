@@ -7,7 +7,7 @@ import { FiltersReturnsOrderInput } from '../dtos/filters-returns-order';
 import { ReturnOrder } from '../entities/return-order.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateReturnOrderInput } from '../dtos/create-return-order-input';
-import { Order, StatusOrder } from '../entities/order.entity';
+import { DetailOrder, Order, StatusOrder } from '../entities/order.entity';
 import { OrdersService } from './orders.service';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { CouponsService } from 'src/crm/services/coupons.service';
@@ -99,8 +99,6 @@ export class ReturnsOrderService {
 			lean: true,
 		};
 
-
-
 		return this.returnOrderModel.paginate(filters, options);
 	}
 
@@ -126,6 +124,7 @@ export class ReturnsOrderService {
 		}
 
 		const detailsReturn = [];
+		let detailsOrder: DetailOrder[] = order?.details as DetailOrder[];
 
 		for (let i = 0; i < details.length; i++) {
 			const { productId, quantity } = details[i];
@@ -146,11 +145,26 @@ export class ReturnsOrderService {
 				);
 			}
 
-			if (quantity > detail?.quantity) {
+			if (quantity > detail?.quantity - detail?.quantityReturn) {
 				throw new BadRequestException(
-					`El pedido solo tiene ${detail?.quantity} para el producto  ${detail?.product?.reference['name']} / ${detail?.product?.barcode}`,
+					`El pedido solo tiene ${
+						detail?.quantity - detail?.quantityReturn
+					} para el producto  ${detail?.product?.reference['name']} / ${
+						detail?.product?.barcode
+					}`,
 				);
 			}
+
+			detailsOrder = detailsOrder.map((item) => {
+				if (item?.product?._id.toString() === productId) {
+					return {
+						...item,
+						quantityReturn: item.quantityReturn + quantity,
+					};
+				}
+
+				return item;
+			});
 
 			detailsReturn.push({
 				product: detail?.product,
@@ -197,6 +211,11 @@ export class ReturnsOrderService {
 			coupon: coupon._id,
 			user,
 		});
+
+		await this.ordersService.updateProducts(
+			order?._id.toString(),
+			detailsOrder,
+		);
 
 		await this.stockHistoryService.addStock(
 			{

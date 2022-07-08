@@ -866,6 +866,27 @@ input CreateCustomerInput {
   phone: String
 }
 
+"""Datos para crear un descuento"""
+input CreateDiscountRuleInput {
+  """Fecha final para aplicar el descuento"""
+  dateFinal: String!
+
+  """Fecha inicial para aplicar el descuento"""
+  dateInitial: String!
+
+  """Nombre del descuento"""
+  name: String!
+
+  """Porcentaje del descuento"""
+  percent: Float
+
+  """Reglas a aplicar"""
+  rules: [RuleInput!]!
+
+  """Valor del descuento"""
+  value: Float
+}
+
 """Datos para crear Egreso"""
 input CreateExpenseInput {
   """Identificador de la caja"""
@@ -1427,6 +1448,9 @@ type DetailOrder {
   """Cantidad de productos en el pedido"""
   quantity: Float!
 
+  """Cantidad de productos devueltos"""
+  quantityReturn: Float!
+
   """Estado del producto"""
   status: String!
 
@@ -1619,6 +1643,42 @@ type DetailTransfer {
   updatedAt: DateTime!
 }
 
+"""Reglas de descuento"""
+type DiscountRule {
+  """Identificación de mongo"""
+  _id: String!
+
+  """Descuenti activo"""
+  active: Boolean!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Fecha y hora del final del descuento"""
+  dateFinal: DateTime!
+
+  """Fecha y hora de inicio del descuento"""
+  dateInitial: DateTime!
+
+  """Nombre de la regla"""
+  name: String!
+
+  """Valor del porcentaje del descuento"""
+  percent: Float!
+
+  """Reglas para aplicar el descuento"""
+  rules: [Rule!]!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el descuento"""
+  user: User!
+
+  """Valor del descuento"""
+  value: Float!
+}
+
 """Tipo de documento de identificación"""
 type DocumentType {
   """Identificador de mongo"""
@@ -1640,8 +1700,9 @@ type DocumentType {
   user: User!
 }
 
-enum DocumentTypesRuler {
+enum DocumentTypesRule {
   CATEGORIES
+  COMPANY
   CUSTOMERTYPES
 }
 
@@ -2029,6 +2090,30 @@ input FiltersCustomersInput {
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortCustomer
+}
+
+"""Filtros para consultar las reglas de descuentos"""
+input FiltersDiscountRulesInput {
+  """Si el descuento se encuentra activo"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para el nombre de la regla"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Porcentaje del descuento"""
+  percent: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortDiscountRule
+
+  """Valor en cantidad del descuento"""
+  value: Float
 }
 
 """Filtros para los tipos de documento"""
@@ -2810,6 +2895,12 @@ type Mutation {
     createCustomerInput: CreateCustomerInput!
   ): Customer!
 
+  """Se encarga crear un descuento"""
+  createDiscountRule(
+    """Parámetros para crear el descuento"""
+    createDiscountRuleInput: CreateDiscountRuleInput!
+  ): DiscountRule!
+
   """Crea un egreso"""
   createExpense(
     """Datos para la creación del egreso"""
@@ -2945,8 +3036,11 @@ type Mutation {
 
   """Actualiza una autorización de facturación"""
   updateAuthorization(
+    """Identificador de la autorización"""
+    id: String!
+
     """Datos para actualizar la autorización de facturación"""
-    updateAuthorizationInput: CreateAuthorizationInput = {}
+    updateAuthorizationInput: UpdateAuthorizationInput = {}
   ): AuthorizationDian!
 
   """Actualiza una caja"""
@@ -3029,6 +3123,15 @@ type Mutation {
     """Parámetros para actualizar el cliente"""
     updateCustomerInput: UpdateCustomerInput!
   ): Customer!
+
+  """Se encarga actualizar un descuento"""
+  updateDiscountRule(
+    """Identificador del descuento"""
+    id: String!
+
+    """Parámetros para actualizar el descuento"""
+    updateDiscountRuleInput: UpdateDiscountRuleInput!
+  ): DiscountRule!
 
   """Actualiza un egreso"""
   updateExpense(
@@ -3372,6 +3475,7 @@ enum Permissions {
   ACCESS_CRM_CITIES
   ACCESS_CRM_COUPONS
   ACCESS_CRM_CUSTOMERS
+  ACCESS_CRM_DISCOUNTRULES
   ACCESS_ERP
   ACCESS_INVENTORY_ADJUSTMENTS
   ACCESS_INVENTORY_ATTRIBS
@@ -3405,6 +3509,7 @@ enum Permissions {
   CREATE_CRM_CITY
   CREATE_CRM_COUPON
   CREATE_CRM_CUSTOMER
+  CREATE_CRM_DISCOUNTRULE
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
   CREATE_INVENTORY_BRAND
@@ -3451,6 +3556,7 @@ enum Permissions {
   READ_CRM_COUPONS
   READ_CRM_CUSTOMERS
   READ_CRM_CUSTOMERTYPES
+  READ_CRM_DISCOUNTRULES
   READ_INVENTORY_ADJUSTMENTS
   READ_INVENTORY_ATTRIBS
   READ_INVENTORY_BRANDS
@@ -3482,6 +3588,7 @@ enum Permissions {
   UPDATE_CRM_CITY
   UPDATE_CRM_COUPON
   UPDATE_CRM_CUSTOMER
+  UPDATE_CRM_DISCOUNTRULE
   UPDATE_INVENTORY_ADJUSTMENT
   UPDATE_INVENTORY_ATTRIB
   UPDATE_INVENTORY_BRAND
@@ -3695,6 +3802,12 @@ type Query {
     """Filtros para consultar el listado de clientes"""
     filtersCustomerInput: FiltersCustomersInput = {}
   ): ResponseCustomers!
+
+  """Listado de descuentos"""
+  discountRules(
+    """Filtros para consultar el listado de descuentos"""
+    filtersDiscountRulesInput: FiltersDiscountRulesInput = {}
+  ): ResponseDiscountRules!
 
   """Listado de tipos de documento"""
   documentTypes(
@@ -4588,6 +4701,39 @@ type ResponseCustomers {
   totalPages: Float!
 }
 
+"""Respuesta del listado de reglas de descuento"""
+type ResponseDiscountRules {
+  """Lista de reglas de descuento"""
+  docs: [DiscountRule!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta a la consulta de egresos"""
 type ResponseExpenses {
   """Lista de egresos"""
@@ -5335,7 +5481,19 @@ type Rule {
   documentIds: [String!]!
 
   """Tipo de documento para validar el descuento"""
-  documentType: DocumentTypesRuler!
+  documentType: DocumentTypesRule!
+
+  """Tipo de regla que deben cumplir los documentos"""
+  type: [TypesRule!]!
+}
+
+"""Regla de descuento"""
+input RuleInput {
+  """Identificador de los documentos"""
+  documentIds: [String!]!
+
+  """Tipo de documento para validar el descuento"""
+  documentType: DocumentTypesRule!
 
   """Tipo de regla que deben cumplir los documentos"""
   type: [String!]!
@@ -5677,6 +5835,18 @@ input SortCustomer {
 
   """ordernamiento por teléfono"""
   phone: Float
+}
+
+"""Datos para el ordenamiento"""
+input SortDiscountRule {
+  active: Float
+  createdAt: Float
+  dateFinal: Float
+  dateInitial: Float
+  name: Float
+  percent: Float
+  updatedAt: Float
+  value: Float
 }
 
 """Ordenamiento de los egresos"""
@@ -6304,6 +6474,14 @@ enum TypePayment {
   CREDIT
 }
 
+enum TypesRule {
+  EQUAL
+  GREATER
+  GREATERTHANOREQUAL
+  LESS
+  LESSTHANOREQUAL
+}
+
 """Datos para actualizar la ciudad"""
 input UpadteCityInput {
   """Nombre del país"""
@@ -6323,6 +6501,12 @@ input UpdateAttribInput {
 
   """Valor asignado al atributo"""
   name: String
+}
+
+"""Datos para actualizar la autorización"""
+input UpdateAuthorizationInput {
+  """Prefijo de facturación"""
+  prefix: String
 }
 
 """Datos para actualizar caja"""
@@ -6452,6 +6636,30 @@ input UpdateCustomerInput {
 
   """Número de teléfono"""
   phone: String
+}
+
+"""Datos para actualizar el descuento"""
+input UpdateDiscountRuleInput {
+  """Estado del descuento"""
+  active: Boolean!
+
+  """Fecha final para aplicar el descuento"""
+  dateFinal: String
+
+  """Fecha inicial para aplicar el descuento"""
+  dateInitial: String
+
+  """Nombre del descuento"""
+  name: String
+
+  """Porcentaje del descuento"""
+  percent: Float
+
+  """Reglas a aplicar"""
+  rules: [RuleInput!]
+
+  """Valor del descuento"""
+  value: Float
 }
 
 """Datos para actualizar el egreso"""

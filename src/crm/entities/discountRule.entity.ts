@@ -3,14 +3,15 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
 
-export enum DocumentTypesRuler {
+export enum DocumentTypesRule {
 	CUSTOMERTYPES = 'customerTypes',
 	CATEGORIES = 'categories',
+	COMPANY = 'company',
 }
 
-registerEnumType(DocumentTypesRuler, { name: 'DocumentTypesRuler' });
+registerEnumType(DocumentTypesRule, { name: 'DocumentTypesRule' });
 
-export enum TypesRuler {
+export enum TypesRule {
 	EQUAL = 'equal',
 	GREATER = 'greater',
 	LESS = 'less',
@@ -18,29 +19,29 @@ export enum TypesRuler {
 	GREATERTHANOREQUAL = 'greaterThanOrEqual',
 }
 
-registerEnumType(TypesRuler, { name: 'TypesRuler' });
+registerEnumType(TypesRule, { name: 'TypesRule' });
 
 @ObjectType({ description: 'Reglas para el descuento' })
 export class Rule {
-	@Field(() => DocumentTypesRuler, {
+	@Field(() => DocumentTypesRule, {
 		description: 'Tipo de documento para validar el descuento',
 	})
-	documentType: DocumentTypesRuler;
+	documentType: DocumentTypesRule;
 
 	@Field(() => [String], {
 		description: 'Identificador de los documentos',
 	})
 	documentIds: string[];
 
-	@Field(() => [String], {
+	@Field(() => [TypesRule], {
 		description: 'Tipo de regla que deben cumplir los documentos',
 	})
-	type: TypesRuler;
+	type: TypesRule;
 }
 
 @ObjectType({ description: 'Reglas de descuento' })
 @Schema({ timestamps: true })
-export class DiscountRuler extends Document {
+export class DiscountRule extends Document {
 	@Field(() => String, { description: 'Identificación de mongo' })
 	_id: Types.ObjectId;
 
@@ -68,6 +69,10 @@ export class DiscountRuler extends Document {
 	@Prop({ type: Date, required: true })
 	dateFinal: Date;
 
+	@Field(() => Boolean, { description: 'Descuenti activo' })
+	@Prop({ type: Boolean, default: true })
+	active: boolean;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el descuento',
 	})
@@ -81,4 +86,4 @@ export class DiscountRuler extends Document {
 	updatedAt: Date;
 }
 
-export const DiscountRulerSchema = SchemaFactory.createForClass(DiscountRuler);
+export const DiscountRuleSchema = SchemaFactory.createForClass(DiscountRule);

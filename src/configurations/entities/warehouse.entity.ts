@@ -35,7 +35,7 @@ export class Warehouse extends Document {
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece la bodega',
 	})
-	@Prop({ type: Types.ObjectId, required: true, ref: Company.name })
+	@Prop({ type: Types.ObjectId, required: true, ref: 'Company' })
 	company: Types.ObjectId;
 
 	@Field(() => User, { description: 'Usuario que creó el usuario' })
@@ -51,7 +51,7 @@ export class Warehouse extends Document {
 
 export const WarehouseSchema = SchemaFactory.createForClass(Warehouse);
 
-@Entity({ name: 'warehouses' })
+/*@Entity({ name: 'warehouses' })
 export class WarehouseMysql {
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -61,4 +61,4 @@ export class WarehouseMysql {
 
 	@Column()
 	shop_id: number;
-}
+}*/

@@ -9,15 +9,14 @@ import { CreateSizeInput } from '../dtos/create-size.input';
 import { FiltersSizesInput } from '../dtos/filters-sizes.input';
 import { ResponseSizes } from '../dtos/response-sizes';
 import { UpdateSizeInput } from '../dtos/update-size.input';
-import { Size, SizeMysql } from '../entities/size.entity';
+import { Size } from '../entities/size.entity';
 
 @Injectable()
 export class SizesService {
 	constructor(
 		@InjectModel(Size.name)
-		private sizeModel: PaginateModel<Size>,
-		@InjectRepository(SizeMysql)
-		private readonly sizeRepo: Repository<SizeMysql>,
+		private sizeModel: PaginateModel<Size> /*	@InjectRepository(SizeMysql)
+		private readonly sizeRepo: Repository<SizeMysql>,*/,
 	) {}
 
 	async findAll({
@@ -92,7 +91,7 @@ export class SizesService {
 		return this.sizeModel.findOne({ id }).lean();
 	}
 
-	async migration() {
+	/*async migration() {
 		try {
 			const sizesMysql = await this.sizeRepo.find();
 
@@ -115,5 +114,5 @@ export class SizesService {
 		} catch (e) {
 			throw new NotFoundException(`Error al migrar las tallas, ${e}`);
 		}
-	}
+	}*/
 }

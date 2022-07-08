@@ -47,7 +47,7 @@ export class CategoryLevel1 extends Document {
 export const CategoryLevel1Schema =
 	SchemaFactory.createForClass(CategoryLevel1);
 
-@Entity({ name: 'categories' })
+/*@Entity({ name: 'categories' })
 export class CategoryMysql {
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -57,4 +57,4 @@ export class CategoryMysql {
 
 	@Column({ type: 'int' })
 	parent_id: number;
-}
+}*/
