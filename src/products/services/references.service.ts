@@ -26,7 +26,7 @@ import { SizesService } from './sizes.service';
 import { AttribsService } from './attribs.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
-import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
+import { DiscountRulesService } from 'src/crm/services/discount-rules.service';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -50,7 +50,7 @@ export class ReferencesService {
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
 		private readonly attribsService: AttribsService,
-		private readonly discountRulesService: DiscountRulersService,
+		private readonly discountRulesService: DiscountRulesService,
 	) {}
 
 	async findAll(
@@ -138,7 +138,7 @@ export class ReferencesService {
 					]);
 				let discount = 0;
 				if (customerId) {
-					discount = await this.discountRulesService.getDiscountReference({
+					discount = await this.discountRulesService.getDiscount({
 						customerId,
 						reference,
 						companyId,

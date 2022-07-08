@@ -1499,7 +1499,7 @@ type DocumentType {
   user: User!
 }
 
-enum DocumentTypesRuler {
+enum DocumentTypesRule {
   CATEGORIES
   COMPANY
   CUSTOMERTYPES
@@ -4857,10 +4857,10 @@ type Rule {
   documentIds: [String!]!
 
   """Tipo de documento para validar el descuento"""
-  documentType: DocumentTypesRuler!
+  documentType: DocumentTypesRule!
 
   """Tipo de regla que deben cumplir los documentos"""
-  type: [String!]!
+  type: [TypesRule!]!
 }
 
 """Datos de medidas para el envío de los productos"""
@@ -5772,6 +5772,14 @@ enum TypePayment {
   BONUS
   CASH
   CREDIT
+}
+
+enum TypesRule {
+  EQUAL
+  GREATER
+  GREATERTHANOREQUAL
+  LESS
+  LESSTHANOREQUAL
 }
 
 """Datos para actualizar el atributo"""
