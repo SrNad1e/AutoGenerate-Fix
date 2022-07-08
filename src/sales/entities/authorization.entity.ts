@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { User } from 'src/configurations/entities/user.entity';
 
 @Schema({ timestamps: true, collection: 'authorizationDIAN' })
 @ObjectType({ description: 'Autorizacion DIAN de la tienda' })
@@ -9,7 +10,26 @@ export class AuthorizationDian extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Prefijo de autorización' })
+	@Prop({ type: String, required: true })
 	prefix: string;
+
+	@Field(() => String, {
+		description: 'Compañía a la que pertenece la autorización',
+	})
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
+
+	@Field(() => User, {
+		description: 'Usuario que creó o editó la autorización de facturación',
+	})
+	@Prop({ type: Object, required: true })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación' })
+	createdAt: Date;
+
+	@Field(() => Date, { description: 'Fecha de actualización' })
+	updatedAt: Date;
 }
 
 export const AuthorizationDianSchema =
