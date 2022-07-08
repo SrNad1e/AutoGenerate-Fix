@@ -27,7 +27,7 @@ export class DiscountRulesService {
 		private readonly customersService: CustomersService,
 	) {}
 
-	async findAllDiscountRulers(
+	async findAll(
 		{
 			sort,
 			active,
