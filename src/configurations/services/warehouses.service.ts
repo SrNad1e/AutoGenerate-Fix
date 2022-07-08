@@ -11,7 +11,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { CompaniesService } from 'src/configurations/services/companies.service';
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
-import { Warehouse, WarehouseMysql } from '../entities/warehouse.entity';
+import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateWarehouseInput } from '../dtos/create-warehouse.input';
 import { UpdateWarehouseInput } from '../dtos/update-warehouse.input';
@@ -21,8 +21,8 @@ export class WarehousesService {
 	constructor(
 		@InjectModel(Warehouse.name)
 		private readonly warehouseModel: PaginateModel<Warehouse>,
-		@InjectRepository(WarehouseMysql)
-		private readonly warehouseRepo: Repository<WarehouseMysql>,
+		/*@InjectRepository(WarehouseMysql)
+		private readonly warehouseRepo: Repository<WarehouseMysql>,*/
 		private readonly companiesService: CompaniesService,
 	) {}
 
@@ -132,7 +132,7 @@ export class WarehousesService {
 		return this.warehouseModel.findOne({ id }).lean();
 	}
 
-	async migrate() {
+	/*async migrate() {
 		try {
 			const warehousesMysql = await this.warehouseRepo.find();
 			const companyDefault = await this.companiesService.findOne('Cirotex');
@@ -157,5 +157,5 @@ export class WarehousesService {
 		} catch (e) {
 			throw new NotFoundException(`Error al migrar las bodegas ${e}`);
 		}
-	}
+	}*/
 }

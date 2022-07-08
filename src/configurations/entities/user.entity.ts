@@ -76,7 +76,7 @@ export class User extends Document {
 
 	@Prop({
 		type: [Types.ObjectId],
-		ref: Company.name,
+		ref: 'Company',
 		autopopulate: true,
 		required: true,
 	})
@@ -107,7 +107,7 @@ export class User extends Document {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-@Entity({ name: 'users' })
+/*@Entity({ name: 'users' })
 @ObjectType()
 export class UserMysql {
 	@Field()
@@ -169,4 +169,4 @@ export class UserMysql {
 	@Field()
 	@Column({ type: 'tinyint' })
 	wholesale_member: boolean;
-}
+}*/

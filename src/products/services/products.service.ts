@@ -19,7 +19,7 @@ import {
 	FiltersProductsInput,
 } from '../dtos/filters-products.input';
 import { Product, StatusProduct } from '../entities/product.entity';
-import { ProductMysql } from '../entities/product.entity';
+//import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { ReferencesService } from './references.service';
@@ -114,8 +114,8 @@ export class ProductsService {
 		private readonly productModel: AggregatePaginateModel<Product>,
 		@InjectModel(Image.name)
 		private readonly imageModel: PaginateModel<Image>,
-		@InjectRepository(ProductMysql)
-		private readonly productRepo: Repository<ProductMysql>,
+		/*@InjectRepository(ProductMysql)
+		private readonly productRepo: Repository<ProductMysql>,*/
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
 		private readonly usersService: UsersService,
@@ -425,7 +425,7 @@ export class ProductsService {
 		);
 	}
 
-	async migration() {
+	/*	async migration() {
 		try {
 			const productsMysql = await this.productRepo.find();
 			const warehouses = await this.warehousesService.findAll(
@@ -588,7 +588,7 @@ export class ProductsService {
 		} catch (e) {
 			throw new NotFoundException(`Error al migrar productos ${e}`);
 		}
-	}
+	}*/
 
 	/**
 	 * @description se encarga de agregar unidades al inventario

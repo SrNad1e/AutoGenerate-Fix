@@ -3,15 +3,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Product, ProductSchema } from './entities/product.entity';
-import { ProductMysql } from './entities/product.entity';
+//import { ProductMysql } from './entities/product.entity';
 import { ProductsService } from './services/products.service';
 import { ProductsController } from './controllers/products.controller';
 import { ColorsResolver } from './resolvers/colors.resolver';
 import { SizesResolver } from './resolvers/sizes.resolver';
 import { SizesService } from './services/sizes.service';
 import { ColorsService } from './services/colors.service';
-import { Color, ColorMysql, ColorSchema } from './entities/color.entity';
-import { Size, SizeMysql, SizeSchema } from './entities/size.entity';
+import { Color, ColorSchema } from './entities/color.entity';
+import { Size, SizeSchema } from './entities/size.entity';
 import { ProductsResolver } from './resolvers/products.resolver';
 import { Reference, ReferenceSchema } from './entities/reference.entity';
 import { ReferencesService } from './services/references.service';
@@ -21,7 +21,6 @@ import { Attrib, AttribSchema } from './entities/attrib.entity';
 import {
 	CategoryLevel1,
 	CategoryLevel1Schema,
-	CategoryMysql,
 } from './entities/category-level1.entity';
 import {
 	CategoryLevel2,
@@ -66,12 +65,12 @@ import { CrmModule } from 'src/crm/crm.module';
 				},
 			},
 		]),
-		TypeOrmModule.forFeature([
+		/*		TypeOrmModule.forFeature([
 			ProductMysql,
 			SizeMysql,
 			ColorMysql,
 			CategoryMysql,
-		]),
+		]),*/
 	],
 	providers: [
 		ProductsService,

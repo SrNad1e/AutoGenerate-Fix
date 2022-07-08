@@ -63,7 +63,7 @@ export class Color extends Document {
 
 export const ColorSchema = SchemaFactory.createForClass(Color);
 
-@Entity({ name: 'colors' })
+/*@Entity({ name: 'colors' })
 export class ColorMysql {
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -85,4 +85,4 @@ export class ColorMysql {
 
 	@Column({ type: 'datetime' })
 	created_at: Date;
-}
+}*/

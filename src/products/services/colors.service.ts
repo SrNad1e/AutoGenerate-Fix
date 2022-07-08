@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 
 import { ResponseColors } from '../dtos/response-colors';
 import { FiltersColorsInput } from '../dtos/filters-colors.input';
-import { Color, ColorMysql } from '../entities/color.entity';
+import { Color } from '../entities/color.entity';
 import { CreateColorInput } from '../dtos/create-color.input';
 import { UpdateColorInput } from '../dtos/update-color.input';
 import { Image } from 'src/configurations/entities/image.entity';
@@ -19,8 +19,8 @@ export class ColorsService {
 	constructor(
 		@InjectModel(Color.name)
 		private readonly colorModel: PaginateModel<Color>,
-		@InjectRepository(ColorMysql)
-		private readonly colorRepo: Repository<ColorMysql>,
+		/*@InjectRepository(ColorMysql)
+		private readonly colorRepo: Repository<ColorMysql>,*/
 		@InjectModel(Image.name)
 		private readonly imageModel: PaginateModel<Image>,
 	) {}
@@ -132,7 +132,7 @@ export class ColorsService {
 		return this.colorModel.findOne({ id }).lean();
 	}
 
-	async migration() {
+	/*async migration() {
 		try {
 			const colorsMysql = await this.colorRepo.find();
 
@@ -189,5 +189,5 @@ export class ColorsService {
 		} catch (e) {
 			throw new NotFoundException(`Error al migrar colores, ${e} `);
 		}
-	}
+	}*/
 }

@@ -10,7 +10,7 @@ export class ShopsController {
 		private readonly warehousesService: WarehousesService,
 	) {}
 
-	@Get('migrateShops')
+	/*	@Get('migrateShops')
 	migrate() {
 		return this.shopsService.migrate();
 	}
@@ -18,5 +18,5 @@ export class ShopsController {
 	@Get('migrateWarehouses')
 	migrateWarehouses() {
 		return this.warehousesService.migrate();
-	}
+	}*/
 }

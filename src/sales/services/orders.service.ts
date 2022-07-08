@@ -22,6 +22,7 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import {
+	DetailOrder,
 	Order,
 	StatusOrder,
 	StatusOrderDetail,
@@ -807,6 +808,7 @@ export class OrdersService {
 					product,
 					status: StatusOrderDetail.NEW,
 					quantity,
+					quantityReturn: 0,
 					price: product.reference['price'] - discount,
 					discount,
 					createdAt: new Date(),
@@ -1141,5 +1143,11 @@ export class OrdersService {
 			credit,
 			order: newOrder,
 		};
+	}
+
+	async updateProducts(id: string, details: DetailOrder[]) {
+		return this.orderModel.findByIdAndUpdate(id, {
+			$set: { details },
+		});
 	}
 }
