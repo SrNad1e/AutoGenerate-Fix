@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 import * as dayjs from 'dayjs';
@@ -13,6 +17,7 @@ import {
 	TypesRule,
 } from '../entities/discountRule.entity';
 import { CustomersService } from './customers.service';
+import { UpdateDiscountRuleInput } from '../dtos/update-discount-rule.input';
 
 @Injectable()
 export class DiscountRulesService {
@@ -114,7 +119,72 @@ export class DiscountRulesService {
 		});
 	}
 
-	async update() {}
+	async update(
+		id: string,
+		{
+			dateFinal,
+			dateInitial,
+			value,
+			percent,
+			...params
+		}: UpdateDiscountRuleInput,
+		user: User,
+		companyId: string,
+	) {
+		const discountRule = await this.discountRuler.findById(id);
+
+		if (!discountRule) {
+			throw new BadRequestException('El descuento no existe');
+		}
+
+		if (
+			user.username !== 'admin' &&
+			!!discountRule?.rules?.find((item) =>
+				item?.documentIds.includes(companyId),
+			)
+		) {
+			throw new UnauthorizedException(
+				'El usuario no puede realizar cambios en esta regla',
+			);
+		}
+
+		if (!dayjs(dateInitial).isBefore(dayjs(dateFinal))) {
+			throw new BadRequestException(
+				'La fecha final debe ser posterior a la fecha inicial',
+			);
+		}
+
+		if (value < 0 || percent < 0) {
+			throw new BadRequestException('El descuento no puede ser negativo');
+		}
+
+		if (value > 0 && percent > 0) {
+			throw new BadRequestException(
+				'Solo debe enviar un descuento ya sea en porcentaje o valor',
+			);
+		}
+
+		let newDateFinal;
+		if (dateFinal) {
+			newDateFinal = new Date(dateFinal);
+		}
+
+		let newDateInitial;
+		if (dateInitial) {
+			newDateInitial = new Date(dateInitial);
+		}
+
+		return this.discountRuler.findByIdAndUpdate(id, {
+			$set: {
+				dateFinal: newDateFinal,
+				dateInitial: newDateInitial,
+				value,
+				percent,
+				params,
+				user,
+			},
+		});
+	}
 
 	/**
 	 * @description obtiene el descuento del producto a evaluar
