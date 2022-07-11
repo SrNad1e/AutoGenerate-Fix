@@ -5484,7 +5484,7 @@ type Rule {
   documentType: DocumentTypesRule!
 
   """Tipo de regla que deben cumplir los documentos"""
-  type: [TypesRule!]!
+  type: TypesRule!
 }
 
 """Regla de descuento"""
@@ -5496,7 +5496,7 @@ input RuleInput {
   documentType: DocumentTypesRule!
 
   """Tipo de regla que deben cumplir los documentos"""
-  type: [String!]!
+  type: TypesRule!
 }
 
 """Datos de medidas para el envío de los productos"""
