@@ -8,11 +8,16 @@ export class FindDiscountInput {
 		description: 'Identificador del cliente para validar el descuento',
 		nullable: true,
 	})
-	customerId: string;
+	customerId?: string;
 
 	@Field(() => Reference, {
 		description: 'Referencia para validar el descuento',
 		nullable: true,
 	})
-	reference: Reference;
+	reference?: Reference;
+
+	@Field(() => String, {
+		description: 'Compañía a la que pertenece la regla',
+	})
+	companyId: string;
 }

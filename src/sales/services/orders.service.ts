@@ -30,7 +30,7 @@ import {
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
-import { DiscountRulersService } from 'src/crm/services/discount-rulers.service';
+import { DiscountRulesService } from 'src/crm/services/discount-rules.service';
 import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ActionProductsOrder } from '../dtos/add-products-order-input';
@@ -62,7 +62,7 @@ export class OrdersService {
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly paymentsService: PaymentsService,
 		private readonly receiptsService: ReceiptsService,
-		private readonly discountRulesService: DiscountRulersService,
+		private readonly discountRulesService: DiscountRulesService,
 		private readonly conveyorsService: ConveyorsService,
 		private readonly couponsService: CouponsService,
 		private readonly creditHistoryService: CreditHistoryService,
@@ -286,12 +286,11 @@ export class OrdersService {
 				for (let i = 0; i < order?.details?.length; i++) {
 					const detail = order?.details[i];
 
-					const discount = await this.discountRulesService.getDiscountReference(
-						{
-							customerId: customer._id.toString(),
-							reference: detail?.product?.reference as any,
-						},
-					);
+					const discount = await this.discountRulesService.getDiscount({
+						customerId: customer._id.toString(),
+						reference: detail?.product?.reference as any,
+						companyId,
+					});
 
 					newDetails.push({
 						...detail,
@@ -798,9 +797,10 @@ export class OrdersService {
 					);
 				}
 
-				const discount = await this.discountRulesService.getDiscountReference({
+				const discount = await this.discountRulesService.getDiscount({
 					customerId: order?.customer?._id.toString(),
 					reference: product?.reference as any,
+					companyId,
 				});
 
 				newDetails.push({
