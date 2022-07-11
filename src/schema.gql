@@ -647,6 +647,21 @@ type Conveyor {
   user: User!
 }
 
+"""Transportadora que realiza el envio"""
+type ConveyorOrder {
+  """Datos del transportista"""
+  conveyor: Conveyor!
+
+  """Código de la guia del transportista"""
+  guideCode: String
+
+  """Fecha en el que se realiza el envío"""
+  shippingDate: DateTime
+
+  """Valor del envío"""
+  value: Float!
+}
+
 """Cupones para pagos"""
 type Coupon {
   """Identificador de mongo"""
@@ -3306,7 +3321,7 @@ type Order {
   company: Company!
 
   """Trasportadora"""
-  conveyor: Conveyor
+  conveyor: ConveyorOrder
 
   """Fecha de creación"""
   createdAt: DateTime!
