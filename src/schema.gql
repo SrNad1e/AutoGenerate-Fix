@@ -637,6 +637,9 @@ type Conveyor {
   """Logo de la tranportadora"""
   logo: Image!
 
+  """Mensaje para el usuario"""
+  message: String
+
   """Nombre de la transportadora"""
   name: String!
 
@@ -3761,11 +3764,17 @@ type Query {
     filtersCompaniesInput: FiltersCompaniesInput = {}
   ): ResponseCompanies!
 
-  """Lista de ajustes de productos"""
+  """Lista de transportadoras"""
   conveyors(
     """Filtros de lista de las transportadoras"""
     filtersConveyorsInput: FiltersConveyorsInput = {}
   ): ResponseConveyors!
+
+  """Lista de transportadoras para el pedido"""
+  conveyorsOrder(
+    """Identificador del pedido"""
+    orderId: String!
+  ): [ConveyorOrder!]!
 
   """Consultar cupón"""
   coupon(

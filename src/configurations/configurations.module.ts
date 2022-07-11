@@ -4,7 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PassportModule } from '@nestjs/passport';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Conveyor, ConveyorSchema } from './entities/conveyor.entity';
 import { CompanySchema } from './entities/company.entity';
@@ -42,6 +41,7 @@ import { PermissionsService } from './services/permissions.service';
 import { PermissionsResolver } from './resolvers/permissions.resolver';
 import { RolesResolver } from './resolvers/roles.resolver';
 import { CompaniesResolver } from './resolvers/companies.resolver';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 
 @Module({
 	imports: [
@@ -84,6 +84,10 @@ import { CompaniesResolver } from './resolvers/companies.resolver';
 				name: Warehouse.name,
 				schema: WarehouseSchema,
 			},
+			{
+				name: Order.name,
+				schema: OrderSchema,
+			},
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -106,7 +110,6 @@ import { CompaniesResolver } from './resolvers/companies.resolver';
 				},
 			},
 		]),
-		//	TypeOrmModule.forFeature([UserMysql, ShopMysql, WarehouseMysql]),
 	],
 	providers: [
 		AuthResolver,

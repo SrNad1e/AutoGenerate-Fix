@@ -15,6 +15,13 @@ export class Conveyor extends Document {
 	@Prop({ type: String, required: true })
 	name: string;
 
+	@Field(() => String, {
+		description: 'Mensaje para el usuario',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	message?: string;
+
 	@Field(() => Image, { description: 'Logo de la tranportadora' })
 	@Prop({
 		type: Types.ObjectId,
