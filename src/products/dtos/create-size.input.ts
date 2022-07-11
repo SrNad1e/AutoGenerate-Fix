@@ -5,6 +5,6 @@ export class CreateSizeInput {
 	@Field(() => String, { description: 'Valor asignado a la talla' })
 	value: string;
 
-	@Field(() => String, { description: 'Posición del ordenamiento' })
+	@Field(() => Number, { description: 'Posición del ordenamiento' })
 	weight: number;
 }
