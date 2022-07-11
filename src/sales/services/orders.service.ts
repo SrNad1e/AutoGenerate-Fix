@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, trusted, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
 
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
@@ -221,7 +221,7 @@ export class OrdersService {
 			.lean();
 
 		if (lastOrder) {
-			number = lastOrder.number + 1;
+			number = (lastOrder.number || 0) + 1;
 		}
 
 		const address =
