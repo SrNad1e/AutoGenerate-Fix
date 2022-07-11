@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Conveyor, ConveyorSchema } from './entities/conveyor.entity';
-import { Company, CompanySchema } from './entities/company.entity';
+import { CompanySchema } from './entities/company.entity';
 import { CompaniesService } from './services/companies.service';
 import { ConveyorsService } from './services/conveyors.service';
 import { ConveyorsResolver } from './resolvers/conveyors.resolver';
@@ -19,7 +19,7 @@ import {
 	PointOfSale,
 	PointOfSaleSchema,
 } from 'src/sales/entities/pointOfSale.entity';
-import { User, UserMysql, UserSchema } from './entities/user.entity';
+import { User, UserSchema } from './entities/user.entity';
 import { UsersResolver } from './resolvers/users.resolver';
 import { AuthResolver } from './resolvers/auth.resolver';
 import { AuthService } from './services/auth.service';
@@ -31,12 +31,8 @@ import { Image, ImageSchema } from './entities/image.entity';
 import { ImagesService } from './services/images.service';
 import { ImagesResolver } from './resolvers/images.resolver';
 import { StaticfilesController } from './controllers/staticfiles.controller';
-import { Shop, ShopMysql, ShopSchema } from './entities/shop.entity';
-import {
-	Warehouse,
-	WarehouseMysql,
-	WarehouseSchema,
-} from './entities/warehouse.entity';
+import { Shop, ShopSchema } from './entities/shop.entity';
+import { Warehouse, WarehouseSchema } from './entities/warehouse.entity';
 import { ShopsController } from './controllers/shops.controller';
 import { ShopsService } from './services/shops.service';
 import { WarehousesService } from './services/warehouses.service';
@@ -61,7 +57,7 @@ import { RolesResolver } from './resolvers/roles.resolver';
 			inject: [config.KEY],
 		}),
 		MongooseModule.forFeature([
-			{ name: Company.name, schema: CompanySchema },
+			{ name: 'Company', schema: CompanySchema },
 			{ name: Conveyor.name, schema: ConveyorSchema },
 			{
 				name: Image.name,
@@ -109,7 +105,7 @@ import { RolesResolver } from './resolvers/roles.resolver';
 				},
 			},
 		]),
-		TypeOrmModule.forFeature([UserMysql, ShopMysql, WarehouseMysql]),
+		//	TypeOrmModule.forFeature([UserMysql, ShopMysql, WarehouseMysql]),
 	],
 	providers: [
 		AuthResolver,

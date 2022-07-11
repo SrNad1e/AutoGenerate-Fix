@@ -1283,6 +1283,9 @@ type DetailOrder {
   """Cantidad de productos en el pedido"""
   quantity: Float!
 
+  """Cantidad de productos devueltos"""
+  quantityReturn: Float!
+
   """Estado del producto"""
   status: String!
 

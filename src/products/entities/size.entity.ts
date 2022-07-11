@@ -45,7 +45,7 @@ export class Size extends Document {
 }
 export const SizeSchema = SchemaFactory.createForClass(Size);
 
-@Entity({ name: 'sizes' })
+/*@Entity({ name: 'sizes' })
 export class SizeMysql {
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -55,4 +55,4 @@ export class SizeMysql {
 
 	@Column({ type: 'tinyint' })
 	active: boolean;
-}
+}*/

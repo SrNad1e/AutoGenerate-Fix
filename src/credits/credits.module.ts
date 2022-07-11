@@ -30,7 +30,12 @@ import { CreditHistoryResolver } from './resolvers/credit-history.resolver';
 			},
 		]),
 	],
-	providers: [CreditsService, CreditHistoryService, CreditsResolver, CreditHistoryResolver],
+	providers: [
+		CreditsService,
+		CreditHistoryService,
+		CreditsResolver,
+		CreditHistoryResolver,
+	],
 	exports: [CreditHistoryService, CreditsService],
 })
 export class CreditsModule {}

@@ -70,14 +70,14 @@
 			"option": "Entrada",
 			"name": "Consultar",
 			"description": "Permite consultar las entradas de inventario",
-			"action": "READ_INVENTORY_OUTPUTS"
+			"action": "READ_INVENTORY_INPUTS"
 		},
 		{
 			"module": "Inventario",
 			"option": "Salida",
 			"name": "Consultar",
 			"description": "Permite consultar las salidas de inventario",
-			"action": "READ_INVENTORY_INPUTS"
+			"action": "READ_INVENTORY_OUTPUTS"
 		},
 		{
 			"module": "Inventario",
@@ -854,7 +854,7 @@
 	"defaultUser": {
 		"name": "Administrador del Sistema",
 		"username": "admin",
-		"password": "$2a$10$npZLFrWgjEM/VwdUkzIQQ.rhgi38vEx86jFiPwlOUSR8TZU25RRcm",
+		"password": "$2a$10$kK5kguA6gee9Tit19ed6LewkEALbFWTa9UTvAdLdp3vmFGqLhzoz.",
 		"user": {
 			"name": "Administrador del Sistema",
 			"username": "admin"

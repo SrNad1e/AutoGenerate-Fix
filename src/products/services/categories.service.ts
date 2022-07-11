@@ -10,10 +10,7 @@ import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.in
 import { FiltersCategoriesInput } from '../dtos/filters-categories.input';
 import { FiltersCategoryInput } from '../dtos/filters-category.input';
 import { UpdateCategoryInput } from '../dtos/update-category.input';
-import {
-	CategoryLevel1,
-	CategoryMysql,
-} from '../entities/category-level1.entity';
+import { CategoryLevel1 } from '../entities/category-level1.entity';
 import { CategoryLevel2 } from '../entities/category-level2.entity';
 import { CategoryLevel3 } from '../entities/category-level3.entity';
 
@@ -36,9 +33,8 @@ export class CategoriesService {
 		@InjectModel(CategoryLevel2.name)
 		private readonly categoryLevel2Model: PaginateModel<CategoryLevel2>,
 		@InjectModel(CategoryLevel3.name)
-		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3>,
-		@InjectRepository(CategoryMysql)
-		private readonly categoryRepository: Repository<CategoryMysql>,
+		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3> /*@InjectRepository(CategoryMysql)
+		private readonly categoryRepository: Repository<CategoryMysql>,*/,
 	) {}
 
 	async findAll({
@@ -172,9 +168,9 @@ export class CategoriesService {
 	 * @param id
 	 * @returns
 	 */
-	async getByIdMysql(id: number) {
+	/*async getByIdMysql(id: number) {
 		return this.categoryRepository.findOne({ id });
-	}
+	}*/
 
 	async create(
 		{ name, level, parentId }: CreateCategoryInput,

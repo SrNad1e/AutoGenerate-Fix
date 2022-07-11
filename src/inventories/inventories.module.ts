@@ -45,7 +45,7 @@ import {
 	imports: [
 		ProductsModule,
 		ConfigurationsModule,
-		TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
+		//TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
 		MongooseModule.forFeature([
 			{
 				name: StockTransfer.name,
