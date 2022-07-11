@@ -33,7 +33,7 @@ export class Rule {
 	})
 	documentIds: string[];
 
-	@Field(() => [TypesRule], {
+	@Field(() => TypesRule, {
 		description: 'Tipo de regla que deben cumplir los documentos',
 	})
 	type: TypesRule;

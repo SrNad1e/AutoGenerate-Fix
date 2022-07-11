@@ -14,7 +14,7 @@ export class RuleInput {
 	})
 	documentIds: string[];
 
-	@Field(() => [String], {
+	@Field(() => TypesRule, {
 		description: 'Tipo de regla que deben cumplir los documentos',
 	})
 	type: TypesRule;
