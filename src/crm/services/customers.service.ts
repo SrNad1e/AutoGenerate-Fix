@@ -163,6 +163,7 @@ export class CustomersService {
 		if (!customer) {
 			throw new NotFoundException('El cliente no existe');
 		}
+
 		if (customerTypeId) {
 			const customerType = this.customerTypeService.findById(customerTypeId);
 
@@ -209,9 +210,13 @@ export class CustomersService {
 			{ _id: id },
 			{
 				$set: {
-					customerType: new Types.ObjectId(customerTypeId),
+					customerType: customerTypeId
+						? new Types.ObjectId(customerTypeId)
+						: undefined,
 					document,
-					documentTypeId: new Types.ObjectId(documentTypeId),
+					documentTypeId: documentTypeId
+						? new Types.ObjectId(documentTypeId)
+						: undefined,
 					user,
 					addresses: newAddresses.length > 0 ? newAddresses : undefined,
 					...params,

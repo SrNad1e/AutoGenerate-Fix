@@ -808,35 +808,28 @@
 			"action": "READ_CRM_CUSTOMERTYPES"
 		},
 		{
-			"module": "Crm",
-			"option": "Tipo de cliente",
-			"name": "Consultar",
-			"description": "Permite consultar el tipo de cliente",
-			"action": "READ_CRM_CUSTOMERTYPES"
-		},
-		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Descuento",
 			"name": "Acceder",
 			"description": "Permite acceder a los descuentos",
 			"action": "ACCESS_CRM_DISCOUNTRULES"
 		},
 		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Descuento",
 			"name": "Consultar",
 			"description": "Permite consultar los descuentos",
 			"action": "READ_CRM_DISCOUNTRULES"
 		},
 		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Descuento",
 			"name": "Crear",
 			"description": "Permite crear un descuento",
 			"action": "CREATE_CRM_DISCOUNTRULE"
 		},
 		{
-			"module": "Crm",
+			"module": "CRM",
 			"option": "Descuento",
 			"name": "Actualizar",
 			"description": "Permite actualizar un descuento",
