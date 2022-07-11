@@ -3324,7 +3324,7 @@ type Order {
   company: Company!
 
   """Trasportadora"""
-  conveyor: ConveyorOrder
+  conveyorOrder: ConveyorOrder
 
   """Fecha de creación"""
   createdAt: DateTime!

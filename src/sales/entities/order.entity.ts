@@ -250,7 +250,7 @@ export class Order extends Document {
 		nullable: true,
 	})
 	@Prop({ type: Object })
-	conveyor?: ConveyorOrder;
+	conveyorOrder?: ConveyorOrder;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

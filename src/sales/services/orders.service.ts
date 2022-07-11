@@ -420,12 +420,16 @@ export class OrdersService {
 			dataUpdate['status'] = StatusOrder[status];
 		}
 
-		let conveyor;
+		let conveyorOrder;
 		if (conveyorId) {
-			conveyor = await this.conveyorsService.findById(conveyorId);
+			const conveyor = await this.conveyorsService.findById(conveyorId);
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+			conveyorOrder = {
+				conveyor,
+				value: 0,
+			};
 		}
 
 		if (StatusOrder[status] === StatusOrder.CANCELLED) {
@@ -501,7 +505,11 @@ export class OrdersService {
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
-				$set: { ...dataUpdate, user, conveyor },
+				$set: {
+					...dataUpdate,
+					user,
+					conveyorOrder,
+				},
 			},
 			{
 				populate,

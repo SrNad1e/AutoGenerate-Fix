@@ -55,7 +55,7 @@ export class ConveyorsService {
 			throw new BadRequestException('El pedido no existe');
 		}
 
-		const conveyors = await this.conveyorModel.find();
+		const conveyors = await this.conveyorModel.find().populate(populate);
 
 		//TODO: aca se deben realizar todos los calculos para cada uno de los transportistas
 
