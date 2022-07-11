@@ -100,7 +100,11 @@ export class DiscountRulesService {
 			);
 		}
 
-		const newRules = rules;
+		const newRules = rules.map(({ type, documentType, ...rule }) => ({
+			...rule,
+			documentType: DocumentTypesRule[documentType],
+			type: TypesRule[type],
+		}));
 
 		newRules.push({
 			documentType: DocumentTypesRule.COMPANY,
@@ -126,6 +130,7 @@ export class DiscountRulesService {
 			dateInitial,
 			value,
 			percent,
+			rules,
 			...params
 		}: UpdateDiscountRuleInput,
 		user: User,
@@ -174,13 +179,20 @@ export class DiscountRulesService {
 			newDateInitial = new Date(dateInitial);
 		}
 
+		const newRules = rules.map(({ type, documentType, ...rule }) => ({
+			...rule,
+			documentType: DocumentTypesRule[documentType],
+			type: TypesRule[type],
+		}));
+
 		return this.discountRuler.findByIdAndUpdate(id, {
 			$set: {
 				dateFinal: newDateFinal,
 				dateInitial: newDateInitial,
 				value,
 				percent,
-				params,
+				rules: newRules,
+				...params,
 				user,
 			},
 		});
