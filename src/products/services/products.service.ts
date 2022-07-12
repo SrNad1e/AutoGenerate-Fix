@@ -729,13 +729,14 @@ export class ProductsService {
 				product?.stock.length <= 0 ||
 				product?.stock[0]?.quantity < quantity
 			) {
-				throw new BadRequestException(
-					`El producto ${product?.reference['name']}/${
+				throw new BadRequestException({
+					message: `El producto ${product?.reference['name']}/${
 						product?.barcode
 					} no tiene suficientes unidades, stock: ${
 						product?.stock[0]?.quantity || 0
 					}`,
-				);
+					data: product,
+				});
 			}
 
 			return product;
