@@ -826,14 +826,14 @@
 			"option": "Autorización DIAN",
 			"name": "Crear",
 			"description": "Permite crear la autorización de facturación",
-			"action": "CREATE_INVOICING_AUTHORIZATIONS"
+			"action": "CREATE_INVOICING_AUTHORIZATION"
 		},
 		{
 			"module": "Facturación",
 			"option": "Autorización DIAN",
 			"name": "Actualizar",
 			"description": "Permite actualizar la autorización de facturación",
-			"action": "UPDATE_INVOICING_AUTHORIZATIONS"
+			"action": "UPDATE_INVOICING_AUTHORIZATION"
 		},
 		{
 			"module": "Tesorería",
