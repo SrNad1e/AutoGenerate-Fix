@@ -809,6 +809,26 @@
 		},
 		{
 			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Acceder",
+			"description": "Permite acceder a las bodegas",
+			"action": "ACCESS_CONFIGURATION_WAREHOUSES"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Crear",
+			"description": "Permite crear la bodega",
+			"action": "CREATE_CONFIGURATION_WAREHOUSE"
+		},
+		{
+			"module": "Configuración",
+			"option": "Bodega",
+			"name": "Actualizar",
+			"description": "Permite actualizar la bodega",
+			"action": "UPDATE_CONFIGURATION_WAREHOUSE"
+		},
+		{
 			"option": "Tienda",
 			"name": "Acceder",
 			"description": "Permite acceder las tiendas",
@@ -827,6 +847,13 @@
 			"name": "Actualizar",
 			"description": "Permite actualizar la tienda",
 			"action": "UPDATE_CONFIGURATION_SHOP"
+		},
+		{
+			"module": "Facturación",
+			"option": "Pedido",
+			"name": "Imprimir",
+			"description": "Permite imprimir el pedido de facturación",
+			"action": "PRINT_INVOICING_ORDER"
 		}
 	],
 	//CREAR ROL ADMIN, SE DEBEN OBTENER TODOS LOS IDS DE LOS PERMISOS
