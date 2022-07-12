@@ -662,9 +662,9 @@
 		},
 		{
 			"module": "Tesorería",
-			"option": "Medio de pago",
+			"option": "Método de pago",
 			"name": "Consultar",
-			"description": "Permite consultar los medios de pago",
+			"description": "Permite consultar los métodos de pago",
 			"action": "READ_TREASURY_PAYMENTS"
 		},
 		{
@@ -711,9 +711,9 @@
 		},
 		{
 			"module": "Tesorería",
-			"option": "Medio de pago",
+			"option": "Método de pago",
 			"name": "Acceder",
-			"description": "Permite acceder a los medios de pago",
+			"description": "Permite acceder a los métodos de pago",
 			"action": "ACCESS_TREASURY_PAYMENTS"
 		},
 		{
@@ -721,7 +721,7 @@
 			"option": "Recibo de caja",
 			"name": "Acceder",
 			"description": "Permite acceder a los recibos de caja",
-			"action": "ACCESS_TREASURY_PAYMENTS"
+			"action": "ACCESS_TREASURY_RECEIPT"
 		},
 		{
 			"module": "Tesorería",
@@ -806,6 +806,47 @@
 			"name": "Consultar",
 			"description": "Permite consultar el tipo de cliente",
 			"action": "READ_CRM_CUSTOMERTYPES"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Método de pago",
+			"name": "Crear",
+			"description": "Permite crear el método de pago",
+			"action": "CREATE_TREASURY_PAYMENT"
+		},
+		{
+			"module": "Tesorería",
+			"option": "Método de pago",
+			"name": "Actualizar",
+			"description": "Permite actualizar el método de pago",
+			"action": "UPDATE_TREASURY_PAYMENT"
+		},
+		{
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Crear",
+			"description": "Permite crear el cupón",
+			"action": "CREATE_CRM_COUPON"
+		},
+		{
+			"module": "CRM",
+			"option": "Cupón",
+			"name": "Actualizar",
+			"description": "Permite actualizar el cupón",
+			"action": "UPDATE_CRM_COUPON"
+		},
+		{
+			"option": "Ciudad",
+			"name": "Crear",
+			"description": "Permite crear la ciudad",
+			"action": "CREATE_CRM_CITY"
+		},
+		{
+			"module": "CRM",
+			"option": "Ciudad",
+			"name": "Actualizar",
+			"description": "Permite actualizar la ciudad",
+			"action": "UPDATE_CRM_CITY"
 		},
 		{
 			"module": "Configuración",

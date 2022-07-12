@@ -21,7 +21,7 @@ export class Payment extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre del medio de pago' })
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, unique: true })
 	name: string;
 
 	@Field(() => TypePayment, {
