@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 import { Shop } from 'src/configurations/entities/shop.entity';
 import { User } from 'src/configurations/entities/user.entity';
 
@@ -33,6 +34,12 @@ export class PointOfSale extends Document {
 	})
 	@Prop({ type: Types.ObjectId, ref: 'AuthorizationDian', required: true })
 	authorization: Types.ObjectId;
+
+	@Field(() => Company, {
+		description: 'Compañia a la que pertenece el punto de venta',
+	})
+	@Prop({ type: Types.ObjectId, ref: 'Compnay', required: true })
+	company: Types.ObjectId;
 
 	@Field(() => Box, {
 		description: 'Caja del punto de venta',
