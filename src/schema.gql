@@ -1825,6 +1825,27 @@ input FiltersCouponInput {
   status: StatusCoupon
 }
 
+"""Filtros para consultar los cupones"""
+input FiltersCouponsInput {
+  """Código del cupón"""
+  code: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del cupón"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCoupon
+
+  """Estado del cupón"""
+  status: StatusCoupon
+}
+
 """Filtros para consultar los créditos de los clientes"""
 input FiltersCreditHistoryInput {
   """Monto del movimiento"""
@@ -3245,6 +3266,7 @@ enum Permissions {
   CREATE_TREASURY_EXPENSE
   CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
+  PRINT_CRM_COUPON
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
   PRINT_INVENTORY_OUTPUT
@@ -3448,6 +3470,12 @@ type Query {
     """Filtros para consultar un cupón"""
     filtersCouponInput: FiltersCouponInput!
   ): Coupon!
+
+  """Consultar cupones"""
+  coupons(
+    """Filtros para consultar los cupones"""
+    filtersCouponsInput: FiltersCouponsInput!
+  ): ResponseCoupons!
 
   """Crédito"""
   credit(
@@ -4120,6 +4148,39 @@ type ResponseColors {
 type ResponseConveyors {
   """Lista de transportadoras"""
   docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de cupones"""
+type ResponseCoupons {
+  """Lista de cupones"""
+  docs: [Coupon!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -5251,6 +5312,24 @@ input SortConveyor {
   name: Float
 
   """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento del ccupón"""
+input SortCoupon {
+  """ordernamiento por fecha de creación"""
+  createdAt: Float
+
+  """ordernamiento por fecha de expiración"""
+  expiration: Float
+
+  """ordernamiento por consecutivo"""
+  number: Float
+
+  """ordernamiento por estado"""
+  status: Float
+
+  """ordernamiento por fecha de actualización"""
   updatedAt: Float
 }
 
