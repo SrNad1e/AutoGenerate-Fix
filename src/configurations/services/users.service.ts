@@ -289,7 +289,7 @@ export class UsersService {
 		let newPassword;
 		if (password) {
 			const salt = await bcrypt.genSalt(10);
-			const hashedPassword = await bcrypt.hash(user.password, salt);
+			const hashedPassword = await bcrypt.hash(password, salt);
 
 			newPassword = hashedPassword;
 		}
