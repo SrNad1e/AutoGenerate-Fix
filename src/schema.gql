@@ -922,7 +922,7 @@ input CreateSizeInput {
   value: String!
 
   """Posición del ordenamiento"""
-  weight: String!
+  weight: Float!
 }
 
 """Datos para crear el ajuste de productos"""
