@@ -33,7 +33,7 @@ export class DiscountRulesResolver {
 		return this.discountRulesService.findAll(
 			context.req.body.variables.input,
 			context.req.user.user,
-			context.req.user.customerId,
+			context.req.user.companyId,
 		);
 	}
 
@@ -52,7 +52,7 @@ export class DiscountRulesResolver {
 		return this.discountRulesService.create(
 			context.req.body.variables.input,
 			context.req.user.user,
-			context.req.user.customerId,
+			context.req.user.companyId,
 		);
 	}
 
@@ -73,7 +73,7 @@ export class DiscountRulesResolver {
 			id,
 			context.req.body.variables.input,
 			context.req.user.user,
-			context.req.user.customerId,
+			context.req.user.companyId,
 		);
 	}
 }

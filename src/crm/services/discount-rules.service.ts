@@ -128,8 +128,8 @@ export class DiscountRulesService {
 		{
 			dateFinal,
 			dateInitial,
-			value,
-			percent,
+			value = 0,
+			percent = 0,
 			rules,
 			...params
 		}: UpdateDiscountRuleInput,
