@@ -1341,9 +1341,6 @@ type CustomerType {
   """Fecha de creación"""
   createdAt: DateTime!
 
-  """Descuento al tipo de cliente"""
-  discount: Float!
-
   """Nombre del tipo de cliente"""
   name: String!
 
