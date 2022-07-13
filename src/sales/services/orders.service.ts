@@ -330,11 +330,9 @@ export class OrdersService {
 			switch (order?.status) {
 				case StatusOrder.OPEN:
 					if (
-						![
-							StatusOrder.CANCELLED,
-							StatusOrder.INVOICED,
-							StatusOrder.CLOSED,
-						].includes(StatusOrder[status])
+						![StatusOrder.CANCELLED, StatusOrder.CLOSED].includes(
+							StatusOrder[status],
+						)
 					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
@@ -346,15 +344,6 @@ export class OrdersService {
 						)
 					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
-					}
-					break;
-				case StatusOrder.INVOICED:
-					if (
-						![StatusOrder.SENT, StatusOrder.CLOSED].includes(
-							StatusOrder[status],
-						)
-					) {
-						throw new BadRequestException('El pedido se encuentra facturado');
 					}
 					break;
 				case StatusOrder.SENT:
@@ -616,7 +605,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT, StatusOrder.INVOICED],
+						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -645,7 +634,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT, StatusOrder.INVOICED],
+						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},

@@ -19,7 +19,6 @@ export enum StatusOrder {
 	CANCELLED = 'cancelled',
 	CLOSED = 'closed',
 	SENT = 'sent',
-	INVOICED = 'invoiced',
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });

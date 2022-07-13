@@ -6149,7 +6149,6 @@ enum StatusExpense {
 enum StatusOrder {
   CANCELLED
   CLOSED
-  INVOICED
   OPEN
   PENDING
   SENT
