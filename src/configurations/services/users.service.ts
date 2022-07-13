@@ -279,7 +279,7 @@ export class UsersService {
 			throw new NotFoundException(`Usuario que intenta actualizar no existe`);
 		}
 
-		const companies = user.companies.map((company) => company.toString());
+		const companies = user.companies.map((company) => company._id.toString());
 
 		if (userUpdate.username !== 'admin' && !companies.includes(idCompany)) {
 			throw new UnauthorizedException(
