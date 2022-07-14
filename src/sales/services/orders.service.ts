@@ -933,7 +933,11 @@ export class OrdersService {
 			tax,
 		};
 
-		if (!order?.orderPos) {
+		if (
+			!order?.orderPos &&
+			order?.status === StatusOrder.OPEN &&
+			order?.customer?.customerType['name'] === 'Detal'
+		) {
 			const customerTypeWholesale = await this.customerTypesService.findOne(
 				'Mayorista',
 			);
