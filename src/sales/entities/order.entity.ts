@@ -19,7 +19,6 @@ export enum StatusOrder {
 	CANCELLED = 'cancelled',
 	CLOSED = 'closed',
 	SENT = 'sent',
-	INVOICED = 'invoiced',
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });
@@ -30,6 +29,27 @@ export enum StatusOrderDetail {
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });
+
+@ObjectType({ description: 'Transportadora que realiza el envio' })
+export class ConveyorOrder {
+	@Field(() => Number, { description: 'Valor del envío' })
+	value: number;
+
+	@Field(() => String, {
+		description: 'Código de la guia del transportista',
+		nullable: true,
+	})
+	guideCode?: string;
+
+	@Field(() => Conveyor, { description: 'Datos del transportista' })
+	conveyor: Conveyor;
+
+	@Field(() => Date, {
+		description: 'Fecha en el que se realiza el envío',
+		nullable: true,
+	})
+	shippingDate?: Date;
+}
 
 @ObjectType({ description: 'Productos del pedido' })
 export class DetailOrder {
@@ -224,12 +244,12 @@ export class Order extends Document {
 	@Prop({ type: Object })
 	address?: Address;
 
-	@Field(() => Conveyor, {
+	@Field(() => ConveyorOrder, {
 		description: 'Trasportadora',
 		nullable: true,
 	})
 	@Prop({ type: Object })
-	conveyor?: Conveyor;
+	conveyorOrder?: ConveyorOrder;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

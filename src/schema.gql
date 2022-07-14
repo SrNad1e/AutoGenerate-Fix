@@ -637,6 +637,9 @@ type Conveyor {
   """Logo de la tranportadora"""
   logo: Image!
 
+  """Mensaje para el usuario"""
+  message: String
+
   """Nombre de la transportadora"""
   name: String!
 
@@ -645,6 +648,21 @@ type Conveyor {
 
   """Usuario que crea la transportadora"""
   user: User!
+}
+
+"""Transportadora que realiza el envio"""
+type ConveyorOrder {
+  """Datos del transportista"""
+  conveyor: Conveyor!
+
+  """Código de la guia del transportista"""
+  guideCode: String
+
+  """Fecha en el que se realiza el envío"""
+  shippingDate: DateTime
+
+  """Valor del envío"""
+  value: Float!
 }
 
 """Cupones para pagos"""
@@ -1322,9 +1340,6 @@ type CustomerType {
 
   """Fecha de creación"""
   createdAt: DateTime!
-
-  """Descuento al tipo de cliente"""
-  discount: Float!
 
   """Nombre del tipo de cliente"""
   name: String!
@@ -2206,7 +2221,7 @@ input FiltersOrdersInput {
   number: Float
 
   """Trae los pedidos POS solamente"""
-  orderPOS: Boolean
+  orderPos: Boolean
 
   """Desde donde arranca la página"""
   page: Float
@@ -3306,7 +3321,7 @@ type Order {
   company: Company!
 
   """Trasportadora"""
-  conveyor: Conveyor
+  conveyorOrder: ConveyorOrder
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -3746,11 +3761,17 @@ type Query {
     filtersCompaniesInput: FiltersCompaniesInput = {}
   ): ResponseCompanies!
 
-  """Lista de ajustes de productos"""
+  """Lista de transportadoras"""
   conveyors(
     """Filtros de lista de las transportadoras"""
     filtersConveyorsInput: FiltersConveyorsInput = {}
   ): ResponseConveyors!
+
+  """Lista de transportadoras para el pedido"""
+  conveyorsOrder(
+    """Identificador del pedido"""
+    orderId: String!
+  ): [ConveyorOrder!]!
 
   """Consultar cupón"""
   coupon(
@@ -6128,7 +6149,6 @@ enum StatusExpense {
 enum StatusOrder {
   CANCELLED
   CLOSED
-  INVOICED
   OPEN
   PENDING
   SENT

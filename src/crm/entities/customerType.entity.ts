@@ -14,10 +14,6 @@ export class CustomerType extends Document {
 	@Prop({ type: String })
 	name: string;
 
-	@Field(() => Number, { description: 'Descuento al tipo de cliente' })
-	@Prop({ type: Number, default: 0 })
-	discount: number;
-
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el tipo de cliente',
 	})

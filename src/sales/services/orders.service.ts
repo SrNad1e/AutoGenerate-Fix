@@ -27,7 +27,6 @@ import {
 	StatusOrder,
 	StatusOrderDetail,
 } from '../entities/order.entity';
-import { PointOfSalesService } from './point-of-sales.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
@@ -41,6 +40,7 @@ import { StatusCoupon } from 'src/crm/entities/coupon.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { PointOfSale } from '../entities/pointOfSale.entity';
+import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 const populate = [
 	{
@@ -65,10 +65,10 @@ export class OrdersService {
 		private readonly receiptsService: ReceiptsService,
 		private readonly discountRulesService: DiscountRulesService,
 		private readonly conveyorsService: ConveyorsService,
-		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly couponsService: CouponsService,
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
+		private readonly customerTypesService: CustomerTypeService,
 	) {}
 
 	async findAll(
@@ -78,7 +78,7 @@ export class OrdersService {
 			dateInitial,
 			customerId,
 			number,
-			orderPOS,
+			orderPos,
 			paymentId,
 			sort,
 			limit = 10,
@@ -96,8 +96,8 @@ export class OrdersService {
 			filters.status = StatusOrder[status];
 		}
 
-		if (orderPOS !== undefined) {
-			filters.orderPOS = orderPOS;
+		if (orderPos !== undefined) {
+			filters.orderPos = orderPos;
 		}
 
 		if (dateInitial) {
@@ -223,7 +223,7 @@ export class OrdersService {
 			.lean();
 
 		if (lastOrder) {
-			number = lastOrder.number + 1;
+			number = (lastOrder.number || 0) + 1;
 		}
 
 		const address =
@@ -332,11 +332,9 @@ export class OrdersService {
 			switch (order?.status) {
 				case StatusOrder.OPEN:
 					if (
-						![
-							StatusOrder.CANCELLED,
-							StatusOrder.INVOICED,
-							StatusOrder.CLOSED,
-						].includes(StatusOrder[status])
+						![StatusOrder.CANCELLED, StatusOrder.CLOSED].includes(
+							StatusOrder[status],
+						)
 					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
@@ -348,15 +346,6 @@ export class OrdersService {
 						)
 					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
-					}
-					break;
-				case StatusOrder.INVOICED:
-					if (
-						![StatusOrder.SENT, StatusOrder.CLOSED].includes(
-							StatusOrder[status],
-						)
-					) {
-						throw new BadRequestException('El pedido se encuentra facturado');
 					}
 					break;
 				case StatusOrder.SENT:
@@ -422,12 +411,16 @@ export class OrdersService {
 			dataUpdate['status'] = StatusOrder[status];
 		}
 
-		let conveyor;
+		let conveyorOrder;
 		if (conveyorId) {
-			conveyor = await this.conveyorsService.findById(conveyorId);
+			const conveyor = await this.conveyorsService.findById(conveyorId);
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+			conveyorOrder = {
+				conveyor,
+				value: 0,
+			};
 		}
 
 		if (StatusOrder[status] === StatusOrder.CANCELLED) {
@@ -450,12 +443,66 @@ export class OrdersService {
 				}
 			}
 		}
+		let newDetails = [];
+		let newSummary = undefined;
 
-		if (StatusOrder[status] === StatusOrder.OPEN) {
+		if (
+			order.status === StatusOrder.PENDING &&
+			StatusOrder[status] === StatusOrder.OPEN
+		) {
 			const details = order.details.map((detail) => ({
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
+			if (
+				order?.summary?.total > 300000 &&
+				order?.customer?.customerType['name'] === 'Detal'
+			) {
+				const customerTypeWholesale = await this.customerTypesService.findOne(
+					'Mayorista',
+				);
+
+				for (let i = 0; i < order?.details?.length; i++) {
+					const detail = order?.details[i];
+
+					const discount = await this.discountRulesService.getDiscount({
+						customerTypeId: customerTypeWholesale?._id?.toString(),
+						reference: detail?.product?.reference as any,
+						companyId,
+					});
+
+					newDetails.push({
+						...detail,
+						price: detail?.product?.reference['price'] - discount,
+						discount,
+						updatedAt: new Date(),
+					});
+				}
+				const total = newDetails.reduce(
+					(sum, detail) => sum + detail.price * detail.quantity,
+					0,
+				);
+				if (total >= 300000) {
+					const discountTotal = newDetails.reduce(
+						(sum, detail) => sum + detail.quantity * detail.discount,
+						0,
+					);
+
+					const subtotal = total + discountTotal;
+
+					const tax = 0;
+
+					newSummary = {
+						...order.summary,
+						total,
+						discount: discountTotal,
+						subtotal,
+						tax,
+					};
+				} else {
+					newDetails = [];
+				}
+			}
 
 			await this.stockHistoryService.deleteStock(
 				{
@@ -503,7 +550,13 @@ export class OrdersService {
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
-				$set: { ...dataUpdate, user, conveyor },
+				$set: {
+					...dataUpdate,
+					details: newDetails.length > 0 ? newDetails : undefined,
+					summary: newSummary,
+					user,
+					conveyorOrder,
+				},
 			},
 			{
 				populate,
@@ -548,6 +601,7 @@ export class OrdersService {
 			.find({
 				pointOfSale: user.pointOfSale?._id,
 				status: StatusOrder.OPEN,
+				orderPos: true,
 			})
 			.populate(populate)
 			.lean();
@@ -609,7 +663,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT, StatusOrder.INVOICED],
+						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -638,7 +692,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT, StatusOrder.INVOICED],
+						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -871,13 +925,64 @@ export class OrdersService {
 
 		const tax = 0;
 
-		const summary = {
+		let summary = {
 			...order.summary,
 			total,
 			discount,
 			subtotal,
 			tax,
 		};
+
+		if (
+			!order?.orderPos &&
+			order?.status === StatusOrder.OPEN &&
+			order?.customer?.customerType['name'] === 'Detal'
+		) {
+			const customerTypeWholesale = await this.customerTypesService.findOne(
+				'Mayorista',
+			);
+
+			for (let i = 0; i < order?.details?.length; i++) {
+				const detail = order?.details[i];
+
+				const discount = await this.discountRulesService.getDiscount({
+					customerTypeId: customerTypeWholesale?._id?.toString(),
+					reference: detail?.product?.reference as any,
+					companyId,
+				});
+
+				newDetails.push({
+					...detail,
+					price: detail?.product?.reference['price'] - discount,
+					discount,
+					updatedAt: new Date(),
+				});
+			}
+			const total = newDetails.reduce(
+				(sum, detail) => sum + detail.price * detail.quantity,
+				0,
+			);
+			if (total >= 300000) {
+				const discountTotal = newDetails.reduce(
+					(sum, detail) => sum + detail.quantity * detail.discount,
+					0,
+				);
+
+				const subtotal = total + discountTotal;
+
+				const tax = 0;
+
+				summary = {
+					...order.summary,
+					total,
+					discount: discountTotal,
+					subtotal,
+					tax,
+				};
+			} else {
+				newDetails = [];
+			}
+		}
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,

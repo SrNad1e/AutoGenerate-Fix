@@ -25,6 +25,7 @@ import { FiltersUserInput } from '../dtos/filters-user.input';
 import { Shop } from '../entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { CustomerType } from 'src/crm/entities/customerType.entity';
+import { DocumentType } from 'src/crm/entities/documentType.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },
@@ -33,10 +34,16 @@ const populate = [
 	{ path: 'companies', model: Company.name },
 	{
 		path: 'customer',
-		populate: {
-			path: 'customerType',
-			model: CustomerType.name,
-		},
+		populate: [
+			{
+				path: 'customerType',
+				model: CustomerType.name,
+			},
+			{
+				path: 'documentType',
+				model: DocumentType.name,
+			},
+		],
 	},
 	{
 		path: 'shop',
@@ -146,6 +153,7 @@ export class UsersService {
 		if (!user) {
 			throw new NotFoundException(`Usuario con id ${id} no existe`);
 		}
+
 		return user;
 	}
 

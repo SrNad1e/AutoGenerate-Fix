@@ -110,6 +110,7 @@ export class ReceiptsService {
 		companyId: string,
 	) {
 		let box;
+
 		if (boxId) {
 			box = await this.boxService.findById(boxId);
 			if (!box) {

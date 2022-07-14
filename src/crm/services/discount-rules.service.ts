@@ -203,7 +203,12 @@ export class DiscountRulesService {
 	 * @param params datos para evaluar las reglas
 	 * @returns valor del descuento
 	 */
-	async getDiscount({ customerId, reference, companyId }: FindDiscountInput) {
+	async getDiscount({
+		customerId,
+		reference,
+		companyId,
+		customerTypeId,
+	}: FindDiscountInput) {
 		const discountRulers = await this.discountRuler.find({
 			dateInitial: {
 				$gt: new Date(),
@@ -226,7 +231,9 @@ export class DiscountRulesService {
 						switch (documentType) {
 							case DocumentTypesRule.CUSTOMERTYPES:
 								if (
-									!documentIds.includes(customer?.customerType?._id?.toString())
+									!documentIds.includes(
+										customer?.customerType?._id?.toString() || customerTypeId,
+									)
 								) {
 									pass = false;
 									i = rules?.length;
