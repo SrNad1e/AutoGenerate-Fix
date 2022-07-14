@@ -20,4 +20,10 @@ export class FindDiscountInput {
 		description: 'Compañía a la que pertenece la regla',
 	})
 	companyId: string;
+
+	@Field(() => String, {
+		description: 'Identificador del tipo de cliente para validar el descuento',
+		nullable: true,
+	})
+	customerTypeId?: string;
 }

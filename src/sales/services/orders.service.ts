@@ -40,6 +40,7 @@ import { StatusCoupon } from 'src/crm/entities/coupon.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { PointOfSale } from '../entities/pointOfSale.entity';
+import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 
 const populate = [
 	{
@@ -67,6 +68,7 @@ export class OrdersService {
 		private readonly couponsService: CouponsService,
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
+		private readonly customerTypesService: CustomerTypeService,
 	) {}
 
 	async findAll(
@@ -441,12 +443,66 @@ export class OrdersService {
 				}
 			}
 		}
+		let newDetails = [];
+		let newSummary = undefined;
 
-		if (StatusOrder[status] === StatusOrder.OPEN) {
+		if (
+			order.status === StatusOrder.PENDING &&
+			StatusOrder[status] === StatusOrder.OPEN
+		) {
 			const details = order.details.map((detail) => ({
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
 			}));
+			if (
+				order?.summary?.total > 300000 &&
+				order?.customer?.customerType['name'] === 'Detal'
+			) {
+				const customerTypeWholesale = await this.customerTypesService.findOne(
+					'Mayorista',
+				);
+
+				for (let i = 0; i < order?.details?.length; i++) {
+					const detail = order?.details[i];
+
+					const discount = await this.discountRulesService.getDiscount({
+						customerTypeId: customerTypeWholesale?._id?.toString(),
+						reference: detail?.product?.reference as any,
+						companyId,
+					});
+
+					newDetails.push({
+						...detail,
+						price: detail?.product?.reference['price'] - discount,
+						discount,
+						updatedAt: new Date(),
+					});
+				}
+				const total = newDetails.reduce(
+					(sum, detail) => sum + detail.price * detail.quantity,
+					0,
+				);
+				if (total >= 300000) {
+					const discountTotal = newDetails.reduce(
+						(sum, detail) => sum + detail.quantity * detail.discount,
+						0,
+					);
+
+					const subtotal = total + discountTotal;
+
+					const tax = 0;
+
+					newSummary = {
+						...order.summary,
+						total,
+						discount: discountTotal,
+						subtotal,
+						tax,
+					};
+				} else {
+					newDetails = [];
+				}
+			}
 
 			await this.stockHistoryService.deleteStock(
 				{
@@ -496,6 +552,8 @@ export class OrdersService {
 			{
 				$set: {
 					...dataUpdate,
+					details: newDetails.length > 0 ? newDetails : undefined,
+					summary: newSummary,
 					user,
 					conveyorOrder,
 				},
