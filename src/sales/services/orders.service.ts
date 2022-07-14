@@ -925,13 +925,60 @@ export class OrdersService {
 
 		const tax = 0;
 
-		const summary = {
+		let summary = {
 			...order.summary,
 			total,
 			discount,
 			subtotal,
 			tax,
 		};
+
+		if (!order?.orderPos) {
+			const customerTypeWholesale = await this.customerTypesService.findOne(
+				'Mayorista',
+			);
+
+			for (let i = 0; i < order?.details?.length; i++) {
+				const detail = order?.details[i];
+
+				const discount = await this.discountRulesService.getDiscount({
+					customerTypeId: customerTypeWholesale?._id?.toString(),
+					reference: detail?.product?.reference as any,
+					companyId,
+				});
+
+				newDetails.push({
+					...detail,
+					price: detail?.product?.reference['price'] - discount,
+					discount,
+					updatedAt: new Date(),
+				});
+			}
+			const total = newDetails.reduce(
+				(sum, detail) => sum + detail.price * detail.quantity,
+				0,
+			);
+			if (total >= 300000) {
+				const discountTotal = newDetails.reduce(
+					(sum, detail) => sum + detail.quantity * detail.discount,
+					0,
+				);
+
+				const subtotal = total + discountTotal;
+
+				const tax = 0;
+
+				summary = {
+					...order.summary,
+					total,
+					discount: discountTotal,
+					subtotal,
+					tax,
+				};
+			} else {
+				newDetails = [];
+			}
+		}
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,
