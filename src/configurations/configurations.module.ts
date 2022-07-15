@@ -42,11 +42,13 @@ import { PermissionsResolver } from './resolvers/permissions.resolver';
 import { RolesResolver } from './resolvers/roles.resolver';
 import { CompaniesResolver } from './resolvers/companies.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { SendMailModule } from 'src/send-mail/send-mail.module';
 
 @Module({
 	imports: [
 		PassportModule,
 		CrmModule,
+		SendMailModule,
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;

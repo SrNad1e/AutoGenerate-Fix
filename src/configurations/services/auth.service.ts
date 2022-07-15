@@ -10,11 +10,12 @@ import * as bcrypt from 'bcryptjs';
 import { PaginateModel } from 'mongoose';
 
 import { CustomersService } from 'src/crm/services/customers.service';
+import { SendMailService } from 'src/send-mail/services/send-mail.service';
 import { LoginResponse } from '../dtos/login-response';
 import { LoginUserInput } from '../dtos/login-user.input';
 import { SignUpInput } from '../dtos/signup.input';
 import { Shop } from '../entities/shop.entity';
-import { User } from '../entities/user.entity';
+import { StatusUser, User } from '../entities/user.entity';
 import { RolesService } from './roles.service';
 import { UsersService } from './users.service';
 
@@ -26,6 +27,7 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 		private readonly customersService: CustomersService,
 		private readonly rolesService: RolesService,
+		private readonly sendMailService: SendMailService,
 	) {}
 
 	async login(
@@ -132,6 +134,30 @@ export class AuthService {
 				sub: newUser._id,
 			}),
 		};
+	}
+
+	async recoveryPassword(email: string) {
+		const user = await this.usersService.findOne({ username: email });
+
+		if (!user) {
+			throw new UnauthorizedException(
+				`El usuario ${email} no se encuentra registrado`,
+			);
+		}
+
+		if (user.status !== StatusUser.ACTIVE) {
+			throw new UnauthorizedException(
+				`El usuario ${email} no se encuentra activo`,
+			);
+		}
+
+		try {
+			//TODO: se debe crear un token para realizar este proceso y almacenarlo en la base de datos
+			await this.sendMailService.sendRecoveryPassword(user, 'creartoken');
+			return true;
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	/**

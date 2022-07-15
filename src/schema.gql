@@ -3034,6 +3034,12 @@ type Mutation {
     loginUserInput: LoginUserInput!
   ): LoginResponse!
 
+  """Se encarga de enviar correo de recuperación de contraseña"""
+  recovery(
+    """Correo del usuario que se desea recuperar la contraseña"""
+    email: String!
+  ): Boolean!
+
   """Se encarga de crear el usuario desde aplicaciones externas"""
   signup(
     """Datos para la creación del usuario y cliente"""

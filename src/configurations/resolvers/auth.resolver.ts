@@ -42,4 +42,16 @@ export class AuthResolver {
 			...context.req.body.variables.input,
 		});
 	}
+
+	@Mutation(() => Boolean, {
+		description: 'Se encarga de enviar correo de recuperación de contraseña',
+	})
+	async recovery(
+		@Args('email', {
+			description: 'Correo del usuario que se desea recuperar la contraseña',
+		})
+		email: string,
+	) {
+		return this.authService.recoveryPassword(email);
+	}
 }
