@@ -42,11 +42,15 @@ import { PermissionsResolver } from './resolvers/permissions.resolver';
 import { RolesResolver } from './resolvers/roles.resolver';
 import { CompaniesResolver } from './resolvers/companies.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { SendMailModule } from 'src/send-mail/send-mail.module';
+import { Token, TokenSchema } from './entities/token.entity';
+import { TokensService } from './services/tokens.service';
 
 @Module({
 	imports: [
 		PassportModule,
 		CrmModule,
+		SendMailModule,
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;
@@ -87,6 +91,10 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 			{
 				name: Order.name,
 				schema: OrderSchema,
+			},
+			{
+				name: Token.name,
+				schema: TokenSchema,
 			},
 		]),
 		MongooseModule.forFeatureAsync([
@@ -132,6 +140,7 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 		PermissionsResolver,
 		RolesResolver,
 		CompaniesResolver,
+		TokensService,
 	],
 	controllers: [StaticfilesController, ShopsController],
 	exports: [
