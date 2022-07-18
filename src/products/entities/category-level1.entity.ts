@@ -3,7 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { CategoryLevel2 } from './category-level2.entity';
 

@@ -553,9 +553,6 @@ type Color {
   """Color en formato html"""
   html: String!
 
-  """Identificador del color mysql"""
-  id: Float @deprecated(reason: "Campo para migración de mysql")
-
   """Imagen del color"""
   image: Image
 

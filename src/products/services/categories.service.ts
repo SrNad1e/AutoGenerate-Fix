@@ -1,9 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
-import { Repository } from 'typeorm';
 
 import { CreateCategoryInput } from '../dtos/create-category.input';
 import { FiltersCategoriesLevelInput } from '../dtos/filters-categories-level.input';
@@ -33,8 +31,7 @@ export class CategoriesService {
 		@InjectModel(CategoryLevel2.name)
 		private readonly categoryLevel2Model: PaginateModel<CategoryLevel2>,
 		@InjectModel(CategoryLevel3.name)
-		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3> /*@InjectRepository(CategoryMysql)
-		private readonly categoryRepository: Repository<CategoryMysql>,*/,
+		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3> 
 	) {}
 
 	async findAll({

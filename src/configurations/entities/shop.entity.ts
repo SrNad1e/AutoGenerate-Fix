@@ -1,10 +1,8 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 
 import { Warehouse } from './warehouse.entity';
-import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/configurations/entities/user.entity';
 
 export enum StatusShop {

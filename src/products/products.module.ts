@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Product, ProductSchema } from './entities/product.entity';
-//import { ProductMysql } from './entities/product.entity';
 import { ProductsService } from './services/products.service';
 import { ProductsController } from './controllers/products.controller';
 import { ColorsResolver } from './resolvers/colors.resolver';
@@ -65,12 +63,6 @@ import { CrmModule } from 'src/crm/crm.module';
 				},
 			},
 		]),
-		/*		TypeOrmModule.forFeature([
-			ProductMysql,
-			SizeMysql,
-			ColorMysql,
-			CategoryMysql,
-		]),*/
 	],
 	providers: [
 		ProductsService,
