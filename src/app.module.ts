@@ -21,12 +21,12 @@ import { SendMailModule } from './send-mail/send-mail.module';
 
 @Module({
 	imports: [
-		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', 'public'),
-		}),
 		GraphQLModule.forRoot({
 			autoSchemaFile: 'src/schema.gql',
 			sortSchema: true,
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', 'public'),
 		}),
 		ConfigModule.forRoot({
 			envFilePath: enviroments[process.env.NODE_ENV] || '.env',
