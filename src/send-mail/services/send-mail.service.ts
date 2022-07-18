@@ -8,7 +8,7 @@ export class SendMailService {
 	constructor(private mailerService: MailerService) {}
 
 	async sendRecoveryPassword(user: User, token: string) {
-		//const api = `https://wholesalers-wa.toulouse.com.co`;
+		//const api = `https://wholesalers-qa.toulouse.com.co`;
 		//const web = `https://wholesalers-wa.toulouse.com.co`;
 		const web = 'http://localhost:3000';
 		const api = `http://localhost:8080`;

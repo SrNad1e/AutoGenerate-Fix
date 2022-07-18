@@ -9,5 +9,5 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
 		description: 'Estado del usuario',
 		nullable: true,
 	})
-	status: StatusUser;
+	status?: StatusUser;
 }

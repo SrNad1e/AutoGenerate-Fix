@@ -43,6 +43,8 @@ import { RolesResolver } from './resolvers/roles.resolver';
 import { CompaniesResolver } from './resolvers/companies.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { SendMailModule } from 'src/send-mail/send-mail.module';
+import { Token, TokenSchema } from './entities/token.entity';
+import { TokensService } from './services/tokens.service';
 
 @Module({
 	imports: [
@@ -90,6 +92,10 @@ import { SendMailModule } from 'src/send-mail/send-mail.module';
 				name: Order.name,
 				schema: OrderSchema,
 			},
+			{
+				name: Token.name,
+				schema: TokenSchema,
+			},
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -134,6 +140,7 @@ import { SendMailModule } from 'src/send-mail/send-mail.module';
 		PermissionsResolver,
 		RolesResolver,
 		CompaniesResolver,
+		TokensService,
 	],
 	controllers: [StaticfilesController, ShopsController],
 	exports: [

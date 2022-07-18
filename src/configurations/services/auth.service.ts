@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
+import * as dayjs from 'dayjs';
 import { PaginateModel } from 'mongoose';
 
 import { CustomersService } from 'src/crm/services/customers.service';
@@ -17,6 +18,7 @@ import { SignUpInput } from '../dtos/signup.input';
 import { Shop } from '../entities/shop.entity';
 import { StatusUser, User } from '../entities/user.entity';
 import { RolesService } from './roles.service';
+import { TokensService } from './tokens.service';
 import { UsersService } from './users.service';
 
 @Injectable()
@@ -28,6 +30,7 @@ export class AuthService {
 		private readonly customersService: CustomersService,
 		private readonly rolesService: RolesService,
 		private readonly sendMailService: SendMailService,
+		private readonly tokensService: TokensService,
 	) {}
 
 	async login(
@@ -152,12 +155,47 @@ export class AuthService {
 		}
 
 		try {
-			//TODO: se debe crear un token para realizar este proceso y almacenarlo en la base de datos
-			await this.sendMailService.sendRecoveryPassword(user, 'creartoken');
+			await this.tokensService.inactiveToken(user);
+			const token = await this.tokensService.generateToken(
+				user,
+				dayjs().add(1, 'd').toDate(),
+			);
+
+			await this.sendMailService.sendRecoveryPassword(user, token?.code);
 			return true;
 		} catch (e) {
 			console.log(e);
 		}
+	}
+
+	async changePasswordToken(code: string, password: string) {
+		const token = await this.tokensService.validateToken(code);
+
+		if (!token) {
+			throw new UnauthorizedException(
+				'El token ya se ha vencido o fue inactivado, solicite uno nuevo',
+			);
+		}
+
+		await this.tokensService.inactiveToken(token.user as unknown as User);
+
+		const user = await this.usersService.update(
+			token?.user['_id']?.toString(),
+			{
+				password,
+			},
+			token.user as unknown as User,
+			token.user['companies'][0]?.toString(),
+		);
+
+		return {
+			access_token: this.jwtService.sign({
+				username: user.username,
+				companyId: token.user['companies'][0]?.toString(),
+				sub: user._id,
+			}),
+			user,
+		};
 	}
 
 	/**
