@@ -620,6 +620,15 @@ type Company {
   user: User!
 }
 
+"""Datos para confirmar productos"""
+input ConfirmProductsOrderInput {
+  """Productos a confirmar"""
+  details: [DetailsConfirm!]!
+
+  """Identificador del pedido a confirmar productos"""
+  orderId: String!
+}
+
 """Datos para confirmar los productos del traslado"""
 input ConfirmStockTransferInput {
   """Productos para confirmar"""
@@ -1467,7 +1476,7 @@ type DetailOrder {
   quantityReturn: Float!
 
   """Estado del producto"""
-  status: String!
+  status: StatusOrderDetail!
 
   """Fecha de actualizado del producto al pedido"""
   updatedAt: DateTime!
@@ -1656,6 +1665,15 @@ type DetailTransfer {
 
   """Fecha de actualizacion el producto"""
   updatedAt: DateTime!
+}
+
+"""Producto para confirmar en el pedido"""
+input DetailsConfirm {
+  """Producto a confirmar"""
+  productId: String!
+
+  """Estado del producto, si es diferente a confirm"""
+  status: StatusOrderDetail
 }
 
 """Reglas de descuento"""
@@ -2831,6 +2849,12 @@ type Mutation {
     """Token generado para validar el cambio de clave"""
     token: String!
   ): LoginResponse!
+
+  """Se encarga de confirmar o desconfirmar productos de un pedido"""
+  confirmProductsOrder(
+    """Productos del pedido para actualizar"""
+    confirmProductsOrderInput: ConfirmProductsOrderInput!
+  ): ResponseOrder!
 
   """Confirma los productos del traslado"""
   confirmProductsStockTransfer(
@@ -6167,6 +6191,11 @@ enum StatusOrder {
   OPEN
   PENDING
   SENT
+}
+
+enum StatusOrderDetail {
+  CONFIRMED
+  NEW
 }
 
 enum StatusProduct {
