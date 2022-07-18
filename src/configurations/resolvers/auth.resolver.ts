@@ -42,4 +42,32 @@ export class AuthResolver {
 			...context.req.body.variables.input,
 		});
 	}
+
+	@Mutation(() => Boolean, {
+		description: 'Se encarga de enviar correo de recuperación de contraseña',
+	})
+	async recoveryPassword(
+		@Args('email', {
+			description: 'Correo del usuario que se desea recuperar la contraseña',
+		})
+		email: string,
+	) {
+		return this.authService.recoveryPassword(email);
+	}
+
+	@Mutation(() => LoginResponse, {
+		description: 'Se encarga de cambiar la clave al usuario con base al tokenu',
+	})
+	async changePasswordToken(
+		@Args('token', {
+			description: 'Token generado para validar el cambio de clave',
+		})
+		token: string,
+		@Args('password', {
+			description: 'Nueva contraseña',
+		})
+		password: string,
+	) {
+		return this.authService.changePasswordToken(token, password);
+	}
 }

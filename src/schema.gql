@@ -2823,6 +2823,15 @@ type Mutation {
     addProductsOrderInput: AddProductsOrderInput!
   ): ResponseOrder!
 
+  """Se encarga de cambiar la clave al usuario con base al tokenu"""
+  changePasswordToken(
+    """Nueva contraseña"""
+    password: String!
+
+    """Token generado para validar el cambio de clave"""
+    token: String!
+  ): LoginResponse!
+
   """Confirma los productos del traslado"""
   confirmProductsStockTransfer(
     """Datos para confirmar los productos del traslado"""
@@ -3033,6 +3042,12 @@ type Mutation {
     """Datos de usuario para realizar el login"""
     loginUserInput: LoginUserInput!
   ): LoginResponse!
+
+  """Se encarga de enviar correo de recuperación de contraseña"""
+  recoveryPassword(
+    """Correo del usuario que se desea recuperar la contraseña"""
+    email: String!
+  ): Boolean!
 
   """Se encarga de crear el usuario desde aplicaciones externas"""
   signup(
