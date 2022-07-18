@@ -41,6 +41,7 @@ import { CreditsService } from 'src/credits/services/credits.service';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
+import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 
 const populate = [
 	{
@@ -996,6 +997,75 @@ export class OrdersService {
 			{
 				populate,
 				new: true,
+				lean: true,
+			},
+		);
+
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?._id.toString(),
+			});
+		} catch {}
+
+		return {
+			credit,
+			order: newOrder,
+		};
+	}
+
+	async confirmProducts(
+		{ details, orderId }: ConfirmProductsOrderInput,
+		user: User,
+		companyId: string,
+	) {
+		const order = await this.orderModel.findById(orderId).lean();
+
+		if (!order) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (![StatusOrder.OPEN].includes(order?.status)) {
+			throw new BadRequestException(
+				`El pedido ${order.number} ya se encuentra procesado`,
+			);
+		}
+
+		const newDetails = [];
+
+		for (let i = 0; i < details.length; i++) {
+			const { productId, status = StatusOrderDetail.CONFIRMED } = details[i];
+
+			const productFind = order?.details?.find(
+				({ product }) => product._id.toString() === productId,
+			);
+
+			if (!productFind) {
+				throw new BadRequestException({
+					message: 'Uno de los productos no existe en el pedido',
+					data: productId,
+				});
+			}
+
+			newDetails.push({
+				...productFind,
+				status,
+			});
+		}
+
+		const newOrder = await this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					details: newDetails,
+					user,
+				},
+			},
+			{
+				new: true,
+				populate,
 				lean: true,
 			},
 		);

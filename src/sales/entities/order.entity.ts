@@ -28,7 +28,7 @@ export enum StatusOrderDetail {
 	CONFIRMED = 'confirmed',
 }
 
-registerEnumType(StatusOrder, { name: 'StatusOrder' });
+registerEnumType(StatusOrderDetail, { name: 'StatusOrderDetail' });
 
 @ObjectType({ description: 'Transportadora que realiza el envio' })
 export class ConveyorOrder {
@@ -56,7 +56,7 @@ export class DetailOrder {
 	@Field(() => Product, { description: 'Producto agregado al pedido' })
 	product: Product;
 
-	@Field(() => String, { description: 'Estado del producto' })
+	@Field(() => StatusOrderDetail, { description: 'Estado del producto' })
 	status: StatusOrderDetail;
 
 	@Field(() => Number, { description: 'Cantidad de productos en el pedido' })
