@@ -1173,7 +1173,7 @@ export class OrdersService {
 
 				if (index < 0) {
 					throw new BadRequestException(
-						`El producto ${detail.paymentId} no existe en el pedido ${order?.number}`,
+						`El medio de pago ${detail.paymentId} no existe en el pedido ${order?.number}`,
 					);
 				}
 			}
@@ -1206,7 +1206,7 @@ export class OrdersService {
 
 				if (index >= 0) {
 					throw new BadRequestException(
-						`El producto ${newPayments[index].payment.name} ya existe en la orden ${order?.number} y no se puede agregar`,
+						`El medio de pago ${newPayments[index].payment.name} ya existe en la orden ${order?.number} y no se puede agregar`,
 					);
 				}
 			}
@@ -1264,7 +1264,8 @@ export class OrdersService {
 			0,
 		);
 
-		const change = totalPaid - order.summary.total;
+		const change =
+			totalPaid - order.summary.total > 0 ? totalPaid - order.summary.total : 0;
 
 		const cash = newPayments.reduce((sum, payment) => sum + payment?.total, 0);
 
