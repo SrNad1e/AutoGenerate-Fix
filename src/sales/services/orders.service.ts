@@ -943,8 +943,8 @@ export class OrdersService {
 				'Mayorista',
 			);
 
-			for (let i = 0; i < order?.details?.length; i++) {
-				const detail = order?.details[i];
+			for (let i = 0; i < newDetails.length; i++) {
+				const detail = newDetails[i];
 
 				const discount = await this.discountRulesService.getDiscount({
 					customerTypeId: customerTypeWholesale?._id?.toString(),
@@ -980,9 +980,9 @@ export class OrdersService {
 					subtotal,
 					tax,
 				};
-			} else {
+			} /*else {
 				newDetails = [];
-			}
+			}*/
 		}
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
