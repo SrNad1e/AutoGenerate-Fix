@@ -942,9 +942,10 @@ export class OrdersService {
 			const customerTypeWholesale = await this.customerTypesService.findOne(
 				'Mayorista',
 			);
-
-			for (let i = 0; i < newDetails.length; i++) {
-				const detail = newDetails[i];
+			const details = [...newDetails];
+			newDetails = [];
+			for (let i = 0; i < details.length; i++) {
+				const detail = details[i];
 
 				const discount = await this.discountRulesService.getDiscount({
 					customerTypeId: customerTypeWholesale?._id?.toString(),
