@@ -409,6 +409,9 @@ type City {
   """Identificador de mongo"""
   _id: String!
 
+  """Codigo DANE"""
+  code: String!
+
   """País"""
   country: String!
 

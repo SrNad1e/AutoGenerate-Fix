@@ -26,4 +26,12 @@ export default registerAs('config', () => ({
 		user: process.env.NODEMAILER_USER,
 		password: process.env.NODEMAILER_PASSWORD,
 	},
+	interapidisimo: {
+		api: process.env.INTER_API,
+	},
+	FEDEX: {
+		api: process.env.FEDEX_API,
+		client_id: process.env.FEDEX_CLIENT_ID,
+		client_secret: process.env.FEDEX_CLIENT_SECRET,
+	},
 }));

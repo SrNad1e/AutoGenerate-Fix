@@ -6,7 +6,7 @@ import {
 } from 'src/configurations/libs/permissions.decorator';
 import { ConveyorOrder } from 'src/sales/entities/order.entity';
 import { FiltersConveyorsInput } from '../dtos/filters-conveyors.input';
-import { ResponseConveyors } from '../dtos/response-conveyors.input';
+import { ResponseConveyors } from '../dtos/response-conveyors';
 import { ConveyorsService } from '../services/conveyors.service';
 
 @Resolver()

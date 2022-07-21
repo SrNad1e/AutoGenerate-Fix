@@ -22,6 +22,10 @@ export class City extends Document {
 	@Prop({ type: String })
 	country: string;
 
+	@Field(() => String, { description: 'Codigo DANE' })
+	@Prop({ type: String })
+	code: string;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la ciudad',
 	})

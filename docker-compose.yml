@@ -8,21 +8,14 @@ services:
       - mongo
     environment:
       PORT: 8080
+      #Mongo
       MONGO_DB: pos_qa
-      #MONGO_USER: clientUser
       MONGO_USER: cirotex
-      #MONGO_PASSWORD: B8g5UsdguLTm62Ef
       MONGO_PASSWORD: prueba
       MONGO_PORT: 27017
-      #MONGO_HOST: toulouse.gtczv.mongodb.net
       MONGO_HOST: mongo
-      #MONGO_CONNECTION: mongodb+srv
       MONGO_CONNECTION: mongodb
-      MARIADB_DB: pos_qa
-      MARIADB_USER: root
-      MARIADB_PASSWORD: 1234
-      MARIADB_PORT: 3306
-      MARIADB_HOST: mysql
+      # JWT
       SECRET_TOKEN: prueba
       EXPIRE_TOKEN: 24h
       # Nodemailer
@@ -36,6 +29,8 @@ services:
       AWS_ACCESS_KEY_ID: AKIA5MNQTDPXCZ3Y225G
       AWS_SECRET_ACCESS_KEY: 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
       AWS_PUBLIC_BUCKET_NAME: admin-z1bt76x1jqpz961o43xt3ik7pzhd6use1a-s3alias
+      # Interapidisimo
+      INTER_API: https://stgwww3.interrapidisimo.com
     ports:
       - "8080:8080"
     volumes:

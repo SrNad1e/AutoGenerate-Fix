@@ -3,7 +3,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateCompanyInput } from '../dtos/create-company.input';
 import { FiltersCompaniesInput } from '../dtos/filters-companies.input';
 
-import { ResponseCompanies } from '../dtos/response-companies.input';
+import { ResponseCompanies } from '../dtos/response-companies';
 import { UpdateCompanyInput } from '../dtos/update-company.input';
 import { Company } from '../entities/company.entity';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
