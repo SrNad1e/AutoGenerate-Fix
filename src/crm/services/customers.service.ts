@@ -232,11 +232,9 @@ export class CustomersService {
 		if (newCustomer) {
 			await this.orderModel.updateMany(
 				{
-					$set: {
-						'customer._id': new Types.ObjectId(id),
-						status: {
-							$in: [StatusOrder.OPEN, StatusOrder.PENDING],
-						},
+					'customer._id': new Types.ObjectId(id),
+					status: {
+						$in: [StatusOrder.OPEN, StatusOrder.PENDING],
 					},
 				},
 				{
