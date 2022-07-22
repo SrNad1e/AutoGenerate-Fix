@@ -31,6 +31,13 @@ services:
       AWS_PUBLIC_BUCKET_NAME: admin-z1bt76x1jqpz961o43xt3ik7pzhd6use1a-s3alias
       # Interapidisimo
       INTER_API: https://stgwww3.interrapidisimo.com
+      # Fedex
+      FEDEX_API: https://apis-sandbox.fedex.com
+      FEDEX_CLIENT_ID: l71770d83ad25a4b3d961c3ed8ab48ec88
+      FEDEX_CLIENT_SECRET: dc0838dab7bc4c75be8db1adbead2f20
+      FEDEX_ACCOUNT_NUMBER: 740561073
+      FEDEX_POSTAL_CODE_DEFAULT: 055413
+      FEDEX_COUNTRY_DEFAULT: CO
     ports:
       - "8080:8080"
     volumes:

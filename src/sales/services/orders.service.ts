@@ -242,7 +242,9 @@ export class OrdersService {
 			status: StatusOrder[status],
 			company: new Types.ObjectId(companyId),
 		});
+
 		let credit;
+
 		try {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?.toString(),

@@ -4,7 +4,9 @@ import { ConfigType } from '@nestjs/config';
 import { map } from 'rxjs';
 
 import config from 'src/config';
+import { GetPriceFedexInput } from '../dtos/get-price-fedex.input';
 import { ResponseAuthorizationFedex } from '../dtos/response-authorization-fedex';
+import { ResponsePriceFedex } from '../dtos/response-price-fedex';
 
 @Injectable()
 export class FedexService {
@@ -34,8 +36,66 @@ export class FedexService {
 		}
 	}
 
-	async getPrice() {
+	/**
+	 * @description obtiene el precio del
+	 * @param params datos para el cálculo del envío
+	 * @return precio redondeado del envío
+	 */
+	async getPrice({ address, dimensions, weight }: GetPriceFedexInput) {
+		const { api, accountNumber, postalCode, country } =
+			this.configService.FEDEX;
 		const { access_token }: ResponseAuthorizationFedex =
 			await this.generateAuthorization();
+
+		const response = (await this.httpService
+			.post(
+				`${api}/rate/v1/rates/quotes`,
+				{
+					accountNumber: {
+						value: accountNumber,
+					},
+					requestedShipment: {
+						serviceType: 'STANDARD_OVERNIGHT',
+						shipper: {
+							address: {
+								postalCode: postalCode,
+								countryCode: country,
+							},
+						},
+						recipient: {
+							address: address,
+						},
+						pickupType: 'DROPOFF_AT_FEDEX_LOCATION',
+						rateRequestType: ['PREFERRED'],
+						requestedPackageLineItems: [
+							{
+								weight: {
+									value: weight,
+									units: 'KG',
+								},
+								dimensions: {
+									...dimensions,
+									units: 'CM',
+								},
+							},
+						],
+					},
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						authorization: `Bearer ${access_token}`,
+						'x-locale': 'es_MX',
+					},
+				},
+			)
+			.pipe(map((resp) => resp.data))) as unknown as ResponsePriceFedex;
+
+		let total =
+			response?.output?.rateReplyDetails[0]?.ratedShipmentDetails[1]
+				?.totalNetFedExCharge || 0;
+
+		total = Math.ceil(total);
+		return Math.ceil(total / 100) * 100;
 	}
 }
