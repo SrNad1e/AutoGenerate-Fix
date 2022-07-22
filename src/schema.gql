@@ -409,14 +409,17 @@ type City {
   """Identificador de mongo"""
   _id: String!
 
-  """Codigo DANE"""
+  """Código DANE"""
   code: String!
 
   """País"""
-  country: String!
+  country: Country!
 
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Código postal"""
+  defaultPostalCode: String!
 
   """Nombre de la ciudad"""
   name: String!
@@ -652,6 +655,9 @@ type Conveyor {
   """Nombre de la transportadora"""
   name: String!
 
+  """Tipo de transportadora"""
+  type: ConveyorType!
+
   """Fecha de actualización de la transportadora"""
   updatedAt: DateTime!
 
@@ -672,6 +678,21 @@ type ConveyorOrder {
 
   """Valor del envío"""
   value: Float!
+}
+
+enum ConveyorType {
+  FEDEX
+  ITERRAPIDISIMO
+  REGION
+}
+
+"""Pais"""
+type Country {
+  """Nombre del país"""
+  name: String!
+
+  """Prefijo del país"""
+  prefix: String!
 }
 
 """Cupones para pagos"""

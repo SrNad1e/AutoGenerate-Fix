@@ -1,9 +1,17 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 import { Image } from 'src/configurations/entities/image.entity';
 import { User } from './user.entity';
+
+export enum ConveyorType {
+	FEDEX = 'FEDEX',
+	ITERRAPIDISIMO = 'Interapidisimo',
+	REGION = 'region',
+}
+
+registerEnumType(ConveyorType, { name: 'ConveyorType' });
 
 @ObjectType({ description: 'Modelo para la transportadora' })
 @Schema({ timestamps: true })
@@ -14,6 +22,10 @@ export class Conveyor extends Document {
 	@Field(() => String, { description: 'Nombre de la transportadora' })
 	@Prop({ type: String, required: true })
 	name: string;
+
+	@Field(() => ConveyorType, { description: 'Tipo de transportadora' })
+	@Prop({ type: String, required: true })
+	type: ConveyorType;
 
 	@Field(() => String, {
 		description: 'Mensaje para el usuario',

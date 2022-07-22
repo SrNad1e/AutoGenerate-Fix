@@ -4,6 +4,15 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 
+@ObjectType({ description: 'Pais' })
+export class Country {
+	@Field(() => String, { description: 'Nombre del país' })
+	name: string;
+
+	@Field(() => String, { description: 'Prefijo del país' })
+	prefix: string;
+}
+
 @ObjectType({ description: 'Ciudad de la dirección' })
 @Schema({ timestamps: true })
 export class City extends Document {
@@ -11,25 +20,29 @@ export class City extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => String, { description: 'Nombre de la ciudad' })
-	@Prop({ type: String })
+	@Prop({ type: String, required: true })
 	name: string;
 
 	@Field(() => String, { description: 'Departamento' })
-	@Prop({ type: String })
+	@Prop({ type: String, required: true })
 	state: string;
 
-	@Field(() => String, { description: 'País' })
-	@Prop({ type: String })
-	country: string;
+	@Field(() => Country, { description: 'País' })
+	@Prop({ type: Object, required: true })
+	country: Country;
 
-	@Field(() => String, { description: 'Codigo DANE' })
-	@Prop({ type: String })
+	@Field(() => String, { description: 'Código DANE' })
+	@Prop({ type: String, required: true })
 	code: string;
+
+	@Field(() => String, { description: 'Código postal' })
+	@Prop({ type: String, required: true })
+	defaultPostalCode: string;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la ciudad',
 	})
-	@Prop({ type: Object })
+	@Prop({ type: Object, required: true })
 	user: User;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
