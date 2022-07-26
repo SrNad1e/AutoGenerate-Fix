@@ -169,11 +169,25 @@ export class CreditsService {
 					}
 					available = available - detailAddCredit?.total;
 					balance = balance + detailAddCredit?.total;
-					details.push({
-						order: new Types.ObjectId(detailAddCredit?.orderId),
-						balance: detailAddCredit?.total,
-						total: detailAddCredit?.total,
-					});
+
+					const detailIndex = credit.details.findIndex(
+						(detail) =>
+							detail?.order?._id?.toString() === detailAddCredit?.orderId,
+					);
+
+					if (detailIndex >= 0) {
+						details[detailIndex] = {
+							order: new Types.ObjectId(detailAddCredit?.orderId),
+							balance: details[detailIndex].balance + detailAddCredit?.total,
+							total: detailAddCredit?.total,
+						};
+					} else {
+						details.push({
+							order: new Types.ObjectId(detailAddCredit?.orderId),
+							balance: detailAddCredit?.total,
+							total: detailAddCredit?.total,
+						});
+					}
 					break;
 				case TypeCreditHistory.DEBIT:
 					if (detailAddCredit?.total > balance) {
