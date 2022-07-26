@@ -41,11 +41,22 @@ export class FedexService {
 	 * @param params datos para el cálculo del envío
 	 * @return precio redondeado del envío
 	 */
-	async getPrice({ address, dimensions, weight }: GetPriceFedexInput) {
+	async getPrice({ address, dimensions }: GetPriceFedexInput) {
 		const { api, accountNumber, postalCode, country } =
 			this.configService.FEDEX;
 		const { access_token }: ResponseAuthorizationFedex =
 			await this.generateAuthorization();
+
+		const requestedPackageLineItems = dimensions.map((dimension) => ({
+			weight: {
+				value: dimension.weight,
+				units: 'KG',
+			},
+			dimensions: {
+				...dimension.dimensions,
+				units: 'CM',
+			},
+		}));
 
 		const response = (await this.httpService
 			.post(
@@ -67,18 +78,7 @@ export class FedexService {
 						},
 						pickupType: 'DROPOFF_AT_FEDEX_LOCATION',
 						rateRequestType: ['PREFERRED'],
-						requestedPackageLineItems: [
-							{
-								weight: {
-									value: weight,
-									units: 'KG',
-								},
-								dimensions: {
-									...dimensions,
-									units: 'CM',
-								},
-							},
-						],
+						requestedPackageLineItems,
 					},
 				},
 				{

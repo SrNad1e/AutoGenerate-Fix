@@ -420,9 +420,15 @@ export class OrdersService {
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+
+			const value = this.conveyorsService.calculateValue(
+				conveyor.type,
+				order as Order,
+			);
+
 			conveyorOrder = {
 				conveyor,
-				value: 0,
+				value,
 			};
 		}
 

@@ -9,8 +9,12 @@ class DimensionsFedexInput {
 	height: number;
 }
 
+class Dimensions {
+	weight: number;
+	dimensions: DimensionsFedexInput;
+}
+
 export class GetPriceFedexInput {
 	address: AddressFedexInput;
-	dimensions: DimensionsFedexInput;
-	weight: number;
+	dimensions: Dimensions[];
 }
