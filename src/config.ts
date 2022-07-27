@@ -28,6 +28,8 @@ export default registerAs('config', () => ({
 	},
 	interapidisimo: {
 		api: process.env.INTER_API,
+		signature: process.env.INTER_SIGNATURE,
+		security_token: process.env.INTER_SECURITY_TOKEN,
 	},
 	FEDEX: {
 		api: process.env.FEDEX_API,

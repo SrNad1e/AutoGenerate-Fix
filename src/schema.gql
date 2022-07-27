@@ -105,6 +105,9 @@ type Address {
 
   """Teléfono del contacto"""
   phone: String!
+
+  """Código postal"""
+  postalCode: String
 }
 
 """Dirección del cliente"""
@@ -440,7 +443,7 @@ input CityInput {
   _id: String!
 
   """País"""
-  country: String!
+  country: CountryInput!
 
   """Fecha de creación"""
   createdAt: DateTime
@@ -693,6 +696,12 @@ type Country {
 
   """Prefijo del país"""
   prefix: String!
+}
+
+"""País entrada"""
+input CountryInput {
+  """Nombre del país"""
+  name: String!
 }
 
 """Cupones para pagos"""

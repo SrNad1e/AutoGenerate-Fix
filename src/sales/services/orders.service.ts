@@ -421,10 +421,12 @@ export class OrdersService {
 				throw new NotFoundException('El transportista no existe');
 			}
 
-			const value = this.conveyorsService.calculateValue(
+			const value = await this.conveyorsService.calculateValue(
 				conveyor.type,
 				order as Order,
 			);
+
+			console.log(value);
 
 			conveyorOrder = {
 				conveyor,

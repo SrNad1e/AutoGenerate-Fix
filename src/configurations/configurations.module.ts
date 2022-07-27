@@ -54,7 +54,10 @@ import { FedexService } from './services/fedex.service';
 		PassportModule,
 		CrmModule,
 		SendMailModule,
-		HttpModule,
+		HttpModule.register({
+			timeout: 5000,
+			maxRedirects: 5,
+		}),
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;

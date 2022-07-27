@@ -51,6 +51,8 @@ import { SendMailModule } from './send-mail/send-mail.module';
 				NODEMAILER_USER: Joi.string().required(),
 				NODEMAILER_PASSWORD: Joi.string().required(),
 				INTER_API: Joi.string().required(),
+				INTER_SIGNATURE: Joi.string().required(),
+				INTER_SECURITY_TOKEN: Joi.string().required(),
 				FEDEX_API: Joi.string().required(),
 				FEDEX_CLIENT_ID: Joi.string().required(),
 				FEDEX_CLIENT_SECRET: Joi.string().required(),

@@ -1,12 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { map } from 'rxjs';
 
 import config from 'src/config';
 import { GetPriceFedexInput } from '../dtos/get-price-fedex.input';
 import { ResponseAuthorizationFedex } from '../dtos/response-authorization-fedex';
-import { ResponsePriceFedex } from '../dtos/response-price-fedex';
 
 @Injectable()
 export class FedexService {
@@ -20,17 +18,18 @@ export class FedexService {
 	 * @description obtiene la autorización de fedex
 	 * @returns token de autorización para los consumos
 	 */
-	async generateAuthorization(): Promise<ResponseAuthorizationFedex | any> {
+	async generateAuthorization(): Promise<ResponseAuthorizationFedex> {
 		const { api, client_id, client_secret } = this.configService.FEDEX;
-
+		const params = new URLSearchParams();
+		params.append('grant_type', 'client_credentials');
+		params.append('client_id', client_id);
+		params.append('client_secret', client_secret);
 		try {
-			return this.httpService
-				.post(`${api}/oauth/token`, {
-					grant_type: 'client_credentials',
-					client_id,
-					client_secret,
-				})
-				.pipe(map((resp) => resp.data));
+			const response = await this.httpService.axiosRef.post(
+				`${api}/oauth/token`,
+				params,
+			);
+			return response.data;
 		} catch (e) {
 			throw new Error(e.message);
 		}
@@ -58,8 +57,8 @@ export class FedexService {
 			},
 		}));
 
-		const response = (await this.httpService
-			.post(
+		try {
+			const response = await this.httpService.axiosRef.post(
 				`${api}/rate/v1/rates/quotes`,
 				{
 					accountNumber: {
@@ -88,14 +87,17 @@ export class FedexService {
 						'x-locale': 'es_MX',
 					},
 				},
-			)
-			.pipe(map((resp) => resp.data))) as unknown as ResponsePriceFedex;
+			);
+			console.log(response);
 
-		let total =
-			response?.output?.rateReplyDetails[0]?.ratedShipmentDetails[1]
-				?.totalNetFedExCharge || 0;
+			let total =
+				response?.data?.output?.rateReplyDetails[0]?.ratedShipmentDetails[1]
+					?.totalNetFedExCharge || 0;
 
-		total = Math.ceil(total);
-		return Math.ceil(total / 100) * 100;
+			total = Math.ceil(total);
+			return Math.ceil(total / 100) * 100;
+		} catch (e) {
+			throw new Error('Error en servidor FEDEX');
+		}
 	}
 }
