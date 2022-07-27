@@ -7,7 +7,7 @@ import { User } from './user.entity';
 
 export enum ConveyorType {
 	FEDEX = 'FEDEX',
-	ITERRAPIDISIMO = 'Interapidisimo',
+	INTERRAPIDISIMO = 'Interapidisimo',
 	REGION = 'region',
 }
 

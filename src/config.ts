@@ -29,7 +29,9 @@ export default registerAs('config', () => ({
 	interapidisimo: {
 		api: process.env.INTER_API,
 		signature: process.env.INTER_SIGNATURE,
-		security_token: process.env.INTER_SECURITY_TOKEN,
+		Authorization: process.env.INTER_AUTHORIZATION,
+		city_default: process.env.INTER_CITY_DEFAULT,
+		client_id: process.env.INTER_CLIENT_ID,
 	},
 	FEDEX: {
 		api: process.env.FEDEX_API,

@@ -32,13 +32,15 @@ services:
       # Interapidisimo
       INTER_API: https://stgwww3.interrapidisimo.com
       INTER_SIGNATURE: userManufacturasSTG
-      INTER_SECURITY_TOKEN: bearer xn7PLu7KCmgS7uq2D7JkC_44DBN99-vTrXE2BHkh4eTKd7sOzQG5MdqRK74eaRsULyP5z4lkJsQDzyNNZwSJRzHbpESCnQx7L7GTI3ZXswLugl1CrdUbVbXKoE6u07HfZsfRzXEfsVKxQHwUS-khx2m73zpoMb8xwU41GaUTvjxupa_mIQtxzorUyI86cruaPKaSCwPib1uZtdkzHhfG2jqnGIi3OYAIDWGMWAMnzVyigSfmkk6ise76zLmPhAkc
+      INTER_AUTHORIZATION: bearer xn7PLu7KCmgS7uq2D7JkC_44DBN99-vTrXE2BHkh4eTKd7sOzQG5MdqRK74eaRsULyP5z4lkJsQDzyNNZwSJRzHbpESCnQx7L7GTI3ZXswLugl1CrdUbVbXKoE6u07HfZsfRzXEfsVKxQHwUS-khx2m73zpoMb8xwU41GaUTvjxupa_mIQtxzorUyI86cruaPKaSCwPib1uZtdkzHhfG2jqnGIi3OYAIDWGMWAMnzVyigSfmkk6ise76zLmPhAkc
+      INTER_CITY_DEFAULT: 05360
+      INTER_CLIENT_ID: 5853
       # Fedex
       FEDEX_API: https://apis-sandbox.fedex.com
       FEDEX_CLIENT_ID: l71770d83ad25a4b3d961c3ed8ab48ec88
       FEDEX_CLIENT_SECRET: dc0838dab7bc4c75be8db1adbead2f20
       FEDEX_ACCOUNT_NUMBER: 740561073
-      FEDEX_POSTAL_CODE_DEFAULT: 055413
+      FEDEX_POSTAL_CODE_DEFAULT: 055411
       FEDEX_COUNTRY_DEFAULT: CO
     ports:
       - "8080:8080"

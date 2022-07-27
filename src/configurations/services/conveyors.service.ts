@@ -8,6 +8,7 @@ import { Order } from 'src/sales/entities/order.entity';
 import { FiltersConveyorsInput } from '../dtos/filters-conveyors.input';
 import { Conveyor, ConveyorType } from '../entities/conveyor.entity';
 import { FedexService } from './fedex.service';
+import { InterapidisimoService } from './interapidisimo.service';
 
 const populate = [
 	{
@@ -24,6 +25,7 @@ export class ConveyorsService {
 		@InjectModel(Order.name)
 		private readonly orderModel: PaginateModel<Order>,
 		private readonly fedexService: FedexService,
+		private readonly interrapidisimoService: InterapidisimoService,
 		private readonly citiesService: CitiesService,
 	) {}
 
@@ -70,7 +72,11 @@ export class ConveyorsService {
 		});
 	}
 
-	async calculateValue(type: ConveyorType, { address, details }: Order) {
+	async calculateValue(
+		type: ConveyorType,
+		{ address, details, summary }: Order,
+	) {
+		const city = await this.citiesService.findById(address.city._id.toString());
 		switch (type) {
 			case ConveyorType.FEDEX:
 				const dimensions = details.map((detail) => ({
@@ -89,9 +95,6 @@ export class ConveyorsService {
 				}));
 
 				let postalCode = address.postalCode;
-				const city = await this.citiesService.findById(
-					address.city._id.toString(),
-				);
 				if (!address.postalCode) {
 					postalCode = city.defaultPostalCode;
 				}
@@ -102,6 +105,18 @@ export class ConveyorsService {
 						postalCode,
 					},
 					dimensions,
+				});
+			case ConveyorType.INTERRAPIDISIMO:
+				const weight = details.reduce(
+					(sum, detail) => sum + detail.product.reference['shipping']['weight'],
+					0,
+				);
+
+				return this.interrapidisimoService.getPrice({
+					cityId: city.code,
+					shippingInsurance: false,
+					total: summary.total,
+					weight,
 				});
 			default:
 				break;

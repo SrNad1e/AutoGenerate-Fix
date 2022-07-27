@@ -685,7 +685,7 @@ type ConveyorOrder {
 
 enum ConveyorType {
   FEDEX
-  ITERRAPIDISIMO
+  INTERRAPIDISIMO
   REGION
 }
 
