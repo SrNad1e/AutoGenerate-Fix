@@ -84,25 +84,32 @@ export class InterapidisimoService {
 			(type) => type.max >= weight && type.min <= weight,
 		);
 
+		const url = `${api}/ApiServInterStg/api/Cotizadorcliente/ResultadoListaCotizar/${client_id}/${city_default}/${cityId}/${Math.ceil(
+			weight,
+		)}/${shippingInsurance ? Math.ceil(total) : 0}/${
+			typeSent.code
+		}/${dayjs().format('DD-MM-YYYY')}`;
+
+		const headers = {
+			'x-app-signature': signature,
+			'x-app-security_token': Access_token,
+		};
+
+		console.log(url);
+		console.log(headers);
+
 		try {
 			const response: { data: ResponsePriceInterrapidisimo } =
-				await this.httpService.axiosRef.get(
-					`${api}/ApiServInterStg/api/Cotizadorcliente/ResultadoListaCotizar/${client_id}/${city_default}/${cityId}/${weight}/${
-						shippingInsurance ? total : 0
-					}/${typeSent.code}/${dayjs().format('DD-MM-YYYY')}`,
-					{
-						headers: {
-							'x-app-signature': signature,
-							'x-app-security_token': Access_token,
-						},
-					},
-				);
-			console.log(response.data);
+				await this.httpService.axiosRef.get(url, {
+					headers,
+				});
+			console.log('response', response.data);
 			let totalPay = response.data.Precio.Valor;
 			totalPay = Math.ceil(totalPay);
 			return Math.ceil(totalPay / 100) * 100;
 		} catch (e) {
-			console.log(e.response);
+			console.log(e.message);
+			console.log(e.response.data);
 
 			throw new Error('Error en servidor Interrapidisimo');
 		}
