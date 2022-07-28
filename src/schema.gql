@@ -435,6 +435,9 @@ type City {
 
   """Usuario que creó o editó la ciudad"""
   user: User!
+
+  """Zona a la que pertenece la ciudad"""
+  zone: ZoneType!
 }
 
 """Ciudad entrada"""
@@ -686,7 +689,7 @@ type ConveyorOrder {
 enum ConveyorType {
   FEDEX
   INTERRAPIDISIMO
-  REGION
+  ZONE
 }
 
 """Pais"""
@@ -795,6 +798,9 @@ input CreateCityInput {
 
   """Nombre del departamento"""
   state: String!
+
+  """Tipo de zona"""
+  zone: ZoneType!
 }
 
 """Datos para crear un cierre X"""
@@ -6598,6 +6604,9 @@ input UpadteCityInput {
 
   """Nombre del departamento"""
   state: String
+
+  """Tipo de zona"""
+  zone: ZoneType
 }
 
 """Datos para actualizar el atributo"""
@@ -7138,4 +7147,13 @@ type Warehouse {
 
   """Usuario que creó el usuario"""
   user: User!
+}
+
+enum ZoneType {
+  INSHOP
+  LOCAL
+  METROPOLITAN
+  NATIONAL
+  SPECIAL
+  URBAN
 }

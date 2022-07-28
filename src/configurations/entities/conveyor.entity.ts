@@ -8,10 +8,21 @@ import { User } from './user.entity';
 export enum ConveyorType {
 	FEDEX = 'FEDEX',
 	INTERRAPIDISIMO = 'Interapidisimo',
-	REGION = 'region',
+	ZONE = 'Zona',
 }
 
 registerEnumType(ConveyorType, { name: 'ConveyorType' });
+
+export enum ZoneType {
+	LOCAL = 'Local',
+	METROPOLITAN = 'Metropolitano',
+	URBAN = 'Urbano',
+	NATIONAL = 'Nacional',
+	SPECIAL = 'Especial',
+	INSHOP = 'Recogida en tienda',
+}
+
+registerEnumType(ZoneType, { name: 'ZoneType' });
 
 @ObjectType({ description: 'Modelo para la transportadora' })
 @Schema({ timestamps: true })

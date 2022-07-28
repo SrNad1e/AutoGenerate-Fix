@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { ZoneType } from 'src/configurations/entities/conveyor.entity';
 
 import { User } from 'src/configurations/entities/user.entity';
 
@@ -26,6 +27,10 @@ export class City extends Document {
 	@Field(() => String, { description: 'Departamento' })
 	@Prop({ type: String, required: true })
 	state: string;
+
+	@Field(() => ZoneType, { description: 'Zona a la que pertenece la ciudad' })
+	@Prop({ type: String, required: true })
+	zone: ZoneType;
 
 	@Field(() => Country, { description: 'País' })
 	@Prop({ type: Object, required: true })
