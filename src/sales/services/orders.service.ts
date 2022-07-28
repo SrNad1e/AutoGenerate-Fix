@@ -1033,6 +1033,12 @@ export class OrdersService {
 			);
 		}
 
+		if (details.length !== order.details.length) {
+			throw new BadRequestException(
+				`No puede eliminar ni agregar productos nuevos`,
+			);
+		}
+
 		const newDetails = [];
 
 		for (let i = 0; i < details.length; i++) {
@@ -1051,7 +1057,7 @@ export class OrdersService {
 
 			newDetails.push({
 				...productFind,
-				status,
+				status: StatusOrderDetail[status],
 			});
 		}
 
