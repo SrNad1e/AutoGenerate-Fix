@@ -53,6 +53,7 @@ export class ReceiptsService {
 			paymentId,
 			sort,
 			status,
+			boxId,
 		}: FiltersReceiptsInput,
 		user: User,
 		companyId: string,
@@ -72,7 +73,11 @@ export class ReceiptsService {
 		}
 
 		if (status) {
-			filters.status = StatusReceipt[status];
+			filters.status = StatusReceipt[status] || status;
+		}
+
+		if (boxId) {
+			filters.box = new Types.ObjectId(boxId);
 		}
 
 		if (dateInitial) {
