@@ -1195,6 +1195,17 @@ export class OrdersService {
 			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.CREATE,
 		);
 
+		for (let i = 0; i < paymentsCreate.length; i++) {
+			const { paymentId } = paymentsCreate[i];
+			const payment = await this.paymentsService.findById(paymentId);
+
+			if (!payment.active) {
+				throw new BadRequestException(
+					`El medio de pago ${payment.name} se encuentra inactivo`,
+				);
+			}
+		}
+
 		if (paymentsCreate) {
 			for (let i = 0; i < paymentsCreate.length; i++) {
 				const detail = paymentsCreate[i];
