@@ -1033,26 +1033,26 @@ export class OrdersService {
 			);
 		}
 
-		const newDetails = [];
+		const newDetails = [...order.details];
 
 		for (let i = 0; i < details.length; i++) {
-			const { productId, status = StatusOrderDetail.CONFIRMED } = details[i];
+			const { productId, status } = details[i];
 
-			const productFind = order?.details?.find(
-				({ product }) => product._id.toString() === productId,
+			const index = newDetails.findIndex(
+				(detail) => detail.product._id.toString() === productId,
 			);
 
-			if (!productFind) {
+			if (index < 0) {
 				throw new BadRequestException({
 					message: 'Uno de los productos no existe en el pedido',
 					data: productId,
 				});
 			}
 
-			newDetails.push({
-				...productFind,
-				status,
-			});
+			newDetails[index] = {
+				...newDetails[index],
+				status: StatusOrderDetail[status],
+			};
 		}
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
