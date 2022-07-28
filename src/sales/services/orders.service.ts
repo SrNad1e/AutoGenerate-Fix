@@ -1042,7 +1042,7 @@ export class OrdersService {
 		const newDetails = [];
 
 		for (let i = 0; i < details.length; i++) {
-			const { productId, status = StatusOrderDetail.CONFIRMED } = details[i];
+			const { productId, status } = details[i];
 
 			const productFind = order?.details?.find(
 				({ product }) => product._id.toString() === productId,
