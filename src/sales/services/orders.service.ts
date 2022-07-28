@@ -426,8 +426,6 @@ export class OrdersService {
 				order as Order,
 			);
 
-			console.log(value);
-
 			conveyorOrder = {
 				conveyor,
 				value,
