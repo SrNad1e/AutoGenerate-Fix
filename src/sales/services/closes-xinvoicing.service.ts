@@ -167,50 +167,41 @@ export class ClosesXInvoicingService {
 			companyId,
 		);
 
-		const payments: PaymentOrderClose[] =
-			summaryOrder.payments.length > 0
-				? summaryOrder.payments.map((payment) => {
-						if (receipts.docs.length > 0) {
-							console.log(payment);
-							console.log(receipts.docs[0].payment);
+		const payments: PaymentOrderClose[] = summaryOrder.payments;
 
-							if (
-								payment.toString() === receipts.docs[0].payment._id.toString()
-							) {
-								const total = receipts.docs.reduce(
-									(ant, now) => ({
-										quantity: ant.quantity + 1,
-										value: ant.value + now.value,
-									}),
-									{
-										quantity: 0,
-										value: 0,
-									},
-								);
+		const paymentsReceipt: PaymentOrderClose[] = [];
 
-								return {
-									...payment,
-									quantity: total.quantity,
-									value: total.value,
-								};
-							}
-						}
-						return payment;
-				  })
-				: [
-						receipts.docs.reduce(
-							(ant, now) => ({
-								payment: now.payment._id,
-								value: ant.value + now.value,
-								quantity: ant.quantity + 1,
-							}),
-							{
-								payment: {},
-								quantity: 0,
-								value: 0,
-							},
-						),
-				  ];
+		receipts.docs.forEach((receipt) => {
+			const paymentIndex = paymentsReceipt.findIndex(
+				(item) => item.payment.toString() === receipt.payment._id.toString(),
+			);
+
+			if (paymentIndex) {
+				paymentsReceipt[paymentIndex] = {
+					...payments[paymentIndex],
+					quantity: payments[paymentIndex].quantity + 1,
+					value: payments[paymentIndex].value + receipt.value,
+				};
+			} else {
+				paymentsReceipt.push({
+					payment: receipt.payment._id,
+					quantity: 1,
+					value: receipt.value,
+				});
+			}
+		});
+
+		paymentsReceipt.forEach((payment) => {
+			const paymentIndex = payments.findIndex(
+				(item) => item.payment.toString() === payment.toString(),
+			);
+
+			if (paymentIndex) {
+				payments[paymentIndex] = payment;
+			} else {
+				payments.push(payment);
+			}
+		});
 
 		const newClose = new this.closeXInvoicingModel({
 			cashRegister: cashRegister,
