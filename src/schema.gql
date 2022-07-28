@@ -790,8 +790,14 @@ input CreateCategoryInput {
 
 """Datos para crear una ciudad"""
 input CreateCityInput {
+  """Código DANE"""
+  code: String!
+
   """Nombre del país"""
   country: String!
+
+  """Código postal de la ciudad por defecto"""
+  defaultPostalCode: String!
 
   """Nombre de la ciudad"""
   name: String!
@@ -6596,8 +6602,14 @@ enum TypesRule {
 
 """Datos para actualizar la ciudad"""
 input UpadteCityInput {
+  """Código DANE"""
+  code: String
+
   """Nombre del país"""
   country: String
+
+  """Código postal de la ciudad por defecto"""
+  defaultPostalCode: String
 
   """Nombre de la ciudad"""
   name: String

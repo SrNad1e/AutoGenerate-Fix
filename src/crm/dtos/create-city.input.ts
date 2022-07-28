@@ -14,4 +14,12 @@ export class CreateCityInput {
 
 	@Field(() => ZoneType, { description: 'Tipo de zona' })
 	zone: ZoneType;
+
+	@Field(() => String, { description: 'Código DANE' })
+	code: string;
+
+	@Field(() => String, {
+		description: 'Código postal de la ciudad por defecto',
+	})
+	defaultPostalCode: string;
 }
