@@ -75,6 +75,7 @@ export class FedexService {
 						recipient: {
 							address: address,
 						},
+						preferredCurrency: 'COP',
 						pickupType: 'DROPOFF_AT_FEDEX_LOCATION',
 						rateRequestType: ['PREFERRED'],
 						requestedPackageLineItems,
@@ -88,7 +89,6 @@ export class FedexService {
 					},
 				},
 			);
-			console.log(response);
 
 			let total =
 				response?.data?.output?.rateReplyDetails[0]?.ratedShipmentDetails[1]

@@ -95,22 +95,15 @@ export class InterapidisimoService {
 			'x-app-security_token': Access_token,
 		};
 
-		console.log(url);
-		console.log(headers);
-
 		try {
 			const response: { data: ResponsePriceInterrapidisimo } =
 				await this.httpService.axiosRef.get(url, {
 					headers,
 				});
-			console.log('response', response.data);
-			let totalPay = response.data.Precio.Valor;
+			let totalPay = response.data[0].Precio.Valor;
 			totalPay = Math.ceil(totalPay);
 			return Math.ceil(totalPay / 100) * 100;
 		} catch (e) {
-			console.log(e.message);
-			console.log(e.response.data);
-
 			throw new Error('Error en servidor Interrapidisimo');
 		}
 	}
