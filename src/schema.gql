@@ -2366,6 +2366,9 @@ input FiltersProductsInput {
 
 """Filtros para consultar los recibos de caja"""
 input FiltersReceiptsInput {
+  """Caja que afecta el pago"""
+  boxId: String
+
   """Fecha final para la busqueda"""
   dateFinal: String
 

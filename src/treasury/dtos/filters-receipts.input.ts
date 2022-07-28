@@ -66,6 +66,12 @@ export class FiltersReceiptsInput {
 	})
 	paymentId?: string;
 
+	@Field(() => String, {
+		description: 'Caja que afecta el pago',
+		nullable: true,
+	})
+	boxId?: string;
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 

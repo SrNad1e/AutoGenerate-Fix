@@ -48,6 +48,7 @@ export class ExpensesService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Expense> = {};
+		console.log(status);
 
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -62,7 +63,7 @@ export class ExpensesService {
 		}
 
 		if (status) {
-			filters.status = StatusExpense[status];
+			filters.status = StatusExpense[status] || status;
 		}
 
 		if (dateInitial) {
