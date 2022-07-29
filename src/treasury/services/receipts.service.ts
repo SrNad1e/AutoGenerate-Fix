@@ -217,6 +217,12 @@ export class ReceiptsService {
 		}
 
 		if (StatusReceipt[status] === StatusReceipt.CANCELLED) {
+			if (!receipt.details) {
+				throw new BadRequestException(
+					'El recibo paga el total de una factura y no se puede anular',
+				);
+			}
+
 			const ordersId = receipt.details.map(
 				({ orderId }) => new Types.ObjectId(orderId),
 			);
