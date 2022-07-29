@@ -176,7 +176,7 @@ export class ClosesXInvoicingService {
 				(item) => item.payment.toString() === receipt.payment._id.toString(),
 			);
 
-			if (paymentIndex) {
+			if (paymentIndex > 0) {
 				paymentsReceipt[paymentIndex] = {
 					...payments[paymentIndex],
 					quantity: payments[paymentIndex].quantity + 1,
@@ -196,7 +196,7 @@ export class ClosesXInvoicingService {
 				(item) => item.payment.toString() === payment.toString(),
 			);
 
-			if (paymentIndex) {
+			if (paymentIndex > 0) {
 				payments[paymentIndex] = payment;
 			} else {
 				payments.push(payment);
