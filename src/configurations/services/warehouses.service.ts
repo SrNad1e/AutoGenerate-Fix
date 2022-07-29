@@ -1,12 +1,9 @@
 import {
 	BadRequestException,
 	Injectable,
-	NotFoundException,
 	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { CompaniesService } from 'src/configurations/services/companies.service';
@@ -21,9 +18,6 @@ export class WarehousesService {
 	constructor(
 		@InjectModel(Warehouse.name)
 		private readonly warehouseModel: PaginateModel<Warehouse>,
-		/*@InjectRepository(WarehouseMysql)
-		private readonly warehouseRepo: Repository<WarehouseMysql>,*/
-		private readonly companiesService: CompaniesService,
 	) {}
 
 	async findAll(
@@ -131,31 +125,4 @@ export class WarehousesService {
 	async getByIdMysql(id: number): Promise<Warehouse> {
 		return this.warehouseModel.findOne({ id }).lean();
 	}
-
-	/*async migrate() {
-		try {
-			const warehousesMysql = await this.warehouseRepo.find();
-			const companyDefault = await this.companiesService.findOne('Cirotex');
-			const warehousesMongo = [];
-			for (let i = 0; i < warehousesMysql.length; i++) {
-				const { name } = warehousesMysql[i];
-				warehousesMongo.push({
-					name,
-					max: 100,
-					min: 10,
-					company: companyDefault?._id,
-					user: {
-						name: 'Administrador del Sistema',
-						username: 'admin',
-					},
-				});
-			}
-			await this.warehouseModel.create(warehousesMongo);
-			return {
-				message: 'Migración completa',
-			};
-		} catch (e) {
-			throw new NotFoundException(`Error al migrar las bodegas ${e}`);
-		}
-	}*/
 }

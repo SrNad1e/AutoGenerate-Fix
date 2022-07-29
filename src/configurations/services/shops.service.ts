@@ -5,9 +5,7 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { InjectRepository } from '@nestjs/typeorm';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
-import { Repository } from 'typeorm';
 
 import { CompaniesService } from 'src/configurations/services/companies.service';
 import { CreateShopInput } from '../dtos/create-shop.input';

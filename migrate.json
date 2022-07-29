@@ -105,14 +105,14 @@
 			"option": "Entrada",
 			"name": "Crear",
 			"description": "Permite crear las entradas de inventario",
-			"action": "CREATE_INVENTORY_OUTPUT"
+			"action": "CREATE_INVENTORY_INPUT"
 		},
 		{
 			"module": "Inventario",
 			"option": "Salida",
 			"name": "Crear",
 			"description": "Permite crear las salidas de inventario",
-			"action": "CREATE_INVENTORY_INPUT"
+			"action": "CREATE_INVENTORY_OUTPUT"
 		},
 		{
 			"module": "Inventario",
@@ -140,14 +140,14 @@
 			"option": "Entrada",
 			"name": "Actualizar",
 			"description": "Permite actualizar las entradas de inventario",
-			"action": "UPDATE_INVENTORY_OUTPUT"
+			"action": "UPDATE_INVENTORY_INPUT"
 		},
 		{
 			"module": "Inventario",
 			"option": "Salida",
 			"name": "Actualizar",
 			"description": "Permite actualizar las salidas de inventario",
-			"action": "UPDATE_INVENTORY_INPUT"
+			"action": "UPDATE_INVENTORY_OUTPUT"
 		},
 		{
 			"module": "Inventario",
@@ -175,14 +175,14 @@
 			"option": "Entrada",
 			"name": "Imprimir",
 			"description": "Permite imprimir las entradas de inventario",
-			"action": "PRINT_INVENTORY_OUTPUT"
+			"action": "PRINT_INVENTORY_INPUT"
 		},
 		{
 			"module": "Inventario",
 			"option": "Salida",
 			"name": "Imprimir",
 			"description": "Permite imprimir las salidas de inventario",
-			"action": "PRINT_INVENTORY_INPUT"
+			"action": "PRINT_INVENTORY_OUTPUT"
 		},
 		{
 			"module": "Inventario",

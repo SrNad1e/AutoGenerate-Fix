@@ -1034,26 +1034,26 @@ export class OrdersService {
 			);
 		}
 
-		const newDetails = [];
+		const newDetails = [...order.details];
 
 		for (let i = 0; i < details.length; i++) {
-			const { productId, status = StatusOrderDetail.CONFIRMED } = details[i];
+			const { productId, status } = details[i];
 
-			const productFind = order?.details?.find(
-				({ product }) => product._id.toString() === productId,
+			const index = newDetails.findIndex(
+				(detail) => detail.product._id.toString() === productId,
 			);
 
-			if (!productFind) {
+			if (index < 0) {
 				throw new BadRequestException({
 					message: 'Uno de los productos no existe en el pedido',
 					data: productId,
 				});
 			}
 
-			newDetails.push({
-				...productFind,
-				status,
-			});
+			newDetails[index] = {
+				...newDetails[index],
+				status: StatusOrderDetail[status],
+			};
 		}
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
@@ -1195,6 +1195,17 @@ export class OrdersService {
 		const paymentsCreate = payments?.filter(
 			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.CREATE,
 		);
+
+		for (let i = 0; i < paymentsCreate.length; i++) {
+			const { paymentId } = paymentsCreate[i];
+			const payment = await this.paymentsService.findById(paymentId);
+
+			if (!payment.active) {
+				throw new BadRequestException(
+					`El medio de pago ${payment.name} se encuentra inactivo`,
+				);
+			}
+		}
 
 		if (paymentsCreate) {
 			for (let i = 0; i < paymentsCreate.length; i++) {

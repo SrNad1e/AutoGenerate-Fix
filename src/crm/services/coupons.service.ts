@@ -136,6 +136,7 @@ export class CouponsService {
 		if (coupon.status === StatusCoupon.REDEEMED) {
 			throw new BadRequestException('El cupón ya fue redimido');
 		}
+
 		const response = await this.couponModel.findByIdAndUpdate(
 			id,
 			{

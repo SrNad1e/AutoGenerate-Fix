@@ -553,9 +553,6 @@ type Color {
   """Color en formato html"""
   html: String!
 
-  """Identificador del color mysql"""
-  id: Float @deprecated(reason: "Campo para migración de mysql")
-
   """Imagen del color"""
   image: Image
 
@@ -1497,6 +1494,15 @@ type DetailOutput {
   updatedAt: DateTime!
 }
 
+"""Detalles del recibo"""
+type DetailReceipt {
+  """Monto para abonar al pedido"""
+  amount: Float!
+
+  """Identificador del pedido"""
+  orderId: String!
+}
+
 """Detalles de cruce de la cartera"""
 input DetailReceiptOrder {
   """Monto para abonar al pedido"""
@@ -2360,6 +2366,9 @@ input FiltersProductsInput {
 
 """Filtros para consultar los recibos de caja"""
 input FiltersReceiptsInput {
+  """Caja que afecta el pago"""
+  boxId: String
+
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -3552,7 +3561,7 @@ enum Permissions {
   ACCESS_TREASURY_BOXES
   ACCESS_TREASURY_EXPENSES
   ACCESS_TREASURY_PAYMENTS
-  ACCESS_TREASURY_RECEIPTS
+  ACCESS_TREASURY_RECEIPT
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
@@ -4090,6 +4099,9 @@ type Receipt {
 
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Detalle del cruce del recibo"""
+  details: [DetailReceipt!]!
 
   """Consecutivo del recibo de caja"""
   number: Float!

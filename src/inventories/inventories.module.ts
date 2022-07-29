@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import {
@@ -9,8 +8,6 @@ import {
 import { ProductsModule } from 'src/products/products.module';
 import {
 	StockTransfer,
-	StockTransferDetailMysql,
-	StockTransferMysql,
 	StockTransferSchema,
 } from './entities/stock-transfer.entity';
 import { StockInput, StockInputSchema } from './entities/stock-input.entity';
@@ -45,7 +42,6 @@ import {
 	imports: [
 		ProductsModule,
 		ConfigurationsModule,
-		//TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
 		MongooseModule.forFeature([
 			{
 				name: StockTransfer.name,

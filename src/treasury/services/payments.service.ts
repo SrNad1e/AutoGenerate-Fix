@@ -1,12 +1,20 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { Image } from 'src/configurations/entities/image.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreatePaymentInput } from '../dtos/create-payment.input';
 
 import { FiltersPaymentsInput } from '../dtos/filters-payments.input';
 import { UpdatePaymentInput } from '../dtos/update-payment.input';
 import { Payment, TypePayment } from '../entities/payment.entity';
+
+const populate = [
+	{
+		path: 'logo',
+		model: Image.name,
+	},
+];
 
 @Injectable()
 export class PaymentsService {
@@ -44,6 +52,7 @@ export class PaymentsService {
 			limit,
 			page,
 			sort,
+			populate,
 			lean: true,
 		};
 

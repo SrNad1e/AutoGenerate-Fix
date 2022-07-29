@@ -20,5 +20,6 @@ DockerFile
 /dist/*
 /test/*
 /node_modules/*
+/node_modules
 /coverage/*
 *.env
