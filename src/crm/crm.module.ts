@@ -95,6 +95,7 @@ import { DiscountRulesResolver } from './resolvers/discount-rules.resolver';
 		CustomersService,
 		CustomerTypeService,
 		CouponsService,
+		CitiesService,
 		DiscountRulesService,
 	],
 })

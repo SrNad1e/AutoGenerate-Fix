@@ -1,6 +1,7 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { ZoneType } from 'src/configurations/entities/conveyor.entity';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateCityInput } from '../dtos/create-city.input';
@@ -64,17 +65,19 @@ export class CitiesService {
 		return this.cityModel.findById(id).lean();
 	}
 
-	async create(params: CreateCityInput, user: User) {
-		const city = await this.cityModel.findOne(params);
+	async create({ zone, ...params }: CreateCityInput, user: User) {
+		const city = await this.cityModel.findOne({
+			code: params.code,
+		});
 
 		if (city) {
 			throw new BadGatewayException('La ciudad que intenta crear ya existe');
 		}
 
-		return this.cityModel.create({ ...params, user });
+		return this.cityModel.create({ zone: ZoneType[zone], ...params, user });
 	}
 
-	async update(id: string, params: UpadteCityInput, user: User) {
+	async update(id: string, { zone, ...params }: UpadteCityInput, user: User) {
 		const city = await this.findById(id);
 
 		if (!city) {
@@ -83,7 +86,7 @@ export class CitiesService {
 
 		return this.cityModel.findByIdAndUpdate(
 			id,
-			{ ...params, user },
+			{ zone: ZoneType[zone], ...params, user },
 			{
 				lean: true,
 				new: true,

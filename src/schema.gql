@@ -105,6 +105,9 @@ type Address {
 
   """Teléfono del contacto"""
   phone: String!
+
+  """Código postal"""
+  postalCode: String
 }
 
 """Dirección del cliente"""
@@ -409,11 +412,17 @@ type City {
   """Identificador de mongo"""
   _id: String!
 
+  """Código DANE"""
+  code: String!
+
   """País"""
-  country: String!
+  country: Country!
 
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Código postal"""
+  defaultPostalCode: String!
 
   """Nombre de la ciudad"""
   name: String!
@@ -426,6 +435,9 @@ type City {
 
   """Usuario que creó o editó la ciudad"""
   user: User!
+
+  """Zona a la que pertenece la ciudad"""
+  zone: ZoneType!
 }
 
 """Ciudad entrada"""
@@ -434,7 +446,7 @@ input CityInput {
   _id: String!
 
   """País"""
-  country: String!
+  country: CountryInput!
 
   """Fecha de creación"""
   createdAt: DateTime
@@ -649,6 +661,12 @@ type Conveyor {
   """Nombre de la transportadora"""
   name: String!
 
+  """Precios por región solo para type ZONE"""
+  rates: [RatesRegion!]
+
+  """Tipo de transportadora"""
+  type: ConveyorType!
+
   """Fecha de actualización de la transportadora"""
   updatedAt: DateTime!
 
@@ -669,6 +687,27 @@ type ConveyorOrder {
 
   """Valor del envío"""
   value: Float!
+}
+
+enum ConveyorType {
+  FEDEX
+  INTERRAPIDISIMO
+  ZONE
+}
+
+"""Pais"""
+type Country {
+  """Nombre del país"""
+  name: String!
+
+  """Prefijo del país"""
+  prefix: String!
+}
+
+"""País entrada"""
+input CountryInput {
+  """Nombre del país"""
+  name: String!
 }
 
 """Cupones para pagos"""
@@ -754,14 +793,23 @@ input CreateCategoryInput {
 
 """Datos para crear una ciudad"""
 input CreateCityInput {
+  """Código DANE"""
+  code: String!
+
   """Nombre del país"""
   country: String!
+
+  """Código postal de la ciudad por defecto"""
+  defaultPostalCode: String!
 
   """Nombre de la ciudad"""
   name: String!
 
   """Nombre del departamento"""
   state: String!
+
+  """Tipo de zona"""
+  zone: ZoneType!
 }
 
 """Datos para crear un cierre X"""
@@ -4083,6 +4131,15 @@ type Query {
   ): ResponseWarehouses!
 }
 
+"""Rangos de precio por regiones"""
+type RatesRegion {
+  """Precio de la zona"""
+  price: Float!
+
+  """Zona a aplicar el precio"""
+  zone: ZoneType!
+}
+
 """Egreso de dinero"""
 type Receipt {
   """Identificador de mongo"""
@@ -6560,14 +6617,23 @@ enum TypesRule {
 
 """Datos para actualizar la ciudad"""
 input UpadteCityInput {
+  """Código DANE"""
+  code: String
+
   """Nombre del país"""
   country: String
+
+  """Código postal de la ciudad por defecto"""
+  defaultPostalCode: String
 
   """Nombre de la ciudad"""
   name: String
 
   """Nombre del departamento"""
   state: String
+
+  """Tipo de zona"""
+  zone: ZoneType
 }
 
 """Datos para actualizar el atributo"""
@@ -7108,4 +7174,13 @@ type Warehouse {
 
   """Usuario que creó el usuario"""
   user: User!
+}
+
+enum ZoneType {
+  INSHOP
+  LOCAL
+  METROPOLITAN
+  NATIONAL
+  SPECIAL
+  URBAN
 }

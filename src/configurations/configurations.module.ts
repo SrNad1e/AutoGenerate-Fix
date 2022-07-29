@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PassportModule } from '@nestjs/passport';
+import { HttpModule } from '@nestjs/axios';
 
 import { Conveyor, ConveyorSchema } from './entities/conveyor.entity';
 import { CompanySchema } from './entities/company.entity';
@@ -45,12 +46,18 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { SendMailModule } from 'src/send-mail/send-mail.module';
 import { Token, TokenSchema } from './entities/token.entity';
 import { TokensService } from './services/tokens.service';
+import { InterapidisimoService } from './services/interapidisimo.service';
+import { FedexService } from './services/fedex.service';
 
 @Module({
 	imports: [
 		PassportModule,
 		CrmModule,
 		SendMailModule,
+		HttpModule.register({
+			timeout: 5000,
+			maxRedirects: 5,
+		}),
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;
@@ -141,6 +148,8 @@ import { TokensService } from './services/tokens.service';
 		RolesResolver,
 		CompaniesResolver,
 		TokensService,
+		InterapidisimoService,
+		FedexService,
 	],
 	controllers: [StaticfilesController, ShopsController],
 	exports: [
