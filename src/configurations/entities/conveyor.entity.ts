@@ -24,6 +24,15 @@ export enum ZoneType {
 
 registerEnumType(ZoneType, { name: 'ZoneType' });
 
+@ObjectType({ description: 'Rangos de precio por regiones' })
+export class RatesRegion {
+	@Field(() => ZoneType, { description: 'Zona a aplicar el precio' })
+	zone: ZoneType;
+
+	@Field(() => Number, { description: 'Precio de la zona' })
+	price: number;
+}
+
 @ObjectType({ description: 'Modelo para la transportadora' })
 @Schema({ timestamps: true })
 export class Conveyor extends Document {
@@ -54,6 +63,16 @@ export class Conveyor extends Document {
 	})
 	logo: Types.ObjectId;
 
+	@Field(() => [RatesRegion], {
+		description: 'Precios por región solo para type ZONE',
+		nullable: true,
+	})
+	@Prop({
+		type: Array,
+	})
+	rates: RatesRegion[];
+
+	@Field(() => [ZoneType], { description: '' })
 	@Field(() => User, { description: 'Usuario que crea la transportadora' })
 	@Prop({ type: Object, required: true })
 	user: User;

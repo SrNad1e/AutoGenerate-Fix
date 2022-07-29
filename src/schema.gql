@@ -661,6 +661,9 @@ type Conveyor {
   """Nombre de la transportadora"""
   name: String!
 
+  """Precios por región solo para type ZONE"""
+  rates: [RatesRegion!]
+
   """Tipo de transportadora"""
   type: ConveyorType!
 
@@ -4123,6 +4126,15 @@ type Query {
     """Filtros para consultar las bodegas"""
     filtersWarehousesInput: FiltersWarehousesInput = {}
   ): ResponseWarehouses!
+}
+
+"""Rangos de precio por regiones"""
+type RatesRegion {
+  """Precio de la zona"""
+  price: Float!
+
+  """Zona a aplicar el precio"""
+  zone: ZoneType!
 }
 
 """Egreso de dinero"""
