@@ -64,7 +64,10 @@ export class ConveyorsService {
 		const conveyors = await this.conveyorModel.find().populate(populate);
 
 		return conveyors.map(async (conveyor) => {
-			const value = await this.calculateValue(conveyor.type, order as Order);
+			const value = await this.calculateValue(
+				conveyor as Conveyor,
+				order as Order,
+			);
 			return {
 				conveyor,
 				value,
@@ -73,7 +76,7 @@ export class ConveyorsService {
 	}
 
 	async calculateValue(
-		type: ConveyorType,
+		{ type, rates }: Conveyor,
 		{ address, details, summary }: Order,
 	) {
 		const city = await this.citiesService.findById(address.city._id.toString());
@@ -118,6 +121,9 @@ export class ConveyorsService {
 					total: summary.total,
 					weight,
 				});
+			case ConveyorType.ZONE:
+				const rateSelected = rates.find((rate) => rate.zone === city.zone);
+				return rateSelected.price;
 			default:
 				break;
 		}

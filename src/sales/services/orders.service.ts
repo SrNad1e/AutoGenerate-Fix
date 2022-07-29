@@ -42,6 +42,7 @@ import { CreditHistoryService } from 'src/credits/services/credit-history.servic
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
+import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 
 const populate = [
 	{
@@ -422,7 +423,7 @@ export class OrdersService {
 			}
 
 			const value = await this.conveyorsService.calculateValue(
-				conveyor.type,
+				conveyor as Conveyor,
 				order as Order,
 			);
 
