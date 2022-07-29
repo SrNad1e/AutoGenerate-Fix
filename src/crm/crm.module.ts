@@ -37,7 +37,7 @@ import { DiscountRulesResolver } from './resolvers/discount-rules.resolver';
 				name: City.name,
 				useFactory: () => {
 					const schema = CitySchema;
-					schema.index({ name: 1, state: -1, country: -1 }, { unique: true });
+					schema.index({ code: 1 }, { unique: true });
 					return schema;
 				},
 			},
