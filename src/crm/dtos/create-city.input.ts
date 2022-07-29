@@ -10,7 +10,10 @@ export class CreateCityInput {
 	state: string;
 
 	@Field(() => String, { description: 'Nombre del país' })
-	country: string;
+	countryName: string;
+
+	@Field(() => String, { description: 'Prefijo del país' })
+	countryPrefix: string;
 
 	@Field(() => ZoneType, { description: 'Tipo de zona' })
 	zone: ZoneType;

@@ -65,19 +65,65 @@ export class CitiesService {
 		return this.cityModel.findById(id).lean();
 	}
 
-	async create({ zone, ...params }: CreateCityInput, user: User) {
+	async create(
+		{
+			zone,
+			countryPrefix,
+			countryName,
+			defaultPostalCode,
+			code,
+			...params
+		}: CreateCityInput,
+		user: User,
+	) {
+		if (code.length !== 8) {
+			throw new BadGatewayException('Código DANE erroneo');
+		}
+
+		if (defaultPostalCode.length !== 6) {
+			throw new BadGatewayException('Código postal erroneo');
+		}
+
 		const city = await this.cityModel.findOne({
-			code: params.code,
+			code,
 		});
 
 		if (city) {
 			throw new BadGatewayException('La ciudad que intenta crear ya existe');
 		}
 
-		return this.cityModel.create({ zone: ZoneType[zone], ...params, user });
+		return this.cityModel.create({
+			...params,
+			zone: ZoneType[zone],
+			code,
+			defaultPostalCode,
+			country: {
+				name: countryName,
+				prefix: countryPrefix,
+			},
+			user,
+		});
 	}
 
-	async update(id: string, { zone, ...params }: UpadteCityInput, user: User) {
+	async update(
+		id: string,
+		{
+			zone,
+			code,
+			defaultPostalCode,
+			countryName,
+			countryPrefix,
+			...params
+		}: UpadteCityInput,
+		user: User,
+	) {
+		if (code.length !== 8) {
+			throw new BadGatewayException('Código DANE erroneo');
+		}
+
+		if (defaultPostalCode.length !== 6) {
+			throw new BadGatewayException('Código postal erroneo');
+		}
 		const city = await this.findById(id);
 
 		if (!city) {
@@ -86,7 +132,17 @@ export class CitiesService {
 
 		return this.cityModel.findByIdAndUpdate(
 			id,
-			{ zone: ZoneType[zone], ...params, user },
+			{
+				...params,
+				zone: ZoneType[zone],
+				code,
+				defaultPostalCode,
+				country: {
+					name: countryName,
+					prefix: countryPrefix,
+				},
+				user,
+			},
 			{
 				lean: true,
 				new: true,

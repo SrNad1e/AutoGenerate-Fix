@@ -797,7 +797,10 @@ input CreateCityInput {
   code: String!
 
   """Nombre del país"""
-  country: String!
+  countryName: String!
+
+  """Prefijo del país"""
+  countryPrefix: String!
 
   """Código postal de la ciudad por defecto"""
   defaultPostalCode: String!
@@ -6621,7 +6624,10 @@ input UpadteCityInput {
   code: String
 
   """Nombre del país"""
-  country: String
+  countryName: String
+
+  """Prefijo del país"""
+  countryPrefix: String
 
   """Código postal de la ciudad por defecto"""
   defaultPostalCode: String
