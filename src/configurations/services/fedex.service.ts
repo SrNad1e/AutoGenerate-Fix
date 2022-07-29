@@ -46,7 +46,7 @@ export class FedexService {
 		const { access_token }: ResponseAuthorizationFedex =
 			await this.generateAuthorization();
 
-		const requestedPackageLineItems = dimensions.map((dimension) => ({
+		let requestedPackageLineItems = dimensions.map((dimension) => ({
 			weight: {
 				value: dimension.weight,
 				units: 'KG',
@@ -56,6 +56,9 @@ export class FedexService {
 				units: 'CM',
 			},
 		}));
+		requestedPackageLineItems = requestedPackageLineItems.filter(
+			({ weight }) => weight.value > 0,
+		);
 
 		try {
 			const response = await this.httpService.axiosRef.post(
