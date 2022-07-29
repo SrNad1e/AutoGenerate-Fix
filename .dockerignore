@@ -5,8 +5,8 @@
 .dockerignore
 docker-compose.yml
 DockerFile
-*/mysql_data
-*/mongo_data
+/mysql_data
+/mongo_data
 
 #git
 */.git/
@@ -17,9 +17,9 @@ DockerFile
 .README.md
 
 #default
-*/dist
-*/aws
-*/test
-*/node_modules
-*/coverage
+/dist
+/aws
+/test
+/node_modules
+/coverage
 *.env
