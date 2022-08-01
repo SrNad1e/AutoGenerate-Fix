@@ -125,7 +125,7 @@ export class ConveyorsService {
 
 				return this.interrapidisimoService.getPrice({
 					cityId: city.code,
-					shippingInsurance: true,
+					shippingInsurance: false,
 					total: summary.total,
 					weight,
 				});

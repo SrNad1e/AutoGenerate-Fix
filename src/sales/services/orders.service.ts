@@ -415,6 +415,8 @@ export class OrdersService {
 			dataUpdate['status'] = StatusOrder[status];
 		}
 
+		let newSummary = undefined;
+
 		let conveyorOrder;
 		if (conveyorId) {
 			const conveyor = await this.conveyorsService.findById(conveyorId);
@@ -438,6 +440,11 @@ export class OrdersService {
 					error: 'Error en api externa',
 				};
 			}
+
+			newSummary = {
+				...order.summary,
+				total: order.summary.total + conveyorOrder.value,
+			};
 		}
 
 		if (StatusOrder[status] === StatusOrder.CANCELLED) {
@@ -461,7 +468,6 @@ export class OrdersService {
 			}
 		}
 		let newDetails = [];
-		let newSummary = undefined;
 
 		if (
 			order.status === StatusOrder.PENDING &&
@@ -511,9 +517,9 @@ export class OrdersService {
 
 					newSummary = {
 						...order.summary,
-						total,
+						total: total + (order?.conveyorOrder?.value || 0),
 						discount: discountTotal,
-						subtotal,
+						subtotal: subtotal,
 						tax,
 					};
 				} else {
@@ -944,7 +950,7 @@ export class OrdersService {
 
 		let summary = {
 			...order.summary,
-			total,
+			total: total + (order?.conveyorOrder?.value || 0),
 			discount,
 			subtotal,
 			tax,
@@ -992,7 +998,7 @@ export class OrdersService {
 
 				summary = {
 					...order.summary,
-					total,
+					total: total + (order?.conveyorOrder?.value || 0),
 					discount: discountTotal,
 					subtotal,
 					tax,
