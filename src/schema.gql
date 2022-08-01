@@ -652,6 +652,9 @@ type Conveyor {
   """Fecha de creación de la transportadora"""
   createdAt: DateTime!
 
+  """Precio por defecto"""
+  defaultPrice: Float!
+
   """Logo de la tranportadora"""
   logo: Image!
 
@@ -678,6 +681,9 @@ type Conveyor {
 type ConveyorOrder {
   """Datos del transportista"""
   conveyor: Conveyor!
+
+  """Error del médio de pago"""
+  error: String
 
   """Código de la guia del transportista"""
   guideCode: String

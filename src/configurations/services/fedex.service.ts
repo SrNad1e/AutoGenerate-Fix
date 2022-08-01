@@ -100,11 +100,7 @@ export class FedexService {
 			total = Math.ceil(total);
 			return Math.ceil(total / 100) * 100;
 		} catch (e) {
-			if (e?.response.status === 503) {
-				throw new Error('Error en servidor FEDEX');
-			}
-			console.log(e.response.data);
-			return 12000;
+			throw new Error('Error en servidor FEDEX');
 		}
 	}
 }

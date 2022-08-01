@@ -421,16 +421,23 @@ export class OrdersService {
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+			try {
+				const value = await this.conveyorsService.calculateValue(
+					conveyor as Conveyor,
+					order as Order,
+				);
 
-			const value = await this.conveyorsService.calculateValue(
-				conveyor as Conveyor,
-				order as Order,
-			);
-
-			conveyorOrder = {
-				conveyor,
-				value,
-			};
+				conveyorOrder = {
+					conveyor,
+					value,
+				};
+			} catch (e) {
+				conveyorOrder = {
+					conveyor,
+					value: conveyor.defaultPrice,
+					error: 'Error en api externa',
+				};
+			}
 		}
 
 		if (StatusOrder[status] === StatusOrder.CANCELLED) {
