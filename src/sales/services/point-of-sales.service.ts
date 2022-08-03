@@ -1,4 +1,6 @@
 import {
+	BadGatewayException,
+	BadRequestException,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
@@ -111,6 +113,10 @@ export class PointOfSalesService {
 			throw new UnauthorizedException(
 				'No está autorizado para hacer cambios en ese punto de venta',
 			);
+		}
+
+		if(closeDate === ''){
+			throw new BadRequestException("La fecha no puede estar vacía")
 		}
 
 		return this.pointOfSaleModel.findByIdAndUpdate(id, {
