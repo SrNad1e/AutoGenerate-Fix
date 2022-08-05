@@ -12,12 +12,16 @@ import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateWarehouseInput } from '../dtos/create-warehouse.input';
 import { UpdateWarehouseInput } from '../dtos/update-warehouse.input';
+import { ProductsService } from 'src/products/services/products.service';
+import { Product } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class WarehousesService {
 	constructor(
 		@InjectModel(Warehouse.name)
 		private readonly warehouseModel: PaginateModel<Warehouse>,
+		@InjectModel(Product.name)
+		private readonly productModel: PaginateModel<Product>,
 	) {}
 
 	async findAll(
@@ -56,7 +60,7 @@ export class WarehousesService {
 		}
 
 		const options = {
-			limit,
+			limit: limit > 0 ? limit : null,
 			page: page,
 			sort,
 			lean: true,
@@ -78,12 +82,26 @@ export class WarehousesService {
 	}
 
 	async create(params: CreateWarehouseInput, user: User, companyId: string) {
-		const newShop = new this.warehouseModel({
+		const newWarehouse = new this.warehouseModel({
 			...params,
 			user,
 			company: new Types.ObjectId(companyId),
 		});
-		return newShop.save();
+
+		const response = await this.productModel.updateMany(
+			{},
+			{
+				$addToSet: {
+					stock: {
+						Warehouse: newWarehouse._id,
+						quantity: 0,
+					},
+				},
+			},
+		);
+		console.log(response);
+
+		return newWarehouse.save();
 	}
 
 	async update(
