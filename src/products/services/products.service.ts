@@ -27,6 +27,7 @@ import { Color } from '../entities/color.entity';
 import { Image } from 'src/configurations/entities/image.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
+import { WarehousesService } from 'src/configurations/services/warehouses.service';
 
 const populate = [
 	{
@@ -107,6 +108,7 @@ export class ProductsService {
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
 		private readonly referencesService: ReferencesService,
+		private readonly warehousesService: WarehousesService,
 	) {}
 
 	async findAll(
@@ -332,6 +334,21 @@ export class ProductsService {
 		};
 		const barcode = `7700000${total()}`;
 
+		const warehouses = await this.warehousesService.findAll(
+			{
+				limit: -1,
+			},
+			{
+				username: 'admin',
+			},
+			companyId,
+		);
+
+		const stock = warehouses.docs.map((warehouse) => ({
+			warehouse: warehouse._id,
+			quantity: 0,
+		}));
+
 		return (
 			await this.productModel.create({
 				reference: reference?._id,
@@ -339,6 +356,7 @@ export class ProductsService {
 				size: size?._id,
 				images: imagesId?.map((id) => new Types.ObjectId(id)),
 				barcode,
+				stock,
 				user,
 			})
 		).populate(populate);

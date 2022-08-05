@@ -48,6 +48,7 @@ import { Token, TokenSchema } from './entities/token.entity';
 import { TokensService } from './services/tokens.service';
 import { InterapidisimoService } from './services/interapidisimo.service';
 import { FedexService } from './services/fedex.service';
+import { Product, ProductSchema } from 'src/products/entities/product.entity';
 
 @Module({
 	imports: [
@@ -102,6 +103,10 @@ import { FedexService } from './services/fedex.service';
 			{
 				name: Token.name,
 				schema: TokenSchema,
+			},
+			{
+				name: Product.name,
+				schema: ProductSchema,
 			},
 		]),
 		MongooseModule.forFeatureAsync([
