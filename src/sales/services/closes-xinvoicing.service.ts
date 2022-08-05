@@ -83,7 +83,9 @@ export class ClosesXInvoicingService {
 
 		if (shopId) {
 			const pointOfSales = await this.pointOfSalesService.findAll(
-				{ shopId },
+				{
+					shopId,
+				},
 				user,
 				companyId,
 			);
@@ -93,7 +95,9 @@ export class ClosesXInvoicingService {
 					(pointOfSale) => new Types.ObjectId(pointOfSale._id),
 				);
 
-				filters.pointOfSale = { $in: ids };
+				filters.pointOfSale = {
+					$in: ids,
+				};
 			} else {
 				filters.pointOfSale = '';
 			}
@@ -145,12 +149,8 @@ export class ClosesXInvoicingService {
 		);
 
 		const closeX = await this.closeXInvoicingModel
-			.findOne({
-				company: new Types.ObjectId(companyId),
-			})
-			.sort({
-				_id: -1,
-			})
+			.findOne({ company: new Types.ObjectId(companyId) })
+			.sort({ _id: -1 })
 			.lean();
 
 		const number = (closeX?.number || 0) + 1;
@@ -167,39 +167,27 @@ export class ClosesXInvoicingService {
 			companyId,
 		);
 
-		const payments: PaymentOrderClose[] = summaryOrder.payments;
-
-		const paymentsReceipt: PaymentOrderClose[] = [];
+		const payments: PaymentOrderClose[] = [];
 
 		receipts.docs.forEach((receipt) => {
-			const paymentIndex = paymentsReceipt.findIndex(
+			const paymentIndex = payments.findIndex(
 				(item) => item.payment.toString() === receipt.payment._id.toString(),
 			);
 
-			if (paymentIndex > 0) {
-				paymentsReceipt[paymentIndex] = {
+			console.log(paymentIndex);
+
+			if (paymentIndex >= 0) {
+				payments[paymentIndex] = {
 					...payments[paymentIndex],
 					quantity: payments[paymentIndex].quantity + 1,
 					value: payments[paymentIndex].value + receipt.value,
 				};
 			} else {
-				paymentsReceipt.push({
+				payments.push({
 					payment: receipt.payment._id,
 					quantity: 1,
 					value: receipt.value,
 				});
-			}
-		});
-
-		paymentsReceipt.forEach((payment) => {
-			const paymentIndex = payments.findIndex(
-				(item) => item.payment.toString() === payment.toString(),
-			);
-
-			if (paymentIndex > 0) {
-				payments[paymentIndex] = payment;
-			} else {
-				payments.push(payment);
 			}
 		});
 

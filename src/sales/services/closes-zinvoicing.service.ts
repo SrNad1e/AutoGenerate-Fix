@@ -173,39 +173,25 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-		const payments: PaymentOrderClose[] = summaryOrder.payments;
-
-		const paymentsReceipt: PaymentOrderClose[] = [];
+		const payments: PaymentOrderClose[] = [];
 
 		receipts.docs.forEach((receipt) => {
-			const paymentIndex = paymentsReceipt.findIndex(
+			const paymentIndex = payments.findIndex(
 				(item) => item.payment.toString() === receipt.payment._id.toString(),
 			);
 
-			if (paymentIndex) {
-				paymentsReceipt[paymentIndex] = {
+			if (paymentIndex >= 0) {
+				payments[paymentIndex] = {
 					...payments[paymentIndex],
 					quantity: payments[paymentIndex].quantity + 1,
 					value: payments[paymentIndex].value + receipt.value,
 				};
 			} else {
-				paymentsReceipt.push({
+				payments.push({
 					payment: receipt.payment._id,
 					quantity: 1,
 					value: receipt.value,
 				});
-			}
-		});
-
-		paymentsReceipt.forEach((payment) => {
-			const paymentIndex = payments.findIndex(
-				(item) => item.payment.toString() === payment.toString(),
-			);
-
-			if (paymentIndex) {
-				payments[paymentIndex] = payment;
-			} else {
-				payments.push(payment);
 			}
 		});
 

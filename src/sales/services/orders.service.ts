@@ -691,35 +691,6 @@ export class OrdersService {
 			},
 		]);
 
-		const payments: any = await this.orderModel.aggregate([
-			{
-				$unwind: '$payments',
-			},
-			{
-				$match: {
-					updatedAt: {
-						$gte: dateIntial,
-						$lt: dateFinal,
-					},
-					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
-					},
-					pointOfSale: new Types.ObjectId(pointOfSaleId),
-				},
-			},
-			{
-				$group: {
-					_id: '$payments.payment._id',
-					total: {
-						$sum: 1,
-					},
-					value: {
-						$sum: '$payments.total',
-					},
-				},
-			},
-		]);
-
 		return {
 			summaryOrder: {
 				quantityClosed: ordersClosed[0]?.total || 0,
@@ -727,12 +698,6 @@ export class OrdersService {
 				quantityCancel: ordersCancel[0]?.total || 0,
 				value: ordersClosed[0]?.value || 0,
 			},
-			payments:
-				payments?.map((payment) => ({
-					quantity: payment?.total,
-					value: payment?.value,
-					payment: payment?._id,
-				})) || [],
 		};
 	}
 
