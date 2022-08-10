@@ -439,6 +439,10 @@ export class StockRequestService {
 					}
 				}
 
+				if (newDetails.length === 0) {
+					throw new BadRequestException('La solicitud no puede estar vacía');
+				}
+
 				return this.stockRequestModel.findByIdAndUpdate(
 					id,
 					{

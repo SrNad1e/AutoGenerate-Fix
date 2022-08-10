@@ -503,6 +503,10 @@ export class StockTransferService {
 				}
 			}
 
+			if (newDetails.length === 0) {
+				throw new BadRequestException('El traslado no puede estar vacío');
+			}
+
 			return this.stockTransferModel.findByIdAndUpdate(
 				id,
 				{
