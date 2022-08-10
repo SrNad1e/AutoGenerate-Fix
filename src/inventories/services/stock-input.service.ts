@@ -363,6 +363,10 @@ export class StockInputService {
 				0,
 			);
 
+			if (newDetails.length === 0) {
+				throw new BadRequestException('La entrada no puede estar vacía');
+			}
+
 			const response = await this.stockInputModel.findByIdAndUpdate(
 				id,
 				{
