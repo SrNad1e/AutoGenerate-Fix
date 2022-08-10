@@ -88,18 +88,17 @@ export class WarehousesService {
 			company: new Types.ObjectId(companyId),
 		});
 
-		const response = await this.productModel.updateMany(
+		await this.productModel.updateMany(
 			{},
 			{
 				$addToSet: {
 					stock: {
-						Warehouse: newWarehouse._id,
+						warehouse: newWarehouse._id,
 						quantity: 0,
 					},
 				},
 			},
 		);
-		console.log(response);
 
 		return newWarehouse.save();
 	}

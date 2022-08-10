@@ -795,7 +795,7 @@
 		},
 		{
 			"module": "Tesorería",
-			"option": "Recibo",
+			"option": "Recibo de caja",
 			"name": "Imprimir",
 			"description": "Permite imprimir el recibo de caja",
 			"action": "PRINT_TREASURY_RECEIPT"
