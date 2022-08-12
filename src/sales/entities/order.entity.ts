@@ -18,10 +18,21 @@ export enum StatusOrder {
 	PENDING = 'pending',
 	CANCELLED = 'cancelled',
 	CLOSED = 'closed',
-	SENT = 'sent',
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });
+
+export enum StatusWeb {
+	PENDING = 'pending',
+	PENDING_CREDIT = 'pendingCredit',
+	PAYMENT_CONFIRMED = 'closed',
+	PREPARING = 'preparing',
+	DELIVERED = 'delivered',
+	SENT = 'sent',
+	CANCELLED = 'cancelled',
+}
+
+registerEnumType(StatusWeb, { name: 'StatusWeb' });
 
 export enum StatusOrderDetail {
 	NEW = 'new',
@@ -180,6 +191,15 @@ export class Order extends Document {
 		default: 'open',
 	})
 	status: StatusOrder;
+
+	@Field(() => StatusWeb, {
+		description: 'Estado de transición pedido web',
+		nullable: true,
+	})
+	@Prop({
+		type: String,
+	})
+	statusWeb: StatusWeb;
 
 	@Field(() => Invoice, {
 		description: 'Factura generada al facturar',

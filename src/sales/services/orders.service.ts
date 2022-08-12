@@ -26,6 +26,7 @@ import {
 	Order,
 	StatusOrder,
 	StatusOrderDetail,
+	StatusWeb,
 } from '../entities/order.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
@@ -260,7 +261,7 @@ export class OrdersService {
 
 	async update(
 		orderId: string,
-		{ status, customerId, address, conveyorId }: UpdateOrderInput,
+		{ status, customerId, address, conveyorId, statusWeb }: UpdateOrderInput,
 		user: User,
 		companyId: string,
 	) {
@@ -332,12 +333,19 @@ export class OrdersService {
 			}
 		}
 
-		if (StatusOrder[status]) {
+		let newStatus = status;
+
+		//TODO: Validar estados de los pedidos web para tomar restricciones y asignar el estado del pedido
+
+		if (StatusWeb[statusWeb]) {
+		}
+
+		if (StatusOrder[newStatus]) {
 			switch (order?.status) {
 				case StatusOrder.OPEN:
 					if (
 						![StatusOrder.CANCELLED, StatusOrder.CLOSED].includes(
-							StatusOrder[status],
+							StatusOrder[newStatus],
 						)
 					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
@@ -346,15 +354,10 @@ export class OrdersService {
 				case StatusOrder.PENDING:
 					if (
 						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(
-							StatusOrder[status],
+							StatusOrder[newStatus],
 						)
 					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
-					}
-					break;
-				case StatusOrder.SENT:
-					if (![StatusOrder.CLOSED].includes(StatusOrder[status])) {
-						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
 				case StatusOrder.CANCELLED:
@@ -370,7 +373,7 @@ export class OrdersService {
 
 			if (
 				order.status === StatusOrder.OPEN &&
-				StatusOrder[status] === StatusOrder.CLOSED
+				StatusOrder[newStatus] === StatusOrder.CLOSED
 			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
@@ -412,7 +415,7 @@ export class OrdersService {
 				dataUpdate['payments'] = payments;
 			}
 
-			dataUpdate['status'] = StatusOrder[status];
+			dataUpdate['status'] = StatusOrder[newStatus];
 		}
 
 		let conveyorOrder;
@@ -433,7 +436,7 @@ export class OrdersService {
 			};
 		}
 
-		if (StatusOrder[status] === StatusOrder.CANCELLED) {
+		if (StatusOrder[newStatus] === StatusOrder.CANCELLED) {
 			if (order?.status === StatusOrder.OPEN) {
 				const details = order?.details?.map((detail) => ({
 					productId: detail?.product?._id.toString(),
@@ -456,10 +459,22 @@ export class OrdersService {
 		let newDetails = [];
 		let newSummary = undefined;
 
+		let newStatusWeb = statusWeb;
+
 		if (
 			order.status === StatusOrder.PENDING &&
-			StatusOrder[status] === StatusOrder.OPEN
+			StatusOrder[newStatus] === StatusOrder.OPEN
 		) {
+			const isCredit = order.payments.find(
+				({ payment }) => payment.type === TypePayment.CREDIT,
+			);
+
+			if (isCredit) {
+				newStatusWeb = StatusWeb.PENDING_CREDIT;
+			} else {
+				newStatusWeb = StatusWeb.PENDING;
+			}
+
 			const details = order.details.map((detail) => ({
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
@@ -526,7 +541,7 @@ export class OrdersService {
 			);
 		}
 
-		if (StatusOrder[status] === StatusOrder.CLOSED) {
+		if (StatusOrder[newStatus] === StatusOrder.CLOSED) {
 			for (let i = 0; i < order?.payments?.length; i++) {
 				const payment = order?.payments[i];
 
@@ -564,6 +579,7 @@ export class OrdersService {
 					...dataUpdate,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
+					statusWeb: newStatusWeb,
 					user,
 					conveyorOrder,
 				},
@@ -673,7 +689,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
+						$in: [StatusOrder.CLOSED],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},

@@ -3452,6 +3452,9 @@ type Order {
   """Estado del pedido"""
   status: StatusOrder!
 
+  """Estado de transición pedido web"""
+  statusWeb: StatusWeb
+
   """Resumen de los pagosy totales"""
   summary: SummaryOrder!
 
@@ -6262,7 +6265,6 @@ enum StatusOrder {
   CLOSED
   OPEN
   PENDING
-  SENT
 }
 
 enum StatusOrderDetail {
@@ -6324,6 +6326,16 @@ enum StatusUser {
   ACTIVE
   INACTIVE
   SUSPEND
+}
+
+enum StatusWeb {
+  CANCELLED
+  DELIVERED
+  PAYMENT_CONFIRMED
+  PENDING
+  PENDING_CREDIT
+  PREPARING
+  SENT
 }
 
 """Inventario por bodegas del producto"""
@@ -6829,6 +6841,9 @@ input UpdateOrderInput {
 
   """Estado del pedido"""
   status: StatusOrder
+
+  """Estado que se aplicará al pedid web"""
+  statusWeb: StatusWeb
 }
 
 """Datos para actualizar método de pago"""
