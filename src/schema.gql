@@ -630,6 +630,15 @@ type Company {
 }
 
 """Datos para confirmar productos"""
+input ConfirmPaymentsOrderInput {
+  """Identificador del pedido a confirmar los pagos"""
+  orderId: String!
+
+  """Pagos a confirmar"""
+  payments: [PaymentConfirm!]!
+}
+
+"""Datos para confirmar productos"""
 input ConfirmProductsOrderInput {
   """Productos a confirmar"""
   details: [DetailsConfirm!]!
@@ -2910,6 +2919,12 @@ type Mutation {
     token: String!
   ): LoginResponse!
 
+  """Se encarga de confirmar o desconfirmar pagos de un pedido"""
+  confirmPaymentsOrder(
+    """Medios de pago del pedido para actualizar"""
+    confirmPaymentsOrderInput: ConfirmPaymentsOrderInput!
+  ): ResponseOrder!
+
   """Se encarga de confirmar o desconfirmar productos de un pedido"""
   confirmProductsOrder(
     """Productos del pedido para actualizar"""
@@ -3492,6 +3507,15 @@ type Payment {
   user: User!
 }
 
+"""Producto para confirmar en el pedido"""
+input PaymentConfirm {
+  """Médio de pago a confirmar"""
+  paymentId: String!
+
+  """Estado del producto, si es diferente a confirm"""
+  status: StatusOrderDetail
+}
+
 """Medios de pago de la factura"""
 type PaymentInvoice {
   """Método de pago usado"""
@@ -3514,6 +3538,9 @@ type PaymentOrder {
 
   """Total pagado"""
   receipt: Receipt
+
+  """Estado del pago"""
+  status: StatusOrderDetail!
 
   """Total pagado"""
   total: Float!

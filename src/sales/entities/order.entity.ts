@@ -99,6 +99,9 @@ export class PaymentOrder {
 	})
 	code?: string;
 
+	@Field(() => StatusOrderDetail, { description: 'Estado del pago' })
+	status: StatusOrderDetail;
+
 	@Field(() => Date, {
 		description: 'Fecha de agregado del pago al pedido',
 	})
