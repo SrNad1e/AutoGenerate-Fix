@@ -417,21 +417,35 @@ export class OrdersService {
 			dataUpdate['status'] = StatusOrder[status];
 		}
 
+		let newSummary = undefined;
+
 		let conveyorOrder;
 		if (conveyorId) {
 			const conveyor = await this.conveyorsService.findById(conveyorId);
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+			try {
+				const value = await this.conveyorsService.calculateValue(
+					conveyor as Conveyor,
+					order as Order,
+				);
 
-			const value = await this.conveyorsService.calculateValue(
-				conveyor as Conveyor,
-				order as Order,
-			);
+				conveyorOrder = {
+					conveyor,
+					value,
+				};
+			} catch (e) {
+				conveyorOrder = {
+					conveyor,
+					value: conveyor.defaultPrice,
+					error: 'Error en api externa',
+				};
+			}
 
-			conveyorOrder = {
-				conveyor,
-				value,
+			newSummary = {
+				...order.summary,
+				total: order.summary.total + conveyorOrder.value,
 			};
 		}
 
@@ -456,7 +470,6 @@ export class OrdersService {
 			}
 		}
 		let newDetails = [];
-		let newSummary = undefined;
 
 		if (
 			order.status === StatusOrder.PENDING &&
@@ -506,9 +519,9 @@ export class OrdersService {
 
 					newSummary = {
 						...order.summary,
-						total,
+						total: total + (order?.conveyorOrder?.value || 0),
 						discount: discountTotal,
-						subtotal,
+						subtotal: subtotal,
 						tax,
 					};
 				} else {
@@ -904,7 +917,7 @@ export class OrdersService {
 
 		let summary = {
 			...order.summary,
-			total,
+			total: total + (order?.conveyorOrder?.value || 0),
 			discount,
 			subtotal,
 			tax,
@@ -952,7 +965,7 @@ export class OrdersService {
 
 				summary = {
 					...order.summary,
-					total,
+					total: total + (order?.conveyorOrder?.value || 0),
 					discount: discountTotal,
 					subtotal,
 					tax,

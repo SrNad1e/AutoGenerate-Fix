@@ -63,6 +63,13 @@ export class Conveyor extends Document {
 	})
 	logo: Types.ObjectId;
 
+	@Field(() => Number, { description: 'Precio por defecto' })
+	@Prop({
+		type: Number,
+		required: true,
+	})
+	defaultPrice: number;
+
 	@Field(() => [RatesRegion], {
 		description: 'Precios por región solo para type ZONE',
 		nullable: true,

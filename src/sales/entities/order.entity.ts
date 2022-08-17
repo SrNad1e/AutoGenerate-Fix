@@ -44,6 +44,12 @@ export class ConveyorOrder {
 	@Field(() => Conveyor, { description: 'Datos del transportista' })
 	conveyor: Conveyor;
 
+	@Field(() => String, {
+		description: 'Error del médio de pago',
+		nullable: true,
+	})
+	error?: string;
+
 	@Field(() => Date, {
 		description: 'Fecha en el que se realiza el envío',
 		nullable: true,
