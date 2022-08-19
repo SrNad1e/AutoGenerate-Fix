@@ -8,7 +8,7 @@ export enum StatusWeb {
 	OPEN = 'open',
 	PENDDING = 'pendding',
 	PENDDING_CREDIT = 'penddingCredit',
-	PAYMENT_CONFIRMED = 'closed',
+	PAYMENT_CONFIRMED = 'paymentConfirmed',
 	PREPARING = 'preparing',
 	DELIVERED = 'delivered',
 	SENT = 'sent',

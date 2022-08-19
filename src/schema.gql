@@ -2324,6 +2324,9 @@ input FiltersOrdersInput {
 
   """Estado del pedido"""
   status: StatusOrder
+
+  """Estado del pedido Web"""
+  statusWeb: StatusWeb
 }
 
 """Filtros para obtener el listado de tipos de medios de pago"""
