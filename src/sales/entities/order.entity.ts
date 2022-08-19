@@ -12,6 +12,7 @@ import { Receipt } from 'src/treasury/entities/receipt.entity';
 import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
+import { StatusWeb } from './status-web-history';
 
 export enum StatusOrder {
 	OPEN = 'open',
@@ -21,18 +22,6 @@ export enum StatusOrder {
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });
-
-export enum StatusWeb {
-	PENDING = 'pending',
-	PENDING_CREDIT = 'pendingCredit',
-	PAYMENT_CONFIRMED = 'closed',
-	PREPARING = 'preparing',
-	DELIVERED = 'delivered',
-	SENT = 'sent',
-	CANCELLED = 'cancelled',
-}
-
-registerEnumType(StatusWeb, { name: 'StatusWeb' });
 
 export enum StatusOrderDetail {
 	NEW = 'new',

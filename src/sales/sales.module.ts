@@ -37,6 +37,11 @@ import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver
 import { CreditsModule } from 'src/credits/credits.module';
 import { AuthorizationsService } from './services/authorizations.service';
 import { AuthorizationsResolver } from './resolvers/authorizations.resolver';
+import {
+	StatusWebHistory,
+	StatusWebHistorySchema,
+} from './entities/status-web-history';
+import { StatusWebHistoriesService } from './services/status-web-histories.service';
 
 @Module({
 	imports: [
@@ -97,6 +102,10 @@ import { AuthorizationsResolver } from './resolvers/authorizations.resolver';
 				name: AuthorizationDian.name,
 				schema: AuthorizationDianSchema,
 			},
+			{
+				name: StatusWebHistory.name,
+				schema: StatusWebHistorySchema,
+			},
 		]),
 	],
 	providers: [
@@ -114,6 +123,7 @@ import { AuthorizationsResolver } from './resolvers/authorizations.resolver';
 		ClosesZinvoicingResolver,
 		AuthorizationsService,
 		AuthorizationsResolver,
+		StatusWebHistoriesService,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })

@@ -27,7 +27,6 @@ import {
 	Order,
 	StatusOrder,
 	StatusOrderDetail,
-	StatusWeb,
 } from '../entities/order.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
@@ -46,6 +45,8 @@ import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
+import { StatusWeb } from '../entities/status-web-history';
+import { StatusWebHistoriesService } from './status-web-histories.service';
 
 const populate = [
 	{
@@ -74,6 +75,7 @@ export class OrdersService {
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
+		private readonly statusWebHistoriesService: StatusWebHistoriesService,
 	) {}
 
 	async findAll(
@@ -249,6 +251,12 @@ export class OrdersService {
 
 		let credit;
 
+		await this.statusWebHistoriesService.addRegister({
+			orderId: newOrder._id.toString(),
+			status: StatusWeb.OPEN,
+			user,
+		});
+
 		try {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?.toString(),
@@ -337,9 +345,66 @@ export class OrdersService {
 
 		let newStatus = status;
 
-		//TODO: Validar estados de los pedidos web para tomar restricciones y asignar el estado del pedido
-
 		if (StatusWeb[statusWeb]) {
+			switch (statusWeb) {
+				case StatusWeb.PENDING || StatusWeb.PENDING_CREDIT:
+					if (order.statusWeb !== StatusWeb.OPEN) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+					newStatus = StatusOrder.OPEN;
+					break;
+				case StatusWeb.PAYMENT_CONFIRMED:
+					if (
+						![StatusWeb.PENDING, StatusWeb.PENDING_CREDIT].includes(
+							order.statusWeb,
+						)
+					) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+
+					const confirmed = order.payments.find(
+						({ payment, status }) =>
+							payment.type !== TypePayment.CASH &&
+							status === StatusOrderDetail.NEW,
+					);
+
+					if (!confirmed) {
+						throw new BadRequestException(
+							'Debe confirmar los medios de pagos antes de cambiar de estado',
+						);
+					}
+					break;
+				case StatusWeb.SENT:
+					if (order.statusWeb !== StatusWeb.PAYMENT_CONFIRMED) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+					newStatus = StatusOrder.CLOSED;
+					break;
+				case StatusWeb.DELIVERED:
+					if (order.statusWeb !== StatusWeb.SENT) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+					break;
+
+				case StatusWeb.CANCELLED:
+					if ([StatusWeb.DELIVERED, StatusWeb.SENT].includes(order.statusWeb)) {
+						throw new BadRequestException(
+							'El pedido no puede ser cancelado, ya se encuentra finalizado',
+						);
+					}
+					newStatus = StatusOrder.CANCELLED;
+					break;
+				default:
+					break;
+			}
 		}
 
 		if (StatusOrder[newStatus]) {
@@ -609,6 +674,11 @@ export class OrdersService {
 		try {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?._id?.toString(),
+			});
+			await this.statusWebHistoriesService.addRegister({
+				orderId,
+				status: StatusWeb[newStatusWeb] || newStatusWeb,
+				user,
 			});
 		} catch {}
 

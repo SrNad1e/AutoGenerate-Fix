@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { StatusOrder, StatusWeb } from '../entities/order.entity';
+import { StatusOrder } from '../entities/order.entity';
+import { StatusWeb } from '../entities/status-web-history';
 
 @InputType({ description: 'País entrada' })
 export class CountryInput {
