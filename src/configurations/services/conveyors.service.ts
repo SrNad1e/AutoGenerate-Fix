@@ -64,14 +64,22 @@ export class ConveyorsService {
 		const conveyors = await this.conveyorModel.find().populate(populate);
 
 		return conveyors.map(async (conveyor) => {
-			const value = await this.calculateValue(
-				conveyor as Conveyor,
-				order as Order,
-			);
-			return {
-				conveyor,
-				value,
-			};
+			try {
+				const value = await this.calculateValue(
+					conveyor as Conveyor,
+					order as Order,
+				);
+				return {
+					conveyor,
+					value,
+				};
+			} catch (e) {
+				return {
+					conveyor,
+					value: conveyor.defaultPrice,
+					error: 'Error api externo',
+				};
+			}
 		});
 	}
 
@@ -117,7 +125,7 @@ export class ConveyorsService {
 
 				return this.interrapidisimoService.getPrice({
 					cityId: city.code,
-					shippingInsurance: true,
+					shippingInsurance: false,
 					total: summary.total,
 					weight,
 				});

@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -43,6 +44,7 @@ import { CreditHistoryService } from 'src/credits/services/credit-history.servic
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
+import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 
 const populate = [
@@ -418,21 +420,35 @@ export class OrdersService {
 			dataUpdate['status'] = StatusOrder[newStatus];
 		}
 
+		let newSummary = undefined;
+
 		let conveyorOrder;
 		if (conveyorId) {
 			const conveyor = await this.conveyorsService.findById(conveyorId);
 			if (!conveyor) {
 				throw new NotFoundException('El transportista no existe');
 			}
+			try {
+				const value = await this.conveyorsService.calculateValue(
+					conveyor as Conveyor,
+					order as Order,
+				);
 
-			const value = await this.conveyorsService.calculateValue(
-				conveyor as Conveyor,
-				order as Order,
-			);
+				conveyorOrder = {
+					conveyor,
+					value,
+				};
+			} catch (e) {
+				conveyorOrder = {
+					conveyor,
+					value: conveyor.defaultPrice,
+					error: 'Error en api externa',
+				};
+			}
 
-			conveyorOrder = {
-				conveyor,
-				value,
+			newSummary = {
+				...order.summary,
+				total: order.summary.total + conveyorOrder.value,
 			};
 		}
 
@@ -457,7 +473,6 @@ export class OrdersService {
 			}
 		}
 		let newDetails = [];
-		let newSummary = undefined;
 
 		let newStatusWeb = statusWeb;
 
@@ -519,9 +534,9 @@ export class OrdersService {
 
 					newSummary = {
 						...order.summary,
-						total,
+						total: total + (order?.conveyorOrder?.value || 0),
 						discount: discountTotal,
-						subtotal,
+						subtotal: subtotal,
 						tax,
 					};
 				} else {
@@ -918,7 +933,7 @@ export class OrdersService {
 
 		let summary = {
 			...order.summary,
-			total,
+			total: total + (order?.conveyorOrder?.value || 0),
 			discount,
 			subtotal,
 			tax,
@@ -966,7 +981,7 @@ export class OrdersService {
 
 				summary = {
 					...order.summary,
-					total,
+					total: total + (order?.conveyorOrder?.value || 0),
 					discount: discountTotal,
 					subtotal,
 					tax,
@@ -1012,6 +1027,12 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
+		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+			throw new UnauthorizedException(
+				'El usuario no tiene permisos para actualizar el pedido',
+			);
+		}
+
 		if (!order) {
 			throw new BadRequestException(
 				'El pedido que intenta actualizar no existe',
@@ -1051,6 +1072,80 @@ export class OrdersService {
 			{
 				$set: {
 					details: newDetails,
+					user,
+				},
+			},
+			{
+				new: true,
+				populate,
+				lean: true,
+			},
+		);
+
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?._id.toString(),
+			});
+		} catch {}
+
+		return {
+			credit,
+			order: newOrder,
+		};
+	}
+
+	async confirmPayments(
+		{ payments, orderId }: ConfirmPaymentsOrderInput,
+		user: User,
+		companyId: string,
+	) {
+		const order = await this.orderModel.findById(orderId).lean();
+
+		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+			throw new UnauthorizedException(
+				'El usuario no tiene permisos para actualizar el pedido',
+			);
+		}
+		if (!order) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (![StatusOrder.OPEN].includes(order?.status)) {
+			throw new BadRequestException(
+				`El pedido ${order.number} ya se encuentra procesado`,
+			);
+		}
+
+		const newPayments = [...order.payments];
+
+		for (let i = 0; i < payments.length; i++) {
+			const { paymentId, status } = payments[i];
+
+			const index = newPayments.findIndex(
+				(payment) => payment.payment._id.toString() === paymentId,
+			);
+
+			if (index < 0) {
+				throw new BadRequestException({
+					message: 'Uno de los pagos no existe en el pedido',
+					data: paymentId,
+				});
+			}
+
+			newPayments[index] = {
+				...newPayments[index],
+				status: StatusOrderDetail[status],
+			};
+		}
+
+		const newOrder = await this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					payments: newPayments,
 					user,
 				},
 			},
@@ -1217,13 +1312,16 @@ export class OrdersService {
 				const payment = await this.paymentsService.findById(
 					detailPayment.paymentId,
 				);
+
 				newPayments.push({
 					payment,
 					code: detailPayment.code,
 					total: detailPayment.total,
+					status: StatusOrderDetail.NEW,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				});
+
 				if (payment?.type === TypePayment.BONUS) {
 					if (!detailPayment?.code) {
 						throw new BadRequestException(

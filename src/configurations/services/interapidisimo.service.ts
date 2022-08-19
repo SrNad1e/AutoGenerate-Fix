@@ -76,6 +76,7 @@ export class InterapidisimoService {
 	}: GetPriceInterrapidismoInput) {
 		const { api, signature, city_default, client_id } =
 			this.configService.interapidisimo;
+		console.log(Math.ceil(weight));
 
 		const { Access_token }: ResponseAuthorizationInterrapidisimo =
 			await this.generateAuthorization();
@@ -83,6 +84,8 @@ export class InterapidisimoService {
 		const typeSent = await this.types.find(
 			(type) => type.max >= weight && type.min <= weight,
 		);
+
+		console.log(typeSent);
 
 		const url = `${api}/ApiServInterStg/api/Cotizadorcliente/ResultadoListaCotizar/${client_id}/${city_default}/${cityId}/${Math.ceil(
 			weight,
