@@ -659,7 +659,7 @@ export class OrdersService {
 					...dataUpdate,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
-					statusWeb: newStatusWeb,
+					statusWeb: StatusWeb[newStatusWeb] || newStatusWeb,
 					user,
 					conveyorOrder,
 				},
