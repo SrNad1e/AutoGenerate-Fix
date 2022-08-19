@@ -166,7 +166,7 @@ export class OrdersService {
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
 		if (
-			![StatusOrder.OPEN, StatusOrder.PENDING].includes(StatusOrder[status])
+			![StatusOrder.OPEN, StatusOrder.PENDDING].includes(StatusOrder[status])
 		) {
 			throw new BadRequestException('El estado del pedido no es correcto');
 		}
@@ -347,7 +347,7 @@ export class OrdersService {
 
 		if (StatusWeb[statusWeb]) {
 			switch (statusWeb) {
-				case StatusWeb.PENDING || StatusWeb.PENDING_CREDIT:
+				case StatusWeb.PENDDING || StatusWeb.PENDDING_CREDIT:
 					if (order.statusWeb !== StatusWeb.OPEN) {
 						throw new BadRequestException(
 							'El pedido no puede ser procesado, estado inválido',
@@ -357,7 +357,7 @@ export class OrdersService {
 					break;
 				case StatusWeb.PAYMENT_CONFIRMED:
 					if (
-						![StatusWeb.PENDING, StatusWeb.PENDING_CREDIT].includes(
+						![StatusWeb.PENDDING, StatusWeb.PENDDING_CREDIT].includes(
 							order.statusWeb,
 						)
 					) {
@@ -418,7 +418,7 @@ export class OrdersService {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
 					break;
-				case StatusOrder.PENDING:
+				case StatusOrder.PENDDING:
 					if (
 						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(
 							StatusOrder[newStatus],
@@ -542,7 +542,7 @@ export class OrdersService {
 		let newStatusWeb = statusWeb;
 
 		if (
-			order.status === StatusOrder.PENDING &&
+			order.status === StatusOrder.PENDDING &&
 			StatusOrder[newStatus] === StatusOrder.OPEN
 		) {
 			const isCredit = order.payments.find(
@@ -550,9 +550,9 @@ export class OrdersService {
 			);
 
 			if (isCredit) {
-				newStatusWeb = StatusWeb.PENDING_CREDIT;
+				newStatusWeb = StatusWeb.PENDDING_CREDIT;
 			} else {
-				newStatusWeb = StatusWeb.PENDING;
+				newStatusWeb = StatusWeb.PENDDING;
 			}
 
 			const details = order.details.map((detail) => ({
@@ -815,7 +815,7 @@ export class OrdersService {
 			);
 		}
 
-		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} no se encuentra abierto`,
 			);
@@ -1248,7 +1248,7 @@ export class OrdersService {
 			);
 		}
 
-		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} ya se encuentra procesado`,
 			);

@@ -16,7 +16,7 @@ import { StatusWeb } from './status-web-history';
 
 export enum StatusOrder {
 	OPEN = 'open',
-	PENDING = 'pending',
+	PENDDING = 'pendding',
 	CANCELLED = 'cancelled',
 	CLOSED = 'closed',
 }

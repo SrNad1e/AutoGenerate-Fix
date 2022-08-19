@@ -6,8 +6,8 @@ import { Order } from './order.entity';
 
 export enum StatusWeb {
 	OPEN = 'open',
-	PENDING = 'pending',
-	PENDING_CREDIT = 'pendingCredit',
+	PENDDING = 'pendding',
+	PENDDING_CREDIT = 'penddingCredit',
 	PAYMENT_CONFIRMED = 'closed',
 	PREPARING = 'preparing',
 	DELIVERED = 'delivered',

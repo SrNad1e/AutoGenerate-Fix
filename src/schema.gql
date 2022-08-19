@@ -6297,7 +6297,7 @@ enum StatusOrder {
   CANCELLED
   CLOSED
   OPEN
-  PENDING
+  PENDDING
 }
 
 enum StatusOrderDetail {
@@ -6366,8 +6366,8 @@ enum StatusWeb {
   DELIVERED
   OPEN
   PAYMENT_CONFIRMED
-  PENDING
-  PENDING_CREDIT
+  PENDDING
+  PENDDING_CREDIT
   PREPARING
   SENT
 }

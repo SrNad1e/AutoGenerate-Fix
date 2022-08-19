@@ -234,7 +234,7 @@ export class CustomersService {
 				{
 					'customer._id': new Types.ObjectId(id),
 					status: {
-						$in: [StatusOrder.OPEN, StatusOrder.PENDING],
+						$in: [StatusOrder.OPEN, StatusOrder.PENDDING],
 					},
 				},
 				{
