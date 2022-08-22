@@ -2068,6 +2068,9 @@ input FiltersCompaniesInput {
 
 """Filtros para obtener listado de transportadoras"""
 input FiltersConveyorsInput {
+  """Identificador de la transportadora"""
+  _id: String
+
   """Cantidad de registros"""
   limit: Float
 
