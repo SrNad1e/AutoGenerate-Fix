@@ -12,13 +12,13 @@ import { Receipt } from 'src/treasury/entities/receipt.entity';
 import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
+import { StatusWeb } from './status-web-history';
 
 export enum StatusOrder {
 	OPEN = 'open',
-	PENDING = 'pending',
+	PENDDING = 'pendding',
 	CANCELLED = 'cancelled',
 	CLOSED = 'closed',
-	SENT = 'sent',
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });
@@ -189,6 +189,15 @@ export class Order extends Document {
 		default: 'open',
 	})
 	status: StatusOrder;
+
+	@Field(() => StatusWeb, {
+		description: 'Estado de transición pedido web',
+		nullable: true,
+	})
+	@Prop({
+		type: String,
+	})
+	statusWeb: StatusWeb;
 
 	@Field(() => Invoice, {
 		description: 'Factura generada al facturar',

@@ -1,5 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { StatusOrder } from '../entities/order.entity';
+import { StatusWeb } from '../entities/status-web-history';
 
 @InputType({ description: 'País entrada' })
 export class CountryInput {
@@ -102,4 +103,10 @@ export class UpdateOrderInput {
 		nullable: true,
 	})
 	address?: AddressInputOrder;
+
+	@Field(() => StatusWeb, {
+		description: 'Estado que se aplicará al pedid web',
+		nullable: true,
+	})
+	statusWeb?: StatusWeb;
 }

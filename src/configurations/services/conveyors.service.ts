@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { Image } from 'src/configurations/entities/image.entity';
 import { CitiesService } from 'src/crm/services/cities.service';
@@ -29,7 +29,13 @@ export class ConveyorsService {
 		private readonly citiesService: CitiesService,
 	) {}
 
-	async findAll({ sort, limit = 10, name, page = 1 }: FiltersConveyorsInput) {
+	async findAll({
+		sort,
+		_id,
+		limit = 10,
+		name,
+		page = 1,
+	}: FiltersConveyorsInput) {
 		const filters: FilterQuery<Conveyor> = {};
 
 		if (name) {
@@ -37,6 +43,10 @@ export class ConveyorsService {
 				$regex: name,
 				$options: 'i',
 			};
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		const options = {

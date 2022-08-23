@@ -45,6 +45,8 @@ import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
+import { StatusWeb } from '../entities/status-web-history';
+import { StatusWebHistoriesService } from './status-web-histories.service';
 
 const populate = [
 	{
@@ -73,6 +75,7 @@ export class OrdersService {
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
+		private readonly statusWebHistoriesService: StatusWebHistoriesService,
 	) {}
 
 	async findAll(
@@ -163,7 +166,7 @@ export class OrdersService {
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
 		if (
-			![StatusOrder.OPEN, StatusOrder.PENDING].includes(StatusOrder[status])
+			![StatusOrder.OPEN, StatusOrder.PENDDING].includes(StatusOrder[status])
 		) {
 			throw new BadRequestException('El estado del pedido no es correcto');
 		}
@@ -248,6 +251,12 @@ export class OrdersService {
 
 		let credit;
 
+		await this.statusWebHistoriesService.addRegister({
+			orderId: newOrder._id.toString(),
+			status: StatusWeb.OPEN,
+			user,
+		});
+
 		try {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?.toString(),
@@ -262,7 +271,7 @@ export class OrdersService {
 
 	async update(
 		orderId: string,
-		{ status, customerId, address, conveyorId }: UpdateOrderInput,
+		{ status, customerId, address, conveyorId, statusWeb }: UpdateOrderInput,
 		user: User,
 		companyId: string,
 	) {
@@ -334,29 +343,88 @@ export class OrdersService {
 			}
 		}
 
-		if (StatusOrder[status]) {
+		let newStatus = status;
+
+		if (StatusWeb[statusWeb]) {
+			switch (statusWeb) {
+				case StatusWeb.PENDDING || StatusWeb.PENDDING_CREDIT:
+					if (order.statusWeb !== StatusWeb.OPEN) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+					newStatus = StatusOrder.OPEN;
+					break;
+				case StatusWeb.PAYMENT_CONFIRMED:
+					if (
+						![StatusWeb.PENDDING, StatusWeb.PENDDING_CREDIT].includes(
+							order.statusWeb,
+						)
+					) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+
+					const confirmed = order.payments.find(
+						({ payment, status }) =>
+							payment.type !== TypePayment.CASH &&
+							status === StatusOrderDetail.NEW,
+					);
+
+					if (!confirmed) {
+						throw new BadRequestException(
+							'Debe confirmar los medios de pagos antes de cambiar de estado',
+						);
+					}
+					break;
+				case StatusWeb.SENT:
+					if (order.statusWeb !== StatusWeb.PAYMENT_CONFIRMED) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+					newStatus = StatusOrder.CLOSED;
+					break;
+				case StatusWeb.DELIVERED:
+					if (order.statusWeb !== StatusWeb.SENT) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+					break;
+
+				case StatusWeb.CANCELLED:
+					if ([StatusWeb.DELIVERED, StatusWeb.SENT].includes(order.statusWeb)) {
+						throw new BadRequestException(
+							'El pedido no puede ser cancelado, ya se encuentra finalizado',
+						);
+					}
+					newStatus = StatusOrder.CANCELLED;
+					break;
+				default:
+					break;
+			}
+		}
+
+		if (StatusOrder[newStatus]) {
 			switch (order?.status) {
 				case StatusOrder.OPEN:
 					if (
 						![StatusOrder.CANCELLED, StatusOrder.CLOSED].includes(
-							StatusOrder[status],
+							StatusOrder[newStatus],
 						)
 					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
 					break;
-				case StatusOrder.PENDING:
+				case StatusOrder.PENDDING:
 					if (
 						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(
-							StatusOrder[status],
+							StatusOrder[newStatus],
 						)
 					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
-					}
-					break;
-				case StatusOrder.SENT:
-					if (![StatusOrder.CLOSED].includes(StatusOrder[status])) {
-						throw new BadRequestException('El pedido se encuentra enviado');
 					}
 					break;
 				case StatusOrder.CANCELLED:
@@ -372,7 +440,7 @@ export class OrdersService {
 
 			if (
 				order.status === StatusOrder.OPEN &&
-				StatusOrder[status] === StatusOrder.CLOSED
+				StatusOrder[newStatus] === StatusOrder.CLOSED
 			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
@@ -414,7 +482,7 @@ export class OrdersService {
 				dataUpdate['payments'] = payments;
 			}
 
-			dataUpdate['status'] = StatusOrder[status];
+			dataUpdate['status'] = StatusOrder[newStatus];
 		}
 
 		let newSummary = undefined;
@@ -449,7 +517,7 @@ export class OrdersService {
 			};
 		}
 
-		if (StatusOrder[status] === StatusOrder.CANCELLED) {
+		if (StatusOrder[newStatus] === StatusOrder.CANCELLED) {
 			if (order?.status === StatusOrder.OPEN) {
 				const details = order?.details?.map((detail) => ({
 					productId: detail?.product?._id.toString(),
@@ -471,10 +539,22 @@ export class OrdersService {
 		}
 		let newDetails = [];
 
+		let newStatusWeb = statusWeb;
+
 		if (
-			order.status === StatusOrder.PENDING &&
-			StatusOrder[status] === StatusOrder.OPEN
+			order.status === StatusOrder.PENDDING &&
+			StatusOrder[newStatus] === StatusOrder.OPEN
 		) {
+			const isCredit = order.payments.find(
+				({ payment }) => payment.type === TypePayment.CREDIT,
+			);
+
+			if (isCredit) {
+				newStatusWeb = StatusWeb.PENDDING_CREDIT;
+			} else {
+				newStatusWeb = StatusWeb.PENDDING;
+			}
+
 			const details = order.details.map((detail) => ({
 				productId: detail?.product?._id.toString(),
 				quantity: detail?.quantity,
@@ -541,7 +621,7 @@ export class OrdersService {
 			);
 		}
 
-		if (StatusOrder[status] === StatusOrder.CLOSED) {
+		if (StatusOrder[newStatus] === StatusOrder.CLOSED) {
 			for (let i = 0; i < order?.payments?.length; i++) {
 				const payment = order?.payments[i];
 
@@ -579,6 +659,7 @@ export class OrdersService {
 					...dataUpdate,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
+					statusWeb: StatusWeb[newStatusWeb] || newStatusWeb,
 					user,
 					conveyorOrder,
 				},
@@ -593,6 +674,11 @@ export class OrdersService {
 		try {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?._id?.toString(),
+			});
+			await this.statusWebHistoriesService.addRegister({
+				orderId,
+				status: StatusWeb[newStatusWeb] || newStatusWeb,
+				user,
 			});
 		} catch {}
 
@@ -688,7 +774,7 @@ export class OrdersService {
 						$lt: dateFinal,
 					},
 					status: {
-						$in: [StatusOrder.CLOSED, StatusOrder.SENT],
+						$in: [StatusOrder.CLOSED],
 					},
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -729,7 +815,7 @@ export class OrdersService {
 			);
 		}
 
-		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} no se encuentra abierto`,
 			);
@@ -1162,7 +1248,7 @@ export class OrdersService {
 			);
 		}
 
-		if (![StatusOrder.OPEN, StatusOrder.PENDING].includes(order?.status)) {
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
 			throw new BadRequestException(
 				`El pedido ${order.number} ya se encuentra procesado`,
 			);

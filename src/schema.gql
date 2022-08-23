@@ -2068,6 +2068,9 @@ input FiltersCompaniesInput {
 
 """Filtros para obtener listado de transportadoras"""
 input FiltersConveyorsInput {
+  """Identificador de la transportadora"""
+  _id: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -2324,6 +2327,9 @@ input FiltersOrdersInput {
 
   """Estado del pedido"""
   status: StatusOrder
+
+  """Estado del pedido Web"""
+  statusWeb: StatusWeb
 }
 
 """Filtros para obtener el listado de tipos de medios de pago"""
@@ -3472,6 +3478,9 @@ type Order {
 
   """Estado del pedido"""
   status: StatusOrder!
+
+  """Estado de transición pedido web"""
+  statusWeb: StatusWeb
 
   """Resumen de los pagosy totales"""
   summary: SummaryOrder!
@@ -6294,8 +6303,7 @@ enum StatusOrder {
   CANCELLED
   CLOSED
   OPEN
-  PENDING
-  SENT
+  PENDDING
 }
 
 enum StatusOrderDetail {
@@ -6357,6 +6365,17 @@ enum StatusUser {
   ACTIVE
   INACTIVE
   SUSPEND
+}
+
+enum StatusWeb {
+  CANCELLED
+  DELIVERED
+  OPEN
+  PAYMENT_CONFIRMED
+  PENDDING
+  PENDDING_CREDIT
+  PREPARING
+  SENT
 }
 
 """Inventario por bodegas del producto"""
@@ -6862,6 +6881,9 @@ input UpdateOrderInput {
 
   """Estado del pedido"""
   status: StatusOrder
+
+  """Estado que se aplicará al pedid web"""
+  statusWeb: StatusWeb
 }
 
 """Datos para actualizar método de pago"""
