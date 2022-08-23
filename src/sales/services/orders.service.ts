@@ -245,7 +245,8 @@ export class OrdersService {
 			orderPos: false,
 			user,
 			number,
-			status: StatusOrder[status],
+			status: StatusOrder.PENDDING,
+			statusWeb: StatusWeb.OPEN,
 			company: new Types.ObjectId(companyId),
 		});
 
