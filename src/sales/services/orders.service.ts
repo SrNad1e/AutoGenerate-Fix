@@ -88,6 +88,7 @@ export class OrdersService {
 			orderPos,
 			paymentId,
 			sort,
+			nonStatus,
 			limit = 10,
 			page = 1,
 		}: FiltersOrdersInput,
@@ -101,6 +102,12 @@ export class OrdersService {
 
 		if (StatusOrder[status]) {
 			filters.status = StatusOrder[status];
+		}
+
+		if (nonStatus?.length > 0) {
+			filters.status = {
+				$not: { $in: nonStatus.map((item) => StatusOrder[item]) },
+			};
 		}
 
 		if (orderPos !== undefined) {
@@ -371,8 +378,17 @@ export class OrdersService {
 		let newStatus = status;
 
 		if (StatusWeb[statusWeb]) {
-			switch (statusWeb) {
-				case StatusWeb.PENDDING || StatusWeb.PENDDING_CREDIT:
+			switch (StatusWeb[statusWeb]) {
+				case StatusWeb.PENDDING:
+					if (order.statusWeb !== StatusWeb.OPEN) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+
+					newStatus = StatusOrder.OPEN;
+					break;
+				case StatusWeb.PENDDING_CREDIT:
 					if (order.statusWeb !== StatusWeb.OPEN) {
 						throw new BadRequestException(
 							'El pedido no puede ser procesado, estado inválido',
@@ -682,6 +698,7 @@ export class OrdersService {
 			{
 				$set: {
 					...dataUpdate,
+					status: StatusOrder[newStatus] || newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
 					statusWeb: StatusWeb[newStatusWeb] || newStatusWeb,
