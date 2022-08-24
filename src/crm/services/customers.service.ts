@@ -193,17 +193,28 @@ export class CustomersService {
 		const newAddresses = [];
 
 		if (addresses) {
+			let isMainIndex = 0;
 			for (let i = 0; i < addresses.length; i++) {
-				const { cityId, ...params } = addresses[i];
+				const { cityId, isMain, ...params } = addresses[i];
 				const city = await this.citiesService.findById(cityId);
 				if (!city) {
 					throw new NotFoundException('Una de las ciudades no existe');
 				}
+
+				if (isMain) {
+					isMainIndex = i;
+				}
+
 				newAddresses.push({
 					...params,
+					isMain: false,
 					city,
 				});
 			}
+			newAddresses[isMainIndex] = {
+				...newAddresses[isMainIndex],
+				isMain: true,
+			};
 		}
 
 		const newCustomer = await this.customerModel.findByIdAndUpdate(
