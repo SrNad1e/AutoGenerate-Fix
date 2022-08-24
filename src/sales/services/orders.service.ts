@@ -151,6 +151,11 @@ export class OrdersService {
 
 	async findById(id: string) {
 		const order = await this.orderModel.findById(id).populate(populate).lean();
+
+		if (!order) {
+			throw new BadRequestException('El pedido no existe');
+		}
+
 		let credit;
 		try {
 			credit = await this.creditsService.findOne({
@@ -217,6 +222,26 @@ export class OrdersService {
 			}
 		}
 
+		const oldOrder = await this.orderModel.findOne({
+			'customer._id': user.customer._id,
+			status: StatusOrder.PENDDING,
+		});
+
+		if (oldOrder) {
+			let credit;
+
+			try {
+				credit = await this.creditsService.findOne({
+					customerId: oldOrder?.customer?._id?.toString(),
+				});
+			} catch {}
+
+			return {
+				credit,
+				order: oldOrder,
+			};
+		}
+
 		const shop = await this.shopsService.getShopWholesale();
 
 		let number = 1;
@@ -250,17 +275,16 @@ export class OrdersService {
 			company: new Types.ObjectId(companyId),
 		});
 
-		let credit;
-
 		await this.statusWebHistoriesService.addRegister({
 			orderId: newOrder._id.toString(),
 			status: StatusWeb.OPEN,
 			user,
 		});
+		let credit;
 
 		try {
 			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?.toString(),
+				customerId: newOrder?.customer?._id?.toString(),
 			});
 		} catch {}
 
