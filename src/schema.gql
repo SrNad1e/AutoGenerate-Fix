@@ -2310,6 +2310,9 @@ input FiltersOrdersInput {
   """Cantidad de registros"""
   limit: Float
 
+  """Estado del pedido que no quiere consultar"""
+  nonStatus: [StatusOrder!]
+
   """Número consecutivo del pedido"""
   number: Float
 

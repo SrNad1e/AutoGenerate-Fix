@@ -88,6 +88,7 @@ export class OrdersService {
 			orderPos,
 			paymentId,
 			sort,
+			nonStatus,
 			limit = 10,
 			page = 1,
 		}: FiltersOrdersInput,
@@ -101,6 +102,12 @@ export class OrdersService {
 
 		if (StatusOrder[status]) {
 			filters.status = StatusOrder[status];
+		}
+
+		if (nonStatus?.length > 0) {
+			filters.status = {
+				$not: { $in: nonStatus.map((item) => StatusOrder[item]) },
+			};
 		}
 
 		if (orderPos !== undefined) {
@@ -151,6 +158,11 @@ export class OrdersService {
 
 	async findById(id: string) {
 		const order = await this.orderModel.findById(id).populate(populate).lean();
+
+		if (!order) {
+			throw new BadRequestException('El pedido no existe');
+		}
+
 		let credit;
 		try {
 			credit = await this.creditsService.findOne({
@@ -217,6 +229,26 @@ export class OrdersService {
 			}
 		}
 
+		const oldOrder = await this.orderModel.findOne({
+			'customer._id': user.customer._id,
+			status: StatusOrder.PENDDING,
+		});
+
+		if (oldOrder) {
+			let credit;
+
+			try {
+				credit = await this.creditsService.findOne({
+					customerId: oldOrder?.customer?._id?.toString(),
+				});
+			} catch {}
+
+			return {
+				credit,
+				order: oldOrder,
+			};
+		}
+
 		const shop = await this.shopsService.getShopWholesale();
 
 		let number = 1;
@@ -250,17 +282,16 @@ export class OrdersService {
 			company: new Types.ObjectId(companyId),
 		});
 
-		let credit;
-
 		await this.statusWebHistoriesService.addRegister({
 			orderId: newOrder._id.toString(),
 			status: StatusWeb.OPEN,
 			user,
 		});
+		let credit;
 
 		try {
 			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?.toString(),
+				customerId: newOrder?.customer?._id?.toString(),
 			});
 		} catch {}
 
@@ -347,8 +378,17 @@ export class OrdersService {
 		let newStatus = status;
 
 		if (StatusWeb[statusWeb]) {
-			switch (statusWeb) {
-				case StatusWeb.PENDDING || StatusWeb.PENDDING_CREDIT:
+			switch (StatusWeb[statusWeb]) {
+				case StatusWeb.PENDDING:
+					if (order.statusWeb !== StatusWeb.OPEN) {
+						throw new BadRequestException(
+							'El pedido no puede ser procesado, estado inválido',
+						);
+					}
+
+					newStatus = StatusOrder.OPEN;
+					break;
+				case StatusWeb.PENDDING_CREDIT:
 					if (order.statusWeb !== StatusWeb.OPEN) {
 						throw new BadRequestException(
 							'El pedido no puede ser procesado, estado inválido',
@@ -658,6 +698,7 @@ export class OrdersService {
 			{
 				$set: {
 					...dataUpdate,
+					status: StatusOrder[newStatus] || newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
 					statusWeb: StatusWeb[newStatusWeb] || newStatusWeb,
