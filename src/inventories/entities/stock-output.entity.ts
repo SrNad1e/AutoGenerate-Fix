@@ -41,7 +41,7 @@ export class StockOutput extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Número consecutivo' })
-	@Prop({ type: Number, default: 0, unique: true })
+	@Prop({ type: Number, required: true })
 	number: number;
 
 	@Field(() => [DetailOutput], { description: 'Detalles de la salida' })

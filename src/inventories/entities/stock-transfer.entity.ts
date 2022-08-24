@@ -67,7 +67,7 @@ export class StockTransfer extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
 
-	@Prop({ type: Number, default: 0, unique: true })
+	@Prop({ type: Number, required: true })
 	@Field(() => Number, { description: 'Consecutivo del traslado' })
 	number: number;
 
