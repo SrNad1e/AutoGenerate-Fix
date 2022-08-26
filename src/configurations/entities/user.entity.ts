@@ -90,6 +90,12 @@ export class User extends Document {
 	})
 	status: StatusUser;
 
+	@Prop({ type: Boolean, default: false })
+	@Field(() => Boolean, {
+		description: 'Usado para diferenciar la creación de los usuarios',
+	})
+	isWeb: boolean;
+
 	@Field(() => User, {
 		description: 'Usuario que creó el usuario',
 		nullable: true,

@@ -89,6 +89,7 @@ export class UsersService {
 			name,
 			roleId,
 			status,
+			isWeb,
 			limit = 10,
 			page = 1,
 			sort,
@@ -119,6 +120,10 @@ export class UsersService {
 
 		if (StatusUser[status]) {
 			filters.status = StatusUser[status];
+		}
+
+		if (isWeb !== undefined) {
+			filters.isWeb = isWeb;
 		}
 
 		if (user?.companies) {
@@ -169,7 +174,6 @@ export class UsersService {
 		{
 			username,
 			shopId,
-			//companyId,
 			pointOfSaleId,
 			roleId,
 			customerId,
