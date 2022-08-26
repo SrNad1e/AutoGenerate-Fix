@@ -764,6 +764,9 @@ export class OrdersService {
 		const dateIntial = new Date(closeDate);
 		const dateFinal = dayjs(closeDate).add(1, 'd').toDate();
 
+		console.log(closeDate);
+		console.log(dateIntial);
+
 		const ordersCancel: any = await this.orderModel.aggregate([
 			{
 				$match: {

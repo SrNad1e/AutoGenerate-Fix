@@ -74,7 +74,7 @@ export class ClosesXInvoicingService {
 		}
 
 		if (closeDate) {
-			filters.closeDate = new Date(closeDate);
+			filters.closeDate = new Date(closeDate.split(' ')[0]);
 		}
 
 		if (number) {
@@ -129,12 +129,12 @@ export class ClosesXInvoicingService {
 		}
 
 		const summaryOrder = await this.ordersService.getSummaryOrder(
-			closeDate,
+			closeDate?.split(' ')[0],
 			pointOfSaleId,
 		);
 
-		const dateInitial = dayjs(closeDate).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate).format('YYYY/MM/DD');
+		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 
 		const expenses = await this.expensesService.findAll(
 			{
@@ -197,7 +197,7 @@ export class ClosesXInvoicingService {
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
-			closeDate: new Date(closeDate),
+			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
 			...summaryOrder,
 			payments,
