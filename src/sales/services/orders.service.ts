@@ -489,6 +489,7 @@ export class OrdersService {
 						const valuesReceipt = {
 							value: total,
 							paymentId: payment?._id?.toString(),
+							pointOfSaleId: order.pointOfSale._id.toString(),
 							concept: `Abono a pedido ${order?.number}`,
 							boxId:
 								payment?.type === 'cash'
@@ -763,9 +764,6 @@ export class OrdersService {
 	async getSummaryOrder(closeDate: string, pointOfSaleId: string) {
 		const dateIntial = new Date(closeDate);
 		const dateFinal = dayjs(closeDate).add(1, 'd').toDate();
-
-		console.log(closeDate);
-		console.log(dateIntial);
 
 		const ordersCancel: any = await this.orderModel.aggregate([
 			{

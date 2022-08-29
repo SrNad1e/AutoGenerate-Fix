@@ -72,6 +72,12 @@ export class FiltersReceiptsInput {
 	})
 	boxId?: string;
 
+	@Field(() => String, {
+		description: 'Punto de venta del pago',
+		nullable: true,
+	})
+	pointOfSaleId?: string;
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 

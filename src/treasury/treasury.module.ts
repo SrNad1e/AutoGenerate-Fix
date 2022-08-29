@@ -17,6 +17,10 @@ import { ExpensesResolver } from './resolvers/expenses.resolver';
 import { BoxesResolver } from './resolvers/boxes.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { CreditsModule } from 'src/credits/credits.module';
+import {
+	PointOfSale,
+	PointOfSaleSchema,
+} from 'src/sales/entities/pointOfSale.entity';
 
 @Module({
 	imports: [
@@ -51,6 +55,10 @@ import { CreditsModule } from 'src/credits/credits.module';
 			{
 				name: Payment.name,
 				schema: PaymentSchema,
+			},
+			{
+				name: PointOfSale.name,
+				schema: PointOfSaleSchema,
 			},
 			{
 				name: BoxHistory.name,

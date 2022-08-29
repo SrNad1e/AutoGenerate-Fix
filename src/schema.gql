@@ -1054,6 +1054,9 @@ input CreateReceiptInput {
   """Identificador del medio de pago"""
   paymentId: String!
 
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
+
   """Valor del recibo"""
   value: Float!
 }
@@ -2461,6 +2464,9 @@ input FiltersReceiptsInput {
 
   """Identificador del medio de pago"""
   paymentId: String
+
+  """Punto de venta del pago"""
+  pointOfSaleId: String
 
   """Ordenamiento"""
   sort: SortReceipt
@@ -4213,6 +4219,9 @@ type Receipt {
 
   """Método de pago del recibo de caja"""
   payment: Payment!
+
+  """Punto de venta que genera el recibo"""
+  pointOfSale: Box!
 
   """Estado del recibo de caja"""
   status: StatusReceipt!

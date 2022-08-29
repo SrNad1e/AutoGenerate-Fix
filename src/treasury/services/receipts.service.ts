@@ -22,6 +22,7 @@ import { TypePayment } from '../entities/payment.entity';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { Order } from 'src/sales/entities/order.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
+import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 
 const populate = [
 	{
@@ -35,6 +36,8 @@ export class ReceiptsService {
 	constructor(
 		@InjectModel(Receipt.name)
 		private readonly receiptModel: PaginateModel<Receipt>,
+		@InjectModel(PointOfSale.name)
+		private readonly PointOfSaleModel: PaginateModel<PointOfSale>,
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
 		private readonly boxService: BoxService,
 		private readonly paymentsService: PaymentsService,
@@ -54,6 +57,7 @@ export class ReceiptsService {
 			sort,
 			status,
 			boxId,
+			pointOfSaleId,
 		}: FiltersReceiptsInput,
 		user: User,
 		companyId: string,
@@ -78,6 +82,10 @@ export class ReceiptsService {
 
 		if (boxId) {
 			filters.box = new Types.ObjectId(boxId);
+		}
+
+		if (pointOfSaleId) {
+			filters.pointOfSale = new Types.ObjectId(pointOfSaleId);
 		}
 
 		if (dateInitial) {
@@ -111,7 +119,14 @@ export class ReceiptsService {
 	}
 
 	async create(
-		{ concept, paymentId, value, boxId, details }: CreateReceiptInput,
+		{
+			concept,
+			paymentId,
+			value,
+			boxId,
+			pointOfSaleId,
+			details,
+		}: CreateReceiptInput,
 		user: User,
 		companyId: string,
 	) {
@@ -121,6 +136,15 @@ export class ReceiptsService {
 			box = await this.boxService.findById(boxId);
 			if (!box) {
 				throw new NotFoundException('La caja no existe');
+			}
+		}
+
+		let pointOfSale;
+
+		if (pointOfSaleId) {
+			pointOfSale = await this.PointOfSaleModel.findById(pointOfSaleId);
+			if (!pointOfSale) {
+				throw new NotFoundException('El punto de venta no existe');
 			}
 		}
 
@@ -153,6 +177,7 @@ export class ReceiptsService {
 			concept,
 			box: box?._id,
 			payment: payment,
+			pointOfSale: pointOfSale._id,
 			company: new Types.ObjectId(companyId),
 			details,
 			user,

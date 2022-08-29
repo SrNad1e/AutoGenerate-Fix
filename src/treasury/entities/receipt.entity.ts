@@ -72,6 +72,15 @@ export class Receipt extends Document {
 	})
 	box?: Types.ObjectId;
 
+	@Field(() => Box, {
+		description: 'Punto de venta que genera el recibo',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: '¨PointOfSale',
+	})
+	pointOfSale?: Types.ObjectId;
+
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece el recibo de caja',
 	})

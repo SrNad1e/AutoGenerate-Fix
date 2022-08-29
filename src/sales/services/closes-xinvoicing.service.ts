@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
+import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 
+import { User } from 'src/configurations/entities/user.entity';
+import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
+import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { ExpensesService } from 'src/treasury/services/expenses.service';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
 import {
@@ -12,10 +16,6 @@ import {
 } from '../entities/close-x-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
-import { User } from 'src/configurations/entities/user.entity';
-import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
-import { ReceiptsService } from 'src/treasury/services/receipts.service';
-import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 
 const populate: PopulateOptions[] = [
 	{
@@ -159,7 +159,7 @@ export class ClosesXInvoicingService {
 			{
 				status: StatusReceipt.ACTIVE,
 				limit: 200,
-				boxId: pointOfSale.box._id.toString(),
+				pointOfSaleId: pointOfSale._id.toString(),
 				dateInitial,
 				dateFinal,
 			},
@@ -173,8 +173,6 @@ export class ClosesXInvoicingService {
 			const paymentIndex = payments.findIndex(
 				(item) => item.payment.toString() === receipt.payment._id.toString(),
 			);
-
-			console.log(paymentIndex);
 
 			if (paymentIndex >= 0) {
 				payments[paymentIndex] = {
