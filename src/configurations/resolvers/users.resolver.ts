@@ -44,7 +44,7 @@ export class UsersResolver {
 	})
 	@UseGuards(JwtAuthGuard)
 	getCurrent(@Context() context) {
-		return this.usersService.findById(context.req.user.user._id);
+		return this.usersService.getCurrent(context.req.user.user._id);
 	}
 
 	@Mutation(() => User)

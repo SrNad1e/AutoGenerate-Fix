@@ -44,6 +44,15 @@ export class AuthService {
 				`El usuario no tiene acceso a la compañia`,
 			);
 		}
+
+		if (user.status === StatusUser.INACTIVE) {
+			throw new UnauthorizedException(`El usuario se encuentra inactivo`);
+		}
+
+		if (user.status === StatusUser.SUSPEND) {
+			throw new UnauthorizedException(`El usuario se encuentra suspendido`);
+		}
+
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,

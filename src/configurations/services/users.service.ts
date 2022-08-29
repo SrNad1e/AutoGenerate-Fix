@@ -373,6 +373,19 @@ export class UsersService {
 			.lean();
 	}
 
+	async getCurrent(userId: string) {
+		const user = await this.findById(userId);
+
+		if (user.status === StatusUser.INACTIVE) {
+			throw new UnauthorizedException(`El usuario ha sido inactivado`);
+		}
+
+		if (user.status === StatusUser.SUSPEND) {
+			throw new UnauthorizedException(`El usuario ha sido suspendido`);
+		}
+		return user;
+	}
+
 	/**
 	 * @description se usa para la migración
 	 * @param id identificador mysql del usuario
