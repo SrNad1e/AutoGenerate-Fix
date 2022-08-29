@@ -47,6 +47,7 @@ import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input'
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
+import { throws } from 'assert';
 
 const populate = [
 	{
@@ -484,7 +485,7 @@ export class OrdersService {
 				StatusOrder[newStatus] === StatusOrder.CLOSED
 			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
-					const { total, payment } = order?.payments[i];
+					const { total, payment, code } = order?.payments[i];
 					if (payment?.type !== TypePayment.CREDIT) {
 						const valuesReceipt = {
 							value: total,
