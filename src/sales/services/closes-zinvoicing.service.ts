@@ -165,7 +165,7 @@ export class ClosesZinvoicingService {
 			{
 				status: StatusReceipt.ACTIVE,
 				limit: 200,
-				boxId: pointOfSale.box._id.toString(),
+				pointOfSaleId: pointOfSale._id.toString(),
 				dateInitial,
 				dateFinal,
 			},
