@@ -73,7 +73,7 @@ export class ReceiptsService {
 		}
 
 		if (paymentId) {
-			filters.payment = new Types.ObjectId(paymentId);
+			filters['payment._id'] = new Types.ObjectId(paymentId);
 		}
 
 		if (status) {
