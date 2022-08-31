@@ -32,11 +32,11 @@ export class CreateUserInput {
 	})
 	pointOfSaleId?: string;
 
-	/*@Field(() => String, {
-		description: 'Identificador de la empresa a la que pertenece el usuario',
+	@Field(() => Boolean, {
+		description: 'Identifica si el usuario es web',
 		nullable: true,
 	})
-	companyId?: string;*/
+	isWeb?: boolean;
 
 	@Field(() => StatusUser, {
 		description: 'Estado del usuario',

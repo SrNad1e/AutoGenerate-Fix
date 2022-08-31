@@ -130,6 +130,7 @@ export class AuthService {
 				roleId: role._id.toString(),
 				shopId: shop._id.toString(),
 				customerId: customer._id.toString(),
+				isWeb: true,
 			},
 			{
 				name: 'Administrador del sistema',

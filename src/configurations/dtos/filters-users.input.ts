@@ -43,6 +43,12 @@ export class FiltersUsersInput {
 	})
 	status: StatusUser;
 
+	@Field(() => Boolean, {
+		description: 'Selecciona si es usuario web o no',
+		nullable: true,
+	})
+	isWeb?: boolean;
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 
