@@ -1260,6 +1260,9 @@ input CreateUserInput {
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
+  """Identifica si el usuario es web"""
+  isWeb: Boolean
+
   """Nombre del usuario"""
   name: String!
 
@@ -2776,6 +2779,9 @@ input FiltersStockTransfersInput {
 input FiltersUsersInput {
   """Identificador del tipo de cliente"""
   customerTypeId: String
+
+  """Selecciona si es usuario web o no"""
+  isWeb: Boolean
 
   """Cantidad de registros"""
   limit: Float
@@ -7128,6 +7134,9 @@ input UpdateUserInput {
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
+  """Identifica si el usuario es web"""
+  isWeb: Boolean
+
   """Nombre del usuario"""
   name: String
 
@@ -7190,6 +7199,9 @@ type User {
 
   """Cliente asignado"""
   customer: Customer
+
+  """Usado para diferenciar la creación de los usuarios"""
+  isWeb: Boolean!
 
   """Nombre de para mostrar del usuario"""
   name: String!
