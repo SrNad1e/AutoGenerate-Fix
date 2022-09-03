@@ -48,6 +48,7 @@ import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
 import { throws } from 'assert';
+import { StatusCredit } from 'src/credits/entities/credit.entity';
 
 const populate = [
 	{
@@ -1405,7 +1406,7 @@ export class OrdersService {
 				);
 			}
 		}
-
+		let credit;
 		if (paymentsCreate) {
 			for (let i = 0; i < paymentsCreate.length; i++) {
 				const detail = paymentsCreate[i];
@@ -1426,6 +1427,20 @@ export class OrdersService {
 				const payment = await this.paymentsService.findById(
 					detailPayment.paymentId,
 				);
+
+				if (payment.type === TypePayment.CREDIT) {
+					try {
+						credit = await this.creditsService.findOne({
+							customerId: order?.customer?._id.toString(),
+						});
+
+						if (credit?.status !== StatusCredit.ACTIVE) {
+							console.log(
+								'El crédito del cliente se encuentra suspendido o inactivo',
+							);
+						}
+					} catch {}
+				}
 
 				newPayments.push({
 					payment,
@@ -1522,12 +1537,6 @@ export class OrdersService {
 				new: true,
 			},
 		);
-		let credit;
-		try {
-			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?._id.toString(),
-			});
-		} catch {}
 
 		return {
 			credit,
