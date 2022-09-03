@@ -234,8 +234,14 @@ export class ClosesZinvoicingService {
 				.reduce((sum, item) => sum + item, 0);
 
 			const total = boxMain.total + cash;
-
 			await this.boxesService.updateTotal(boxMain._id.toString(), total);
+
+			const box = await this.boxesService.findById(
+				pointOfSale.box._id.toString(),
+			);
+
+			const totalBox = box.total - cash;
+			await this.boxesService.updateTotal(box._id.toString(), totalBox);
 		}
 
 		return {
