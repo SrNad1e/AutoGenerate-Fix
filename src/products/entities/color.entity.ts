@@ -16,7 +16,7 @@ export class Color extends Document {
 	name: string;
 
 	@Field(() => String, { description: 'Nombre interno del color' })
-	@Prop({ type: String, required: true })
+	@Prop({ type: String, required: true, lowercase: true })
 	name_internal: string;
 
 	@Field(() => String, { description: 'Color en formato html' })
