@@ -1433,13 +1433,12 @@ export class OrdersService {
 						credit = await this.creditsService.findOne({
 							customerId: order?.customer?._id.toString(),
 						});
-
-						if (credit?.status !== StatusCredit.ACTIVE) {
-							console.log(
-								'El crédito del cliente se encuentra suspendido o inactivo',
-							);
-						}
 					} catch {}
+					if (credit?.status !== StatusCredit.ACTIVE) {
+						throw new BadRequestException(
+							'El crédito del cliente se encuentra suspendido',
+						);
+					}
 				}
 
 				newPayments.push({
