@@ -29,11 +29,17 @@ export class FiltersBoxesInput {
 	})
 	name?: string;
 
+	@Field(() => Boolean, {
+		description: 'Es caja principal',
+		nullable: true,
+	})
+	isMain?: boolean;
+
 	@Field(() => String, {
 		description: 'Identificador de la caja',
 		nullable: true,
 	})
-	_id: string;
+	_id?: string;
 
 	@Field(() => SortBox, { description: 'Ordenamiento', nullable: true })
 	sort?: SortBox;

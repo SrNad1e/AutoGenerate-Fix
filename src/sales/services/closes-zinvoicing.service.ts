@@ -14,6 +14,7 @@ import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { PaymentOrderClose } from '../entities/close-x-invoicing.entity';
+import { BoxService } from 'src/treasury/services/box.service';
 
 const populate: PopulateOptions[] = [
 	{
@@ -51,6 +52,7 @@ export class ClosesZinvoicingService {
 		private readonly ordersService: OrdersService,
 		private readonly expensesService: ExpensesService,
 		private readonly receiptsService: ReceiptsService,
+		private readonly boxesService: BoxService,
 	) {}
 
 	async findAll(
@@ -219,6 +221,21 @@ export class ClosesZinvoicingService {
 				user,
 				companyId,
 			);
+
+			const boxMain = await this.boxesService.findOne(
+				{
+					isMain: true,
+				},
+				companyId,
+			);
+
+			const cash = Object.keys(cashRegister)
+				.map((key) => parseInt(key.slice(1)) * cashRegister[key])
+				.reduce((sum, item) => sum + item, 0);
+
+			const total = boxMain.total + cash;
+
+			await this.boxesService.updateTotal(boxMain._id.toString(), total);
 		}
 
 		return {

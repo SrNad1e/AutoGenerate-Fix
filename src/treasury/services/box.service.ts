@@ -50,6 +50,29 @@ export class BoxService {
 		return this.boxModel.paginate(filters, options);
 	}
 
+	async findOne({ _id, name, isMain }: FiltersBoxesInput, companyId: string) {
+		const filters: FilterQuery<Box> = {};
+
+		filters.company = new Types.ObjectId(companyId);
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
+		}
+
+		if (name) {
+			filters.name = {
+				$regex: name,
+				$options: 'i',
+			};
+		}
+
+		if (isMain) {
+			filters.isMain = isMain;
+		}
+
+		return this.boxModel.findOne(filters);
+	}
+
 	async findById(id: string) {
 		return this.boxModel.findById(id).lean();
 	}
