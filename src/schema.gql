@@ -1891,6 +1891,9 @@ input FiltersBoxesInput {
   """Identificador de la caja"""
   _id: String
 
+  """Es caja principal"""
+  isMain: Boolean
+
   """Cantidad de registros"""
   limit: Float
 

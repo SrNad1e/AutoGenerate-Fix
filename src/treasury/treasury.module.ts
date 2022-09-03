@@ -81,6 +81,6 @@ import {
 		ExpensesResolver,
 		BoxesResolver,
 	],
-	exports: [PaymentsService, ReceiptsService, ExpensesService],
+	exports: [PaymentsService, ReceiptsService, ExpensesService, BoxService],
 })
 export class TreasuryModule {}
