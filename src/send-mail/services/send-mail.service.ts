@@ -12,17 +12,18 @@ export class SendMailService {
 		const web = `https://wholesalers-qa.toulouse.com.co`;
 		//const web = 'http://localhost:3000';
 		//const api = `http://localhost:8080`;
-
-		await this.mailerService.sendMail({
-			to: user.username,
-			subject: 'Restablecer contraseña',
-			template: './recovery-password',
-			context: {
-				name: user.name,
-				url: `${web}/auth/recover/${token}`,
-				catalog: `${web}/catalogo`,
-				api,
-			},
-		});
+		try {
+			await this.mailerService.sendMail({
+				to: user.username,
+				subject: 'Restablecer contraseña',
+				template: './recovery-password',
+				context: {
+					name: user.name,
+					url: `${web}/auth/recover/${token}`,
+					catalog: `${web}/catalogo`,
+					api,
+				},
+			});
+		} catch (e) {}
 	}
 }
