@@ -554,10 +554,14 @@ export class OrdersService {
 					error: 'Error en api externa',
 				};
 			}
+			let totalOrder = order.summary.total;
+			if (order?.conveyorOrder?.conveyor) {
+				totalOrder = totalOrder - order.conveyorOrder.value;
+			}
 
 			newSummary = {
 				...order.summary,
-				total: order.summary.total + conveyorOrder.value,
+				total: totalOrder + conveyorOrder.value,
 			};
 		}
 
