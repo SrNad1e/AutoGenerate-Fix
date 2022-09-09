@@ -144,7 +144,7 @@ export class OrdersService {
 		}
 
 		if (paymentId) {
-			filters['payments._id'] = new Types.ObjectId(paymentId);
+			filters['payments.payment._id'] = new Types.ObjectId(paymentId);
 		}
 
 		const options = {
