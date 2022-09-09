@@ -597,8 +597,22 @@ export class OrdersService {
 				({ payment }) => payment.type === TypePayment.CREDIT,
 			);
 
+			if (order.payments.length === 0) {
+				throw new BadRequestException(
+					'El pedido debe contener un médio de pago',
+				);
+			}
+
 			if (isCredit) {
 				newStatusWeb = StatusWeb.PENDDING_CREDIT;
+				console.log('se congela o no', isCredit.total);
+
+				await this.creditHistoryService.frozenCreditHistory(
+					orderId,
+					isCredit.total,
+					user,
+					companyId,
+				);
 			} else {
 				newStatusWeb = StatusWeb.PENDDING;
 			}
@@ -1354,6 +1368,15 @@ export class OrdersService {
 						order.company.toString(),
 					);
 				}
+
+				if (newPayments[index]?.payment?.type === TypePayment.CREDIT) {
+					await this.creditHistoryService.thawedCreditHistory(
+						orderId,
+						newPayments[index]?.total,
+						user,
+						order.company._id?.toString(),
+					);
+				}
 			}
 
 			const payments = paymentsDelete.map((item) => item.paymentId);
@@ -1517,6 +1540,41 @@ export class OrdersService {
 
 				return payment;
 			});
+		}
+
+		const creditOrder = order.payments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		const creditUpdate = payments.find(
+			(item) => item.paymentId === creditOrder?.payment?._id.toString(),
+		);
+
+		const newCredit = newPayments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		if (creditUpdate) {
+			await this.creditHistoryService.thawedCreditHistory(
+				orderId,
+				creditOrder.total,
+				user,
+				order.company._id.toString(),
+			);
+
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				creditUpdate.total,
+				user,
+				order.company._id.toString(),
+			);
+		} else if (newCredit) {
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				newCredit.total,
+				user,
+				order.company._id.toString(),
+			);
 		}
 
 		const summary = {
