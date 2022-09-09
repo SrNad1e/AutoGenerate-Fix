@@ -1368,6 +1368,15 @@ export class OrdersService {
 						order.company.toString(),
 					);
 				}
+
+				if (newPayments[index]?.payment?.type === TypePayment.CREDIT) {
+					await this.creditHistoryService.thawedCreditHistory(
+						orderId,
+						newPayments[index]?.total,
+						user,
+						order.company._id?.toString(),
+					);
+				}
 			}
 
 			const payments = paymentsDelete.map((item) => item.paymentId);
