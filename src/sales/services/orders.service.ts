@@ -1533,6 +1533,41 @@ export class OrdersService {
 			});
 		}
 
+		const creditOrder = order.payments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		const creditUpdate = payments.find(
+			(item) => item.paymentId === creditOrder?.payment?._id.toString(),
+		);
+
+		const newCredit = newPayments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		if (creditUpdate) {
+			await this.creditHistoryService.thawedCreditHistory(
+				orderId,
+				creditOrder.total,
+				user,
+				order.company._id.toString(),
+			);
+
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				creditUpdate.total,
+				user,
+				order.company._id.toString(),
+			);
+		} else if (newCredit) {
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				newCredit.total,
+				user,
+				order.company._id.toString(),
+			);
+		}
+
 		const summary = {
 			...order.summary,
 			totalPaid,
