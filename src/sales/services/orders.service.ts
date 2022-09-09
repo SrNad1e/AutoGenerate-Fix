@@ -387,7 +387,6 @@ export class OrdersService {
 							'El pedido no puede ser procesado, estado inválido',
 						);
 					}
-
 					newStatus = StatusOrder.OPEN;
 					break;
 				case StatusWeb.PENDDING_CREDIT:
@@ -591,7 +590,7 @@ export class OrdersService {
 
 		if (
 			order.status === StatusOrder.PENDDING &&
-			StatusOrder[newStatus] === StatusOrder.OPEN
+			newStatus === StatusOrder.OPEN
 		) {
 			const isCredit = order.payments.find(
 				({ payment }) => payment.type === TypePayment.CREDIT,
@@ -605,7 +604,6 @@ export class OrdersService {
 
 			if (isCredit) {
 				newStatusWeb = StatusWeb.PENDDING_CREDIT;
-				console.log('se congela o no', isCredit.total);
 
 				await this.creditHistoryService.frozenCreditHistory(
 					orderId,
