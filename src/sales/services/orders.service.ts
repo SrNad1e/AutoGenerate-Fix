@@ -597,8 +597,22 @@ export class OrdersService {
 				({ payment }) => payment.type === TypePayment.CREDIT,
 			);
 
+			if (order.payments.length === 0) {
+				throw new BadRequestException(
+					'El pedido debe contener un médio de pago',
+				);
+			}
+
 			if (isCredit) {
 				newStatusWeb = StatusWeb.PENDDING_CREDIT;
+				console.log('se congela o no', isCredit.total);
+
+				await this.creditHistoryService.frozenCreditHistory(
+					orderId,
+					isCredit.total,
+					user,
+					companyId,
+				);
 			} else {
 				newStatusWeb = StatusWeb.PENDDING;
 			}
