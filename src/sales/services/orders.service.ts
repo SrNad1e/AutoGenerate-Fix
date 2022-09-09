@@ -901,6 +901,11 @@ export class OrdersService {
 						`El producto ${detail.productId} no existe en el pedido ${order?.number}`,
 					);
 				}
+
+				productsDelete[i] = {
+					...productsDelete[i],
+					quantity: newDetails[index].quantity,
+				};
 			}
 
 			const products = productsDelete.map((item) => item.productId);
