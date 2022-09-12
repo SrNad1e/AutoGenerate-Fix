@@ -211,10 +211,10 @@ export class DiscountRulesService {
 	}: FindDiscountInput) {
 		const discountRulers = await this.discountRuler.find({
 			dateInitial: {
-				$gt: new Date(),
+				$lte: new Date(),
 			},
 			dateFinal: {
-				$lte: new Date(),
+				$gte: new Date(),
 			},
 			active: true,
 		});
