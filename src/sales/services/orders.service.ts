@@ -89,6 +89,7 @@ export class OrdersService {
 			orderPos,
 			paymentId,
 			sort,
+			statusWeb,
 			nonStatus,
 			limit = 10,
 			page = 1,
@@ -101,8 +102,12 @@ export class OrdersService {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
-		if (StatusOrder[status]) {
-			filters.status = StatusOrder[status];
+		if (status) {
+			filters.status = StatusOrder[status] || status;
+		}
+
+		if (statusWeb) {
+			filters.statusWeb = StatusOrder[statusWeb] || statusWeb;
 		}
 
 		if (nonStatus?.length > 0) {
