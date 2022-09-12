@@ -47,7 +47,6 @@ import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input'
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
-import { throws } from 'assert';
 import { StatusCredit } from 'src/credits/entities/credit.entity';
 
 const populate = [
@@ -414,7 +413,7 @@ export class OrdersService {
 							status === StatusOrderDetail.NEW,
 					);
 
-					if (!confirmed) {
+					if (confirmed) {
 						throw new BadRequestException(
 							'Debe confirmar los medios de pagos antes de cambiar de estado',
 						);
