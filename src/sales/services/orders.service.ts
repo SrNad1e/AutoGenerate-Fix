@@ -324,6 +324,8 @@ export class OrdersService {
 			);
 		}
 		const dataUpdate = { address };
+		let newDetails = [];
+		let newSummary = undefined;
 
 		if (customerId) {
 			const customer = await this.customersService.findById(customerId);
@@ -336,8 +338,6 @@ export class OrdersService {
 				customer.customerType._id.toString() !==
 				order.customer.customerType._id.toString()
 			) {
-				const newDetails = [];
-
 				for (let i = 0; i < order?.details?.length; i++) {
 					const detail = order?.details[i];
 
@@ -369,15 +369,13 @@ export class OrdersService {
 
 				const tax = 0;
 
-				const summary = {
+				newSummary = {
 					...order.summary,
 					total,
 					discount,
 					subtotal,
 					tax,
 				};
-				dataUpdate['summary'] = summary;
-				dataUpdate['details'] = newDetails;
 			}
 		}
 
@@ -532,8 +530,6 @@ export class OrdersService {
 			dataUpdate['status'] = StatusOrder[newStatus];
 		}
 
-		let newSummary = undefined;
-
 		let conveyorOrder;
 		if (conveyorId) {
 			const conveyor = await this.conveyorsService.findById(conveyorId);
@@ -588,7 +584,6 @@ export class OrdersService {
 				}
 			}
 		}
-		let newDetails = [];
 
 		let newStatusWeb = statusWeb;
 
