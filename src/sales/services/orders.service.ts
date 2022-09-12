@@ -144,7 +144,7 @@ export class OrdersService {
 		}
 
 		if (paymentId) {
-			filters['payments._id'] = new Types.ObjectId(paymentId);
+			filters['payments.payment._id'] = new Types.ObjectId(paymentId);
 		}
 
 		const options = {
@@ -387,7 +387,6 @@ export class OrdersService {
 							'El pedido no puede ser procesado, estado inválido',
 						);
 					}
-
 					newStatus = StatusOrder.OPEN;
 					break;
 				case StatusWeb.PENDDING_CREDIT:
@@ -591,14 +590,27 @@ export class OrdersService {
 
 		if (
 			order.status === StatusOrder.PENDDING &&
-			StatusOrder[newStatus] === StatusOrder.OPEN
+			newStatus === StatusOrder.OPEN
 		) {
 			const isCredit = order.payments.find(
 				({ payment }) => payment.type === TypePayment.CREDIT,
 			);
 
+			if (order.payments.length === 0) {
+				throw new BadRequestException(
+					'El pedido debe contener un médio de pago',
+				);
+			}
+
 			if (isCredit) {
 				newStatusWeb = StatusWeb.PENDDING_CREDIT;
+
+				await this.creditHistoryService.frozenCreditHistory(
+					orderId,
+					isCredit.total,
+					user,
+					companyId,
+				);
 			} else {
 				newStatusWeb = StatusWeb.PENDDING;
 			}
@@ -889,6 +901,11 @@ export class OrdersService {
 						`El producto ${detail.productId} no existe en el pedido ${order?.number}`,
 					);
 				}
+
+				productsDelete[i] = {
+					...productsDelete[i],
+					quantity: newDetails[index].quantity,
+				};
 			}
 
 			const products = productsDelete.map((item) => item.productId);
@@ -1354,6 +1371,15 @@ export class OrdersService {
 						order.company.toString(),
 					);
 				}
+
+				if (newPayments[index]?.payment?.type === TypePayment.CREDIT) {
+					await this.creditHistoryService.thawedCreditHistory(
+						orderId,
+						newPayments[index]?.total,
+						user,
+						order.company._id?.toString(),
+					);
+				}
 			}
 
 			const payments = paymentsDelete.map((item) => item.paymentId);
@@ -1517,6 +1543,41 @@ export class OrdersService {
 
 				return payment;
 			});
+		}
+
+		const creditOrder = order.payments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		const creditUpdate = payments.find(
+			(item) => item.paymentId === creditOrder?.payment?._id.toString(),
+		);
+
+		const newCredit = newPayments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		if (creditUpdate) {
+			await this.creditHistoryService.thawedCreditHistory(
+				orderId,
+				creditOrder.total,
+				user,
+				order.company._id.toString(),
+			);
+
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				creditUpdate.total,
+				user,
+				order.company._id.toString(),
+			);
+		} else if (newCredit) {
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				newCredit.total,
+				user,
+				order.company._id.toString(),
+			);
 		}
 
 		const summary = {
