@@ -423,7 +423,7 @@ export class OrdersService {
 					}
 					break;
 				case StatusWeb.SENT:
-					if (order.statusWeb !== StatusWeb.PAYMENT_CONFIRMED) {
+					if (order.statusWeb !== StatusWeb.PREPARING) {
 						throw new BadRequestException(
 							'El pedido no puede ser procesado, estado inválido',
 						);
