@@ -163,7 +163,7 @@ export class CreditHistoryService {
 		const credit = await this.creditsService.validateCredit(
 			order?.customer?._id?.toString(),
 			amount,
-			TypeCreditHistory.CREDIT,
+			TypeCreditHistory.FROZEN,
 		);
 
 		const newCredit = await this.creditsService.update(
