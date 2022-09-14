@@ -133,18 +133,18 @@ export class ClosesZinvoicingService {
 		}
 
 		const summaryOrder = await this.ordersService.getSummaryOrder(
-			closeDate,
+			closeDate?.split(' ')[0],
 			pointOfSaleId,
 		);
 
-		const dateInitial = dayjs(closeDate).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate).add(1, 'd').format('YYYY/MM/DD');
+		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 
 		const expenses = await this.expensesService.findAll(
 			{
 				status: StatusExpense.ACTIVE,
 				limit: 200,
-				boxId: pointOfSaleId,
+				boxId: pointOfSale.box._id.toString(),
 				dateInitial,
 				dateFinal,
 			},
@@ -203,7 +203,7 @@ export class ClosesZinvoicingService {
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
-			closeDate: new Date(closeDate),
+			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
 			...summaryOrder,
 			payments,
@@ -233,7 +233,7 @@ export class ClosesZinvoicingService {
 				.map((key) => parseInt(key.slice(1)) * cashRegister[key])
 				.reduce((sum, item) => sum + item, 0);
 
-			const total = boxMain.total + cash;
+			const total = boxMain?.total + cash;
 			await this.boxesService.updateTotal(boxMain._id.toString(), total);
 
 			const box = await this.boxesService.findById(
