@@ -202,7 +202,7 @@ export class CreditHistoryService {
 		}
 
 		const credit = await this.creditsService.validateCredit(
-			order?.customer.toString(),
+			order?.customer?._id?.toString(),
 			amount,
 			TypeCreditHistory.THAWED,
 		);
