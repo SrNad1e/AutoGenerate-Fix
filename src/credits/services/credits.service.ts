@@ -267,13 +267,23 @@ export class CreditsService {
 		type: TypeCreditHistory,
 	) {
 		switch (type) {
-			case TypeCreditHistory.CREDIT || TypeCreditHistory.FROZEN:
+			case TypeCreditHistory.CREDIT:
 				return this.creditModel.findOne({
 					customer: new Types.ObjectId(customerId),
 					available: {
 						$gte: amount,
 					},
 				});
+			case TypeCreditHistory.FROZEN:
+				const result = await this.creditModel.findOne({
+					customer: new Types.ObjectId(customerId),
+					available: {
+						$gte: amount,
+					},
+				});
+
+				return result;
+
 			case TypeCreditHistory.DEBIT:
 				return this.creditModel.findOne({
 					customer: new Types.ObjectId(customerId),
