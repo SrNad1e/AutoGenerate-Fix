@@ -423,7 +423,11 @@ export class OrdersService {
 					}
 					break;
 				case StatusWeb.SENT:
-					if (order.statusWeb !== StatusWeb.PREPARING) {
+					if (
+						![StatusWeb.PREPARING, StatusWeb.PAYMENT_CONFIRMED].includes(
+							order.statusWeb,
+						)
+					) {
 						throw new BadRequestException(
 							'El pedido no puede ser procesado, estado inválido',
 						);
@@ -487,7 +491,7 @@ export class OrdersService {
 				StatusOrder[newStatus] === StatusOrder.CLOSED
 			) {
 				for (let i = 0; i < order?.payments?.length; i++) {
-					const { total, payment, code } = order?.payments[i];
+					const { total, payment } = order?.payments[i];
 					if (payment?.type !== TypePayment.CREDIT) {
 						const valuesReceipt = {
 							value: total,
@@ -680,7 +684,7 @@ export class OrdersService {
 			);
 		}
 
-		if (StatusOrder[newStatus] === StatusOrder.CLOSED) {
+		if ([StatusOrder[newStatus], newStatus].includes(StatusOrder.CLOSED)) {
 			for (let i = 0; i < order?.payments?.length; i++) {
 				const payment = order?.payments[i];
 
@@ -708,6 +712,26 @@ export class OrdersService {
 						order.company.toString(),
 					);
 				}
+			}
+
+			const customerType = await this.customerTypesService.findOne('Mayorista');
+
+			if (
+				!order.orderPos &&
+				order.summary.totalPaid >= 300000 &&
+				order.customer.customerType._id !== customerType._id
+			) {
+				if (!customerType) {
+					throw new BadRequestException('Cliente tipo Mayorista no existe');
+				}
+
+				await this.customersService.update(
+					order.customer._id.toString(),
+					{
+						customerTypeId: customerType._id.toString(),
+					},
+					user,
+				);
 			}
 		}
 
