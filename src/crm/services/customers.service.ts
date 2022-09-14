@@ -192,7 +192,7 @@ export class CustomersService {
 
 		const newAddresses = [];
 
-		if (addresses.length > 0) {
+		if (addresses?.length > 0) {
 			let isMainIndex = 0;
 			for (let i = 0; i < addresses.length; i++) {
 				const { cityId, isMain, ...params } = addresses[i];

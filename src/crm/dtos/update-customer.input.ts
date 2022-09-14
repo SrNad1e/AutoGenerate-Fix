@@ -7,19 +7,19 @@ export class UpdateCustomerInput {
 		description: 'Identificación del tipo de documento',
 		nullable: true,
 	})
-	documentTypeId: string;
+	documentTypeId?: string;
 
 	@Field(() => String, { description: 'Número de documento', nullable: true })
-	document: string;
+	document?: string;
 
 	@Field(() => String, { description: 'Nombres del cliente', nullable: true })
-	firstName: string;
+	firstName?: string;
 
 	@Field(() => Boolean, { description: 'Cliente activo', nullable: true })
-	active: boolean;
+	active?: boolean;
 
 	@Field(() => String, { description: 'Apellidos del cliente', nullable: true })
-	lastName: string;
+	lastName?: string;
 
 	@Field(() => [AddressInput], {
 		description: 'Direcciones del cliente',
@@ -31,7 +31,7 @@ export class UpdateCustomerInput {
 		description: 'Identificación de tipo de cliente',
 		nullable: true,
 	})
-	customerTypeId: string;
+	customerTypeId?: string;
 
 	@Field(() => String, { description: 'Número de teléfono', nullable: true })
 	phone?: string;
