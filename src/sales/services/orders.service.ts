@@ -608,12 +608,12 @@ export class OrdersService {
 			if (isCredit) {
 				newStatusWeb = StatusWeb.PENDDING_CREDIT;
 
-				await this.creditHistoryService.frozenCreditHistory(
+				/*	await this.creditHistoryService.frozenCreditHistory(
 					orderId,
 					isCredit.total,
 					user,
 					companyId,
-				);
+				);*/
 			} else {
 				newStatusWeb = StatusWeb.PENDDING;
 			}
