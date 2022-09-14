@@ -1378,6 +1378,7 @@ export class OrdersService {
 							'El medio de pago cupón debe tener código',
 						);
 					}
+
 					const coupon = await this.couponsService.findOne(
 						{
 							code: newPayments[index]?.code,
@@ -1400,7 +1401,7 @@ export class OrdersService {
 						orderId,
 						newPayments[index]?.total,
 						user,
-						order.company._id?.toString(),
+						order.company?.toString(),
 					);
 				}
 			}
