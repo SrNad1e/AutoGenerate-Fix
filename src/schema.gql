@@ -2191,6 +2191,9 @@ input FiltersCustomerTypesInput {
 
 """Filtros de listado de clientes"""
 input FiltersCustomersInput {
+  """Identificdor de un usuario"""
+  _id: String
+
   """Si el cliente se encuentra activo"""
   active: Boolean
 
