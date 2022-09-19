@@ -40,6 +40,7 @@ export class CustomersService {
 
 	async findAll({
 		dato,
+		_id,
 		sort,
 		active,
 		limit = 20,
@@ -74,6 +75,10 @@ export class CustomersService {
 					},
 				},
 			];
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		if (active !== undefined) {
