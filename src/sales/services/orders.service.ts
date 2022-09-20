@@ -516,6 +516,14 @@ export class OrdersService {
 						});
 					} else {
 						payments.push(order?.payments[i]);
+
+						await this.creditHistoryService.thawedCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
+
 						const creditHistory =
 							await this.creditHistoryService.addCreditHistory(
 								order?._id?.toString(),
