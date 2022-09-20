@@ -225,7 +225,7 @@ export class CreditsService {
 							`El crédito del cliente no tiene cupo congelado disponible para liberar, cupo $ ${frozenAmount}`,
 						);
 					}
-					available = available - detailAddCredit?.total;
+					available = available + detailAddCredit?.total;
 					frozenAmount = frozenAmount - detailAddCredit?.total;
 					break;
 				default:
