@@ -26,4 +26,10 @@ export class FindDiscountInput {
 		nullable: true,
 	})
 	customerTypeId?: string;
+
+	@Field(() => String, {
+		description: 'Identificador de la tienda para validar el descuento',
+		nullable: true,
+	})
+	shopId?: string;
 }
