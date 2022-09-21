@@ -37,6 +37,9 @@ import { StockHistoryService } from './stock-history.service';
 import { StockRequestService } from './stock-request.service';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { StatusDetailTransferError } from '../entities/stock-trasnsfer-error.entity';
+import { StockTransferErrorsService } from './stock-transfer-errors.service';
+import { DetailsStockTransferErrorCreateInput } from '../dtos/create-stockTransferError.input';
 
 const populate = [
 	{
@@ -78,6 +81,7 @@ export class StockTransferService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly stockRequestService: StockRequestService,
+		private readonly stockTransferErrorsService: StockTransferErrorsService,
 	) {}
 
 	async findAll(
@@ -665,10 +669,42 @@ export class StockTransferService {
 
 				return detail;
 			});
-
-			//revisar el newDetails para validar cuales tienen inconsistencias
 		}
+		const detailsError = newDetails.filter(
+			(detail) =>
+				detail.quantity !== detail.quantityConfirmed &&
+				detail.status === StatusDetailTransfer.CONFIRMED,
+		);
 
+		if (detailsError) {
+			const detailsErrorFormat = detailsError.map((detail) => {
+				const newQuantity = detail.quantity - detail.quantityConfirmed;
+
+				if (newQuantity > 0) {
+					return {
+						product: detail.product,
+						quantity: detail.quantity,
+						status: StatusDetailTransferError.MISSING,
+					};
+				} else {
+					return {
+						product: detail.product,
+						quantity: -detail.quantity,
+						status: StatusDetailTransferError.SURPLUS,
+					};
+				}
+			});
+
+			await this.stockTransferErrorsService.addRegister(
+				{
+					details: detailsErrorFormat as DetailsStockTransferErrorCreateInput[],
+					stockTransferId: stockTransfer._id.toString(),
+				},
+				user,
+			);
+
+			//validar que solo se agreguen las unidades que fueron confirmadas siempre y cuando no superen las cantidades solicitadas
+		}
 		return this.stockTransferModel.findByIdAndUpdate(
 			id,
 			{

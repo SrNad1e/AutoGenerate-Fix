@@ -21,7 +21,7 @@ export class StockTransferErrorsService {
 		private readonly stockTransferErrorModel: PaginateModel<StockTransferError>,
 	) {}
 
-	async create(
+	async addRegister(
 		{ details, stockTransferId }: CreateStockTransferError,
 		user: User,
 	) {
