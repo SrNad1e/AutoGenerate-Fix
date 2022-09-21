@@ -37,6 +37,9 @@ import { StockHistoryService } from './stock-history.service';
 import { StockRequestService } from './stock-request.service';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import { StatusDetailTransferError } from '../entities/stock-trasnsfer-error.entity';
+import { StockTransferErrorsService } from './stock-transfer-errors.service';
+import { DetailsStockTransferErrorCreateInput } from '../dtos/create-stockTransferError.input';
 
 const populate = [
 	{
@@ -78,6 +81,7 @@ export class StockTransferService {
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly stockRequestService: StockRequestService,
+		private readonly stockTransferErrorsService: StockTransferErrorsService,
 	) {}
 
 	async findAll(
@@ -312,7 +316,7 @@ export class StockTransferService {
 			status,
 			...options
 		}: UpdateStockTransferInput,
-		user: Partial<User>,
+		user: User,
 		companyId: string,
 	) {
 		const stockTransfer = await this.stockTransferModel.findById(id).lean();
@@ -481,10 +485,18 @@ export class StockTransferService {
 					);
 				}
 
-				let detailHistory = newDetails.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantityConfirmed,
-				}));
+				let detailHistory = newDetails.map((detail) => {
+					if (detail.quantity <= detail.quantityConfirmed) {
+						return {
+							productId: detail.product._id.toString(),
+							quantity: detail.quantity,
+						};
+					}
+					return {
+						productId: detail.product._id.toString(),
+						quantity: detail.quantityConfirmed,
+					};
+				});
 
 				detailHistory = detailHistory.filter((item) => item.quantity > 0);
 
@@ -500,6 +512,41 @@ export class StockTransferService {
 						user,
 						companyId,
 					);
+
+					const detailsError = newDetails.filter(
+						(detail) =>
+							detail.quantity !== detail.quantityConfirmed &&
+							detail.status === StatusDetailTransfer.CONFIRMED,
+					);
+
+					if (detailsError) {
+						const detailsErrorFormat = detailsError.map((detail) => {
+							const newQuantity = detail.quantity - detail.quantityConfirmed;
+
+							if (newQuantity > 0) {
+								return {
+									product: detail.product,
+									quantity: newQuantity,
+									status: StatusDetailTransferError.MISSING,
+								};
+							} else {
+								return {
+									product: detail.product,
+									quantity: -newQuantity,
+									status: StatusDetailTransferError.SURPLUS,
+								};
+							}
+						});
+
+						await this.stockTransferErrorsService.addRegister(
+							{
+								details:
+									detailsErrorFormat as DetailsStockTransferErrorCreateInput[],
+								stockTransferId: stockTransfer._id.toString(),
+							},
+							user,
+						);
+					}
 				}
 			}
 
@@ -554,10 +601,18 @@ export class StockTransferService {
 			}
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
-				let detailHistory = stockTransfer?.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantityConfirmed,
-				}));
+				let detailHistory = stockTransfer?.details.map((detail) => {
+					if (detail.quantity <= detail.quantityConfirmed) {
+						return {
+							productId: detail.product._id.toString(),
+							quantity: detail.quantity,
+						};
+					}
+					return {
+						productId: detail.product._id.toString(),
+						quantity: detail.quantityConfirmed,
+					};
+				});
 
 				detailHistory = detailHistory.filter((item) => item.quantity > 0);
 
@@ -573,6 +628,40 @@ export class StockTransferService {
 						user,
 						companyId,
 					);
+					const detailsError = stockTransfer.details.filter(
+						(detail) =>
+							detail.quantity !== detail.quantityConfirmed &&
+							detail.status === StatusDetailTransfer.CONFIRMED,
+					);
+
+					if (detailsError) {
+						const detailsErrorFormat = detailsError.map((detail) => {
+							const newQuantity = detail.quantity - detail.quantityConfirmed;
+
+							if (newQuantity > 0) {
+								return {
+									product: detail.product,
+									quantity: newQuantity,
+									status: StatusDetailTransferError.MISSING,
+								};
+							} else {
+								return {
+									product: detail.product,
+									quantity: -newQuantity,
+									status: StatusDetailTransferError.SURPLUS,
+								};
+							}
+						});
+
+						await this.stockTransferErrorsService.addRegister(
+							{
+								details:
+									detailsErrorFormat as DetailsStockTransferErrorCreateInput[],
+								stockTransferId: stockTransfer._id.toString(),
+							},
+							user,
+						);
+					}
 				}
 			}
 
