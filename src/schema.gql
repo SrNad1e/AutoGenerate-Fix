@@ -2771,6 +2771,21 @@ input FiltersStockRequestsInput {
 }
 
 """Filtros para el listado de traslados de productos"""
+input FiltersStockTransfersErrorInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortStockTransferError
+
+  """Si el traslado esta o no verificado por completo"""
+  verifield: Boolean
+}
+
+"""Filtros para el listado de traslados de productos"""
 input FiltersStockTransfersInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -3464,6 +3479,12 @@ type Mutation {
     """Datos para actualizar la bodega"""
     updateWarehouseInput: UpdateWarehouseInput!
   ): Warehouse!
+
+  """Verifica un producto de un traslado en error"""
+  verifiedProductStockTransfer(
+    """Datos para verificar un producto del traslado en error"""
+    verifiedProductTransferErrorInput: VerifiedProductTransferErrorInput!
+  ): StockTransferError!
 }
 
 """Opción del permiso"""
@@ -3728,6 +3749,7 @@ enum Permissions {
   CREATE_TREASURY_EXPENSE
   CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
+  INVENTORY_TRANSFERS_VERIFIED
   PRINT_CRM_COUPON
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
@@ -4196,6 +4218,12 @@ type Query {
     """Filtros para listado de traslados de productos entre bodegas"""
     filtersStockTransfersInput: FiltersStockTransfersInput = {}
   ): ResponseStockTransfers!
+
+  """Obtiene listado de traslados en error de productos entre bodegas"""
+  stockTransfersError(
+    """Filtros para listado de traslados en error de productos entre bodegas"""
+    filtersStockTransfersErrorInput: FiltersStockTransfersErrorInput = {}
+  ): ResponseStockTransfersError!
 
   """Consulta todos los usuarios con base a los filtros"""
   users(
@@ -5563,6 +5591,39 @@ type ResponseStockTransfers {
   totalPages: Float!
 }
 
+"""Lista de traslados en error de productos"""
+type ResponseStockTransfersError {
+  """Lista de traslados en error"""
+  docs: [StockTransferError!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Lista de usuarios"""
 type ResponseUsers {
   """Lista de usuarios"""
@@ -6301,6 +6362,15 @@ input SortStockTransfer {
   warehouseOrigin: Float
 }
 
+"""Ordenamiento del traslado de productos"""
+input SortStockTransferError {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento de los usuarios"""
 input SortUser {
   createdAt: Float
@@ -6638,6 +6708,27 @@ type StockTransfer {
 
   """Bodega de origen del traslado"""
   warehouseOrigin: Warehouse!
+}
+
+"""Errores en traslados de productos"""
+type StockTransferError {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación del traslado"""
+  createdAt: DateTime!
+
+  """Detalle de los productos que están en error"""
+  details: [DetailTransferError!]!
+
+  """Traslado al que está relacionado"""
+  stockTransfer: StockTransfer!
+
+  """Fecha de actualización del traslado"""
+  updatedAt: DateTime!
+
+  """Si ya fue verificados todos los errores"""
+  verified: Boolean!
 }
 
 """Resumen de la factura"""
@@ -7260,6 +7351,20 @@ type User {
 
   """Cuenta de usuario"""
   username: String!
+}
+
+"""Datos para verificar los productos"""
+input VerifiedProductTransferErrorInput {
+  """Identificador del producto"""
+  productId: String!
+
+  """
+  Proceso a realizar, si se envia al origen true, si se envia al destino false
+  """
+  returnInventory: Boolean!
+
+  """Identificador del traslado en error"""
+  stockTransferErrorId: String!
 }
 
 """Modelo de la bodega"""

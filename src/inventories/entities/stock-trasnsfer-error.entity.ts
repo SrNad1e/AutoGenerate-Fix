@@ -62,6 +62,12 @@ export class StockTransferError extends Document {
 	})
 	details: DetailTransferError[];
 
+	@Prop({ type: Boolean, default: false })
+	@Field(() => Boolean, {
+		description: 'Si ya fue verificados todos los errores',
+	})
+	verified: boolean[];
+
 	@Field(() => Date, { description: 'Fecha de creación del traslado' })
 	createdAt: Date;
 

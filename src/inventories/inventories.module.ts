@@ -42,6 +42,7 @@ import {
 	StockTransferErrorSchema,
 } from './entities/stock-trasnsfer-error.entity';
 import { StockTransferErrorsService } from './services/stock-transfer-errors.service';
+import { StockTransferErrorsResolver } from './resolvers/stock-transfer-errors.resolver';
 
 @Module({
 	imports: [
@@ -99,6 +100,7 @@ import { StockTransferErrorsService } from './services/stock-transfer-errors.ser
 		StockOutputResolver,
 		StockAdjustmentResolver,
 		StockTransferErrorsService,
+		StockTransferErrorsResolver,
 	],
 	controllers: [],
 	exports: [StockHistoryService],
