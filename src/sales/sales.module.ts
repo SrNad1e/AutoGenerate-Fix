@@ -72,7 +72,7 @@ import { StatusWebHistoriesService } from './services/status-web-histories.servi
 				name: ReturnOrder.name,
 				useFactory: async () => {
 					const schema = ReturnOrderSchema;
-					schema.index({ number: 1, authorization: -1 }, { unique: true });
+					schema.index({ number: 1, company: -1 }, { unique: true });
 					return schema;
 				},
 			},
