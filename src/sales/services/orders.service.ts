@@ -344,6 +344,7 @@ export class OrdersService {
 					const discount = await this.discountRulesService.getDiscount({
 						customerId: customer._id.toString(),
 						reference: detail?.product?.reference as any,
+						shopId: order?.shop?._id?.toString(),
 						companyId,
 					});
 
@@ -644,6 +645,7 @@ export class OrdersService {
 					const discount = await this.discountRulesService.getDiscount({
 						customerTypeId: customerTypeWholesale?._id?.toString(),
 						reference: detail?.product?.reference as any,
+						shopId: order?.shop?._id?.toString(),
 						companyId,
 					});
 
@@ -1028,6 +1030,7 @@ export class OrdersService {
 				const discount = await this.discountRulesService.getDiscount({
 					customerId: order?.customer?._id.toString(),
 					reference: product?.reference as any,
+					shopId: order?.shop?._id?.toString(),
 					companyId,
 				});
 
@@ -1122,6 +1125,7 @@ export class OrdersService {
 				const discount = await this.discountRulesService.getDiscount({
 					customerTypeId: customerTypeWholesale?._id?.toString(),
 					reference: detail?.product?.reference as any,
+					shopId: order?.shop?._id?.toString(),
 					companyId,
 				});
 

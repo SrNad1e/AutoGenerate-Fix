@@ -7,6 +7,7 @@ export enum DocumentTypesRule {
 	CUSTOMERTYPES = 'customerTypes',
 	CATEGORIES = 'categories',
 	COMPANY = 'company',
+	SHOPS = 'shops',
 }
 
 registerEnumType(DocumentTypesRule, { name: 'DocumentTypesRule' });

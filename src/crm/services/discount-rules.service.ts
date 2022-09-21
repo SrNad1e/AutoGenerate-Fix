@@ -208,6 +208,7 @@ export class DiscountRulesService {
 		reference,
 		companyId,
 		customerTypeId,
+		shopId,
 	}: FindDiscountInput) {
 		const discountRulers = await this.discountRuler.find({
 			dateInitial: {
@@ -271,6 +272,15 @@ export class DiscountRulesService {
 									pass = true;
 								}
 								break;
+							case DocumentTypesRule.SHOPS:
+								if (!documentIds.includes(shopId)) {
+									pass = false;
+									i = rules?.length;
+								} else {
+									pass = true;
+								}
+								break;
+
 							default:
 								break;
 						}
