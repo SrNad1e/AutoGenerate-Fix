@@ -32,6 +32,12 @@ export class DetailTransferError {
 	})
 	status: StatusDetailTransferError;
 
+	@Field(() => String, {
+		description: 'Motivo del proceso',
+		nullable: true,
+	})
+	reason?: string;
+
 	@Prop({ type: Object })
 	@Field(() => User, {
 		description: 'Usuario que valida el error',

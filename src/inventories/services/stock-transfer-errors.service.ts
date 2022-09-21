@@ -58,6 +58,7 @@ export class StockTransferErrorsService {
 			productId,
 			returnInventory,
 			stockTransferErrorId,
+			reason,
 		}: VerifiedProductTransferErrorInput,
 		user: User,
 	) {
@@ -151,6 +152,7 @@ export class StockTransferErrorsService {
 					...detail,
 					status: StatusDetailTransferError.CONFIRMED,
 					updatedAt: new Date(),
+					reason,
 				};
 			}
 

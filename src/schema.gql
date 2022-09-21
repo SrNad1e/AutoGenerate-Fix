@@ -1753,6 +1753,9 @@ type DetailTransferError {
   """Cantidad del productos en el traslado"""
   quantity: Float!
 
+  """Motivo del proceso"""
+  reason: String
+
   """Estado del producto"""
   status: StatusDetailTransferError!
 
@@ -7357,6 +7360,9 @@ type User {
 input VerifiedProductTransferErrorInput {
   """Identificador del producto"""
   productId: String!
+
+  """Motivo por el cual se verifica el producto"""
+  reason: String!
 
   """
   Proceso a realizar, si se envia al origen true, si se envia al destino false
