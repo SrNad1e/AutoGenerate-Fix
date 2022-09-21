@@ -37,6 +37,11 @@ import {
 	ReturnOrder,
 	ReturnOrderSchema,
 } from 'src/sales/entities/return-order.entity';
+import {
+	StockTransferError,
+	StockTransferErrorSchema,
+} from './entities/stock-trasnsfer-error.entity';
+import { StockTransferErrorsService } from './services/stock-transfer-errors.service';
 
 @Module({
 	imports: [
@@ -75,6 +80,10 @@ import {
 				name: ReturnOrder.name,
 				schema: ReturnOrderSchema,
 			},
+			{
+				name: StockTransferError.name,
+				schema: StockTransferErrorSchema,
+			},
 		]),
 	],
 	providers: [
@@ -89,6 +98,7 @@ import {
 		StockAdjustmentService,
 		StockOutputResolver,
 		StockAdjustmentResolver,
+		StockTransferErrorsService,
 	],
 	controllers: [],
 	exports: [StockHistoryService],

@@ -1745,6 +1745,24 @@ type DetailTransfer {
   updatedAt: DateTime!
 }
 
+"""Detalle del traslado de productos"""
+type DetailTransferError {
+  """Producto del detalle"""
+  product: Product!
+
+  """Cantidad del productos en el traslado"""
+  quantity: Float!
+
+  """Estado del producto"""
+  status: StatusDetailTransferError!
+
+  """Fecha de actualización del traslado"""
+  updatedAt: DateTime!
+
+  """Usuario que valida el error"""
+  user: User
+}
+
 """Producto para confirmar en el pedido"""
 input DetailsConfirm {
   """Producto a confirmar"""
@@ -6317,6 +6335,12 @@ enum StatusDetailTransfer {
   CONFIRMED
   NEW
   SENT
+}
+
+enum StatusDetailTransferError {
+  CONFIRMED
+  MISSING
+  SURPLUS
 }
 
 enum StatusExpense {

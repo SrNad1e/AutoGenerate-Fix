@@ -665,6 +665,8 @@ export class StockTransferService {
 
 				return detail;
 			});
+
+			//revisar el newDetails para validar cuales tienen inconsistencias
 		}
 
 		return this.stockTransferModel.findByIdAndUpdate(
