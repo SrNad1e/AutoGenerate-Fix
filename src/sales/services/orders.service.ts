@@ -566,15 +566,50 @@ export class OrdersService {
 					error: 'Error en api externa',
 				};
 			}
-			let totalOrder = order.summary.total;
-			if (order?.conveyorOrder?.conveyor) {
-				totalOrder = totalOrder - order.conveyorOrder.value;
-			}
 
-			newSummary = {
-				...order.summary,
-				total: totalOrder + conveyorOrder.value,
-			};
+			const customerTypeWholesale = await this.customerTypesService.findOne(
+				'Mayorista',
+			);
+
+			for (let i = 0; i < order?.details?.length; i++) {
+				const detail = order?.details[i];
+
+				const discount = await this.discountRulesService.getDiscount({
+					customerTypeId: customerTypeWholesale?._id?.toString(),
+					reference: detail?.product?.reference as any,
+					shopId: order?.shop?._id?.toString(),
+					companyId,
+				});
+
+				newDetails.push({
+					...detail,
+					price: detail?.product?.reference['price'] - discount,
+					discount,
+					updatedAt: new Date(),
+				});
+			}
+			const total = newDetails.reduce(
+				(sum, detail) => sum + detail.price * detail.quantity,
+				0,
+			);
+			if (total >= 300000) {
+				const discountTotal = newDetails.reduce(
+					(sum, detail) => sum + detail.quantity * detail.discount,
+					0,
+				);
+
+				const subtotal = total + discountTotal;
+
+				const tax = 0;
+
+				newSummary = {
+					...order.summary,
+					total: total + (conveyorOrder?.value || 0),
+					discount: discountTotal,
+					subtotal: subtotal,
+					tax,
+				};
+			}
 		}
 
 		if (StatusOrder[newStatus] === StatusOrder.CANCELLED) {
