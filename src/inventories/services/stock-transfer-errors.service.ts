@@ -99,7 +99,7 @@ export class StockTransferErrorsService {
 					warehouseId: stockTransfer.warehouseOrigin._id.toString(),
 				},
 				user,
-				stockTransfer.company.toString(),
+				stockTransfer.company._id.toString(),
 			);
 		} else {
 			if (productFind.status === StatusDetailTransferError.SURPLUS) {
@@ -116,7 +116,7 @@ export class StockTransferErrorsService {
 						warehouseId: stockTransfer.warehouseOrigin._id.toString(),
 					},
 					user,
-					stockTransfer.company.toString(),
+					stockTransfer.company._id.toString(),
 				);
 			}
 
@@ -133,7 +133,7 @@ export class StockTransferErrorsService {
 					warehouseId: stockTransfer.warehouseDestination._id.toString(),
 				},
 				user,
-				stockTransfer.company.toString(),
+				stockTransfer.company._id.toString(),
 			);
 		}
 
