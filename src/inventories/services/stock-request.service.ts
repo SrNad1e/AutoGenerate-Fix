@@ -520,7 +520,7 @@ export class StockRequestService {
 		const productsRequest = products
 			.map((product) => {
 				const stock = product.stock.find(
-					(item) => item.warehouse.toString() === warehouse._id.toString(),
+					(item) => item.warehouse._id.toString() === warehouse._id.toString(),
 				);
 
 				return { ...product, stock };
