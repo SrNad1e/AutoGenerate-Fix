@@ -186,7 +186,7 @@ export class StockTransferErrorsService {
 		const newDetails = details.map((detail) => ({
 			...detail,
 			user,
-			updateAt: new Date(),
+			updatedAt: new Date(),
 		}));
 
 		if (stockTransferError) {
