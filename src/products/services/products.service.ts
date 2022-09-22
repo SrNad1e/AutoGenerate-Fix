@@ -104,7 +104,6 @@ export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
 		private readonly productModel: AggregatePaginateModel<Product>,
-		@InjectModel(Image.name)
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
 		private readonly referencesService: ReferencesService,
