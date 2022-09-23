@@ -1196,12 +1196,19 @@ export class OrdersService {
 			}*/
 		}
 
+		let newStatus;
+
+		if (order.statusWeb !== StatusWeb.PREPARING && !order.orderPos) {
+			newStatus = StatusWeb.PREPARING;
+		}
+
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,
 			{
 				$set: {
 					details: newDetails,
 					user,
+					statusWeb: newStatus,
 					summary,
 				},
 			},
