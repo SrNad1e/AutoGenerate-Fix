@@ -480,7 +480,6 @@ export class OrdersService {
 					throw new BadRequestException('El pedido se encuentra cancelado');
 				case StatusOrder.CLOSED:
 					throw new BadRequestException('El pedido se encuentra finalizado');
-					break;
 				default:
 					break;
 			}
@@ -612,7 +611,7 @@ export class OrdersService {
 			}
 		}
 
-		if (StatusOrder[newStatus] === StatusOrder.CANCELLED) {
+		if ([newStatus, StatusOrder[newStatus]].includes(StatusOrder.CANCELLED)) {
 			if (order?.status === StatusOrder.OPEN) {
 				const details = order?.details?.map((detail) => ({
 					productId: detail?.product?._id.toString(),
