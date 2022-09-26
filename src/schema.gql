@@ -1003,6 +1003,9 @@ input CreatePaymentInput {
   """Identificador de la imagen del método de pago"""
   logoId: String
 
+  """Mensaje para el medio de pago"""
+  message: String
+
   """Nombre del método de pago"""
   name: String!
 
@@ -3572,6 +3575,9 @@ type Payment {
 
   """Logo para el medio de pago"""
   logo: Image
+
+  """Mensaje para el usuario web"""
+  message: String
 
   """Nombre del medio de pago"""
   name: String!
@@ -7039,6 +7045,9 @@ input UpdatePaymentInput {
 
   """Identificador de la imagen del método de pago"""
   logoId: String
+
+  """Mensaje para el medio de pago"""
+  message: String
 
   """Nombre del método de pago"""
   name: String
