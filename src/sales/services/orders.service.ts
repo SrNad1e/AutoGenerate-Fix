@@ -227,12 +227,14 @@ export class OrdersService {
 				);
 			}
 
-			const number = this.generateNumber(companyId);
+			const number = await this.generateNumber(companyId);
 
+			const summary = this.calculateSummary({});
 			//Se crea el nuevo pedido
 			const newOrder = await this.orderModel.create({
 				customer,
 				shop,
+				summary,
 				number,
 				company: new Types.ObjectId(companyId),
 				user,
@@ -277,7 +279,7 @@ export class OrdersService {
 
 		const shop = await this.shopsService.getShopWholesale();
 
-		const number = this.generateNumber(companyId);
+		const number = await this.generateNumber(companyId);
 
 		//Se asigna la dirección principal del cliente si la tiene
 		const address =
@@ -285,10 +287,13 @@ export class OrdersService {
 				? user?.customer['addresses']?.find((address) => address?.isMain)
 				: undefined;
 
+		const summary = await this.calculateSummary({});
+
 		//Se crea el nuevo pedido
 		const newOrder = await this.orderModel.create({
 			customer: user.customer,
 			address,
+			summary,
 			shop,
 			orderPos: false,
 			user,
@@ -611,7 +616,10 @@ export class OrdersService {
 				newSummary = await this.calculateSummary({
 					...(order as Order),
 					...dataUpdate,
-					details: newDetails,
+					details:
+						newDetails.length > 0
+							? (newDetails as DetailOrder[])
+							: (order.details as DetailOrder[]),
 				});
 
 				if (newSummary.total > newSummary.totalPaid) {
@@ -1656,20 +1664,20 @@ export class OrdersService {
 	 * @param order pedido a cual realizar el calculo del summary
 	 * @returns datos del summary del pedido
 	 */
-	async calculateSummary({
+	calculateSummary({
 		summary,
 		details,
 		payments,
 		conveyorOrder,
 	}: Partial<Order>) {
-		let newTotal = summary?.total;
-		let newDiscount = summary?.discount;
-		let newSubtotal = summary?.subtotal;
-		let newChange = summary?.change;
-		let newTotalPaid = summary?.totalPaid;
-		const newTax = summary?.tax;
+		let newTotal = 0;
+		let newDiscount = 0;
+		let newSubtotal = 0;
+		const newChange = summary?.change || 0;
+		let newTotalPaid = 0;
+		const newTax = 0;
 
-		for (let i = 0; i < details.length; i++) {
+		for (let i = 0; i < details?.length; i++) {
 			const { price, discount, quantity } = details[i];
 
 			newTotal = newTotal + price * quantity;
@@ -1677,7 +1685,7 @@ export class OrdersService {
 			newSubtotal = newSubtotal + (discount + price) * quantity;
 		}
 
-		for (let i = 0; i < payments.length; i++) {
+		for (let i = 0; i < payments?.length; i++) {
 			const { total } = payments[i];
 			newTotalPaid = newTotalPaid + total;
 		}
@@ -1685,7 +1693,6 @@ export class OrdersService {
 		if (conveyorOrder?.value > 0) {
 			newTotal = newTotal + conveyorOrder?.value;
 		}
-		newChange = newTotalPaid - newTotal;
 
 		return {
 			total: newTotal,
