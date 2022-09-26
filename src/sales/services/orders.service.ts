@@ -339,7 +339,6 @@ export class OrdersService {
 		let newStatus = StatusOrder[status] || status;
 		let newStatusWeb = StatusWeb[statusWeb] || statusWeb;
 		const newDetails: DetailOrder[] = [];
-		let newSummary: Partial<SummaryOrder> = {};
 		const dataUpdate: Partial<Order> = {};
 		const newPayments = [];
 
@@ -524,6 +523,25 @@ export class OrdersService {
 				} else {
 					newStatusWeb = StatusWeb.PENDDING;
 				}
+
+				//Reservar los productos de inventario
+				if (!order.orderPos) {
+					const detailsDelete = order.details.map(({ product, quantity }) => ({
+						productId: product?._id?.toString(),
+						quantity,
+					}));
+
+					await this.stockHistoryService.deleteStock(
+						{
+							details: detailsDelete,
+							warehouseId: order?.shop?.defaultWarehouse?._id?.toString(),
+							documentId: order?._id?.toString(),
+							documentType: DocumentTypeStockHistory.ORDER,
+						},
+						user,
+						companyId,
+					);
+				}
 			}
 
 			//Si se procede a cancelar el pedido
@@ -617,7 +635,7 @@ export class OrdersService {
 				}
 
 				//Calcular el resumen
-				newSummary = await this.calculateSummary({
+				const newSummary = await this.calculateSummary({
 					...(order as Order),
 					...dataUpdate,
 					details:
@@ -715,6 +733,15 @@ export class OrdersService {
 				user,
 			});
 		}
+
+		const newSummary = this.calculateSummary({
+			...(order as Order),
+			...dataUpdate,
+			details:
+				newDetails.length > 0
+					? (newDetails as DetailOrder[])
+					: (order.details as DetailOrder[]),
+		});
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,
