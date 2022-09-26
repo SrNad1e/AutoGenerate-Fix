@@ -5,21 +5,40 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
+import { Conveyor } from 'src/configurations/entities/conveyor.entity';
+import { User } from 'src/configurations/entities/user.entity';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
+import { ShopsService } from 'src/configurations/services/shops.service';
+import { StatusCredit } from 'src/credits/entities/credit.entity';
+import { CreditHistoryService } from 'src/credits/services/credit-history.service';
+import { CreditsService } from 'src/credits/services/credits.service';
+import { StatusCoupon } from 'src/crm/entities/coupon.entity';
+import { CouponsService } from 'src/crm/services/coupons.service';
+import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { CustomersService } from 'src/crm/services/customers.service';
+import { DiscountRulesService } from 'src/crm/services/discount-rules.service';
+import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
+import { StatusProduct } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
+import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import {
 	ActionPaymentsOrder,
 	AddPaymentsOrderInput,
 } from '../dtos/add-payments-order-input';
-import { AddProductsOrderInput } from '../dtos/add-products-order-input';
+import {
+	ActionProductsOrder,
+	AddProductsOrderInput,
+} from '../dtos/add-products-order-input';
+import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
+import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 import { CreateOrderInput } from '../dtos/create-order-input';
+import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import {
@@ -28,26 +47,9 @@ import {
 	StatusOrder,
 	StatusOrderDetail,
 } from '../entities/order.entity';
-import { User } from 'src/configurations/entities/user.entity';
-import { ShopsService } from 'src/configurations/services/shops.service';
-import { FiltersOrdersInput } from '../dtos/filters-orders.input';
-import { DiscountRulesService } from 'src/crm/services/discount-rules.service';
-import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
-import { StatusProduct } from 'src/products/entities/product.entity';
-import { ActionProductsOrder } from '../dtos/add-products-order-input';
-import { TypePayment } from 'src/treasury/entities/payment.entity';
-import { CouponsService } from 'src/crm/services/coupons.service';
-import { StatusCoupon } from 'src/crm/entities/coupon.entity';
-import { CreditsService } from 'src/credits/services/credits.service';
-import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { PointOfSale } from '../entities/pointOfSale.entity';
-import { CustomerTypeService } from 'src/crm/services/customer-type.service';
-import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
-import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
-import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
-import { StatusCredit } from 'src/credits/entities/credit.entity';
 
 const populate = [
 	{
@@ -183,13 +185,16 @@ export class OrdersService {
 	}
 
 	async create({ status }: CreateOrderInput, user: User, companyId: string) {
-		if (
-			![StatusOrder.OPEN, StatusOrder.PENDDING].includes(StatusOrder[status])
-		) {
+		const newStatus = StatusOrder[status] || status;
+
+		//Se valida el estado enviado por el usuario
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(newStatus)) {
 			throw new BadRequestException('El estado del pedido no es correcto');
 		}
 
-		if (user?.pointOfSale && StatusOrder[status] === StatusOrder.OPEN) {
+		//Si es un pedido POS
+		if (user?.pointOfSale && newStatus === StatusOrder.OPEN) {
+			//Inicia validación del punto de venta
 			if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
 				throw new NotFoundException(
 					`El punto de venta se encuentra cerrado para el día ${dayjs(
@@ -197,25 +202,31 @@ export class OrdersService {
 					).format('DD/MM/YYYY')}`,
 				);
 			}
+			//Fin validación del punto de venta
+
+			//Consulta del cliente por defecto
 			const customer = await this.customersService.getCustomerDefault();
+
+			if (!customer) {
+				throw new BadRequestException(
+					'La compañia no tiene asignado un cliente por defecto',
+				);
+			}
+
+			//Se consulta la tienda asignada al punto de venta
 			const shop = await this.shopsService.findById(
 				user.pointOfSale['shop'].toString(),
 			);
 
-			let number = 1;
-			const lastOrder = await this.orderModel
-				.findOne({
-					company: new Types.ObjectId(companyId),
-				})
-				.sort({
-					_id: -1,
-				})
-				.lean();
-
-			if (lastOrder) {
-				number = lastOrder.number + 1;
+			if (!shop) {
+				throw new BadRequestException(
+					`La tienda de punto de venta ${user.pointOfSale['name']} no existe`,
+				);
 			}
 
+			const number = this.generateNumber(companyId);
+
+			//Se crea el nuevo pedido
 			const newOrder = await this.orderModel.create({
 				customer,
 				shop,
@@ -235,11 +246,15 @@ export class OrdersService {
 			}
 		}
 
+		//Si es un pedido WEB
+
+		//Se valida si el usuario tiene algun pedido abierto
 		const oldOrder = await this.orderModel.findOne({
 			'customer._id': user.customer._id,
 			status: StatusOrder.PENDDING,
 		});
 
+		//Si lo tiene abierto se regresa ese pedido y no se crea un pedido nuevo
 		if (oldOrder) {
 			let credit;
 
@@ -255,27 +270,19 @@ export class OrdersService {
 			};
 		}
 
+		//Si no tiene pedido se procede a organizar la creación
+
 		const shop = await this.shopsService.getShopWholesale();
 
-		let number = 1;
-		const lastOrder = await this.orderModel
-			.findOne({
-				company: new Types.ObjectId(companyId),
-			})
-			.sort({
-				_id: -1,
-			})
-			.lean();
+		const number = this.generateNumber(companyId);
 
-		if (lastOrder) {
-			number = (lastOrder.number || 0) + 1;
-		}
-
+		//Se asigna la dirección principal del cliente si la tiene
 		const address =
 			user?.customer['addresses']?.length > 0
 				? user?.customer['addresses']?.find((address) => address?.isMain)
 				: undefined;
 
+		//Se crea el nuevo pedido
 		const newOrder = await this.orderModel.create({
 			customer: user.customer,
 			address,
@@ -288,18 +295,14 @@ export class OrdersService {
 			company: new Types.ObjectId(companyId),
 		});
 
+		//Se realiza el registro del historial del pedido
 		await this.statusWebHistoriesService.addRegister({
 			orderId: newOrder._id.toString(),
 			status: StatusWeb.OPEN,
 			user,
 		});
-		let credit;
 
-		try {
-			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?._id?.toString(),
-			});
-		} catch {}
+		const credit = this.getCreditCustomer(newOrder?.customer?._id?.toString());
 
 		return {
 			credit,
@@ -814,6 +817,26 @@ export class OrdersService {
 			credit,
 			order: newOrder,
 		};
+	}
+
+	/**
+	 * @description Se encarga de validar si es posible cambiar de estado al pedido
+	 * @param order pedido al que se le va a cambiar el estado
+	 * @param status nuevo estado del pedido
+	 * @returns true si la validación es correcta
+	 */
+	async validateStatusOder(order: Order, status: StatusOrder) {
+		return true;
+	}
+
+	/**
+	 * @description Se encarga de validar si es posible cambiar de estado web del pedido
+	 * @param order pedido al que se le va a cambiar el estado
+	 * @param statusWeb nuevo estado del pedido
+	 * @returns true si la validación es correcta
+	 */
+	async validateStatusOderWeb(order, statusWeb: StatusWeb) {
+		return true;
 	}
 
 	/**
@@ -1689,5 +1712,49 @@ export class OrdersService {
 		return this.orderModel.findByIdAndUpdate(id, {
 			$set: { details },
 		});
+	}
+
+	/**
+	 * @description se encarga de generar el consecutivo para el pedido
+	 * @param companyId compañía a la que va a asignado el pedido
+	 * @returns número consecutivo del pedido
+	 */
+	async generateNumber(companyId: string) {
+		let number = 1;
+		const lastOrder = await this.orderModel
+			.findOne({
+				company: new Types.ObjectId(companyId),
+			})
+			.sort({
+				_id: -1,
+			})
+			.lean();
+
+		if (lastOrder) {
+			number = lastOrder.number + 1;
+		}
+
+		return number;
+	}
+
+	/**
+	 * @description se encarga de consultar el crédito del cliente
+	 * @param customerId cliente a consultar el crédito
+	 * @returns si el crédito se encuentra correcto el crédito de lo contrario null
+	 */
+	async getCreditCustomer(customerId: string) {
+		try {
+			const credit = await this.creditsService.findOne({
+				customerId,
+			});
+
+			if (credit.status !== StatusCredit.ACTIVE) {
+				return null;
+			}
+
+			return credit;
+		} catch {
+			return null;
+		}
 	}
 }
