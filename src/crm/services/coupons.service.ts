@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types, FilterQuery, _FilterQuery } from 'mongoose';
+import * as dayjs from 'dayjs';
 import * as shortid from 'shortid';
 
 import { User } from 'src/configurations/entities/user.entity';
@@ -152,5 +153,28 @@ export class CouponsService {
 		);
 
 		return response;
+	}
+
+	async validateCoupon(cuponCode: string, user: User, companyId: string) {
+		const coupon = await this.findOne(
+			{
+				code: cuponCode,
+				status: StatusCoupon.ACTIVE,
+			},
+			user,
+			companyId,
+		);
+
+		if (!coupon) {
+			throw new BadRequestException(
+				'El cupón no existe o no puede usarse en esta factura',
+			);
+		}
+
+		if (dayjs().isAfter(coupon?.expiration)) {
+			throw new BadRequestException('El cupón ya se encuentra vencido');
+		}
+
+		return coupon;
 	}
 }

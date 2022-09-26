@@ -12,10 +12,12 @@ import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { ShopsService } from 'src/configurations/services/shops.service';
+import { TypeCreditHistory } from 'src/credits/entities/credit-history.entity';
 import { StatusCredit } from 'src/credits/entities/credit.entity';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { StatusCoupon } from 'src/crm/entities/coupon.entity';
+import { Customer } from 'src/crm/entities/customer.entity';
 import { CouponsService } from 'src/crm/services/coupons.service';
 import { CustomerTypeService } from 'src/crm/services/customer-type.service';
 import { CustomersService } from 'src/crm/services/customers.service';
@@ -46,6 +48,7 @@ import {
 	Order,
 	StatusOrder,
 	StatusOrderDetail,
+	SummaryOrder,
 } from '../entities/order.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { StatusWeb } from '../entities/status-web-history';
@@ -316,31 +319,39 @@ export class OrdersService {
 		user: User,
 		companyId: string,
 	) {
+		//se realiza la validación del pedido
 		const order = await this.orderModel
 			.findById(orderId)
 			.populate(populate)
 			.lean();
-		let credit;
+
 		if (!order) {
 			throw new BadRequestException(
 				'El pedido que intenta actualizar no existe',
 			);
 		}
-		const dataUpdate = { address };
-		let newDetails = [];
-		let newSummary = undefined;
 
+		let newStatus = StatusOrder[status] || status;
+		let newStatusWeb = StatusWeb[statusWeb] || statusWeb;
+		const newDetails: DetailOrder[] = [];
+		let newSummary: Partial<SummaryOrder> = {};
+		const dataUpdate: Partial<Order> = {};
+		const newPayments = [];
+
+		//Se valida si se realiza cambio del cliente
 		if (customerId) {
 			const customer = await this.customersService.findById(customerId);
 			if (!customer?._id) {
 				throw new NotFoundException('El cliente seleccionado no existe');
 			}
-			dataUpdate['customer'] = customer;
 
 			if (
 				customer.customerType._id.toString() !==
 				order.customer.customerType._id.toString()
 			) {
+				dataUpdate.customer = customer as Customer;
+
+				//Se actualiza el precio y el descuento de los productos
 				for (let i = 0; i < order?.details?.length; i++) {
 					const detail = order?.details[i];
 
@@ -356,37 +367,39 @@ export class OrdersService {
 						price: detail?.product?.reference['price'] - discount,
 						discount,
 						updatedAt: new Date(),
-					});
+					} as DetailOrder);
 				}
+			}
+		}
 
-				const total = newDetails.reduce(
-					(sum, detail) => sum + detail.price * detail.quantity,
-					0,
+		//Se valida sei realiza un cambio o agregado de transportista
+		if (conveyorId) {
+			const conveyor = await this.conveyorsService.findById(conveyorId);
+			if (!conveyor) {
+				throw new NotFoundException('El transportista no existe');
+			}
+			try {
+				const value = await this.conveyorsService.calculateValue(
+					conveyor as Conveyor,
+					order as Order,
 				);
 
-				const discount = newDetails.reduce(
-					(sum, detail) => sum + detail.quantity * detail.discount,
-					0,
-				);
-
-				const subtotal = total + discount;
-
-				const tax = 0;
-
-				newSummary = {
-					...order.summary,
-					total,
-					discount,
-					subtotal,
-					tax,
+				dataUpdate.conveyorOrder = {
+					conveyor: conveyor as Conveyor,
+					value,
+				};
+			} catch (e) {
+				dataUpdate.conveyorOrder = {
+					conveyor: conveyor as Conveyor,
+					value: conveyor.defaultPrice,
+					error: 'Error en api externa',
 				};
 			}
 		}
 
-		let newStatus = status;
-
-		if (StatusWeb[statusWeb]) {
-			switch (StatusWeb[statusWeb]) {
+		//Validación del cambio de estado Web
+		if (newStatusWeb) {
+			switch (newStatusWeb) {
 				case StatusWeb.PENDDING:
 					if (order.statusWeb !== StatusWeb.OPEN) {
 						throw new BadRequestException(
@@ -459,22 +472,19 @@ export class OrdersService {
 			}
 		}
 
-		if (StatusOrder[newStatus]) {
+		if (newStatus) {
+			//Validación de los estados
 			switch (order?.status) {
 				case StatusOrder.OPEN:
 					if (
-						![StatusOrder.CANCELLED, StatusOrder.CLOSED].includes(
-							StatusOrder[newStatus],
-						)
+						![StatusOrder.CANCELLED, StatusOrder.CLOSED].includes(newStatus)
 					) {
 						throw new BadRequestException('El pedido se encuentra abierto');
 					}
 					break;
 				case StatusOrder.PENDDING:
 					if (
-						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(
-							StatusOrder[newStatus],
-						)
+						![StatusOrder.OPEN || StatusOrder.CANCELLED].includes(newStatus)
 					) {
 						throw new BadRequestException('El pedido se encuentra pendiente');
 					}
@@ -487,15 +497,134 @@ export class OrdersService {
 					break;
 			}
 
-			const payments = [];
+			//Si se procede a abrir el pedido
 
-			if (
-				order.status === StatusOrder.OPEN &&
-				StatusOrder[newStatus] === StatusOrder.CLOSED
-			) {
+			if (StatusOrder.OPEN === newStatus) {
+				if (order.payments.length === 0) {
+					throw new BadRequestException(
+						'El pedido debe contener un médio de pago',
+					);
+				}
+
+				const isCredit = order.payments.find(
+					({ payment }) => payment.type === TypePayment.CREDIT,
+				);
+
+				if (isCredit) {
+					newStatusWeb = StatusWeb.PENDDING_CREDIT;
+				} else {
+					newStatusWeb = StatusWeb.PENDDING;
+				}
+			}
+
+			//Si se procede a cancelar el pedido
+			if (StatusOrder.CANCELLED === newStatus) {
+				if ([StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
+					const details = order?.details?.map((detail) => ({
+						productId: detail?.product?._id.toString(),
+						quantity: detail?.quantity,
+					}));
+
+					//Se reversan los inventarios
+					if (details.length > 0) {
+						await this.stockHistoryService.addStock(
+							{
+								details,
+								warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
+								documentId: order?._id.toString(),
+								documentType: DocumentTypeStockHistory.ORDER,
+							},
+							user,
+							companyId,
+						);
+					}
+
+					//se descongelan los créditos
+					const credit = order.payments.find(
+						({ payment }) => payment.type === TypePayment.CREDIT,
+					);
+
+					if (credit) {
+						await this.creditHistoryService.thawedCreditHistory(
+							order?._id?.toString(),
+							credit.total,
+							user,
+							companyId,
+						);
+					}
+				} else {
+					throw new BadRequestException(
+						'El pedido ya está siendo procesado y no puede cancelarse',
+					);
+				}
+			}
+
+			//Si se procede a cerrar el pedido
+			if (newStatus === StatusOrder.CLOSED) {
+				//Validar los medios de pago(estado del bono, crédito y valor total del pedido)
+				let coupon;
+				for (let i = 0; i < order?.payments?.length; i++) {
+					const { payment, code, total } = order?.payments[i];
+
+					switch (payment.type) {
+						case TypePayment.BONUS:
+							if (!code) {
+								throw new BadRequestException(
+									'El medio de pago cupón debe tener código',
+								);
+							}
+							coupon = await this.couponsService.findOne(
+								{
+									code,
+								},
+								user,
+								companyId,
+							);
+
+							if (coupon.status !== StatusCoupon.ACTIVE) {
+								throw new BadRequestException(
+									'El cupón ya se encuentra redimido',
+								);
+							}
+							break;
+						case TypePayment.CREDIT:
+							const credit = await this.creditsService.validateCredit(
+								dataUpdate.customer.id?.toString() ||
+									order?.customer?._id?.toString(),
+								total,
+								TypeCreditHistory.THAWED,
+							);
+
+							if (!credit) {
+								throw new BadRequestException(
+									'No se ha podido acreditar el pago, crédito con errores',
+								);
+							}
+							break;
+
+						default:
+							break;
+					}
+				}
+
+				//Calcular el resumen
+				newSummary = await this.calculateSummary({
+					...(order as Order),
+					...dataUpdate,
+					details: newDetails,
+				});
+
+				if (newSummary.total > newSummary.totalPaid) {
+					throw new BadRequestException(
+						'El pedido aun no se encuentra pagado, valide los medios de pago e intente nuevamente',
+					);
+				}
+				//Se crean los recibos de caja
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
-					if (payment?.type !== TypePayment.CREDIT) {
+					if (
+						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
+					) {
 						const valuesReceipt = {
 							value: total,
 							paymentId: payment?._id?.toString(),
@@ -512,13 +641,12 @@ export class OrdersService {
 							user,
 							companyId,
 						);
-
-						payments.push({
+						newPayments.push({
 							...order?.payments[i],
 							receipt: receipt?._id,
 						});
-					} else {
-						payments.push(order?.payments[i]);
+					} else if (payment.type === TypePayment.CREDIT) {
+						newPayments.push(order?.payments[i]);
 
 						await this.creditHistoryService.thawedCreditHistory(
 							order?._id?.toString(),
@@ -527,259 +655,53 @@ export class OrdersService {
 							companyId,
 						);
 
-						const creditHistory =
-							await this.creditHistoryService.addCreditHistory(
-								order?._id?.toString(),
-								total,
-								user,
-								companyId,
-							);
-						credit = creditHistory?.credit;
+						await this.creditHistoryService.addCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
+					} else {
+						await this.couponsService.update(
+							coupon._id.toString(),
+							{
+								status: StatusCoupon.REDEEMED,
+							},
+							user,
+							companyId,
+						);
+						newPayments.push(order?.payments[i]);
 					}
 				}
-			}
-			if (payments.length > 0) {
-				dataUpdate['payments'] = payments;
-			}
 
-			dataUpdate['status'] = StatusOrder[newStatus];
-		}
-
-		let conveyorOrder;
-		if (conveyorId) {
-			const conveyor = await this.conveyorsService.findById(conveyorId);
-			if (!conveyor) {
-				throw new NotFoundException('El transportista no existe');
-			}
-			try {
-				const value = await this.conveyorsService.calculateValue(
-					conveyor as Conveyor,
-					order as Order,
-				);
-
-				conveyorOrder = {
-					conveyor,
-					value,
-				};
-			} catch (e) {
-				conveyorOrder = {
-					conveyor,
-					value: conveyor.defaultPrice,
-					error: 'Error en api externa',
-				};
-			}
-
-			const customerTypeWholesale = await this.customerTypesService.findOne(
-				'Mayorista',
-			);
-
-			for (let i = 0; i < order?.details?.length; i++) {
-				const detail = order?.details[i];
-
-				const discount = await this.discountRulesService.getDiscount({
-					customerTypeId: customerTypeWholesale?._id?.toString(),
-					reference: detail?.product?.reference as any,
-					shopId: order?.shop?._id?.toString(),
-					companyId,
-				});
-
-				newDetails.push({
-					...detail,
-					price: detail?.product?.reference['price'] - discount,
-					discount,
-					updatedAt: new Date(),
-				});
-			}
-			const total = newDetails.reduce(
-				(sum, detail) => sum + detail.price * detail.quantity,
-				0,
-			);
-			if (total >= 300000) {
-				const discountTotal = newDetails.reduce(
-					(sum, detail) => sum + detail.quantity * detail.discount,
-					0,
-				);
-
-				const subtotal = total + discountTotal;
-
-				const tax = 0;
-
-				newSummary = {
-					...order.summary,
-					total: total + (conveyorOrder?.value || 0),
-					discount: discountTotal,
-					subtotal: subtotal,
-					tax,
-				};
-			}
-		}
-
-		if ([newStatus, StatusOrder[newStatus]].includes(StatusOrder.CANCELLED)) {
-			if (order?.status === StatusOrder.OPEN) {
-				const details = order?.details?.map((detail) => ({
-					productId: detail?.product?._id.toString(),
-					quantity: detail?.quantity,
-				}));
-				if (details.length > 0) {
-					await this.stockHistoryService.addStock(
-						{
-							details,
-							warehouseId: order?.shop?.defaultWarehouse?._id.toString(),
-							documentId: order?._id.toString(),
-							documentType: DocumentTypeStockHistory.ORDER,
-						},
-						user,
-						companyId,
-					);
-				}
-			}
-		}
-
-		let newStatusWeb = statusWeb;
-
-		if (
-			order.status === StatusOrder.PENDDING &&
-			newStatus === StatusOrder.OPEN
-		) {
-			const isCredit = order.payments.find(
-				({ payment }) => payment.type === TypePayment.CREDIT,
-			);
-
-			if (order.payments.length === 0) {
-				throw new BadRequestException(
-					'El pedido debe contener un médio de pago',
-				);
-			}
-
-			if (isCredit) {
-				newStatusWeb = StatusWeb.PENDDING_CREDIT;
-
-				/*	await this.creditHistoryService.frozenCreditHistory(
-					orderId,
-					isCredit.total,
-					user,
-					companyId,
-				);*/
-			} else {
-				newStatusWeb = StatusWeb.PENDDING;
-			}
-
-			const details = order.details.map((detail) => ({
-				productId: detail?.product?._id.toString(),
-				quantity: detail?.quantity,
-			}));
-			if (
-				order?.summary?.total > 300000 &&
-				order?.customer?.customerType['name'] === 'Detal'
-			) {
-				const customerTypeWholesale = await this.customerTypesService.findOne(
+				//Se pasa el cliente a mayoristas
+				const customerType = await this.customerTypesService.findOne(
 					'Mayorista',
 				);
 
-				for (let i = 0; i < order?.details?.length; i++) {
-					const detail = order?.details[i];
-
-					const discount = await this.discountRulesService.getDiscount({
-						customerTypeId: customerTypeWholesale?._id?.toString(),
-						reference: detail?.product?.reference as any,
-						shopId: order?.shop?._id?.toString(),
-						companyId,
-					});
-
-					newDetails.push({
-						...detail,
-						price: detail?.product?.reference['price'] - discount,
-						discount,
-						updatedAt: new Date(),
-					});
-				}
-				const total = newDetails.reduce(
-					(sum, detail) => sum + detail.price * detail.quantity,
-					0,
-				);
-				if (total >= 300000) {
-					const discountTotal = newDetails.reduce(
-						(sum, detail) => sum + detail.quantity * detail.discount,
-						0,
-					);
-
-					const subtotal = total + discountTotal;
-
-					const tax = 0;
-
-					newSummary = {
-						...order.summary,
-						total: total + (order?.conveyorOrder?.value || 0),
-						discount: discountTotal,
-						subtotal: subtotal,
-						tax,
-					};
-				} else {
-					newDetails = [];
-				}
-			}
-
-			await this.stockHistoryService.deleteStock(
-				{
-					details,
-					documentId: orderId,
-					documentType: DocumentTypeStockHistory.ORDER,
-					warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-				},
-				user,
-				companyId,
-			);
-		}
-
-		if ([StatusOrder[newStatus], newStatus].includes(StatusOrder.CLOSED)) {
-			for (let i = 0; i < order?.payments?.length; i++) {
-				const payment = order?.payments[i];
-
-				if (payment?.payment?.type === TypePayment.BONUS) {
-					if (!payment?.code) {
-						throw new BadRequestException(
-							'El medio de pago cupón debe tener código',
-						);
+				if (!order.orderPos && newSummary.totalPaid >= 300000) {
+					if (!customerType) {
+						throw new BadRequestException('Cliente tipo Mayorista no existe');
 					}
 
-					const coupon = await this.couponsService.findOne(
+					await this.customersService.update(
+						order.customer._id.toString(),
 						{
-							code: payment?.code,
+							customerTypeId: customerType._id.toString(),
 						},
 						user,
-						companyId,
-					);
-
-					await this.couponsService.update(
-						coupon?._id?.toString(),
-						{
-							status: StatusCoupon.REDEEMED,
-						},
-						user,
-						order.company.toString(),
 					);
 				}
 			}
+		}
 
-			const customerType = await this.customerTypesService.findOne('Mayorista');
-
-			if (
-				!order.orderPos &&
-				order.summary.totalPaid >= 300000 &&
-				order.customer.customerType._id !== customerType._id
-			) {
-				if (!customerType) {
-					throw new BadRequestException('Cliente tipo Mayorista no existe');
-				}
-
-				await this.customersService.update(
-					order.customer._id.toString(),
-					{
-						customerTypeId: customerType._id.toString(),
-					},
-					user,
-				);
-			}
+		//Si se cambia el estado del pedido web agrega el historico
+		if (newStatusWeb !== order.statusWeb) {
+			await this.statusWebHistoriesService.addRegister({
+				orderId,
+				status: newStatusWeb,
+				user,
+			});
 		}
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
@@ -787,12 +709,12 @@ export class OrdersService {
 			{
 				$set: {
 					...dataUpdate,
-					status: StatusOrder[newStatus] || newStatus,
+					status: newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
-					statusWeb: StatusWeb[newStatusWeb] || newStatusWeb,
+					statusWeb: newStatusWeb,
 					user,
-					conveyorOrder,
+					address,
 				},
 			},
 			{
@@ -802,14 +724,746 @@ export class OrdersService {
 			},
 		);
 
-		try {
-			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?._id?.toString(),
-			});
+		const credit = await this.getCreditCustomer(
+			newOrder?.customer?._id?.toString(),
+		);
+
+		return {
+			credit,
+			order: newOrder,
+		};
+	}
+
+	async addProducts(
+		{ orderId, details }: AddProductsOrderInput,
+		user: User,
+		companyId: string,
+	) {
+		const order = await this.orderModel.findById(orderId).lean();
+
+		if (!order) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
+			throw new BadRequestException(
+				`El pedido ${order.number} no se encuentra abierto`,
+			);
+		}
+
+		let newDetails = [...order.details];
+
+		//Seleccionamos los productos a eliminar
+		const productsDelete = details?.filter(
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.DELETE,
+		);
+
+		//validamos si hay productos a eliminar
+		if (productsDelete) {
+			//Validamos si el producto existe
+			for (let i = 0; i < productsDelete.length; i++) {
+				const detail = productsDelete[i];
+
+				const index = newDetails.findIndex(
+					(item) => item.product._id.toString() === detail.productId,
+				);
+
+				if (index < 0) {
+					throw new BadRequestException(
+						`El producto ${detail.productId} no existe en el pedido ${order?.number}`,
+					);
+				}
+
+				productsDelete[i] = {
+					...productsDelete[i],
+					quantity: newDetails[index].quantity,
+				};
+			}
+
+			const products = productsDelete.map((item) => item.productId);
+
+			//Eliminamos los productos
+			newDetails = newDetails.filter(
+				(item) => !products.includes(item.product._id.toString()),
+			);
+		}
+
+		//Seleccionamos los productos a actualizar
+		const productsUpdate = details?.filter(
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.UPDATE,
+		);
+
+		//Validamos si hay productos a actualizar
+		if (productsUpdate) {
+			//Validamos que el producto exista
+			for (let i = 0; i < productsUpdate.length; i++) {
+				const { quantity, productId } = productsUpdate[i];
+
+				const index = newDetails.findIndex(
+					(item) => item.product._id.toString() === productId,
+				);
+
+				if (index < 0) {
+					throw new BadRequestException(
+						`El producto ${productId} no existe en el pedido ${order?.number}`,
+					);
+				}
+
+				//Validamos la disponibilidad de stock total si el pedido está pendding o si no la cantidad de más
+				let product;
+				if (order.status === StatusOrder.PENDDING) {
+					product = await this.productsService.validateStock(
+						productId,
+						quantity,
+						order?.shop?.defaultWarehouse._id.toString(),
+					);
+				} else if (quantity > newDetails[index].quantity) {
+					product = await this.productsService.validateStock(
+						productId,
+						quantity - newDetails[index].quantity,
+						order?.shop?.defaultWarehouse._id.toString(),
+					);
+				}
+
+				if (!product) {
+					throw new BadRequestException(`El producto ${productId}, no existe`);
+				}
+
+				if (product?.status !== StatusProduct.ACTIVE) {
+					throw new BadRequestException(
+						`El producto ${product?.barcode} no se encuentra activo`,
+					);
+				}
+
+				newDetails[index] = {
+					...newDetails[index],
+					product,
+					quantity,
+					updatedAt: new Date(),
+				};
+			}
+		}
+
+		//Seleccionamos los productos a actualizar
+		const productsCreate = details?.filter(
+			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.CREATE,
+		);
+
+		//Validamos si hay productos para crear
+		if (productsCreate) {
+			for (let i = 0; i < productsCreate.length; i++) {
+				const { quantity, productId } = productsCreate[i];
+
+				const index = newDetails.findIndex(
+					(item) => item.product._id.toString() === productId,
+				);
+
+				if (index >= 0) {
+					throw new BadRequestException(
+						`El producto ${newDetails[index].product.reference['name']}/${newDetails[index].product.barcode} ya existe en la orden ${order?.number} y no se puede agregar`,
+					);
+				}
+
+				const product = await this.productsService.validateStock(
+					productId,
+					quantity,
+					order?.shop?.defaultWarehouse?._id?.toString(),
+				);
+
+				if (!product) {
+					throw new BadRequestException(`El producto ${productId}, no existe`);
+				}
+
+				if (product?.status !== StatusProduct.ACTIVE) {
+					throw new BadRequestException(
+						`El producto ${product?.barcode} no se encuentra activo`,
+					);
+				}
+
+				newDetails.push({
+					product,
+					status: StatusOrderDetail.NEW,
+					quantity,
+					quantityReturn: 0,
+					price: product.reference['price'],
+					discount: 0,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				});
+			}
+		}
+
+		if (order?.status === StatusOrder.OPEN) {
+			//Seleccionamos las unidades a eliminar o a agregar en el inventario
+			for (let i = 0; i < productsUpdate.length; i++) {
+				const product = productsUpdate[i];
+
+				const quantityOld = order.details.find(
+					(item) => item.product._id.toString() === product.productId,
+				)?.quantity;
+
+				productsDelete.push({ ...product, quantity: quantityOld });
+
+				productsCreate.push(product);
+			}
+
+			//Eliminamos el inventario de las bodegas si se encuentra en open
+			if (productsDelete.length > 0) {
+				await this.stockHistoryService.addStock(
+					{
+						details: productsDelete,
+						documentId: orderId,
+						documentType: DocumentTypeStockHistory.ORDER,
+						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+					},
+					user,
+					companyId,
+				);
+			}
+
+			if (productsCreate.length > 0) {
+				await this.stockHistoryService.deleteStock(
+					{
+						details: productsCreate,
+						documentId: orderId,
+						documentType: DocumentTypeStockHistory.ORDER,
+						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
+					},
+					user,
+					companyId,
+				);
+			}
+		}
+
+		//Asignamos los descuentos
+		for (let i = 0; i < newDetails.length; i++) {
+			const { product, price } = newDetails[i];
+			let discount = 0;
+
+			if (order.status === StatusOrder.OPEN && !order.orderPos) {
+				const customerType = await this.customerTypesService.findOne(
+					'Mayorista',
+				);
+
+				if (!customerType) {
+					throw new BadRequestException(
+						'El tipo de cliente Mayorista no existe',
+					);
+				}
+
+				discount = await this.discountRulesService.getDiscount({
+					customerTypeId: customerType?._id.toString(),
+					reference: product?.reference as any,
+					shopId: order?.shop?._id?.toString(),
+					companyId,
+				});
+			} else {
+				discount = await this.discountRulesService.getDiscount({
+					customerId: order?.customer?._id.toString(),
+					reference: product?.reference as any,
+					shopId: order?.shop?._id?.toString(),
+					companyId,
+				});
+			}
+
+			newDetails[i] = {
+				...newDetails[i],
+				price: price - discount,
+				discount,
+			};
+		}
+
+		const summary = this.calculateSummary({
+			...(order as Order),
+			details: newDetails as DetailOrder[],
+		});
+
+		const newOrder = await this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					details: newDetails,
+					user,
+					summary,
+				},
+			},
+			{
+				populate,
+				new: true,
+				lean: true,
+			},
+		);
+
+		const credit = await this.getCreditCustomer(
+			order?.customer?._id?.toString(),
+		);
+
+		return {
+			credit,
+			order: newOrder,
+		};
+	}
+
+	async confirmProducts(
+		{ details, orderId }: ConfirmProductsOrderInput,
+		user: User,
+		companyId: string,
+	) {
+		const order = await this.orderModel.findById(orderId).lean();
+
+		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+			throw new UnauthorizedException(
+				'El usuario no tiene permisos para actualizar el pedido',
+			);
+		}
+
+		if (!order) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (![StatusOrder.OPEN].includes(order?.status)) {
+			throw new BadRequestException(
+				`El pedido ${order.number} ya se encuentra procesado`,
+			);
+		}
+
+		const newDetails = [...order.details];
+
+		//Se valida y coonfirma los productos
+		for (let i = 0; i < details.length; i++) {
+			const { productId, status } = details[i];
+
+			const index = newDetails.findIndex(
+				(detail) => detail.product._id.toString() === productId,
+			);
+
+			if (index < 0) {
+				throw new BadRequestException({
+					message: 'Uno de los productos no existe en el pedido',
+					data: productId,
+				});
+			}
+
+			newDetails[index] = {
+				...newDetails[index],
+				status: StatusOrderDetail[status],
+			};
+		}
+
+		let newStatusWeb;
+
+		if (order.statusWeb !== StatusWeb.PREPARING) {
 			await this.statusWebHistoriesService.addRegister({
 				orderId,
-				status: StatusWeb[newStatusWeb] || newStatusWeb,
+				status: StatusWeb.PREPARING,
 				user,
+			});
+			newStatusWeb = StatusWeb.PREPARING;
+		}
+
+		const newOrder = await this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					details: newDetails,
+					statusWeb: newStatusWeb,
+					user,
+				},
+			},
+			{
+				new: true,
+				populate,
+				lean: true,
+			},
+		);
+
+		const credit = await this.getCreditCustomer(
+			order?.customer?._id?.toString(),
+		);
+
+		return {
+			credit,
+			order: newOrder,
+		};
+	}
+
+	async addPayments({ orderId, payments }: AddPaymentsOrderInput, user: User) {
+		const order = await this.orderModel.findById(orderId).lean();
+
+		if (!order) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
+			throw new BadRequestException(
+				`El pedido ${order.number} ya se encuentra procesado`,
+			);
+		}
+
+		//Se valida que los medios de pago no vengan nulos o en 0
+		for (let i = 0; i < payments.length; i++) {
+			const payment = payments[i];
+
+			if (payment?.total <= 0) {
+				throw new BadRequestException(
+					`Los medios de pago no pueden ser menores o iguales a 0`,
+				);
+			}
+		}
+
+		let newPayments = [...order.payments];
+
+		//Se seleccionan los medios de pago a eliminar
+		const paymentsDelete = payments?.filter(
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.DELETE,
+		);
+
+		//Se eliminan los medios de pago
+		if (paymentsDelete) {
+			for (let i = 0; i < paymentsDelete.length; i++) {
+				const payment = paymentsDelete[i];
+
+				const index = newPayments.findIndex(
+					(item) => item.payment._id.toString() === payment.paymentId,
+				);
+
+				if (index < 0) {
+					throw new BadRequestException(
+						`El método de pago ${payment.paymentId} no existe en el pedido ${order?.number}`,
+					);
+				}
+			}
+
+			const payments = paymentsDelete.map((item) => item.paymentId);
+
+			newPayments = newPayments.filter(
+				(item) => !payments.includes(item.payment._id.toString()),
+			);
+		}
+
+		//Se seleccionan los medios de pago a actualizar
+		const paymentsUpdate = payments?.filter(
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.UPDATE,
+		);
+
+		//Se actualizan los medios de pago
+		if (paymentsUpdate) {
+			for (let i = 0; i < paymentsUpdate.length; i++) {
+				const { paymentId } = paymentsUpdate[i];
+
+				const index = newPayments.findIndex(
+					(item) => item.payment._id.toString() === paymentId,
+				);
+
+				if (index < 0) {
+					throw new BadRequestException(
+						`El medio de pago ${paymentId} no existe en el pedido ${order?.number}`,
+					);
+				}
+			}
+
+			newPayments = newPayments.map((item) => {
+				const paymentFind = paymentsUpdate.find(
+					(payment) => payment.paymentId === item.payment._id.toString(),
+				);
+				if (paymentFind) {
+					return {
+						...item,
+						total: paymentFind.total,
+						updatedAt: new Date(),
+					};
+				}
+				return item;
+			});
+		}
+
+		//Se seleccionan los mediois de pago a crear
+		const paymentsCreate = payments?.filter(
+			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.CREATE,
+		);
+
+		//Se valida el estado del medio de pago antes de agregarlo
+		for (let i = 0; i < paymentsCreate.length; i++) {
+			const { paymentId } = paymentsCreate[i];
+			const payment = await this.paymentsService.findById(paymentId);
+
+			if (!payment.active) {
+				throw new BadRequestException(
+					`El medio de pago ${payment.name} se encuentra inactivo`,
+				);
+			}
+		}
+
+		if (paymentsCreate) {
+			for (let i = 0; i < paymentsCreate.length; i++) {
+				const { paymentId } = paymentsCreate[i];
+
+				const index = newPayments.findIndex(
+					(item) => item.payment._id.toString() === paymentId,
+				);
+
+				if (index >= 0) {
+					throw new BadRequestException(
+						`El medio de pago ${newPayments[index].payment.name} ya existe en la orden ${order?.number} y no se puede agregar`,
+					);
+				}
+			}
+
+			for (let i = 0; i < paymentsCreate.length; i++) {
+				const detailPayment = paymentsCreate[i];
+				const payment = await this.paymentsService.findById(
+					detailPayment.paymentId,
+				);
+
+				if (payment.type === TypePayment.CREDIT) {
+					let credit;
+					try {
+						credit = await this.creditsService.findOne({
+							customerId: order?.customer?._id.toString(),
+						});
+					} catch {}
+					if (credit?.status !== StatusCredit.ACTIVE) {
+						throw new BadRequestException(
+							'El crédito del cliente se encuentra suspendido',
+						);
+					}
+				}
+
+				newPayments.push({
+					payment,
+					code: detailPayment.code,
+					total: detailPayment.total,
+					status: StatusOrderDetail.NEW,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				});
+			}
+		}
+
+		const totalPaid = newPayments.reduce(
+			(sum, payment) => sum + payment.total,
+			0,
+		);
+
+		const change =
+			totalPaid - order.summary.total > 0 ? totalPaid - order.summary.total : 0;
+
+		const cash = newPayments.reduce((sum, payment) => sum + payment?.total, 0);
+
+		if (!(cash > 0 && cash > change)) {
+			throw new BadRequestException(
+				`El valor diferente a efectivo supera el valor del pedido`,
+			);
+		}
+
+		if (cash) {
+			newPayments = newPayments.map((payment) => {
+				if (payment?.payment?.type === 'cash') {
+					return {
+						...payment,
+						total: payment?.total - change,
+					};
+				}
+
+				return payment;
+			});
+		}
+
+		//Cambios en la cartera
+		const creditOrder = order.payments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		const creditUpdate = payments.find(
+			(item) => item.paymentId === creditOrder?.payment?._id.toString(),
+		);
+
+		const newCredit = newPayments.find(
+			(item) => item.payment?.type === TypePayment.CREDIT,
+		);
+
+		const creditDelete = order.payments.find(
+			({ payment }) =>
+				payment?.type === TypePayment.CREDIT &&
+				!!newPayments.find(
+					(item) => item.payment._id.toString() === payment._id.toString(),
+				),
+		);
+
+		if (creditUpdate) {
+			await this.creditHistoryService.thawedCreditHistory(
+				orderId,
+				creditOrder.total,
+				user,
+				order.company._id.toString(),
+			);
+
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				creditUpdate.total,
+				user,
+				order.company._id.toString(),
+			);
+		} else if (newCredit) {
+			await this.creditHistoryService.frozenCreditHistory(
+				orderId,
+				newCredit.total,
+				user,
+				order.company._id.toString(),
+			);
+		} else if (creditDelete) {
+			await this.creditHistoryService.thawedCreditHistory(
+				orderId,
+				creditOrder.total,
+				user,
+				order.company._id.toString(),
+			);
+		}
+
+		//Cambios en los cupones
+
+		const couponDelete = paymentsDelete.find((payment) => payment.code);
+
+		if (couponDelete) {
+			const coupon = await this.couponsService.findOne(
+				{
+					code: couponDelete?.code,
+				},
+				user,
+				order.company.toString(),
+			);
+			await this.couponsService.update(
+				coupon?._id?.toString(),
+				{
+					status: StatusCoupon.ACTIVE,
+				},
+				user,
+				order.company.toString(),
+			);
+		}
+
+		const couponCreate = paymentsCreate.find((payment) => payment.code);
+
+		if (couponCreate) {
+			const coupon = await this.couponsService.findOne(
+				{
+					code: couponDelete?.code,
+				},
+				user,
+				order.company.toString(),
+			);
+			await this.couponsService.update(
+				coupon?._id?.toString(),
+				{
+					status: StatusCoupon.REDEEMED,
+				},
+				user,
+				order.company.toString(),
+			);
+		}
+
+		const summary = {
+			...order.summary,
+			totalPaid,
+			change,
+		};
+
+		const newOrder = await this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					payments: newPayments,
+					user,
+					summary,
+				},
+			},
+			{
+				populate,
+				lean: true,
+				new: true,
+			},
+		);
+		const credit = await this.getCreditCustomer(
+			newOrder?.customer?._id._bsontype.toString(),
+		);
+
+		return {
+			credit,
+			order: newOrder,
+		};
+	}
+
+	async confirmPayments(
+		{ payments, orderId }: ConfirmPaymentsOrderInput,
+		user: User,
+		companyId: string,
+	) {
+		const order = await this.orderModel.findById(orderId).lean();
+
+		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+			throw new UnauthorizedException(
+				'El usuario no tiene permisos para actualizar el pedido',
+			);
+		}
+		if (!order) {
+			throw new BadRequestException(
+				'El pedido que intenta actualizar no existe',
+			);
+		}
+
+		if (![StatusOrder.OPEN].includes(order?.status)) {
+			throw new BadRequestException(
+				`El pedido ${order.number} ya se encuentra procesado`,
+			);
+		}
+
+		const newPayments = [...order.payments];
+
+		for (let i = 0; i < payments.length; i++) {
+			const { paymentId, status } = payments[i];
+
+			const index = newPayments.findIndex(
+				(payment) => payment.payment._id.toString() === paymentId,
+			);
+
+			if (index < 0) {
+				throw new BadRequestException({
+					message: 'Uno de los pagos no existe en el pedido',
+					data: paymentId,
+				});
+			}
+
+			newPayments[index] = {
+				...newPayments[index],
+				status: StatusOrderDetail[status],
+			};
+		}
+
+		const newOrder = await this.orderModel.findByIdAndUpdate(
+			orderId,
+			{
+				$set: {
+					payments: newPayments,
+					user,
+				},
+			},
+			{
+				new: true,
+				populate,
+				lean: true,
+			},
+		);
+
+		let credit;
+		try {
+			credit = await this.creditsService.findOne({
+				customerId: newOrder?.customer?._id.toString(),
 			});
 		} catch {}
 
@@ -819,25 +1473,7 @@ export class OrdersService {
 		};
 	}
 
-	/**
-	 * @description Se encarga de validar si es posible cambiar de estado al pedido
-	 * @param order pedido al que se le va a cambiar el estado
-	 * @param status nuevo estado del pedido
-	 * @returns true si la validación es correcta
-	 */
-	async validateStatusOder(order: Order, status: StatusOrder) {
-		return true;
-	}
-
-	/**
-	 * @description Se encarga de validar si es posible cambiar de estado web del pedido
-	 * @param order pedido al que se le va a cambiar el estado
-	 * @param statusWeb nuevo estado del pedido
-	 * @returns true si la validación es correcta
-	 */
-	async validateStatusOderWeb(order, statusWeb: StatusWeb) {
-		return true;
-	}
+	//* INICIAN METODOS GENERALES */
 
 	/**
 	 * @description obtiene los pedidos del punto de venta
@@ -869,6 +1505,12 @@ export class OrdersService {
 			.lean();
 	}
 
+	/**
+	 * @description se encarga de obtener un resumen del día
+	 * @param closeDate dia del resumen
+	 * @param pointOfSaleId punto de venta
+	 * @returns un objeto tipo summaryOrder
+	 */
 	async getSummaryOrder(closeDate: string, pointOfSaleId: string) {
 		const dateIntial = new Date(closeDate);
 		const dateFinal = dayjs(closeDate).add(1, 'd').toDate();
@@ -953,763 +1595,14 @@ export class OrdersService {
 		};
 	}
 
-	async addProducts(
-		{ orderId, details }: AddProductsOrderInput,
-		user: User,
-		companyId: string,
-	) {
-		const order = await this.orderModel.findById(orderId).lean();
-
-		if (!order) {
-			throw new BadRequestException(
-				'El pedido que intenta actualizar no existe',
-			);
-		}
-
-		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
-			throw new BadRequestException(
-				`El pedido ${order.number} no se encuentra abierto`,
-			);
-		}
-
-		let newDetails = [...order.details];
-
-		const productsDelete = details?.filter(
-			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.DELETE,
-		);
-
-		if (productsDelete) {
-			for (let i = 0; i < productsDelete.length; i++) {
-				const detail = productsDelete[i];
-
-				const index = newDetails.findIndex(
-					(item) => item.product._id.toString() === detail.productId,
-				);
-
-				if (index < 0) {
-					throw new BadRequestException(
-						`El producto ${detail.productId} no existe en el pedido ${order?.number}`,
-					);
-				}
-
-				productsDelete[i] = {
-					...productsDelete[i],
-					quantity: newDetails[index].quantity,
-				};
-			}
-
-			const products = productsDelete.map((item) => item.productId);
-
-			newDetails = newDetails.filter(
-				(item) => !products.includes(item.product._id.toString()),
-			);
-		}
-
-		const productsUpdate = details?.filter(
-			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.UPDATE,
-		);
-
-		if (productsUpdate) {
-			for (let i = 0; i < productsUpdate.length; i++) {
-				const { quantity, productId } = productsUpdate[i];
-
-				const index = newDetails.findIndex(
-					(item) => item.product._id.toString() === productId,
-				);
-
-				if (index < 0) {
-					throw new BadRequestException(
-						`El producto ${productId} no existe en el pedido ${order?.number}`,
-					);
-				}
-
-				const product = await this.productsService.validateStock(
-					productId,
-					quantity > newDetails[index].quantity
-						? quantity - newDetails[index].quantity
-						: quantity,
-					order?.shop?.defaultWarehouse._id.toString(),
-				);
-
-				if (!product) {
-					throw new BadRequestException('Uno de los productos no existe');
-				}
-
-				if (product?.status !== StatusProduct.ACTIVE) {
-					throw new BadRequestException(
-						`El producto ${product?.barcode} no se encuentra activo`,
-					);
-				}
-
-				newDetails[index] = {
-					...newDetails[index],
-					product,
-					quantity,
-					updatedAt: new Date(),
-				};
-			}
-		}
-
-		const productsCreate = details?.filter(
-			(item) => ActionProductsOrder[item.action] === ActionProductsOrder.CREATE,
-		);
-
-		if (productsCreate) {
-			for (let i = 0; i < productsCreate.length; i++) {
-				const { quantity, productId } = productsCreate[i];
-
-				const index = newDetails.findIndex(
-					(item) => item.product._id.toString() === productId,
-				);
-
-				if (index >= 0) {
-					throw new BadRequestException(
-						`El producto ${newDetails[index].product.reference['name']}/${newDetails[index].product.barcode} ya existe en la orden ${order?.number} y no se puede agregar`,
-					);
-				}
-
-				const product = await this.productsService.validateStock(
-					productId,
-					quantity,
-					order?.shop?.defaultWarehouse?._id?.toString(),
-				);
-
-				if (!product) {
-					throw new BadRequestException('Uno de los productos no existe');
-				}
-
-				if (product?.status !== StatusProduct.ACTIVE) {
-					throw new BadRequestException(
-						`El producto ${product?.barcode} no se encuentra activo`,
-					);
-				}
-
-				const discount = await this.discountRulesService.getDiscount({
-					customerId: order?.customer?._id.toString(),
-					reference: product?.reference as any,
-					shopId: order?.shop?._id?.toString(),
-					companyId,
-				});
-
-				newDetails.push({
-					product,
-					status: StatusOrderDetail.NEW,
-					quantity,
-					quantityReturn: 0,
-					price: product.reference['price'] - discount,
-					discount,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				});
-			}
-		}
-
-		for (let i = 0; i < productsUpdate.length; i++) {
-			const product = productsUpdate[i];
-
-			const quantityOld = order.details.find(
-				(item) => item.product._id.toString() === product.productId,
-			)?.quantity;
-
-			productsDelete.push({ ...product, quantity: quantityOld });
-
-			productsCreate.push(product);
-		}
-
-		if (order?.status === StatusOrder.OPEN) {
-			if (productsDelete.length > 0) {
-				await this.stockHistoryService.addStock(
-					{
-						details: productsDelete,
-						documentId: orderId,
-						documentType: DocumentTypeStockHistory.ORDER,
-						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-					},
-					user,
-					companyId,
-				);
-			}
-
-			if (productsCreate.length > 0) {
-				await this.stockHistoryService.deleteStock(
-					{
-						details: productsCreate,
-						documentId: orderId,
-						documentType: DocumentTypeStockHistory.ORDER,
-						warehouseId: order.shop.defaultWarehouse['_id'].toString(),
-					},
-					user,
-					companyId,
-				);
-			}
-		}
-
-		const total = newDetails.reduce(
-			(sum, detail) => sum + detail.price * detail.quantity,
-			0,
-		);
-
-		const discount = newDetails.reduce(
-			(sum, detail) => sum + detail.quantity * detail.discount,
-			0,
-		);
-
-		const subtotal = total + discount;
-
-		const tax = 0;
-
-		let summary = {
-			...order.summary,
-			total: total + (order?.conveyorOrder?.value || 0),
-			discount,
-			subtotal,
-			tax,
-		};
-
-		if (
-			!order?.orderPos &&
-			order?.status === StatusOrder.OPEN &&
-			order?.customer?.customerType['name'] === 'Detal'
-		) {
-			const customerTypeWholesale = await this.customerTypesService.findOne(
-				'Mayorista',
-			);
-			const details = [...newDetails];
-			newDetails = [];
-			for (let i = 0; i < details.length; i++) {
-				const detail = details[i];
-
-				const discount = await this.discountRulesService.getDiscount({
-					customerTypeId: customerTypeWholesale?._id?.toString(),
-					reference: detail?.product?.reference as any,
-					shopId: order?.shop?._id?.toString(),
-					companyId,
-				});
-
-				newDetails.push({
-					...detail,
-					price: detail?.product?.reference['price'] - discount,
-					discount,
-					updatedAt: new Date(),
-				});
-			}
-			const total = newDetails.reduce(
-				(sum, detail) => sum + detail.price * detail.quantity,
-				0,
-			);
-			if (total >= 300000) {
-				const discountTotal = newDetails.reduce(
-					(sum, detail) => sum + detail.quantity * detail.discount,
-					0,
-				);
-
-				const subtotal = total + discountTotal;
-
-				const tax = 0;
-
-				summary = {
-					...order.summary,
-					total: total + (order?.conveyorOrder?.value || 0),
-					discount: discountTotal,
-					subtotal,
-					tax,
-				};
-			} /*else {
-				newDetails = [];
-			}*/
-		}
-
-		let newStatus;
-
-		if (order.statusWeb !== StatusWeb.PREPARING && !order.orderPos) {
-			newStatus = StatusWeb.PREPARING;
-		}
-
-		const newOrder = await this.orderModel.findByIdAndUpdate(
-			orderId,
-			{
-				$set: {
-					details: newDetails,
-					user,
-					statusWeb: newStatus,
-					summary,
-				},
-			},
-			{
-				populate,
-				new: true,
-				lean: true,
-			},
-		);
-
-		let credit;
-		try {
-			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?._id.toString(),
-			});
-		} catch {}
-
-		return {
-			credit,
-			order: newOrder,
-		};
-	}
-
-	async confirmProducts(
-		{ details, orderId }: ConfirmProductsOrderInput,
-		user: User,
-		companyId: string,
-	) {
-		const order = await this.orderModel.findById(orderId).lean();
-
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
-			throw new UnauthorizedException(
-				'El usuario no tiene permisos para actualizar el pedido',
-			);
-		}
-
-		if (!order) {
-			throw new BadRequestException(
-				'El pedido que intenta actualizar no existe',
-			);
-		}
-
-		if (![StatusOrder.OPEN].includes(order?.status)) {
-			throw new BadRequestException(
-				`El pedido ${order.number} ya se encuentra procesado`,
-			);
-		}
-
-		const newDetails = [...order.details];
-
-		for (let i = 0; i < details.length; i++) {
-			const { productId, status } = details[i];
-
-			const index = newDetails.findIndex(
-				(detail) => detail.product._id.toString() === productId,
-			);
-
-			if (index < 0) {
-				throw new BadRequestException({
-					message: 'Uno de los productos no existe en el pedido',
-					data: productId,
-				});
-			}
-
-			newDetails[index] = {
-				...newDetails[index],
-				status: StatusOrderDetail[status],
-			};
-		}
-
-		const newOrder = await this.orderModel.findByIdAndUpdate(
-			orderId,
-			{
-				$set: {
-					details: newDetails,
-					user,
-				},
-			},
-			{
-				new: true,
-				populate,
-				lean: true,
-			},
-		);
-
-		let credit;
-		try {
-			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?._id.toString(),
-			});
-		} catch {}
-
-		return {
-			credit,
-			order: newOrder,
-		};
-	}
-
-	async confirmPayments(
-		{ payments, orderId }: ConfirmPaymentsOrderInput,
-		user: User,
-		companyId: string,
-	) {
-		const order = await this.orderModel.findById(orderId).lean();
-
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
-			throw new UnauthorizedException(
-				'El usuario no tiene permisos para actualizar el pedido',
-			);
-		}
-		if (!order) {
-			throw new BadRequestException(
-				'El pedido que intenta actualizar no existe',
-			);
-		}
-
-		if (![StatusOrder.OPEN].includes(order?.status)) {
-			throw new BadRequestException(
-				`El pedido ${order.number} ya se encuentra procesado`,
-			);
-		}
-
-		const newPayments = [...order.payments];
-
-		for (let i = 0; i < payments.length; i++) {
-			const { paymentId, status } = payments[i];
-
-			const index = newPayments.findIndex(
-				(payment) => payment.payment._id.toString() === paymentId,
-			);
-
-			if (index < 0) {
-				throw new BadRequestException({
-					message: 'Uno de los pagos no existe en el pedido',
-					data: paymentId,
-				});
-			}
-
-			newPayments[index] = {
-				...newPayments[index],
-				status: StatusOrderDetail[status],
-			};
-		}
-
-		const newOrder = await this.orderModel.findByIdAndUpdate(
-			orderId,
-			{
-				$set: {
-					payments: newPayments,
-					user,
-				},
-			},
-			{
-				new: true,
-				populate,
-				lean: true,
-			},
-		);
-
-		let credit;
-		try {
-			credit = await this.creditsService.findOne({
-				customerId: newOrder?.customer?._id.toString(),
-			});
-		} catch {}
-
-		return {
-			credit,
-			order: newOrder,
-		};
-	}
-
-	async addPayments({ orderId, payments }: AddPaymentsOrderInput, user: User) {
-		const order = await this.orderModel.findById(orderId).lean();
-
-		if (!order) {
-			throw new BadRequestException(
-				'El pedido que intenta actualizar no existe',
-			);
-		}
-
-		if (![StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
-			throw new BadRequestException(
-				`El pedido ${order.number} ya se encuentra procesado`,
-			);
-		}
-
-		for (let i = 0; i < payments.length; i++) {
-			const payment = payments[i];
-
-			if (payment?.total <= 0) {
-				throw new BadRequestException(
-					`Los medios de pago no pueden ser menores o iguales a 0`,
-				);
-			}
-		}
-
-		let newPayments = [...order.payments];
-
-		const paymentsDelete = payments?.filter(
-			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.DELETE,
-		);
-
-		if (paymentsDelete) {
-			for (let i = 0; i < paymentsDelete.length; i++) {
-				const payment = paymentsDelete[i];
-
-				const index = newPayments.findIndex(
-					(item) => item.payment._id.toString() === payment.paymentId,
-				);
-
-				if (index < 0) {
-					throw new BadRequestException(
-						`El método de pago ${payment.paymentId} no existe en el pedido ${order?.number}`,
-					);
-				}
-				if (newPayments[index]?.payment?.type === TypePayment.BONUS) {
-					if (!payment?.code) {
-						throw new BadRequestException(
-							'El medio de pago cupón debe tener código',
-						);
-					}
-
-					const coupon = await this.couponsService.findOne(
-						{
-							code: newPayments[index]?.code,
-						},
-						user,
-						order.company.toString(),
-					);
-					await this.couponsService.update(
-						coupon?._id?.toString(),
-						{
-							status: StatusCoupon.ACTIVE,
-						},
-						user,
-						order.company.toString(),
-					);
-				}
-
-				if (newPayments[index]?.payment?.type === TypePayment.CREDIT) {
-					await this.creditHistoryService.thawedCreditHistory(
-						orderId,
-						newPayments[index]?.total,
-						user,
-						order.company?.toString(),
-					);
-				}
-			}
-
-			const payments = paymentsDelete.map((item) => item.paymentId);
-
-			newPayments = newPayments.filter(
-				(item) => !payments.includes(item.payment._id.toString()),
-			);
-		}
-
-		const paymentsUpdate = payments?.filter(
-			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.UPDATE,
-		);
-
-		if (paymentsUpdate) {
-			for (let i = 0; i < paymentsUpdate.length; i++) {
-				const detail = paymentsUpdate[i];
-
-				const index = newPayments.findIndex(
-					(item) => item.payment._id.toString() === detail.paymentId,
-				);
-
-				if (index < 0) {
-					throw new BadRequestException(
-						`El medio de pago ${detail.paymentId} no existe en el pedido ${order?.number}`,
-					);
-				}
-			}
-			newPayments = newPayments.map((item) => {
-				const paymentFind = paymentsUpdate.find(
-					(payment) => payment.paymentId === item.payment._id.toString(),
-				);
-				if (paymentFind) {
-					return {
-						...item,
-						total: paymentFind.total,
-						updatedAt: new Date(),
-					};
-				}
-				return item;
-			});
-		}
-
-		const paymentsCreate = payments?.filter(
-			(item) => ActionPaymentsOrder[item.action] === ActionPaymentsOrder.CREATE,
-		);
-
-		for (let i = 0; i < paymentsCreate.length; i++) {
-			const { paymentId } = paymentsCreate[i];
-			const payment = await this.paymentsService.findById(paymentId);
-
-			if (!payment.active) {
-				throw new BadRequestException(
-					`El medio de pago ${payment.name} se encuentra inactivo`,
-				);
-			}
-		}
-		let credit;
-		if (paymentsCreate) {
-			for (let i = 0; i < paymentsCreate.length; i++) {
-				const detail = paymentsCreate[i];
-
-				const index = newPayments.findIndex(
-					(item) => item.payment._id.toString() === detail.paymentId,
-				);
-
-				if (index >= 0) {
-					throw new BadRequestException(
-						`El medio de pago ${newPayments[index].payment.name} ya existe en la orden ${order?.number} y no se puede agregar`,
-					);
-				}
-			}
-
-			for (let i = 0; i < paymentsCreate.length; i++) {
-				const detailPayment = paymentsCreate[i];
-				const payment = await this.paymentsService.findById(
-					detailPayment.paymentId,
-				);
-
-				if (payment.type === TypePayment.CREDIT) {
-					try {
-						credit = await this.creditsService.findOne({
-							customerId: order?.customer?._id.toString(),
-						});
-					} catch {}
-					if (credit?.status !== StatusCredit.ACTIVE) {
-						throw new BadRequestException(
-							'El crédito del cliente se encuentra suspendido',
-						);
-					}
-				}
-
-				newPayments.push({
-					payment,
-					code: detailPayment.code,
-					total: detailPayment.total,
-					status: StatusOrderDetail.NEW,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				});
-
-				if (payment?.type === TypePayment.BONUS) {
-					if (!detailPayment?.code) {
-						throw new BadRequestException(
-							'El medio de pago cupón debe tener código',
-						);
-					}
-					const coupon = await this.couponsService.findOne(
-						{
-							code: detailPayment.code,
-							status: StatusCoupon.ACTIVE,
-						},
-						user,
-						order?.company?._id?.toString(),
-					);
-
-					if (!coupon) {
-						throw new BadRequestException(
-							'El cupón no existe o no puede usarse en esta factura',
-						);
-					}
-
-					if (dayjs().isAfter(coupon?.expiration)) {
-						throw new BadRequestException('El cupón ya se encuentra vencido');
-					}
-					await this.couponsService.update(
-						coupon?._id?.toString(),
-						{
-							status: StatusCoupon.INACTIVE,
-						},
-						user,
-						order.company.toString(),
-					);
-				}
-			}
-		}
-
-		const totalPaid = newPayments.reduce(
-			(sum, payment) => sum + payment.total,
-			0,
-		);
-
-		const change =
-			totalPaid - order.summary.total > 0 ? totalPaid - order.summary.total : 0;
-
-		const cash = newPayments.reduce((sum, payment) => sum + payment?.total, 0);
-
-		if (!(cash > 0 && cash > change)) {
-			throw new BadRequestException(
-				`El valor diferente a efectivo supera el valor del pedido`,
-			);
-		}
-
-		if (cash) {
-			newPayments = newPayments.map((payment) => {
-				if (payment?.payment?.type === 'cash') {
-					return {
-						...payment,
-						total: payment?.total - change,
-					};
-				}
-
-				return payment;
-			});
-		}
-
-		const creditOrder = order.payments.find(
-			(item) => item.payment?.type === TypePayment.CREDIT,
-		);
-
-		const creditUpdate = payments.find(
-			(item) => item.paymentId === creditOrder?.payment?._id.toString(),
-		);
-
-		const newCredit = newPayments.find(
-			(item) => item.payment?.type === TypePayment.CREDIT,
-		);
-
-		if (creditUpdate) {
-			await this.creditHistoryService.thawedCreditHistory(
-				orderId,
-				creditOrder.total,
-				user,
-				order.company._id.toString(),
-			);
-
-			await this.creditHistoryService.frozenCreditHistory(
-				orderId,
-				creditUpdate.total,
-				user,
-				order.company._id.toString(),
-			);
-		} else if (newCredit) {
-			await this.creditHistoryService.frozenCreditHistory(
-				orderId,
-				newCredit.total,
-				user,
-				order.company._id.toString(),
-			);
-		}
-
-		const summary = {
-			...order.summary,
-			totalPaid,
-			change,
-		};
-
-		const newOrder = await this.orderModel.findByIdAndUpdate(
-			orderId,
-			{
-				$set: {
-					payments: newPayments,
-					user,
-					summary,
-				},
-			},
-			{
-				populate,
-				lean: true,
-				new: true,
-			},
-		);
-
-		return {
-			credit,
-			order: newOrder,
-		};
-	}
-
-	async updateProducts(id: string, details: DetailOrder[]) {
-		return this.orderModel.findByIdAndUpdate(id, {
+	/**
+	 * @description actualiza todos los productos del pedido
+	 * @param orderId identificador del pedido a actualizar los productos
+	 * @param details productos a colocar en el pedido
+	 * @returns el pedido actualizado
+	 */
+	async updateProducts(orderId: string, details: DetailOrder[]) {
+		return this.orderModel.findByIdAndUpdate(orderId, {
 			$set: { details },
 		});
 	}
@@ -1756,5 +1649,51 @@ export class OrdersService {
 		} catch {
 			return null;
 		}
+	}
+
+	/**
+	 * @description se encarga de hacer el calculo del summary del pedido
+	 * @param order pedido a cual realizar el calculo del summary
+	 * @returns datos del summary del pedido
+	 */
+	async calculateSummary({
+		summary,
+		details,
+		payments,
+		conveyorOrder,
+	}: Partial<Order>) {
+		let newTotal = summary?.total;
+		let newDiscount = summary?.discount;
+		let newSubtotal = summary?.subtotal;
+		let newChange = summary?.change;
+		let newTotalPaid = summary?.totalPaid;
+		const newTax = summary?.tax;
+
+		for (let i = 0; i < details.length; i++) {
+			const { price, discount, quantity } = details[i];
+
+			newTotal = newTotal + price * quantity;
+			newDiscount = newDiscount + discount * quantity;
+			newSubtotal = newSubtotal + (discount + price) * quantity;
+		}
+
+		for (let i = 0; i < payments.length; i++) {
+			const { total } = payments[i];
+			newTotalPaid = newTotalPaid + total;
+		}
+
+		if (conveyorOrder?.value > 0) {
+			newTotal = newTotal + conveyorOrder?.value;
+		}
+		newChange = newTotalPaid - newTotal;
+
+		return {
+			total: newTotal,
+			discount: newDiscount,
+			subtotal: newSubtotal,
+			change: newChange,
+			totalPaid: newTotalPaid,
+			tax: newTax,
+		};
 	}
 }
