@@ -350,6 +350,10 @@ export class OrdersService {
 				throw new NotFoundException('El cliente seleccionado no existe');
 			}
 
+			if (!customer.active) {
+				throw new NotFoundException('El cliente se encuentra inactivo');
+			}
+
 			if (
 				customer.customerType._id.toString() !==
 				order.customer.customerType._id.toString()
