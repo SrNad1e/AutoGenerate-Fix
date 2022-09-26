@@ -81,6 +81,10 @@ export class StockTransferErrorsService {
 			);
 		}
 
+		if (productFind.status === StatusDetailTransferError.CONFIRMED) {
+			throw new BadRequestException('El producto ya se encuentra verificado');
+		}
+
 		const stockTransfer = await this.stockTransferModel
 			.findById(stockTransferError.stockTransfer)
 			.lean();
