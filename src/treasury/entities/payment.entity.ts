@@ -37,6 +37,13 @@ export class Payment extends Document {
 	@Prop({ type: String })
 	color?: string;
 
+	@Field(() => String, {
+		description: 'Mensaje para el usuario web',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	message?: string;
+
 	@Field(() => Image, {
 		description: 'Logo para el medio de pago',
 		nullable: true,

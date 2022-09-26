@@ -20,4 +20,10 @@ export class CreatePaymentInput {
 		nullable: true,
 	})
 	logoId?: string;
+
+	@Field(() => String, {
+		description: 'Mensaje para el medio de pago',
+		nullable: true,
+	})
+	message?: string;
 }
