@@ -275,14 +275,12 @@ export class CreditsService {
 					},
 				});
 			case TypeCreditHistory.FROZEN:
-				const result = await this.creditModel.findOne({
+				return await this.creditModel.findOne({
 					customer: new Types.ObjectId(customerId),
 					available: {
 						$gte: amount,
 					},
 				});
-
-				return result;
 
 			case TypeCreditHistory.DEBIT:
 				return this.creditModel.findOne({
