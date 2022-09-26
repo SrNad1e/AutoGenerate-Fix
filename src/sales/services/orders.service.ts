@@ -649,20 +649,34 @@ export class OrdersService {
 						'El pedido aun no se encuentra pagado, valide los medios de pago e intente nuevamente',
 					);
 				}
+
+				//Validamos que el usuario que finaliza el proceso tenga punto de venta
+				if (!order.orderPos) {
+					if (!user.pointOfSale) {
+						throw new BadRequestException(
+							'El usuario no tiene punto de venta asignado',
+						);
+					}
+
+					dataUpdate.pointOfSale = user?.pointOfSale?._id;
+				}
+
 				//Se crean los recibos de caja
 				for (let i = 0; i < order?.payments?.length; i++) {
 					const { total, payment } = order?.payments[i];
 					if (
 						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
 					) {
+						const pointOfSale = order.pointOfSale || user.pointOfSale;
+
 						const valuesReceipt = {
 							value: total,
 							paymentId: payment?._id?.toString(),
-							pointOfSaleId: order.pointOfSale._id.toString(),
+							pointOfSaleId: pointOfSale?._id?.toString(),
 							concept: `Abono a pedido ${order?.number}`,
 							boxId:
 								payment?.type === 'cash'
-									? order?.pointOfSale['box']?.toString()
+									? pointOfSale['box']?.toString()
 									: undefined,
 						};
 
