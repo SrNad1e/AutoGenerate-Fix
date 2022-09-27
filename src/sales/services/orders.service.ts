@@ -999,7 +999,7 @@ export class OrdersService {
 		for (let i = 0; i < newDetails.length; i++) {
 			const { product, price } = newDetails[i];
 			let discount = 0;
-			if (isWholesaler) {
+			if (isWholesaler && order.customer.customerType['name'] !== 'Mayorista') {
 				discount = await this.discountRulesService.getDiscount({
 					customerTypeId: customerType?._id.toString(),
 					reference: product?.reference as any,
@@ -1018,6 +1018,7 @@ export class OrdersService {
 					shopId: order?.shop?._id?.toString(),
 					companyId,
 				});
+
 				newDetails[i] = {
 					...newDetails[i],
 					price: price - discount,
