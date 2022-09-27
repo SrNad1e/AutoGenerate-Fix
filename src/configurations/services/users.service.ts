@@ -365,7 +365,7 @@ export class UsersService {
 						name,
 						shop: shop?._id,
 						customer: customer?._id,
-						pointOfSale: pointOfSale?._id || null,
+						pointOfSale: pointOfSale?._id,
 						role: role?._id,
 						username,
 						user: userUpdate,
