@@ -48,7 +48,6 @@ import {
 	Order,
 	StatusOrder,
 	StatusOrderDetail,
-	SummaryOrder,
 } from '../entities/order.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { StatusWeb } from '../entities/status-web-history';
@@ -788,7 +787,7 @@ export class OrdersService {
 	}
 
 	async addProducts(
-		{ orderId, details }: AddProductsOrderInput,
+		{ orderId, details, isWholesaler = false }: AddProductsOrderInput,
 		user: User,
 		companyId: string,
 	) {
@@ -990,28 +989,28 @@ export class OrdersService {
 			}
 		}
 
-		//Asignamos los descuentos
+		//generamos el descuento si es mayorista pedido
+		const newDetailswholesaler = [];
+		const customerType = await this.customerTypesService.findOne('Mayorista');
+		if (!customerType) {
+			throw new BadRequestException('El tipo de cliente Mayorista no existe');
+		}
+
 		for (let i = 0; i < newDetails.length; i++) {
 			const { product, price } = newDetails[i];
 			let discount = 0;
-
-			if (order.status === StatusOrder.OPEN && !order.orderPos) {
-				const customerType = await this.customerTypesService.findOne(
-					'Mayorista',
-				);
-
-				if (!customerType) {
-					throw new BadRequestException(
-						'El tipo de cliente Mayorista no existe',
-					);
-				}
-
+			if (isWholesaler) {
 				discount = await this.discountRulesService.getDiscount({
 					customerTypeId: customerType?._id.toString(),
 					reference: product?.reference as any,
 					shopId: order?.shop?._id?.toString(),
 					companyId,
 				});
+				newDetailswholesaler[i] = {
+					...newDetails[i],
+					price: price - discount,
+					discount,
+				};
 			} else {
 				discount = await this.discountRulesService.getDiscount({
 					customerId: order?.customer?._id.toString(),
@@ -1019,13 +1018,22 @@ export class OrdersService {
 					shopId: order?.shop?._id?.toString(),
 					companyId,
 				});
+				newDetails[i] = {
+					...newDetails[i],
+					price: price - discount,
+					discount,
+				};
 			}
+		}
 
-			newDetails[i] = {
-				...newDetails[i],
-				price: price - discount,
-				discount,
-			};
+		if (
+			isWholesaler &&
+			newDetailswholesaler.reduce(
+				(sum, item: DetailOrder) => sum + item.price * item.quantity,
+				0,
+			) >= 300000
+		) {
+			newDetails = newDetailswholesaler;
 		}
 
 		const summary = this.calculateSummary({
