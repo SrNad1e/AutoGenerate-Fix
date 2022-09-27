@@ -615,7 +615,7 @@ export class OrdersService {
 							break;
 						case TypePayment.CREDIT:
 							const credit = await this.creditsService.validateCredit(
-								dataUpdate.customer.id?.toString() ||
+								dataUpdate.customer?._id?.toString() ||
 									order?.customer?._id?.toString(),
 								total,
 								TypeCreditHistory.THAWED,
