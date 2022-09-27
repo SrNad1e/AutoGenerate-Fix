@@ -352,6 +352,7 @@ export class OrdersService {
 			if (!customer.active) {
 				throw new NotFoundException('El cliente se encuentra inactivo');
 			}
+
 			dataUpdate.customer = customer as Customer;
 
 			if (
