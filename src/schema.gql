@@ -70,6 +70,9 @@ input AddProductsOrderInput {
   """Productos a crear o actualizar"""
   details: [DetailAddProductsOrderInput!]!
 
+  """El pedido es mayorista"""
+  isWholesaler: Boolean
+
   """Id del pedido que se requiere agreagr o editar productos"""
   orderId: String!
 }

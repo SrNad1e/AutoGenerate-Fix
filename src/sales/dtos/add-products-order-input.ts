@@ -35,4 +35,10 @@ export class AddProductsOrderInput {
 		description: 'Productos a crear o actualizar',
 	})
 	details: DetailAddProductsOrderInput[];
+
+	@Field(() => Boolean, {
+		description: 'El pedido es mayorista',
+		nullable: true,
+	})
+	isWholesaler?: boolean;
 }
