@@ -352,13 +352,12 @@ export class OrdersService {
 			if (!customer.active) {
 				throw new NotFoundException('El cliente se encuentra inactivo');
 			}
+			dataUpdate.customer = customer as Customer;
 
 			if (
 				customer.customerType._id.toString() !==
 				order.customer.customerType._id.toString()
 			) {
-				dataUpdate.customer = customer as Customer;
-
 				//Se actualiza el precio y el descuento de los productos
 				for (let i = 0; i < order?.details?.length; i++) {
 					const detail = order?.details[i];
