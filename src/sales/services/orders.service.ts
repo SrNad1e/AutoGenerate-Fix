@@ -513,6 +513,15 @@ export class OrdersService {
 					);
 				}
 
+				if (
+					order.summary.total < 300000 &&
+					order.customer.customerType['name'] !== 'Mayorista'
+				) {
+					throw new BadRequestException(
+						'El monto debe ser superior o igual a $ 300.000 si no eres cliente mayorista',
+					);
+				}
+
 				const isCredit = order.payments.find(
 					({ payment }) => payment.type === TypePayment.CREDIT,
 				);
