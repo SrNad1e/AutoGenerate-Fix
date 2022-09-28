@@ -1022,7 +1022,8 @@ export class OrdersService {
 		}
 
 		if (
-			isWholesaler /*&&
+			isWholesaler &&
+			order.customer.customerType['name'] !== 'Mayorista' /*&&
 			newDetailswholesaler.reduce(
 				(sum, item: DetailOrder) => sum + item.price * item.quantity,
 				0,
