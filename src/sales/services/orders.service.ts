@@ -599,19 +599,13 @@ export class OrdersService {
 									'El medio de pago cupón debe tener código',
 								);
 							}
-							coupon = await this.couponsService.findOne(
-								{
-									code,
-								},
+							coupon = await this.couponsService.validateCoupon(
+								code,
 								user,
 								companyId,
 							);
+							console.log(coupon);
 
-							if (coupon.status !== StatusCoupon.ACTIVE) {
-								throw new BadRequestException(
-									'El cupón ya se encuentra redimido',
-								);
-							}
 							break;
 						case TypePayment.CREDIT:
 							const credit = await this.creditsService.validateCredit(
@@ -1385,48 +1379,6 @@ export class OrdersService {
 				creditOrder.total,
 				user,
 				order.company._id.toString(),
-			);
-		}
-
-		//Cambios en los cupones
-
-		const couponDelete = paymentsDelete.find((payment) => payment.code);
-
-		if (couponDelete) {
-			const coupon = await this.couponsService.findOne(
-				{
-					code: couponDelete?.code,
-				},
-				user,
-				order.company.toString(),
-			);
-			await this.couponsService.update(
-				coupon?._id?.toString(),
-				{
-					status: StatusCoupon.ACTIVE,
-				},
-				user,
-				order.company.toString(),
-			);
-		}
-
-		const couponCreate = paymentsCreate.find((payment) => payment.code);
-
-		if (couponCreate) {
-			const coupon = await this.couponsService.findOne(
-				{
-					code: couponDelete?.code,
-				},
-				user,
-				order.company.toString(),
-			);
-			await this.couponsService.update(
-				coupon?._id?.toString(),
-				{
-					status: StatusCoupon.REDEEMED,
-				},
-				user,
-				order.company.toString(),
 			);
 		}
 
