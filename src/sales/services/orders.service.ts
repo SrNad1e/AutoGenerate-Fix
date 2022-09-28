@@ -613,7 +613,6 @@ export class OrdersService {
 								user,
 								companyId,
 							);
-							console.log(coupon);
 
 							break;
 						case TypePayment.CREDIT:
