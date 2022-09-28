@@ -1028,11 +1028,11 @@ export class OrdersService {
 		}
 
 		if (
-			isWholesaler &&
+			isWholesaler /*&&
 			newDetailswholesaler.reduce(
 				(sum, item: DetailOrder) => sum + item.price * item.quantity,
 				0,
-			) >= 300000
+			) >= 300000*/
 		) {
 			newDetails = newDetailswholesaler;
 		}
