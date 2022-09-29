@@ -73,6 +73,7 @@ export class ErrorsCashService {
 			boxDestination: boxMain._id,
 			closeZ: closeZ._id,
 			typeError: newTypeError,
+			value,
 			user,
 		});
 	}
