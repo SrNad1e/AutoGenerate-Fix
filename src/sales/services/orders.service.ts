@@ -724,7 +724,11 @@ export class OrdersService {
 					'Mayorista',
 				);
 
-				if (!order.orderPos && newSummary.totalPaid >= 300000) {
+				if (
+					!order.orderPos &&
+					newSummary.totalPaid >= 300000 &&
+					order.customer.customerType['name'] === 'Detal'
+				) {
 					if (!customerType) {
 						throw new BadRequestException('Cliente tipo Mayorista no existe');
 					}
