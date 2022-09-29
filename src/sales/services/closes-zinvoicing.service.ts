@@ -15,6 +15,8 @@ import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { PaymentOrderClose } from '../entities/close-x-invoicing.entity';
 import { BoxService } from 'src/treasury/services/box.service';
+import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
+import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
 
 const populate: PopulateOptions[] = [
 	{
@@ -53,6 +55,7 @@ export class ClosesZinvoicingService {
 		private readonly expensesService: ExpensesService,
 		private readonly receiptsService: ReceiptsService,
 		private readonly boxesService: BoxService,
+		private readonly errorsCashService: ErrorsCashService,
 	) {}
 
 	async findAll(
@@ -234,6 +237,7 @@ export class ClosesZinvoicingService {
 				.reduce((sum, item) => sum + item, 0);
 
 			const total = boxMain?.total + cash;
+
 			await this.boxesService.updateTotal(boxMain._id.toString(), total);
 
 			const box = await this.boxesService.findById(
@@ -241,7 +245,34 @@ export class ClosesZinvoicingService {
 			);
 
 			const totalBox = box.total - cash;
-			await this.boxesService.updateTotal(box._id.toString(), totalBox);
+
+			//se valida el cierre si hay cierres y se crea el registro de los errores
+
+			if (totalBox > 0) {
+				await this.errorsCashService.addRegister(
+					{
+						closeZId: response?._id?.toString(),
+						typeError: TypeErrorCash.SURPLUS,
+						value: totalBox,
+					},
+					user,
+					companyId,
+				);
+			}
+
+			if (totalBox < 0) {
+				await this.errorsCashService.addRegister(
+					{
+						closeZId: response?._id?.toString(),
+						typeError: TypeErrorCash.MISSING,
+						value: totalBox * -1,
+					},
+					user,
+					companyId,
+				);
+			}
+
+			await this.boxesService.updateTotal(box._id.toString(), 0);
 		}
 
 		return {
