@@ -1646,7 +1646,7 @@ export class OrdersService {
 				company: new Types.ObjectId(companyId),
 			})
 			.sort({
-				_id: -1,
+				number: -1,
 			})
 			.lean();
 
