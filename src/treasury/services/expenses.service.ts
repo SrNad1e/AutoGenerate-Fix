@@ -62,7 +62,7 @@ export class ExpensesService {
 		}
 
 		if (status) {
-			filters.status = StatusExpense[status];
+			filters.status = StatusExpense[status] || status;
 		}
 
 		if (dateInitial) {

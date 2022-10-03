@@ -173,19 +173,21 @@ export class StockHistoryService {
 
 		const products = details.map((detail) => detail.productId.toString());
 
-		const { totalDocs } = await this.productsService.findAll(
-			{
-				ids: products,
-				status: StatusProduct.ACTIVE,
-			},
-			user,
-			companyId,
-		);
+		const productsError = [];
+		for (let i = 0; i < products.length; i++) {
+			const productId = products[i];
+			try {
+				await this.productsService.findById(productId);
+			} catch {
+				productsError.push(productId);
+			}
+		}
 
-		if (totalDocs !== products.length) {
-			throw new BadRequestException(
-				`Un producto no existe o se encuentra inactivo, revise la lista de productos`,
-			);
+		if (productsError.length > 0) {
+			throw new BadRequestException({
+				message: `Un producto no existe o se encuentra inactivo, revise la lista de productos`,
+				data: productsError,
+			});
 		}
 
 		for (let i = 0; i < details.length; i++) {

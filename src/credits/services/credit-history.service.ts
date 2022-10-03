@@ -87,7 +87,6 @@ export class CreditHistoryService {
 		const newCredit = await this.creditsService.update(
 			credit?._id.toString(),
 			{
-				amount,
 				detailAddCredit: {
 					orderId: order?._id.toString(),
 					total: amount,
@@ -162,9 +161,9 @@ export class CreditHistoryService {
 		}
 
 		const credit = await this.creditsService.validateCredit(
-			order?.customer.toString(),
+			order?.customer?._id?.toString(),
 			amount,
-			TypeCreditHistory.CREDIT,
+			TypeCreditHistory.FROZEN,
 		);
 
 		const newCredit = await this.creditsService.update(
@@ -203,7 +202,7 @@ export class CreditHistoryService {
 		}
 
 		const credit = await this.creditsService.validateCredit(
-			order?.customer.toString(),
+			order?.customer?._id?.toString(),
 			amount,
 			TypeCreditHistory.THAWED,
 		);
@@ -211,7 +210,6 @@ export class CreditHistoryService {
 		const newCredit = await this.creditsService.update(
 			credit?._id.toString(),
 			{
-				amount,
 				detailAddCredit: {
 					orderId: order?._id.toString(),
 					total: amount,

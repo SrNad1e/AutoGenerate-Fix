@@ -4,38 +4,30 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
 	FilterQuery,
-	PaginateModel,
 	Types,
 	AggregatePaginateModel,
 	ProjectionType,
 } from 'mongoose';
-import { Repository } from 'typeorm';
 
 import {
 	FiltersProductInput,
 	FiltersProductsInput,
 } from '../dtos/filters-products.input';
 import { Product, StatusProduct } from '../entities/product.entity';
-//import { ProductMysql } from '../entities/product.entity';
 import { ColorsService } from './colors.service';
 import { SizesService } from './sizes.service';
 import { ReferencesService } from './references.service';
-import { BrandsService } from './brands.service';
 import { CreateProductInput } from '../dtos/create-product.input';
 import { UpdateProductInput } from '../dtos/update-product.input';
-import { CompaniesService } from 'src/configurations/services/companies.service';
 import { Reference } from '../entities/reference.entity';
 import { Size } from '../entities/size.entity';
 import { Color } from '../entities/color.entity';
 import { Image } from 'src/configurations/entities/image.entity';
-import { UsersService } from 'src/configurations/services/users.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
-import { CategoriesService } from './categories.service';
 
 const populate = [
 	{
@@ -112,18 +104,10 @@ export class ProductsService {
 	constructor(
 		@InjectModel(Product.name)
 		private readonly productModel: AggregatePaginateModel<Product>,
-		@InjectModel(Image.name)
-		private readonly imageModel: PaginateModel<Image>,
-		/*@InjectRepository(ProductMysql)
-		private readonly productRepo: Repository<ProductMysql>,*/
 		private readonly colorsService: ColorsService,
 		private readonly sizesService: SizesService,
-		private readonly usersService: UsersService,
-		private readonly warehousesService: WarehousesService,
 		private readonly referencesService: ReferencesService,
-		private readonly brandsService: BrandsService,
-		private readonly companiesService: CompaniesService,
-		private readonly categoriesService: CategoriesService,
+		private readonly warehousesService: WarehousesService,
 	) {}
 
 	async findAll(
@@ -349,6 +333,21 @@ export class ProductsService {
 		};
 		const barcode = `7700000${total()}`;
 
+		const warehouses = await this.warehousesService.findAll(
+			{
+				limit: -1,
+			},
+			{
+				username: 'admin',
+			},
+			companyId,
+		);
+
+		const stock = warehouses.docs.map((warehouse) => ({
+			warehouse: warehouse._id,
+			quantity: 0,
+		}));
+
 		return (
 			await this.productModel.create({
 				reference: reference?._id,
@@ -356,6 +355,7 @@ export class ProductsService {
 				size: size?._id,
 				images: imagesId?.map((id) => new Types.ObjectId(id)),
 				barcode,
+				stock,
 				user,
 			})
 		).populate(populate);
@@ -424,171 +424,6 @@ export class ProductsService {
 			},
 		);
 	}
-
-	/*	async migration() {
-		try {
-			const productsMysql = await this.productRepo.find();
-			const warehouses = await this.warehousesService.findAll(
-				{
-					limit: 100,
-				},
-				{
-					username: 'admin',
-				},
-				'',
-			);
-
-			const productsMongo = [];
-
-			const stock = warehouses?.docs.map((warehouse) => ({
-				warehouse: warehouse._id,
-				quantity: 100,
-			}));
-
-			const userDefault = await this.usersService.findOne({
-				username: 'admin',
-			});
-
-			for (let i = 0; i < productsMysql?.length; i++) {
-				const product = productsMysql[i];
-				const color = await this.colorsService.getByIdMysql(product.color_id);
-				const size = await this.sizesService.getByIdMysql(product.size_id);
-
-				const user = await this.usersService.getByIdMysql(
-					product.owner_user_id,
-				);
-
-				let reference = await this.referencesService.findOne({
-					name: product.reference,
-				});
-
-				const brandSearch =
-					product.provider_id === 1
-						? 'Toulouse'
-						: product.provider_id === 2
-						? 'LuckyWoman'
-						: 'Externos';
-				let brand = await this.brandsService.findOne(brandSearch);
-				const company = await this.companiesService.findOne('Cirotex');
-
-				if (!brand) {
-					await this.brandsService.create({ name: brandSearch }, user);
-					brand = await this.brandsService.findOne(brandSearch);
-				}
-
-				if (!reference) {
-					const categoryMysql = await this.categoriesService.getByIdMysql(
-						product.category_id,
-					);
-
-					let category = await this.categoriesService.findOne({
-						name: categoryMysql?.name,
-					});
-
-					if (category?.level === 3) {
-						category = await this.categoriesService.findOne({
-							name: 'Otros',
-						});
-					}
-
-					let categoryLevel1Id;
-					let categoryLevel2Id;
-					let categoryLevel3Id;
-
-					if (category?.level === 1) {
-						categoryLevel1Id = category?.data?._id;
-					}
-
-					if (category?.level === 2) {
-						categoryLevel1Id = category?.data['parentId'];
-						categoryLevel2Id = category?.data?._id;
-					}
-
-					await this.referencesService.create(
-						{
-							name: product.reference,
-							description: product.description,
-							changeable: product.changeable,
-							price: product.price,
-							cost: product.cost,
-							weight: parseFloat(product?.shipping_weight?.toString() || '0'),
-							width: parseFloat(product.shipping_width?.toString() || '0'),
-							long: parseFloat(product.shipping_long?.toString() || '0'),
-							height: parseFloat(product.shipping_height?.toString() || '0'),
-							volume: parseFloat(product.shipping_volume?.toString() || '0'),
-							brandId: brand._id.toString(),
-							categoryLevel1Id,
-							categoryLevel2Id,
-							categoryLevel3Id,
-							attribIds: [],
-						},
-						userDefault,
-						company._id.toString(),
-					);
-
-					reference = await this.referencesService.findOne({
-						name: product.reference,
-					});
-				}
-
-				const imagesMysql = JSON.parse(product.images);
-
-				const images = [];
-
-				if (imagesMysql) {
-					for (let i = 0; i < imagesMysql?.length; i++) {
-						const { imageSizes, alt } = imagesMysql[i];
-						const { webp, jpg } = imageSizes;
-
-						const image = await this.imageModel.findOne({
-							'urls.original': jpg?.S400x578.split('/')[7],
-						});
-						if (!image) {
-							const newImage = new this.imageModel({
-								name: alt,
-								user: userDefault,
-								urls: {
-									webp: {
-										small: webp?.S150x217.split('/')[7],
-										medium: webp?.S200x289.split('/')[7],
-										big: webp?.S900x1300.split('/')[7],
-									},
-									jpeg: {
-										small: jpg?.S150x217.split('/')[7],
-										medium: jpg?.S200x289.split('/')[7],
-										big: jpg?.S900x1300.split('/')[7],
-									},
-									original: jpg?.S400x578.split('/')[7],
-								},
-							});
-							const { _id } = await newImage.save();
-							images.push(_id);
-						} else {
-							images.push(image._id);
-						}
-					}
-				}
-
-				productsMongo.push({
-					reference: reference?._id,
-					barcode: product.barcode,
-					color: color._id,
-					size: size._id,
-					status: product.state ? StatusProduct.ACTIVE : StatusProduct.INACTIVE,
-					user: user,
-					stock,
-					images,
-				});
-			}
-
-			await this.productModel.create(productsMongo);
-			return {
-				message: 'Migración completa',
-			};
-		} catch (e) {
-			throw new NotFoundException(`Error al migrar productos ${e}`);
-		}
-	}*/
 
 	/**
 	 * @description se encarga de agregar unidades al inventario
@@ -729,13 +564,14 @@ export class ProductsService {
 				product?.stock.length <= 0 ||
 				product?.stock[0]?.quantity < quantity
 			) {
-				throw new BadRequestException(
-					`El producto ${product?.reference['name']}/${
+				throw new BadRequestException({
+					message: `El producto ${product?.reference['name']}/${
 						product?.barcode
 					} no tiene suficientes unidades, stock: ${
 						product?.stock[0]?.quantity || 0
 					}`,
-				);
+					data: product,
+				});
 			}
 
 			return product;

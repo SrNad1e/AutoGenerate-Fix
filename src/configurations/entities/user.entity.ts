@@ -1,7 +1,6 @@
 import { ObjectType, Field, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Role } from './role.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
@@ -91,6 +90,12 @@ export class User extends Document {
 	})
 	status: StatusUser;
 
+	@Prop({ type: Boolean, default: false })
+	@Field(() => Boolean, {
+		description: 'Usado para diferenciar la creación de los usuarios',
+	})
+	isWeb: boolean;
+
 	@Field(() => User, {
 		description: 'Usuario que creó el usuario',
 		nullable: true,
@@ -106,67 +111,3 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-/*@Entity({ name: 'users' })
-@ObjectType()
-export class UserMysql {
-	@Field()
-	@PrimaryGeneratedColumn()
-	id: number;
-
-	@Field()
-	@Column({ type: 'int' })
-	role_id: number;
-
-	@Field()
-	@Column({ type: 'varchar' })
-	authentication_token: string;
-
-	@Field()
-	@Column({ type: 'int' })
-	shop_id: number;
-
-	@Field()
-	@Column({ type: 'int' })
-	customer_id: number;
-
-	@Field()
-	@Column({ type: 'int' })
-	owner_user_id: number;
-
-	@Field()
-	@Column({ type: 'varchar' })
-	user: string;
-
-	@Field()
-	@Column({ type: 'varchar' })
-	email: string;
-
-	@Field()
-	@Column({ type: 'varchar' })
-	password: string;
-
-	@Field()
-	@Column({ type: 'tinyint' })
-	active: boolean;
-
-	@Field()
-	@Column({ type: 'datetime' })
-	created_at: Date;
-
-	@Field()
-	@Column({ type: 'datetime' })
-	last_login_at: Date;
-
-	@Field()
-	@Column({ type: 'varchar' })
-	name: string;
-
-	@Field()
-	@Column({ type: 'varchar' })
-	identification: string;
-
-	@Field()
-	@Column({ type: 'tinyint' })
-	wholesale_member: boolean;
-}*/

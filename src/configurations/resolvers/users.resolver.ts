@@ -11,7 +11,7 @@ import {
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateUserInput } from '../dtos/create-user.input';
-import { ResponseUsers } from '../dtos/response-users.input';
+import { ResponseUsers } from '../dtos/response-users';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -44,7 +44,7 @@ export class UsersResolver {
 	})
 	@UseGuards(JwtAuthGuard)
 	getCurrent(@Context() context) {
-		return this.usersService.findById(context.req.user.user._id);
+		return this.usersService.getCurrent(context.req.user.user._id);
 	}
 
 	@Mutation(() => User)

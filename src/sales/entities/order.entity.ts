@@ -12,14 +12,13 @@ import { Receipt } from 'src/treasury/entities/receipt.entity';
 import { Address, Customer } from '../../crm/entities/customer.entity';
 import { Invoice } from './invoice.entity';
 import { PointOfSale } from './pointOfSale.entity';
+import { StatusWeb } from './status-web-history';
 
 export enum StatusOrder {
 	OPEN = 'open',
-	PENDING = 'pending',
+	PENDDING = 'pendding',
 	CANCELLED = 'cancelled',
 	CLOSED = 'closed',
-	SENT = 'sent',
-	INVOICED = 'invoiced',
 }
 
 registerEnumType(StatusOrder, { name: 'StatusOrder' });
@@ -29,14 +28,41 @@ export enum StatusOrderDetail {
 	CONFIRMED = 'confirmed',
 }
 
-registerEnumType(StatusOrder, { name: 'StatusOrder' });
+registerEnumType(StatusOrderDetail, { name: 'StatusOrderDetail' });
+
+@ObjectType({ description: 'Transportadora que realiza el envio' })
+export class ConveyorOrder {
+	@Field(() => Number, { description: 'Valor del envío' })
+	value: number;
+
+	@Field(() => String, {
+		description: 'Código de la guia del transportista',
+		nullable: true,
+	})
+	guideCode?: string;
+
+	@Field(() => Conveyor, { description: 'Datos del transportista' })
+	conveyor: Conveyor;
+
+	@Field(() => String, {
+		description: 'Error del médio de pago',
+		nullable: true,
+	})
+	error?: string;
+
+	@Field(() => Date, {
+		description: 'Fecha en el que se realiza el envío',
+		nullable: true,
+	})
+	shippingDate?: Date;
+}
 
 @ObjectType({ description: 'Productos del pedido' })
 export class DetailOrder {
 	@Field(() => Product, { description: 'Producto agregado al pedido' })
 	product: Product;
 
-	@Field(() => String, { description: 'Estado del producto' })
+	@Field(() => StatusOrderDetail, { description: 'Estado del producto' })
 	status: StatusOrderDetail;
 
 	@Field(() => Number, { description: 'Cantidad de productos en el pedido' })
@@ -78,6 +104,9 @@ export class PaymentOrder {
 		nullable: true,
 	})
 	code?: string;
+
+	@Field(() => StatusOrderDetail, { description: 'Estado del pago' })
+	status: StatusOrderDetail;
 
 	@Field(() => Date, {
 		description: 'Fecha de agregado del pago al pedido',
@@ -161,6 +190,15 @@ export class Order extends Document {
 	})
 	status: StatusOrder;
 
+	@Field(() => StatusWeb, {
+		description: 'Estado de transición pedido web',
+		nullable: true,
+	})
+	@Prop({
+		type: String,
+	})
+	statusWeb: StatusWeb;
+
 	@Field(() => Invoice, {
 		description: 'Factura generada al facturar',
 		nullable: true,
@@ -224,12 +262,12 @@ export class Order extends Document {
 	@Prop({ type: Object })
 	address?: Address;
 
-	@Field(() => Conveyor, {
+	@Field(() => ConveyorOrder, {
 		description: 'Trasportadora',
 		nullable: true,
 	})
 	@Prop({ type: Object })
-	conveyor?: Conveyor;
+	conveyorOrder?: ConveyorOrder;
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;

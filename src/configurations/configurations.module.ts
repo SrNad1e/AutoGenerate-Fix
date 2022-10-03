@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PassportModule } from '@nestjs/passport';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
 
 import { Conveyor, ConveyorSchema } from './entities/conveyor.entity';
 import { CompanySchema } from './entities/company.entity';
@@ -41,11 +41,24 @@ import { ShopsResolver } from './resolvers/shops.resolver';
 import { PermissionsService } from './services/permissions.service';
 import { PermissionsResolver } from './resolvers/permissions.resolver';
 import { RolesResolver } from './resolvers/roles.resolver';
+import { CompaniesResolver } from './resolvers/companies.resolver';
+import { Order, OrderSchema } from 'src/sales/entities/order.entity';
+import { SendMailModule } from 'src/send-mail/send-mail.module';
+import { Token, TokenSchema } from './entities/token.entity';
+import { TokensService } from './services/tokens.service';
+import { InterapidisimoService } from './services/interapidisimo.service';
+import { FedexService } from './services/fedex.service';
+import { Product, ProductSchema } from 'src/products/entities/product.entity';
 
 @Module({
 	imports: [
 		PassportModule,
 		CrmModule,
+		SendMailModule,
+		HttpModule.register({
+			timeout: 5000,
+			maxRedirects: 5,
+		}),
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigType<typeof config>) => {
 				const { secret, expire } = configService.jwt;
@@ -83,6 +96,18 @@ import { RolesResolver } from './resolvers/roles.resolver';
 				name: Warehouse.name,
 				schema: WarehouseSchema,
 			},
+			{
+				name: Order.name,
+				schema: OrderSchema,
+			},
+			{
+				name: Token.name,
+				schema: TokenSchema,
+			},
+			{
+				name: Product.name,
+				schema: ProductSchema,
+			},
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -105,7 +130,6 @@ import { RolesResolver } from './resolvers/roles.resolver';
 				},
 			},
 		]),
-		//	TypeOrmModule.forFeature([UserMysql, ShopMysql, WarehouseMysql]),
 	],
 	providers: [
 		AuthResolver,
@@ -127,6 +151,10 @@ import { RolesResolver } from './resolvers/roles.resolver';
 		PermissionsService,
 		PermissionsResolver,
 		RolesResolver,
+		CompaniesResolver,
+		TokensService,
+		InterapidisimoService,
+		FedexService,
 	],
 	controllers: [StaticfilesController, ShopsController],
 	exports: [

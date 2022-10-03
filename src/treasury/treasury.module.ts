@@ -12,11 +12,21 @@ import { BoxHistoryService } from './services/box-history.service';
 import { BoxHistory, BoxHistorySchema } from './entities/box-history.entity';
 import { BoxService } from './services/box.service';
 import { ExpensesService } from './services/expenses.service';
+import { ErrorsCashService } from './services/errors-cash.service';
 import { ReceiptsResolver } from './resolvers/receipts.resolver';
 import { ExpensesResolver } from './resolvers/expenses.resolver';
 import { BoxesResolver } from './resolvers/boxes.resolver';
 import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { CreditsModule } from 'src/credits/credits.module';
+import {
+	PointOfSale,
+	PointOfSaleSchema,
+} from 'src/sales/entities/pointOfSale.entity';
+import { ErrorCash, ErrorCashSchema } from './entities/error-cash.entity';
+import {
+	CloseZInvoicing,
+	CloseZInvoicingSchema,
+} from 'src/sales/entities/close-z-invoicing.entity';
 
 @Module({
 	imports: [
@@ -53,12 +63,24 @@ import { CreditsModule } from 'src/credits/credits.module';
 				schema: PaymentSchema,
 			},
 			{
+				name: PointOfSale.name,
+				schema: PointOfSaleSchema,
+			},
+			{
 				name: BoxHistory.name,
 				schema: BoxHistorySchema,
 			},
 			{
 				name: Order.name,
 				schema: OrderSchema,
+			},
+			{
+				name: ErrorCash.name,
+				schema: ErrorCashSchema,
+			},
+			{
+				name: CloseZInvoicing.name,
+				schema: CloseZInvoicingSchema,
 			},
 		]),
 	],
@@ -67,12 +89,19 @@ import { CreditsModule } from 'src/credits/credits.module';
 		PaymentsResolver,
 		ReceiptsService,
 		BoxHistoryService,
+		ErrorsCashService,
 		BoxService,
 		ExpensesService,
 		ReceiptsResolver,
 		ExpensesResolver,
 		BoxesResolver,
 	],
-	exports: [PaymentsService, ReceiptsService, ExpensesService],
+	exports: [
+		PaymentsService,
+		ErrorsCashService,
+		ReceiptsService,
+		ExpensesService,
+		BoxService,
+	],
 })
 export class TreasuryModule {}

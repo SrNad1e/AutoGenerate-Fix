@@ -21,6 +21,8 @@ import { UpdateReceiptInput } from '../dtos/update-receipt.input';
 import { TypePayment } from '../entities/payment.entity';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { Order } from 'src/sales/entities/order.entity';
+import { CreditsService } from 'src/credits/services/credits.service';
+import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 
 const populate = [
 	{
@@ -34,12 +36,14 @@ export class ReceiptsService {
 	constructor(
 		@InjectModel(Receipt.name)
 		private readonly receiptModel: PaginateModel<Receipt>,
-		@InjectModel(Order.name)
-		private readonly orderModel: PaginateModel<Order>,
+		@InjectModel(PointOfSale.name)
+		private readonly PointOfSaleModel: PaginateModel<PointOfSale>,
+		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
 		private readonly boxService: BoxService,
 		private readonly paymentsService: PaymentsService,
 		private readonly boxHistoryService: BoxHistoryService,
 		private readonly creditHistoryService: CreditHistoryService,
+		private readonly creditsService: CreditsService,
 	) {}
 
 	async findAll(
@@ -52,6 +56,8 @@ export class ReceiptsService {
 			paymentId,
 			sort,
 			status,
+			boxId,
+			pointOfSaleId,
 		}: FiltersReceiptsInput,
 		user: User,
 		companyId: string,
@@ -67,11 +73,19 @@ export class ReceiptsService {
 		}
 
 		if (paymentId) {
-			filters.payment = new Types.ObjectId(paymentId);
+			filters['payment._id'] = new Types.ObjectId(paymentId);
 		}
 
 		if (status) {
-			filters.status = StatusReceipt[status];
+			filters.status = StatusReceipt[status] || status;
+		}
+
+		if (boxId) {
+			filters.box = new Types.ObjectId(boxId);
+		}
+
+		if (pointOfSaleId) {
+			filters.pointOfSale = new Types.ObjectId(pointOfSaleId);
 		}
 
 		if (dateInitial) {
@@ -105,15 +119,32 @@ export class ReceiptsService {
 	}
 
 	async create(
-		{ concept, paymentId, value, boxId, details }: CreateReceiptInput,
+		{
+			concept,
+			paymentId,
+			value,
+			boxId,
+			pointOfSaleId,
+			details,
+		}: CreateReceiptInput,
 		user: User,
 		companyId: string,
 	) {
 		let box;
+
 		if (boxId) {
 			box = await this.boxService.findById(boxId);
 			if (!box) {
 				throw new NotFoundException('La caja no existe');
+			}
+		}
+
+		let pointOfSale;
+
+		if (pointOfSaleId) {
+			pointOfSale = await this.PointOfSaleModel.findById(pointOfSaleId);
+			if (!pointOfSale) {
+				throw new NotFoundException('El punto de venta no existe');
 			}
 		}
 
@@ -135,12 +166,8 @@ export class ReceiptsService {
 		}
 
 		const receipt = await this.receiptModel
-			.findOne({
-				category: new Types.ObjectId(companyId),
-			})
-			.sort({
-				_id: -1,
-			});
+			.findOne({ category: new Types.ObjectId(companyId) })
+			.sort({ _id: -1 });
 
 		const number = (receipt?.number || 0) + 1;
 
@@ -150,7 +177,9 @@ export class ReceiptsService {
 			concept,
 			box: box?._id,
 			payment: payment,
+			pointOfSale: pointOfSale._id,
 			company: new Types.ObjectId(companyId),
+			details,
 			user,
 		});
 
@@ -212,20 +241,65 @@ export class ReceiptsService {
 			);
 		}
 
-		if (
-			status === StatusReceipt.CANCELLED &&
-			receipt?.payment?.type === TypePayment.CASH
-		) {
-			await this.boxHistoryService.deleteCash(
-				{
-					boxId: receipt?.box.toString(),
-					documentId: id,
-					documentType: StatusBoxHistory.RECEIPT,
-					value: receipt?.value,
-				},
-				user,
-				companyId,
+		if (StatusReceipt[status] === StatusReceipt.CANCELLED) {
+			if (!receipt.details) {
+				throw new BadRequestException(
+					'El recibo paga el total de una factura y no se puede anular',
+				);
+			}
+
+			const ordersId = receipt.details.map(
+				({ orderId }) => new Types.ObjectId(orderId),
 			);
+			const orders = await this.orderModel.find({
+				_id: {
+					$in: ordersId,
+				},
+			});
+
+			if (orders.length === 0) {
+				throw new Error(
+					'Se ha presentado un error sin identificar, comunique al administrador',
+				);
+			}
+
+			const credit = await this.creditsService.findOne({
+				customerId: orders[0].customer?._id?.toString(),
+			});
+
+			if (!credit) {
+				throw new NotFoundException(`El cliente no tiene cartera asignada`);
+			}
+
+			if (receipt.value > credit.available) {
+				throw new BadRequestException(
+					'El crédito no tiene suficiente cupo para anuar el recibo',
+				);
+			}
+
+			for (let i = 0; i < receipt.details.length; i++) {
+				const { orderId, amount } = receipt.details[i];
+
+				await this.creditHistoryService.addCreditHistory(
+					orderId,
+					amount,
+					user,
+					companyId,
+				);
+			}
+
+			if (receipt?.payment?.type === TypePayment.CASH) {
+				await this.boxHistoryService.deleteCash(
+					{
+						boxId: receipt?.box.toString(),
+						documentId: id,
+						documentType: StatusBoxHistory.RECEIPT,
+						value: receipt?.value,
+					},
+					user,
+					companyId,
+				);
+			}
 		}
 
 		return this.receiptModel.findByIdAndUpdate(id, {

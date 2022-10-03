@@ -60,6 +60,12 @@ export class FiltersCustomersInput {
 	})
 	dato: string;
 
+	@Field(() => String, {
+		description: 'Identificdor de un usuario',
+		nullable: true,
+	})
+	_id?: string;
+
 	@Field(() => SortCustomer, {
 		description: 'Ordenamiento (1 es ascendente, -1 es descendente)',
 		nullable: true,

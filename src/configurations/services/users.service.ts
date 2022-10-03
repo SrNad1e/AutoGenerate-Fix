@@ -25,6 +25,7 @@ import { FiltersUserInput } from '../dtos/filters-user.input';
 import { Shop } from '../entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { CustomerType } from 'src/crm/entities/customerType.entity';
+import { DocumentType } from 'src/crm/entities/documentType.entity';
 
 const populate = [
 	{ path: 'role', model: Role.name },
@@ -33,10 +34,16 @@ const populate = [
 	{ path: 'companies', model: Company.name },
 	{
 		path: 'customer',
-		populate: {
-			path: 'customerType',
-			model: CustomerType.name,
-		},
+		populate: [
+			{
+				path: 'customerType',
+				model: CustomerType.name,
+			},
+			{
+				path: 'documentType',
+				model: DocumentType.name,
+			},
+		],
 	},
 	{
 		path: 'shop',
@@ -82,6 +89,7 @@ export class UsersService {
 			name,
 			roleId,
 			status,
+			isWeb,
 			limit = 10,
 			page = 1,
 			sort,
@@ -112,6 +120,10 @@ export class UsersService {
 
 		if (StatusUser[status]) {
 			filters.status = StatusUser[status];
+		}
+
+		if (isWeb !== undefined) {
+			filters.isWeb = isWeb;
 		}
 
 		if (user?.companies) {
@@ -146,6 +158,7 @@ export class UsersService {
 		if (!user) {
 			throw new NotFoundException(`Usuario con id ${id} no existe`);
 		}
+
 		return user;
 	}
 
@@ -161,7 +174,6 @@ export class UsersService {
 		{
 			username,
 			shopId,
-			//companyId,
 			pointOfSaleId,
 			roleId,
 			customerId,
@@ -353,7 +365,7 @@ export class UsersService {
 						name,
 						shop: shop?._id,
 						customer: customer?._id,
-						pointOfSale: pointOfSale?._id || null,
+						pointOfSale: pointOfSale?._id,
 						role: role?._id,
 						username,
 						user: userUpdate,
@@ -363,6 +375,19 @@ export class UsersService {
 			)
 			.populate(populate)
 			.lean();
+	}
+
+	async getCurrent(userId: string) {
+		const user = await this.findById(userId);
+
+		if (user.status === StatusUser.INACTIVE) {
+			throw new UnauthorizedException(`El usuario ha sido inactivado`);
+		}
+
+		if (user.status === StatusUser.SUSPEND) {
+			throw new UnauthorizedException(`El usuario ha sido suspendido`);
+		}
+		return user;
 	}
 
 	/**

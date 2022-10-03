@@ -9,13 +9,6 @@ export default registerAs('config', () => ({
 		port: parseInt(process.env.MONGO_PORT, 10),
 		connection: process.env.MONGO_CONNECTION,
 	},
-	mariadb: {
-		dbName: process.env.MARIADB_DB,
-		user: process.env.MARIADB_USER,
-		password: process.env.MARIADB_PASSWORD,
-		host: process.env.MARIADB_HOST,
-		port: parseInt(process.env.MARIADB_PORT, 10),
-	},
 	jwt: {
 		secret: process.env.SECRET_TOKEN,
 		expire: process.env.EXPIRE_TOKEN,
@@ -25,5 +18,27 @@ export default registerAs('config', () => ({
 		accessKeyId: process.env.AWS_ACCESS_KEY_ID,
 		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 		publicBucketName: process.env.AWS_PUBLIC_BUCKET_NAME,
+	},
+	nodemailer: {
+		host: process.env.NODEMAILER_HOST,
+		port: process.env.NODEMAILER_PORT,
+		secure: process.env.NODEMAILER_SECURE,
+		user: process.env.NODEMAILER_USER,
+		password: process.env.NODEMAILER_PASSWORD,
+	},
+	interapidisimo: {
+		api: process.env.INTER_API,
+		signature: process.env.INTER_SIGNATURE,
+		Authorization: process.env.INTER_AUTHORIZATION,
+		city_default: process.env.INTER_CITY_DEFAULT,
+		client_id: process.env.INTER_CLIENT_ID,
+	},
+	FEDEX: {
+		api: process.env.FEDEX_API,
+		client_id: process.env.FEDEX_CLIENT_ID,
+		client_secret: process.env.FEDEX_CLIENT_SECRET,
+		accountNumber: process.env.FEDEX_ACCOUNT_NUMBER,
+		postalCode: process.env.FEDEX_POSTAL_CODE_DEFAULT,
+		country: process.env.FEDEX_COUNTRY_DEFAULT,
 	},
 }));

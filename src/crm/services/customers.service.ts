@@ -40,6 +40,7 @@ export class CustomersService {
 
 	async findAll({
 		dato,
+		_id,
 		sort,
 		active,
 		limit = 20,
@@ -74,6 +75,10 @@ export class CustomersService {
 					},
 				},
 			];
+		}
+
+		if (_id) {
+			filters._id = new Types.ObjectId(_id);
 		}
 
 		if (active !== undefined) {
@@ -163,6 +168,7 @@ export class CustomersService {
 		if (!customer) {
 			throw new NotFoundException('El cliente no existe');
 		}
+
 		if (customerTypeId) {
 			const customerType = this.customerTypeService.findById(customerTypeId);
 
@@ -191,27 +197,42 @@ export class CustomersService {
 
 		const newAddresses = [];
 
-		if (addresses) {
+		if (addresses?.length > 0) {
+			let isMainIndex = 0;
 			for (let i = 0; i < addresses.length; i++) {
-				const { cityId, ...params } = addresses[i];
+				const { cityId, isMain, ...params } = addresses[i];
 				const city = await this.citiesService.findById(cityId);
 				if (!city) {
 					throw new NotFoundException('Una de las ciudades no existe');
 				}
+
+				if (isMain) {
+					isMainIndex = i;
+				}
+
 				newAddresses.push({
 					...params,
+					isMain: false,
 					city,
 				});
 			}
+			newAddresses[isMainIndex] = {
+				...newAddresses[isMainIndex],
+				isMain: true,
+			};
 		}
 
 		const newCustomer = await this.customerModel.findByIdAndUpdate(
 			{ _id: id },
 			{
 				$set: {
-					customerType: new Types.ObjectId(customerTypeId),
+					customerType: customerTypeId
+						? new Types.ObjectId(customerTypeId)
+						: undefined,
 					document,
-					documentTypeId: new Types.ObjectId(documentTypeId),
+					documentTypeId: documentTypeId
+						? new Types.ObjectId(documentTypeId)
+						: undefined,
 					user,
 					addresses: newAddresses.length > 0 ? newAddresses : undefined,
 					...params,
@@ -227,11 +248,9 @@ export class CustomersService {
 		if (newCustomer) {
 			await this.orderModel.updateMany(
 				{
-					$set: {
-						'customer._id': new Types.ObjectId(id),
-						status: {
-							$in: [StatusOrder.OPEN, StatusOrder.PENDING],
-						},
+					'customer._id': new Types.ObjectId(id),
+					status: {
+						$in: [StatusOrder.OPEN, StatusOrder.PENDDING],
 					},
 				},
 				{
@@ -239,8 +258,6 @@ export class CustomersService {
 				},
 			);
 		}
-
-		console.log('Actualizado orders');
 
 		return newCustomer;
 	}

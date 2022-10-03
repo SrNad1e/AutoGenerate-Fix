@@ -385,6 +385,10 @@ export class StockAdjustmentService {
 				0,
 			);
 
+			if (newDetails.length === 0) {
+				throw new BadRequestException('El ajuste no puede estar vacío');
+			}
+
 			const response = await this.stockAdjustmetnModel.findByIdAndUpdate(
 				id,
 				{

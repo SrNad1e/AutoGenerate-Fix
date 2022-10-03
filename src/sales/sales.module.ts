@@ -35,6 +35,13 @@ import {
 } from './entities/close-z-invoicing.entity';
 import { ClosesZinvoicingResolver } from './resolvers/closes-zinvoicing.resolver';
 import { CreditsModule } from 'src/credits/credits.module';
+import { AuthorizationsService } from './services/authorizations.service';
+import { AuthorizationsResolver } from './resolvers/authorizations.resolver';
+import {
+	StatusWebHistory,
+	StatusWebHistorySchema,
+} from './entities/status-web-history';
+import { StatusWebHistoriesService } from './services/status-web-histories.service';
 
 @Module({
 	imports: [
@@ -65,7 +72,7 @@ import { CreditsModule } from 'src/credits/credits.module';
 				name: ReturnOrder.name,
 				useFactory: async () => {
 					const schema = ReturnOrderSchema;
-					schema.index({ number: 1, authorization: -1 }, { unique: true });
+					schema.index({ number: 1, company: -1 }, { unique: true });
 					return schema;
 				},
 			},
@@ -95,6 +102,10 @@ import { CreditsModule } from 'src/credits/credits.module';
 				name: AuthorizationDian.name,
 				schema: AuthorizationDianSchema,
 			},
+			{
+				name: StatusWebHistory.name,
+				schema: StatusWebHistorySchema,
+			},
 		]),
 	],
 	providers: [
@@ -110,6 +121,9 @@ import { CreditsModule } from 'src/credits/credits.module';
 		ClosesXinvoicingResolver,
 		ClosesZinvoicingService,
 		ClosesZinvoicingResolver,
+		AuthorizationsService,
+		AuthorizationsResolver,
+		StatusWebHistoriesService,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })

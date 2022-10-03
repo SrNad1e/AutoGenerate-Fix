@@ -1,4 +1,3 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
@@ -44,15 +43,3 @@ export class Size extends Document {
 	id: number;
 }
 export const SizeSchema = SchemaFactory.createForClass(Size);
-
-/*@Entity({ name: 'sizes' })
-export class SizeMysql {
-	@PrimaryGeneratedColumn()
-	id: number;
-
-	@Column({ type: 'varchar' })
-	value: string;
-
-	@Column({ type: 'tinyint' })
-	active: boolean;
-}*/

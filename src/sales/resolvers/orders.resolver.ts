@@ -6,6 +6,8 @@ import {
 } from 'src/configurations/libs/permissions.decorator';
 import { AddPaymentsOrderInput } from '../dtos/add-payments-order-input';
 import { AddProductsOrderInput } from '../dtos/add-products-order-input';
+import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
+import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 import { CreateOrderInput } from '../dtos/create-order-input';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { ResponseOrder } from '../dtos/response-order';
@@ -112,7 +114,27 @@ export class OrdersResolver {
 		return this.ordersService.addProducts(
 			context.req.body.variables.input,
 			context.req.user.user,
-			context.req.companyId,
+			context.req.user.companyId,
+		);
+	}
+
+	@Mutation(() => ResponseOrder, {
+		name: 'confirmProductsOrder',
+		description:
+			'Se encarga de confirmar o desconfirmar productos de un pedido',
+	})
+	@RequirePermissions(Permissions.UPDATE_INVOICING_ORDER)
+	confirmProducts(
+		@Args('confirmProductsOrderInput', {
+			description: 'Productos del pedido para actualizar',
+		})
+		_: ConfirmProductsOrderInput,
+		@Context() context,
+	) {
+		return this.ordersService.confirmProducts(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
@@ -131,6 +153,25 @@ export class OrdersResolver {
 		return this.ordersService.addPayments(
 			context.req.body.variables.input,
 			context.req.user.user,
+		);
+	}
+
+	@Mutation(() => ResponseOrder, {
+		name: 'confirmPaymentsOrder',
+		description: 'Se encarga de confirmar o desconfirmar pagos de un pedido',
+	})
+	@RequirePermissions(Permissions.UPDATE_INVOICING_ORDER)
+	confirmPayments(
+		@Args('confirmPaymentsOrderInput', {
+			description: 'Medios de pago del pedido para actualizar',
+		})
+		_: ConfirmPaymentsOrderInput,
+		@Context() context,
+	) {
+		return this.ordersService.confirmPayments(
+			context.req.body.variables.input,
+			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 }

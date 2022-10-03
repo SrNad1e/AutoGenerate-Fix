@@ -10,7 +10,13 @@ import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { User } from 'src/configurations/entities/user.entity';
-import { StatusExpense } from 'src/treasury/entities/expense.entity';
+import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
+import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
+import { PaymentOrderClose } from '../entities/close-x-invoicing.entity';
+import { BoxService } from 'src/treasury/services/box.service';
+import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
+import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
 
 const populate: PopulateOptions[] = [
 	{
@@ -33,6 +39,10 @@ const populate: PopulateOptions[] = [
 			model: 'Payment',
 		},
 	},
+	{
+		path: 'expenses',
+		model: Expense.name,
+	},
 ];
 
 @Injectable()
@@ -42,7 +52,10 @@ export class ClosesZinvoicingService {
 		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
-		private readonly expensessService: ExpensesService,
+		private readonly expensesService: ExpensesService,
+		private readonly receiptsService: ReceiptsService,
+		private readonly boxesService: BoxService,
+		private readonly errorsCashService: ErrorsCashService,
 	) {}
 
 	async findAll(
@@ -123,18 +136,18 @@ export class ClosesZinvoicingService {
 		}
 
 		const summaryOrder = await this.ordersService.getSummaryOrder(
-			closeDate,
+			closeDate?.split(' ')[0],
 			pointOfSaleId,
 		);
 
-		const dateInitial = dayjs(closeDate).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate).add(1, 'd').format('YYYY/MM/DD');
+		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 
-		const expenses = await this.expensessService.findAll(
+		const expenses = await this.expensesService.findAll(
 			{
 				status: StatusExpense.ACTIVE,
 				limit: 200,
-				boxId: pointOfSaleId,
+				boxId: pointOfSale.box._id.toString(),
 				dateInitial,
 				dateFinal,
 			},
@@ -142,7 +155,7 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-		const closeX = await this.closeZInvoicingModel
+		const closeZ = await this.closeZInvoicingModel
 			.findOne({
 				company: new Types.ObjectId(companyId),
 			})
@@ -151,7 +164,41 @@ export class ClosesZinvoicingService {
 			})
 			.lean();
 
-		const number = (closeX?.number || 0) + 1;
+		const number = (closeZ?.number || 0) + 1;
+
+		const receipts = await this.receiptsService.findAll(
+			{
+				status: StatusReceipt.ACTIVE,
+				limit: 200,
+				pointOfSaleId: pointOfSale._id.toString(),
+				dateInitial,
+				dateFinal,
+			},
+			user,
+			companyId,
+		);
+
+		const payments: PaymentOrderClose[] = [];
+
+		receipts.docs.forEach((receipt) => {
+			const paymentIndex = payments.findIndex(
+				(item) => item.payment.toString() === receipt.payment._id.toString(),
+			);
+
+			if (paymentIndex >= 0) {
+				payments[paymentIndex] = {
+					...payments[paymentIndex],
+					quantity: payments[paymentIndex].quantity + 1,
+					value: payments[paymentIndex].value + receipt.value,
+				};
+			} else {
+				payments.push({
+					payment: receipt.payment._id,
+					quantity: 1,
+					value: receipt.value,
+				});
+			}
+		});
 
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
@@ -159,9 +206,10 @@ export class ClosesZinvoicingService {
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
-			closeDate: new Date(closeDate),
+			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
 			...summaryOrder,
+			payments,
 			user,
 		});
 
@@ -176,6 +224,55 @@ export class ClosesZinvoicingService {
 				user,
 				companyId,
 			);
+
+			const boxMain = await this.boxesService.findOne(
+				{
+					isMain: true,
+				},
+				companyId,
+			);
+
+			const cash = Object.keys(cashRegister)
+				.map((key) => parseInt(key.slice(1)) * cashRegister[key])
+				.reduce((sum, item) => sum + item, 0);
+
+			const total = boxMain?.total + cash;
+
+			await this.boxesService.updateTotal(boxMain._id.toString(), total);
+
+			const box = await this.boxesService.findById(
+				pointOfSale.box._id.toString(),
+			);
+
+			const totalBox = box.total - cash;
+
+			//se valida el cierre si hay cierres y se crea el registro de los errores
+
+			if (totalBox > 0) {
+				await this.errorsCashService.addRegister(
+					{
+						closeZId: response?._id?.toString(),
+						typeError: TypeErrorCash.SURPLUS,
+						value: totalBox,
+					},
+					user,
+					companyId,
+				);
+			}
+
+			if (totalBox < 0) {
+				await this.errorsCashService.addRegister(
+					{
+						closeZId: response?._id?.toString(),
+						typeError: TypeErrorCash.MISSING,
+						value: totalBox * -1,
+					},
+					user,
+					companyId,
+				);
+			}
+
+			await this.boxesService.updateTotal(box._id.toString(), 0);
 		}
 
 		return {

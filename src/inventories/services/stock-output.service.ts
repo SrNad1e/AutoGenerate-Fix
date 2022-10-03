@@ -360,6 +360,10 @@ export class StockOutputService {
 				0,
 			);
 
+			if (newDetails.length === 0) {
+				throw new BadRequestException('La salida no puede estar vacía');
+			}
+
 			const response = await this.stockOutputModel.findByIdAndUpdate(
 				id,
 				{

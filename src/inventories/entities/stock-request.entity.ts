@@ -42,7 +42,7 @@ export class StockRequest extends Document {
 	_id: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Número consecutivo de identificación' })
-	@Prop({ type: Number, default: 0, unique: true })
+	@Prop({ type: Number, required: true })
 	number: number;
 
 	@Field(() => StatusStockRequest, {

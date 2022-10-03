@@ -24,6 +24,12 @@ export class SortConveyor {
 @InputType({ description: 'Filtros para obtener listado de transportadoras' })
 export class FiltersConveyorsInput {
 	@Field(() => String, {
+		description: 'Identificador de la transportadora',
+		nullable: true,
+	})
+	_id?: string;
+
+	@Field(() => String, {
 		description: 'Nombre de la transportadora',
 		nullable: true,
 	})

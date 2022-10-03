@@ -57,6 +57,9 @@ export class Address {
 		nullable: true,
 	})
 	isMain: boolean;
+
+	@Field(() => String, { description: 'Código postal', nullable: true })
+	postalCode?: string;
 }
 
 @Schema({ timestamps: true })

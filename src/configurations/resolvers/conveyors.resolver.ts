@@ -4,8 +4,9 @@ import {
 	Permissions,
 	RequirePermissions,
 } from 'src/configurations/libs/permissions.decorator';
+import { ConveyorOrder } from 'src/sales/entities/order.entity';
 import { FiltersConveyorsInput } from '../dtos/filters-conveyors.input';
-import { ResponseConveyors } from '../dtos/response-conveyors.input';
+import { ResponseConveyors } from '../dtos/response-conveyors';
 import { ConveyorsService } from '../services/conveyors.service';
 
 @Resolver()
@@ -14,7 +15,7 @@ export class ConveyorsResolver {
 
 	@Query(() => ResponseConveyors, {
 		name: 'conveyors',
-		description: 'Lista de ajustes de productos',
+		description: 'Lista de transportadoras',
 	})
 	@RequirePermissions(Permissions.READ_CONFIGURATION_CONVEYORS)
 	findAll(
@@ -28,5 +29,20 @@ export class ConveyorsResolver {
 		@Context() context,
 	) {
 		return this.conveyorsService.findAll(context.req.body.variables.input);
+	}
+
+	@Query(() => [ConveyorOrder], {
+		name: 'conveyorsOrder',
+		description: 'Lista de transportadoras para el pedido',
+	})
+	@RequirePermissions(Permissions.READ_CONFIGURATION_CONVEYORS)
+	getAllByOrder(
+		@Args({
+			name: 'orderId',
+			description: 'Identificador del pedido',
+		})
+		orderId: string,
+	) {
+		return this.conveyorsService.getAllByOrder(orderId);
 	}
 }

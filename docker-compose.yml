@@ -8,21 +8,14 @@ services:
       - mongo
     environment:
       PORT: 8080
+      #Mongo
       MONGO_DB: pos_qa
-      #MONGO_USER: clientUser
       MONGO_USER: cirotex
-      #MONGO_PASSWORD: B8g5UsdguLTm62Ef
       MONGO_PASSWORD: prueba
       MONGO_PORT: 27017
-      #MONGO_HOST: toulouse.gtczv.mongodb.net
       MONGO_HOST: mongo
-      #MONGO_CONNECTION: mongodb+srv
       MONGO_CONNECTION: mongodb
-      MARIADB_DB: pos_qa
-      MARIADB_USER: root
-      MARIADB_PASSWORD: 1234
-      MARIADB_PORT: 3306
-      MARIADB_HOST: mysql
+      # JWT
       SECRET_TOKEN: prueba
       EXPIRE_TOKEN: 24h
       # Nodemailer
@@ -36,6 +29,19 @@ services:
       AWS_ACCESS_KEY_ID: AKIA5MNQTDPXCZ3Y225G
       AWS_SECRET_ACCESS_KEY: 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
       AWS_PUBLIC_BUCKET_NAME: admin-z1bt76x1jqpz961o43xt3ik7pzhd6use1a-s3alias
+      # Interapidisimo
+      INTER_API: https://stgwww3.interrapidisimo.com
+      INTER_SIGNATURE: userManufacturasSTG
+      INTER_AUTHORIZATION: bearer xn7PLu7KCmgS7uq2D7JkC_44DBN99-vTrXE2BHkh4eTKd7sOzQG5MdqRK74eaRsULyP5z4lkJsQDzyNNZwSJRzHbpESCnQx7L7GTI3ZXswLugl1CrdUbVbXKoE6u07HfZsfRzXEfsVKxQHwUS-khx2m73zpoMb8xwU41GaUTvjxupa_mIQtxzorUyI86cruaPKaSCwPib1uZtdkzHhfG2jqnGIi3OYAIDWGMWAMnzVyigSfmkk6ise76zLmPhAkc
+      INTER_CITY_DEFAULT: "05360000"
+      INTER_CLIENT_ID: 4281
+      # Fedex
+      FEDEX_API: https://apis-sandbox.fedex.com
+      FEDEX_CLIENT_ID: l71770d83ad25a4b3d961c3ed8ab48ec88
+      FEDEX_CLIENT_SECRET: dc0838dab7bc4c75be8db1adbead2f20
+      FEDEX_ACCOUNT_NUMBER: 740561073
+      FEDEX_POSTAL_CODE_DEFAULT: "055411"
+      FEDEX_COUNTRY_DEFAULT: CO
     ports:
       - "8080:8080"
     volumes:

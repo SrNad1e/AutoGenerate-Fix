@@ -1,16 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
+import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 
+import { User } from 'src/configurations/entities/user.entity';
+import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
+import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { ExpensesService } from 'src/treasury/services/expenses.service';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
-import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
+import {
+	CloseXInvoicing,
+	PaymentOrderClose,
+} from '../entities/close-x-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
-import { User } from 'src/configurations/entities/user.entity';
-import { StatusExpense } from 'src/treasury/entities/expense.entity';
 
 const populate: PopulateOptions[] = [
 	{
@@ -33,6 +38,10 @@ const populate: PopulateOptions[] = [
 			model: 'Payment',
 		},
 	},
+	{
+		path: 'expenses',
+		model: Expense.name,
+	},
 ];
 
 @Injectable()
@@ -42,7 +51,8 @@ export class ClosesXInvoicingService {
 		private readonly closeXInvoicingModel: PaginateModel<CloseXInvoicing>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
-		private readonly expensessService: ExpensesService,
+		private readonly expensesService: ExpensesService,
+		private readonly receiptsService: ReceiptsService,
 	) {}
 
 	async findAll(
@@ -64,7 +74,7 @@ export class ClosesXInvoicingService {
 		}
 
 		if (closeDate) {
-			filters.closeDate = new Date(closeDate);
+			filters.closeDate = new Date(closeDate.split(' ')[0]);
 		}
 
 		if (number) {
@@ -73,7 +83,9 @@ export class ClosesXInvoicingService {
 
 		if (shopId) {
 			const pointOfSales = await this.pointOfSalesService.findAll(
-				{ shopId },
+				{
+					shopId,
+				},
 				user,
 				companyId,
 			);
@@ -83,7 +95,9 @@ export class ClosesXInvoicingService {
 					(pointOfSale) => new Types.ObjectId(pointOfSale._id),
 				);
 
-				filters.pointOfSale = { $in: ids };
+				filters.pointOfSale = {
+					$in: ids,
+				};
 			} else {
 				filters.pointOfSale = '';
 			}
@@ -115,18 +129,18 @@ export class ClosesXInvoicingService {
 		}
 
 		const summaryOrder = await this.ordersService.getSummaryOrder(
-			closeDate,
+			closeDate?.split(' ')[0],
 			pointOfSaleId,
 		);
 
-		const dateInitial = dayjs(closeDate).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate).add(1, 'd').format('YYYY/MM/DD');
+		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 
-		const expenses = await this.expensessService.findAll(
+		const expenses = await this.expensesService.findAll(
 			{
 				status: StatusExpense.ACTIVE,
 				limit: 200,
-				boxId: pointOfSaleId,
+				boxId: pointOfSale.box._id.toString(),
 				dateInitial,
 				dateFinal,
 			},
@@ -135,15 +149,45 @@ export class ClosesXInvoicingService {
 		);
 
 		const closeX = await this.closeXInvoicingModel
-			.findOne({
-				company: new Types.ObjectId(companyId),
-			})
-			.sort({
-				_id: -1,
-			})
+			.findOne({ company: new Types.ObjectId(companyId) })
+			.sort({ _id: -1 })
 			.lean();
 
 		const number = (closeX?.number || 0) + 1;
+
+		const receipts = await this.receiptsService.findAll(
+			{
+				status: StatusReceipt.ACTIVE,
+				limit: 200,
+				pointOfSaleId: pointOfSale._id.toString(),
+				dateInitial,
+				dateFinal,
+			},
+			user,
+			companyId,
+		);
+
+		const payments: PaymentOrderClose[] = [];
+
+		receipts.docs.forEach((receipt) => {
+			const paymentIndex = payments.findIndex(
+				(item) => item.payment.toString() === receipt.payment._id.toString(),
+			);
+
+			if (paymentIndex >= 0) {
+				payments[paymentIndex] = {
+					...payments[paymentIndex],
+					quantity: payments[paymentIndex].quantity + 1,
+					value: payments[paymentIndex].value + receipt.value,
+				};
+			} else {
+				payments.push({
+					payment: receipt.payment._id,
+					quantity: 1,
+					value: receipt.value,
+				});
+			}
+		});
 
 		const newClose = new this.closeXInvoicingModel({
 			cashRegister: cashRegister,
@@ -151,9 +195,10 @@ export class ClosesXInvoicingService {
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
-			closeDate: new Date(closeDate),
+			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
 			...summaryOrder,
+			payments,
 			user,
 		});
 

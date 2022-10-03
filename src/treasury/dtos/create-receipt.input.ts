@@ -16,6 +16,11 @@ export class CreateReceiptInput {
 	})
 	boxId: string;
 
+	@Field(() => String, {
+		description: 'Identificador del punto de venta',
+	})
+	pointOfSaleId: string;
+
 	@Field(() => Number, { description: 'Valor del recibo' })
 	value: number;
 

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import {
@@ -9,8 +8,6 @@ import {
 import { ProductsModule } from 'src/products/products.module';
 import {
 	StockTransfer,
-	StockTransferDetailMysql,
-	StockTransferMysql,
 	StockTransferSchema,
 } from './entities/stock-transfer.entity';
 import { StockInput, StockInputSchema } from './entities/stock-input.entity';
@@ -40,12 +37,17 @@ import {
 	ReturnOrder,
 	ReturnOrderSchema,
 } from 'src/sales/entities/return-order.entity';
+import {
+	StockTransferError,
+	StockTransferErrorSchema,
+} from './entities/stock-trasnsfer-error.entity';
+import { StockTransferErrorsService } from './services/stock-transfer-errors.service';
+import { StockTransferErrorsResolver } from './resolvers/stock-transfer-errors.resolver';
 
 @Module({
 	imports: [
 		ProductsModule,
 		ConfigurationsModule,
-		//TypeOrmModule.forFeature([StockTransferDetailMysql, StockTransferMysql]),
 		MongooseModule.forFeature([
 			{
 				name: StockTransfer.name,
@@ -79,6 +81,10 @@ import {
 				name: ReturnOrder.name,
 				schema: ReturnOrderSchema,
 			},
+			{
+				name: StockTransferError.name,
+				schema: StockTransferErrorSchema,
+			},
 		]),
 	],
 	providers: [
@@ -93,6 +99,8 @@ import {
 		StockAdjustmentService,
 		StockOutputResolver,
 		StockAdjustmentResolver,
+		StockTransferErrorsService,
+		StockTransferErrorsResolver,
 	],
 	controllers: [],
 	exports: [StockHistoryService],

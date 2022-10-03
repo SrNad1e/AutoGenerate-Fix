@@ -14,6 +14,15 @@ export enum StatusReceipt {
 
 registerEnumType(StatusReceipt, { name: 'StatusReceipt' });
 
+@ObjectType({ description: 'Detalles del recibo' })
+export class DetailReceipt {
+	@Field(() => String, { description: 'Identificador del pedido' })
+	orderId: string;
+
+	@Field(() => Number, { description: 'Monto para abonar al pedido' })
+	amount: number;
+}
+
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Egreso de dinero' })
 export class Receipt extends Document {
@@ -34,6 +43,10 @@ export class Receipt extends Document {
 	})
 	@Prop({ type: String })
 	concept: string;
+
+	@Field(() => [DetailReceipt], { description: 'Detalle del cruce del recibo' })
+	@Prop({ type: Array })
+	details: DetailReceipt[];
 
 	@Field(() => StatusReceipt, {
 		description: 'Estado del recibo de caja',
@@ -58,6 +71,15 @@ export class Receipt extends Document {
 		ref: 'Box',
 	})
 	box?: Types.ObjectId;
+
+	@Field(() => Box, {
+		description: 'Punto de venta que genera el recibo',
+	})
+	@Prop({
+		type: Types.ObjectId,
+		ref: '¨PointOfSale',
+	})
+	pointOfSale?: Types.ObjectId;
 
 	@Field(() => Company, {
 		description: 'Empresa a la que pertenece el recibo de caja',

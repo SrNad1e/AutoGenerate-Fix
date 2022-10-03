@@ -1,5 +1,12 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { StatusOrder } from '../entities/order.entity';
+import { StatusWeb } from '../entities/status-web-history';
+
+@InputType({ description: 'País entrada' })
+export class CountryInput {
+	@Field(() => String, { description: 'Nombre del país' })
+	name: string;
+}
 
 @InputType({ description: 'Ciudad entrada' })
 export class CityInput {
@@ -12,8 +19,8 @@ export class CityInput {
 	@Field(() => String, { description: 'Departamento' })
 	state: string;
 
-	@Field(() => String, { description: 'País' })
-	country: string;
+	@Field(() => CountryInput, { description: 'País' })
+	country: CountryInput;
 
 	@Field(() => Date, { description: 'Fecha de creación', nullable: true })
 	createdAt?: Date;
@@ -96,4 +103,10 @@ export class UpdateOrderInput {
 		nullable: true,
 	})
 	address?: AddressInputOrder;
+
+	@Field(() => StatusWeb, {
+		description: 'Estado que se aplicará al pedid web',
+		nullable: true,
+	})
+	statusWeb?: StatusWeb;
 }

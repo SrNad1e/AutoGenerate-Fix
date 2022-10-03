@@ -169,11 +169,25 @@ export class CreditsService {
 					}
 					available = available - detailAddCredit?.total;
 					balance = balance + detailAddCredit?.total;
-					details.push({
-						order: new Types.ObjectId(detailAddCredit?.orderId),
-						balance: detailAddCredit?.total,
-						total: detailAddCredit?.total,
-					});
+
+					const detailIndex = credit.details.findIndex(
+						(detail) =>
+							detail?.order?._id?.toString() === detailAddCredit?.orderId,
+					);
+
+					if (detailIndex >= 0) {
+						details[detailIndex] = {
+							order: new Types.ObjectId(detailAddCredit?.orderId),
+							balance: details[detailIndex].balance + detailAddCredit?.total,
+							total: detailAddCredit?.total,
+						};
+					} else {
+						details.push({
+							order: new Types.ObjectId(detailAddCredit?.orderId),
+							balance: detailAddCredit?.total,
+							total: detailAddCredit?.total,
+						});
+					}
 					break;
 				case TypeCreditHistory.DEBIT:
 					if (detailAddCredit?.total > balance) {
@@ -211,7 +225,7 @@ export class CreditsService {
 							`El crédito del cliente no tiene cupo congelado disponible para liberar, cupo $ ${frozenAmount}`,
 						);
 					}
-					available = available - detailAddCredit?.total;
+					available = available + detailAddCredit?.total;
 					frozenAmount = frozenAmount - detailAddCredit?.total;
 					break;
 				default:
@@ -253,13 +267,21 @@ export class CreditsService {
 		type: TypeCreditHistory,
 	) {
 		switch (type) {
-			case TypeCreditHistory.CREDIT || TypeCreditHistory.FROZEN:
+			case TypeCreditHistory.CREDIT:
 				return this.creditModel.findOne({
 					customer: new Types.ObjectId(customerId),
 					available: {
 						$gte: amount,
 					},
 				});
+			case TypeCreditHistory.FROZEN:
+				return await this.creditModel.findOne({
+					customer: new Types.ObjectId(customerId),
+					available: {
+						$gte: amount,
+					},
+				});
+
 			case TypeCreditHistory.DEBIT:
 				return this.creditModel.findOne({
 					customer: new Types.ObjectId(customerId),

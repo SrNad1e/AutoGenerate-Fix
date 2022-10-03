@@ -70,6 +70,9 @@ input AddProductsOrderInput {
   """Productos a crear o actualizar"""
   details: [DetailAddProductsOrderInput!]!
 
+  """El pedido es mayorista"""
+  isWholesaler: Boolean
+
   """Id del pedido que se requiere agreagr o editar productos"""
   orderId: String!
 }
@@ -105,6 +108,9 @@ type Address {
 
   """Teléfono del contacto"""
   phone: String!
+
+  """Código postal"""
+  postalCode: String
 }
 
 """Dirección del cliente"""
@@ -199,8 +205,20 @@ type AuthorizationDian {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía a la que pertenece la autorización"""
+  company: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
   """Prefijo de autorización"""
   prefix: String!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la autorización de facturación"""
+  user: User!
 }
 
 """Caja donde se deposita el dinero"""
@@ -397,11 +415,17 @@ type City {
   """Identificador de mongo"""
   _id: String!
 
+  """Código DANE"""
+  code: String!
+
   """País"""
-  country: String!
+  country: Country!
 
   """Fecha de creación"""
   createdAt: DateTime!
+
+  """Código postal"""
+  defaultPostalCode: String!
 
   """Nombre de la ciudad"""
   name: String!
@@ -414,6 +438,9 @@ type City {
 
   """Usuario que creó o editó la ciudad"""
   user: User!
+
+  """Zona a la que pertenece la ciudad"""
+  zone: ZoneType!
 }
 
 """Ciudad entrada"""
@@ -422,7 +449,7 @@ input CityInput {
   _id: String!
 
   """País"""
-  country: String!
+  country: CountryInput!
 
   """Fecha de creación"""
   createdAt: DateTime
@@ -541,9 +568,6 @@ type Color {
   """Color en formato html"""
   html: String!
 
-  """Identificador del color mysql"""
-  id: Float @deprecated(reason: "Campo para migración de mysql")
-
   """Imagen del color"""
   image: Image
 
@@ -608,6 +632,24 @@ type Company {
   user: User!
 }
 
+"""Datos para confirmar productos"""
+input ConfirmPaymentsOrderInput {
+  """Identificador del pedido a confirmar los pagos"""
+  orderId: String!
+
+  """Pagos a confirmar"""
+  payments: [PaymentConfirm!]!
+}
+
+"""Datos para confirmar productos"""
+input ConfirmProductsOrderInput {
+  """Productos a confirmar"""
+  details: [DetailsConfirm!]!
+
+  """Identificador del pedido a confirmar productos"""
+  orderId: String!
+}
+
 """Datos para confirmar los productos del traslado"""
 input ConfirmStockTransferInput {
   """Productos para confirmar"""
@@ -622,17 +664,68 @@ type Conveyor {
   """Fecha de creación de la transportadora"""
   createdAt: DateTime!
 
+  """Precio por defecto"""
+  defaultPrice: Float!
+
   """Logo de la tranportadora"""
   logo: Image!
 
+  """Mensaje para el usuario"""
+  message: String
+
   """Nombre de la transportadora"""
   name: String!
+
+  """Precios por región solo para type ZONE"""
+  rates: [RatesRegion!]
+
+  """Tipo de transportadora"""
+  type: ConveyorType!
 
   """Fecha de actualización de la transportadora"""
   updatedAt: DateTime!
 
   """Usuario que crea la transportadora"""
   user: User!
+}
+
+"""Transportadora que realiza el envio"""
+type ConveyorOrder {
+  """Datos del transportista"""
+  conveyor: Conveyor!
+
+  """Error del médio de pago"""
+  error: String
+
+  """Código de la guia del transportista"""
+  guideCode: String
+
+  """Fecha en el que se realiza el envío"""
+  shippingDate: DateTime
+
+  """Valor del envío"""
+  value: Float!
+}
+
+enum ConveyorType {
+  FEDEX
+  INTERRAPIDISIMO
+  ZONE
+}
+
+"""Pais"""
+type Country {
+  """Nombre del país"""
+  name: String!
+
+  """Prefijo del país"""
+  prefix: String!
+}
+
+"""País entrada"""
+input CountryInput {
+  """Nombre del país"""
+  name: String!
 }
 
 """Cupones para pagos"""
@@ -680,6 +773,24 @@ input CreateAttribInput {
   name: String!
 }
 
+"""Datos para la creación de una autorización"""
+input CreateAuthorizationInput {
+  """Prefijo de facturación"""
+  prefix: String!
+}
+
+"""Datos para crear la caja"""
+input CreateBoxInput {
+  """Cantidad de la base para la caja"""
+  base: Float!
+
+  """Es caja principal de la compañía"""
+  isMain: Boolean
+
+  """Nombre de la caja"""
+  name: String!
+}
+
 """Datos para crear una marca"""
 input CreateBrandInput {
   """Nombre de la marca"""
@@ -696,6 +807,30 @@ input CreateCategoryInput {
 
   """Identificador de la categoría padre"""
   parentId: String
+}
+
+"""Datos para crear una ciudad"""
+input CreateCityInput {
+  """Código DANE"""
+  code: String!
+
+  """Nombre del país"""
+  countryName: String!
+
+  """Prefijo del país"""
+  countryPrefix: String!
+
+  """Código postal de la ciudad por defecto"""
+  defaultPostalCode: String!
+
+  """Nombre de la ciudad"""
+  name: String!
+
+  """Nombre del departamento"""
+  state: String!
+
+  """Tipo de zona"""
+  zone: ZoneType!
 }
 
 """Datos para crear un cierre X"""
@@ -743,6 +878,42 @@ input CreateColorInput {
   name_internal: String!
 }
 
+"""Datos para crear empresa"""
+input CreateCompanyInput {
+  """Dirección de la empresa"""
+  address: String!
+
+  """Documento de la empresa"""
+  document: String!
+
+  """Url del logo de la empresa"""
+  logo: String!
+
+  """Nombre de la empresa"""
+  name: String!
+
+  """Teléfono de la empresa"""
+  phone: String!
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean
+}
+
+"""Datos para la creación del cupón"""
+input CreateCouponInput {
+  """Fecha de expiración para el cupón"""
+  expiration: DateTime!
+
+  """Mensaje del cupón"""
+  message: String!
+
+  """Titulo del cupón"""
+  title: String!
+
+  """Monto para crear el cupón"""
+  value: Float!
+}
+
 """Datos para crear un crédito"""
 input CreateCreditInput {
   """Monto de crédigo aprobado"""
@@ -788,6 +959,27 @@ input CreateCustomerInput {
   phone: String
 }
 
+"""Datos para crear un descuento"""
+input CreateDiscountRuleInput {
+  """Fecha final para aplicar el descuento"""
+  dateFinal: String!
+
+  """Fecha inicial para aplicar el descuento"""
+  dateInitial: String!
+
+  """Nombre del descuento"""
+  name: String!
+
+  """Porcentaje del descuento"""
+  percent: Float
+
+  """Reglas a aplicar"""
+  rules: [RuleInput!]!
+
+  """Valor del descuento"""
+  value: Float
+}
+
 """Datos para crear Egreso"""
 input CreateExpenseInput {
   """Identificador de la caja"""
@@ -804,6 +996,39 @@ input CreateExpenseInput {
 input CreateOrderInput {
   """Estado del pedido"""
   status: StatusOrder!
+}
+
+"""Datos para crear un método de pago"""
+input CreatePaymentInput {
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logoId: String
+
+  """Mensaje para el medio de pago"""
+  message: String
+
+  """Nombre del método de pago"""
+  name: String!
+
+  """Tipo de método de pago"""
+  type: TypePayment!
+}
+
+"""Datos para crear un punto de venta"""
+input CreatePointOfSaleInput {
+  """Identificador de la autorización de facturación"""
+  autorizationId: String!
+
+  """Identificador de la caja asignada"""
+  boxId: String!
+
+  """Nombre del punto de venta"""
+  name: String!
+
+  """Identificador de la tienda a la que pertence"""
+  shopId: String!
 }
 
 """Datos para crear un producto"""
@@ -834,6 +1059,9 @@ input CreateReceiptInput {
 
   """Identificador del medio de pago"""
   paymentId: String!
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String!
 
   """Valor del recibo"""
   value: Float!
@@ -914,6 +1142,30 @@ input CreateRoleInput {
 
   """Identificadores de los permisos asignados"""
   permissionIds: [String!]!
+}
+
+"""Datos para la creación de la tienda"""
+input CreateShopInput {
+  """Dirección de la tienda"""
+  address: String!
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String!
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String!
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
 }
 
 """Datos para crear una talla"""
@@ -1014,6 +1266,9 @@ input CreateUserInput {
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
+  """Identifica si el usuario es web"""
+  isWeb: Boolean
+
   """Nombre del usuario"""
   name: String!
 
@@ -1034,6 +1289,18 @@ input CreateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para la creacion de una bodega"""
+input CreateWarehouseInput {
+  """Inventario máximo de productos"""
+  max: Float!
+
+  """Inventario mínimo de productos"""
+  min: Float!
+
+  """Nombre de la bodega"""
+  name: String!
 }
 
 """Crédito del cliente"""
@@ -1157,9 +1424,6 @@ type CustomerType {
 
   """Fecha de creación"""
   createdAt: DateTime!
-
-  """Descuento al tipo de cliente"""
-  discount: Float!
 
   """Nombre del tipo de cliente"""
   name: String!
@@ -1287,7 +1551,7 @@ type DetailOrder {
   quantityReturn: Float!
 
   """Estado del producto"""
-  status: String!
+  status: StatusOrderDetail!
 
   """Fecha de actualizado del producto al pedido"""
   updatedAt: DateTime!
@@ -1306,6 +1570,15 @@ type DetailOutput {
 
   """Fecha de actualización del detalle a la salida"""
   updatedAt: DateTime!
+}
+
+"""Detalles del recibo"""
+type DetailReceipt {
+  """Monto para abonar al pedido"""
+  amount: Float!
+
+  """Identificador del pedido"""
+  orderId: String!
 }
 
 """Detalles de cruce de la cartera"""
@@ -1478,6 +1751,72 @@ type DetailTransfer {
   updatedAt: DateTime!
 }
 
+"""Detalle del traslado de productos"""
+type DetailTransferError {
+  """Producto del detalle"""
+  product: Product!
+
+  """Cantidad del productos en el traslado"""
+  quantity: Float!
+
+  """Motivo del proceso"""
+  reason: String
+
+  """Estado del producto"""
+  status: StatusDetailTransferError!
+
+  """Fecha de actualización del traslado"""
+  updatedAt: DateTime!
+
+  """Usuario que valida el error"""
+  user: User
+}
+
+"""Producto para confirmar en el pedido"""
+input DetailsConfirm {
+  """Producto a confirmar"""
+  productId: String!
+
+  """Estado del producto, si es diferente a confirm"""
+  status: StatusOrderDetail
+}
+
+"""Reglas de descuento"""
+type DiscountRule {
+  """Identificación de mongo"""
+  _id: String!
+
+  """Descuenti activo"""
+  active: Boolean!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Fecha y hora del final del descuento"""
+  dateFinal: DateTime!
+
+  """Fecha y hora de inicio del descuento"""
+  dateInitial: DateTime!
+
+  """Nombre de la regla"""
+  name: String!
+
+  """Valor del porcentaje del descuento"""
+  percent: Float!
+
+  """Reglas para aplicar el descuento"""
+  rules: [Rule!]!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el descuento"""
+  user: User!
+
+  """Valor del descuento"""
+  value: Float!
+}
+
 """Tipo de documento de identificación"""
 type DocumentType {
   """Identificador de mongo"""
@@ -1499,9 +1838,11 @@ type DocumentType {
   user: User!
 }
 
-enum DocumentTypesRuler {
+enum DocumentTypesRule {
   CATEGORIES
+  COMPANY
   CUSTOMERTYPES
+  SHOPS
 }
 
 """Egreso de dinero"""
@@ -1558,10 +1899,28 @@ input FiltersAttribsInput {
   sort: SortAttrib
 }
 
+"""Filtros para consultar las autorizaciones"""
+input FiltersAuthorizationInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Prefijo de facturación"""
+  prefix: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortAuthorization
+}
+
 """Filtros para consultar la cajas"""
 input FiltersBoxesInput {
   """Identificador de la caja"""
   _id: String
+
+  """Es caja principal"""
+  isMain: Boolean
 
   """Cantidad de registros"""
   limit: Float
@@ -1571,6 +1930,9 @@ input FiltersBoxesInput {
 
   """Página actual"""
   page: Float
+
+  """Ordenamiento"""
+  sort: SortBox
 }
 
 """Filtros para la lista de marcas"""
@@ -1723,8 +2085,29 @@ input FiltersColorsInput {
   sort: SortColor
 }
 
+"""Filtros para obtener listado de compañías"""
+input FiltersCompaniesInput {
+  """Estado de la compañía"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comódin para buscar por nombre o documento"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCompany
+}
+
 """Filtros para obtener listado de transportadoras"""
 input FiltersConveyorsInput {
+  """Identificador de la transportadora"""
+  _id: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -1742,6 +2125,27 @@ input FiltersConveyorsInput {
 input FiltersCouponInput {
   """Código del cupón"""
   code: String
+
+  """Estado del cupón"""
+  status: StatusCoupon
+}
+
+"""Filtros para consultar los cupones"""
+input FiltersCouponsInput {
+  """Código del cupón"""
+  code: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Número consecutivo del cupón"""
+  number: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortCoupon
 
   """Estado del cupón"""
   status: StatusCoupon
@@ -1815,6 +2219,9 @@ input FiltersCustomerTypesInput {
 
 """Filtros de listado de clientes"""
 input FiltersCustomersInput {
+  """Identificdor de un usuario"""
+  _id: String
+
   """Si el cliente se encuentra activo"""
   active: Boolean
 
@@ -1831,6 +2238,30 @@ input FiltersCustomersInput {
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortCustomer
+}
+
+"""Filtros para consultar las reglas de descuentos"""
+input FiltersDiscountRulesInput {
+  """Si el descuento se encuentra activo"""
+  active: Boolean
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para el nombre de la regla"""
+  name: String
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Porcentaje del descuento"""
+  percent: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortDiscountRule
+
+  """Valor en cantidad del descuento"""
+  value: Float
 }
 
 """Filtros para los tipos de documento"""
@@ -1919,11 +2350,14 @@ input FiltersOrdersInput {
   """Cantidad de registros"""
   limit: Float
 
+  """Estado del pedido que no quiere consultar"""
+  nonStatus: [StatusOrder!]
+
   """Número consecutivo del pedido"""
   number: Float
 
   """Trae los pedidos POS solamente"""
-  orderPOS: Boolean
+  orderPos: Boolean
 
   """Desde donde arranca la página"""
   page: Float
@@ -1936,6 +2370,9 @@ input FiltersOrdersInput {
 
   """Estado del pedido"""
   status: StatusOrder
+
+  """Estado del pedido Web"""
+  statusWeb: StatusWeb
 }
 
 """Filtros para obtener el listado de tipos de medios de pago"""
@@ -2044,6 +2481,9 @@ input FiltersProductsInput {
 
 """Filtros para consultar los recibos de caja"""
 input FiltersReceiptsInput {
+  """Caja que afecta el pago"""
+  boxId: String
+
   """Fecha final para la busqueda"""
   dateFinal: String
 
@@ -2061,6 +2501,9 @@ input FiltersReceiptsInput {
 
   """Identificador del medio de pago"""
   paymentId: String
+
+  """Punto de venta del pago"""
+  pointOfSaleId: String
 
   """Ordenamiento"""
   sort: SortReceipt
@@ -2337,6 +2780,21 @@ input FiltersStockRequestsInput {
 }
 
 """Filtros para el listado de traslados de productos"""
+input FiltersStockTransfersErrorInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortStockTransferError
+
+  """Si el traslado esta o no verificado por completo"""
+  verifield: Boolean
+}
+
+"""Filtros para el listado de traslados de productos"""
 input FiltersStockTransfersInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -2370,6 +2828,9 @@ input FiltersStockTransfersInput {
 input FiltersUsersInput {
   """Identificador del tipo de cliente"""
   customerTypeId: String
+
+  """Selecciona si es usuario web o no"""
+  isWeb: Boolean
 
   """Cantidad de registros"""
   limit: Float
@@ -2525,6 +2986,27 @@ type Mutation {
     addProductsOrderInput: AddProductsOrderInput!
   ): ResponseOrder!
 
+  """Se encarga de cambiar la clave al usuario con base al tokenu"""
+  changePasswordToken(
+    """Nueva contraseña"""
+    password: String!
+
+    """Token generado para validar el cambio de clave"""
+    token: String!
+  ): LoginResponse!
+
+  """Se encarga de confirmar o desconfirmar pagos de un pedido"""
+  confirmPaymentsOrder(
+    """Medios de pago del pedido para actualizar"""
+    confirmPaymentsOrderInput: ConfirmPaymentsOrderInput!
+  ): ResponseOrder!
+
+  """Se encarga de confirmar o desconfirmar productos de un pedido"""
+  confirmProductsOrder(
+    """Productos del pedido para actualizar"""
+    confirmProductsOrderInput: ConfirmProductsOrderInput!
+  ): ResponseOrder!
+
   """Confirma los productos del traslado"""
   confirmProductsStockTransfer(
     """Datos para confirmar los productos del traslado"""
@@ -2540,6 +3022,18 @@ type Mutation {
     createAttribInput: CreateAttribInput!
   ): Attrib!
 
+  """Crea una autorización de facturación"""
+  createAuthorization(
+    """Datos para crear la autorización de facturación"""
+    createAuthorizationInput: CreateAuthorizationInput!
+  ): AuthorizationDian!
+
+  """Crea una caja"""
+  createBox(
+    """Datos para la creación de la caja"""
+    createBoxInput: CreateBoxInput!
+  ): Box!
+
   """Crea una marca"""
   createBrand(
     """Datos para crear una marca"""
@@ -2551,6 +3045,12 @@ type Mutation {
     """Datos para crear una categoría"""
     createCategoryInput: CreateCategoryInput!
   ): CategoryLevel1!
+
+  """Crea una ciudad"""
+  createCity(
+    """Datos para la creación de la ciudad"""
+    createCityInput: CreateCityInput!
+  ): City!
 
   """Crea un cierre X de facturación"""
   createCloseXInvoicing(
@@ -2570,6 +3070,18 @@ type Mutation {
     createColorInput: CreateColorInput!
   ): Color!
 
+  """Crea una compañía"""
+  createCompany(
+    """Datos para la creación de la compañía"""
+    createCompanyInput: CreateCompanyInput!
+  ): Company!
+
+  """Se encarga crear un cupón"""
+  createCoupon(
+    """Parámetros para actualizar el cupoón"""
+    createCouponInput: CreateCouponInput!
+  ): Coupon!
+
   """Asigna el crédito a un cliente"""
   createCredit(
     """Datos para crear un crédito"""
@@ -2582,6 +3094,12 @@ type Mutation {
     createCustomerInput: CreateCustomerInput!
   ): Customer!
 
+  """Se encarga crear un descuento"""
+  createDiscountRule(
+    """Parámetros para crear el descuento"""
+    createDiscountRuleInput: CreateDiscountRuleInput!
+  ): DiscountRule!
+
   """Crea un egreso"""
   createExpense(
     """Datos para la creación del egreso"""
@@ -2593,6 +3111,18 @@ type Mutation {
     """Parámetros para la creación del pedido"""
     createOrderInput: CreateOrderInput!
   ): ResponseOrder!
+
+  """Crea un método de pago"""
+  createPayment(
+    """Datos para la creación del método de pago"""
+    createPaymentInput: CreatePaymentInput!
+  ): Payment!
+
+  """Se encarga de crear el punto de venta"""
+  createPointOfSale(
+    """Parámetros para la creación del punto de venta"""
+    createPointOfSaleInput: CreatePointOfSaleInput!
+  ): PointOfSale!
 
   """Crea un producto"""
   createProduct(
@@ -2623,6 +3153,12 @@ type Mutation {
     """Datos para la creación del rol"""
     createRoleInput: CreateRoleInput!
   ): Role!
+
+  """Crea una tienda"""
+  createShop(
+    """Datos para la creación de la tienda"""
+    createShopInput: CreateShopInput!
+  ): Shop!
 
   """Crear una talla"""
   createSize(
@@ -2664,6 +3200,12 @@ type Mutation {
     createUserInput: CreateUserInput!
   ): User!
 
+  """Crea una bodega"""
+  createWarehouse(
+    """Datos para la creación de la bodega"""
+    createWarehouseInput: CreateWarehouseInput!
+  ): Warehouse!
+
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
     """Tienda para validar el inventario"""
@@ -2675,6 +3217,12 @@ type Mutation {
     """Datos de usuario para realizar el login"""
     loginUserInput: LoginUserInput!
   ): LoginResponse!
+
+  """Se encarga de enviar correo de recuperación de contraseña"""
+  recoveryPassword(
+    """Correo del usuario que se desea recuperar la contraseña"""
+    email: String!
+  ): Boolean!
 
   """Se encarga de crear el usuario desde aplicaciones externas"""
   signup(
@@ -2690,6 +3238,24 @@ type Mutation {
     """Datos a actualizar en el atributo"""
     updateAttribInput: UpdateAttribInput!
   ): Attrib!
+
+  """Actualiza una autorización de facturación"""
+  updateAuthorization(
+    """Identificador de la autorización"""
+    id: String!
+
+    """Datos para actualizar la autorización de facturación"""
+    updateAuthorizationInput: UpdateAuthorizationInput = {}
+  ): AuthorizationDian!
+
+  """Actualiza una caja"""
+  updateBox(
+    """Identificador de la caja"""
+    id: String!
+
+    """Datos para actualizar la caja"""
+    updateBoxInput: UpdateBoxInput!
+  ): Box!
 
   """Actualiza la marca"""
   updateBrand(
@@ -2709,6 +3275,15 @@ type Mutation {
     updateCategoryInput: UpdateCategoryInput!
   ): CategoryLevel1!
 
+  """Actualiza una ciudad"""
+  updateCity(
+    """Identificador de la ciudad para actualizar"""
+    id: String!
+
+    """Datos para actualizar la ciudad"""
+    updateCityInput: UpadteCityInput!
+  ): City!
+
   """Actualiza el color"""
   updateColor(
     """Identificador del color a actualizar"""
@@ -2717,6 +3292,24 @@ type Mutation {
     """Datos para actualizar un color"""
     updateColorInput: UpdateColorInput!
   ): Color!
+
+  """Actualiza una compañía"""
+  updateCompany(
+    """Identificador de la compañía para actualizar"""
+    id: String!
+
+    """Datos para actualizar la compañía"""
+    updateCompanyInput: UpdateCompanyInput!
+  ): Company!
+
+  """Se encarga actualizar un cupón"""
+  updateCoupon(
+    """Identificador del cupón"""
+    id: String!
+
+    """Parámetros para actualizar el cupón"""
+    updateCustomerInput: UpdateCouponInput!
+  ): Coupon!
 
   """Actualiza el crédito de un cliente"""
   updateCredit(
@@ -2736,6 +3329,15 @@ type Mutation {
     updateCustomerInput: UpdateCustomerInput!
   ): Customer!
 
+  """Se encarga actualizar un descuento"""
+  updateDiscountRule(
+    """Identificador del descuento"""
+    id: String!
+
+    """Parámetros para actualizar el descuento"""
+    updateDiscountRuleInput: UpdateDiscountRuleInput!
+  ): DiscountRule!
+
   """Actualiza un egreso"""
   updateExpense(
     """Identificador del egreso"""
@@ -2753,6 +3355,24 @@ type Mutation {
     """Parámetros para actualizar el pedido"""
     updateOrderInput: UpdateOrderInput!
   ): ResponseOrder!
+
+  """Actualiza un método de pago"""
+  updatePayment(
+    """Identificador del método de pago para actualizar"""
+    id: String!
+
+    """Datos para actualizar el método de pago"""
+    updatePaymentInput: UpdatePaymentInput!
+  ): Payment!
+
+  """Se encarga actualizar un punto de venta"""
+  updatePointOfSale(
+    """Identificador deL punto de venta"""
+    id: String!
+
+    """Parámetros para actualizar el punto de venta"""
+    updatePointOfSaleInput: UpdatePointOfSaleInput!
+  ): PointOfSale!
 
   """Se encarga actualizar un producto"""
   updateProduct(
@@ -2789,6 +3409,15 @@ type Mutation {
     """Datos para actualizar el rol"""
     updateRoleInput: UpdateRoleInput!
   ): Role!
+
+  """Actualiza una tienda"""
+  updateShop(
+    """Identificador de la tienda para actualizar"""
+    id: String!
+
+    """Datos para actualizar la tienda"""
+    updateShopInput: UpdateShopInput!
+  ): Shop!
 
   """Actualizar la talla"""
   updateSize(
@@ -2850,6 +3479,21 @@ type Mutation {
     """Datos a actualizar en el usuario"""
     updateUserInput: UpdateUserInput!
   ): User!
+
+  """Actualiza una bodega"""
+  updateWarehouse(
+    """Identificador de la bodega para actualizar"""
+    id: String!
+
+    """Datos para actualizar la bodega"""
+    updateWarehouseInput: UpdateWarehouseInput!
+  ): Warehouse!
+
+  """Verifica un producto de un traslado en error"""
+  verifiedProductStockTransfer(
+    """Datos para verificar un producto del traslado en error"""
+    verifiedProductTransferErrorInput: VerifiedProductTransferErrorInput!
+  ): StockTransferError!
 }
 
 """Opción del permiso"""
@@ -2873,7 +3517,7 @@ type Order {
   company: Company!
 
   """Trasportadora"""
-  conveyor: Conveyor
+  conveyorOrder: ConveyorOrder
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -2905,6 +3549,9 @@ type Order {
   """Estado del pedido"""
   status: StatusOrder!
 
+  """Estado de transición pedido web"""
+  statusWeb: StatusWeb
+
   """Resumen de los pagosy totales"""
   summary: SummaryOrder!
 
@@ -2932,6 +3579,9 @@ type Payment {
   """Logo para el medio de pago"""
   logo: Image
 
+  """Mensaje para el usuario web"""
+  message: String
+
   """Nombre del medio de pago"""
   name: String!
 
@@ -2943,6 +3593,15 @@ type Payment {
 
   """Usuario que creó o editó el medio de pago"""
   user: User!
+}
+
+"""Producto para confirmar en el pedido"""
+input PaymentConfirm {
+  """Médio de pago a confirmar"""
+  paymentId: String!
+
+  """Estado del producto, si es diferente a confirm"""
+  status: StatusOrderDetail
 }
 
 """Medios de pago de la factura"""
@@ -2967,6 +3626,9 @@ type PaymentOrder {
 
   """Total pagado"""
   receipt: Receipt
+
+  """Estado del pago"""
+  status: StatusOrderDetail!
 
   """Total pagado"""
   total: Float!
@@ -3035,11 +3697,14 @@ type PermissionData {
 enum Permissions {
   ACCESS_CONFIGURATION_CONVEYORS
   ACCESS_CONFIGURATION_ROLES
+  ACCESS_CONFIGURATION_SHOPS
   ACCESS_CONFIGURATION_USERS
+  ACCESS_CONFIGURATION_WAREHOUSES
   ACCESS_CREDITS
   ACCESS_CRM_CITIES
   ACCESS_CRM_COUPONS
   ACCESS_CRM_CUSTOMERS
+  ACCESS_CRM_DISCOUNTRULES
   ACCESS_ERP
   ACCESS_INVENTORY_ADJUSTMENTS
   ACCESS_INVENTORY_ATTRIBS
@@ -3053,20 +3718,27 @@ enum Permissions {
   ACCESS_INVENTORY_REQUESTS
   ACCESS_INVENTORY_SIZES
   ACCESS_INVENTORY_TRANSFERS
+  ACCESS_INVOICING_AUTHORIZATIONS
   ACCESS_INVOICING_CLOSESX
   ACCESS_INVOICING_CLOSESZ
+  ACCESS_INVOICING_POINTOFSALES
   ACCESS_INVOICING_RETURNS
   ACCESS_POS
   ACCESS_TREASURY_BOXES
   ACCESS_TREASURY_EXPENSES
   ACCESS_TREASURY_PAYMENTS
-  ACCESS_TREASURY_RECEIPTS
+  ACCESS_TREASURY_RECEIPT
   AUTOGENERATE_INVENTORY_REQUEST
   CONFIRM_INVENTORY_TRANSFER
   CREATE_CONFIGURATION_ROLE
+  CREATE_CONFIGURATION_SHOP
   CREATE_CONFIGURATION_USER
+  CREATE_CONFIGURATION_WAREHOUSE
   CREATE_CREDIT
+  CREATE_CRM_CITY
+  CREATE_CRM_COUPON
   CREATE_CRM_CUSTOMER
+  CREATE_CRM_DISCOUNTRULE
   CREATE_INVENTORY_ADJUSTMENT
   CREATE_INVENTORY_ATTRIB
   CREATE_INVENTORY_BRAND
@@ -3079,12 +3751,18 @@ enum Permissions {
   CREATE_INVENTORY_REQUEST
   CREATE_INVENTORY_SIZE
   CREATE_INVENTORY_TRANSFER
+  CREATE_INVOICING_AUTHORIZATION
   CREATE_INVOICING_CLOSEX
   CREATE_INVOICING_CLOSEZ
   CREATE_INVOICING_ORDER
+  CREATE_INVOICING_POINTOFSALE
   CREATE_INVOICING_RETURN
+  CREATE_TREASURY_BOX
   CREATE_TREASURY_EXPENSE
+  CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
+  INVENTORY_TRANSFERS_VERIFIED
+  PRINT_CRM_COUPON
   PRINT_INVENTORY_ADJUSTMENT
   PRINT_INVENTORY_INPUT
   PRINT_INVENTORY_OUTPUT
@@ -3092,6 +3770,7 @@ enum Permissions {
   PRINT_INVENTORY_TRANSFER
   PRINT_INVOICING_CLOSEX
   PRINT_INVOICING_CLOSEZ
+  PRINT_INVOICING_ORDER
   PRINT_INVOICING_RETURN
   PRINT_TREASURY_EXPENSE
   PRINT_TREASURY_RECEIPT
@@ -3107,6 +3786,7 @@ enum Permissions {
   READ_CRM_COUPONS
   READ_CRM_CUSTOMERS
   READ_CRM_CUSTOMERTYPES
+  READ_CRM_DISCOUNTRULES
   READ_INVENTORY_ADJUSTMENTS
   READ_INVENTORY_ATTRIBS
   READ_INVENTORY_BRANDS
@@ -3119,6 +3799,7 @@ enum Permissions {
   READ_INVENTORY_REQUESTS
   READ_INVENTORY_SIZES
   READ_INVENTORY_TRANSFERS
+  READ_INVOICING_AUTHORIZATIONS
   READ_INVOICING_CLOSESX
   READ_INVOICING_CLOSESZ
   READ_INVOICING_INVOICES
@@ -3130,9 +3811,14 @@ enum Permissions {
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
   UPDATE_CONFIGURATION_ROLE
+  UPDATE_CONFIGURATION_SHOP
   UPDATE_CONFIGURATION_USER
+  UPDATE_CONFIGURATION_WAREHOUSE
   UPDATE_CREDIT
+  UPDATE_CRM_CITY
+  UPDATE_CRM_COUPON
   UPDATE_CRM_CUSTOMER
+  UPDATE_CRM_DISCOUNTRULE
   UPDATE_INVENTORY_ADJUSTMENT
   UPDATE_INVENTORY_ATTRIB
   UPDATE_INVENTORY_BRAND
@@ -3145,8 +3831,12 @@ enum Permissions {
   UPDATE_INVENTORY_REQUEST
   UPDATE_INVENTORY_SIZE
   UPDATE_INVENTORY_TRANSFER
+  UPDATE_INVOICING_AUTHORIZATION
   UPDATE_INVOICING_ORDER
+  UPDATE_INVOICING_POINTOFSALE
+  UPDATE_TREASURY_BOX
   UPDATE_TREASURY_EXPENSE
+  UPDATE_TREASURY_PAYMENT
   UPDATE_TREASURY_RECEIPT
 }
 
@@ -3163,6 +3853,9 @@ type PointOfSale {
 
   """Fecha de cierre"""
   closeDate: DateTime
+
+  """Compañia a la que pertenece el punto de venta"""
+  company: Company!
 
   """Fecha de creación"""
   createdAt: DateTime!
@@ -3223,6 +3916,12 @@ type Query {
     filtersAttribsInput: FiltersAttribsInput = {}
   ): ResponseAttribs!
 
+  """Lista de autorizaciones"""
+  authorizations(
+    """Filtros de lista de autorizaciones de facturación"""
+    filtersAuthorizations: FiltersAuthorizationInput = {}
+  ): ResponseAuthorizations!
+
   """Se encarga de listar las cajas"""
   boxes(
     """Filtros para consultar las cajas"""
@@ -3271,17 +3970,35 @@ type Query {
     filtersColorsInput: FiltersColorsInput = {}
   ): ResponseColors!
 
-  """Lista de ajustes de productos"""
+  """Listado de las compañías"""
+  companies(
+    """Filtros para las compañías"""
+    filtersCompaniesInput: FiltersCompaniesInput = {}
+  ): ResponseCompanies!
+
+  """Lista de transportadoras"""
   conveyors(
     """Filtros de lista de las transportadoras"""
     filtersConveyorsInput: FiltersConveyorsInput = {}
   ): ResponseConveyors!
+
+  """Lista de transportadoras para el pedido"""
+  conveyorsOrder(
+    """Identificador del pedido"""
+    orderId: String!
+  ): [ConveyorOrder!]!
 
   """Consultar cupón"""
   coupon(
     """Filtros para consultar un cupón"""
     filtersCouponInput: FiltersCouponInput!
   ): Coupon!
+
+  """Consultar cupones"""
+  coupons(
+    """Filtros para consultar los cupones"""
+    filtersCouponsInput: FiltersCouponsInput!
+  ): ResponseCoupons!
 
   """Crédito"""
   credit(
@@ -3321,6 +4038,12 @@ type Query {
     """Filtros para consultar el listado de clientes"""
     filtersCustomerInput: FiltersCustomersInput = {}
   ): ResponseCustomers!
+
+  """Listado de descuentos"""
+  discountRules(
+    """Filtros para consultar el listado de descuentos"""
+    filtersDiscountRulesInput: FiltersDiscountRulesInput = {}
+  ): ResponseDiscountRules!
 
   """Listado de tipos de documento"""
   documentTypes(
@@ -3430,6 +4153,12 @@ type Query {
     filtersRolesInput: FiltersRolesInput = {}
   ): ResponseRoles!
 
+  """Obtiene la tienda por el identificador"""
+  shopId(
+    """Identificador de la tienda"""
+    id: String!
+  ): Shop!
+
   """Se encarga de listar las tiendas"""
   shops(
     """Filtros para consultar las tiendas"""
@@ -3502,6 +4231,12 @@ type Query {
     filtersStockTransfersInput: FiltersStockTransfersInput = {}
   ): ResponseStockTransfers!
 
+  """Obtiene listado de traslados en error de productos entre bodegas"""
+  stockTransfersError(
+    """Filtros para listado de traslados en error de productos entre bodegas"""
+    filtersStockTransfersErrorInput: FiltersStockTransfersErrorInput = {}
+  ): ResponseStockTransfersError!
+
   """Consulta todos los usuarios con base a los filtros"""
   users(
     """Filtros para consultar los usuarios"""
@@ -3521,6 +4256,15 @@ type Query {
   ): ResponseWarehouses!
 }
 
+"""Rangos de precio por regiones"""
+type RatesRegion {
+  """Precio de la zona"""
+  price: Float!
+
+  """Zona a aplicar el precio"""
+  zone: ZoneType!
+}
+
 """Egreso de dinero"""
 type Receipt {
   """Identificador de mongo"""
@@ -3538,11 +4282,17 @@ type Receipt {
   """Fecha de creación"""
   createdAt: DateTime!
 
+  """Detalle del cruce del recibo"""
+  details: [DetailReceipt!]!
+
   """Consecutivo del recibo de caja"""
   number: Float!
 
   """Método de pago del recibo de caja"""
   payment: Payment!
+
+  """Punto de venta que genera el recibo"""
+  pointOfSale: Box!
 
   """Estado del recibo de caja"""
   status: StatusReceipt!
@@ -3684,6 +4434,39 @@ type RefundOrderClose {
 type ResponseAttribs {
   """Lista de atributos"""
   docs: [Attrib!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Lista de autorizaciones de facturación"""
+type ResponseAuthorizations {
+  """Lista de autorización de facturación"""
+  docs: [AuthorizationDian!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -3944,10 +4727,76 @@ type ResponseColors {
   totalPages: Float!
 }
 
+"""Lista de compañías"""
+type ResponseCompanies {
+  """Lista de compañías"""
+  docs: [Company!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Lista de traslados de transportadoras"""
 type ResponseConveyors {
   """Lista de transportadoras"""
   docs: [Conveyor!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de cupones"""
+type ResponseCoupons {
+  """Lista de cupones"""
+  docs: [Coupon!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -4088,6 +4937,39 @@ type ResponseCustomers {
   hasPrevPage: Boolean!
 
   """Total de documentos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta del listado de reglas de descuento"""
+type ResponseDiscountRules {
+  """Lista de reglas de descuento"""
+  docs: [DiscountRule!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
   limit: Float!
 
   """Página siguente"""
@@ -4721,6 +5603,39 @@ type ResponseStockTransfers {
   totalPages: Float!
 }
 
+"""Lista de traslados en error de productos"""
+type ResponseStockTransfersError {
+  """Lista de traslados en error"""
+  docs: [StockTransferError!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Lista de usuarios"""
 type ResponseUsers {
   """Lista de usuarios"""
@@ -4856,10 +5771,22 @@ type Rule {
   documentIds: [String!]!
 
   """Tipo de documento para validar el descuento"""
-  documentType: DocumentTypesRuler!
+  documentType: DocumentTypesRule!
 
   """Tipo de regla que deben cumplir los documentos"""
-  type: [String!]!
+  type: TypesRule!
+}
+
+"""Regla de descuento"""
+input RuleInput {
+  """Identificador de los documentos"""
+  documentIds: [String!]!
+
+  """Tipo de documento para validar el descuento"""
+  documentType: DocumentTypesRule!
+
+  """Tipo de regla que deben cumplir los documentos"""
+  type: TypesRule!
 }
 
 """Datos de medidas para el envío de los productos"""
@@ -4998,6 +5925,22 @@ input SortAttrib {
   updatedAt: Float
 }
 
+"""Ordenamiento de las autorizaciones"""
+input SortAuthorization {
+  """Ordenamiento por prefijo"""
+  prefix: Float
+}
+
+"""Ordenamiento de las cajas"""
+input SortBox {
+  base: Float
+  createdAt: Float
+  isMain: Float
+  name: Float
+  total: Float
+  updatedAt: Float
+}
+
 """Ordenamiento para el listado de marcas"""
 input SortBrand {
   active: Float
@@ -5071,6 +6014,24 @@ input SortColor {
 }
 
 """Ordenamiento de la trasnportadora"""
+input SortCompany {
+  """Ordenamiento por nombre"""
+  active: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por nombre"""
+  name: Float
+
+  """Ordenamiento por nombre"""
+  regimenSimplify: Float
+
+  """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento de la trasnportadora"""
 input SortConveyor {
   """Ordenamiento por fecha de creación"""
   createdAt: Float
@@ -5079,6 +6040,24 @@ input SortConveyor {
   name: Float
 
   """Ordenamiento por fecha de creación"""
+  updatedAt: Float
+}
+
+"""Ordenamiento del ccupón"""
+input SortCoupon {
+  """ordernamiento por fecha de creación"""
+  createdAt: Float
+
+  """ordernamiento por fecha de expiración"""
+  expiration: Float
+
+  """ordernamiento por consecutivo"""
+  number: Float
+
+  """ordernamiento por estado"""
+  status: Float
+
+  """ordernamiento por fecha de actualización"""
   updatedAt: Float
 }
 
@@ -5146,6 +6125,18 @@ input SortCustomer {
 
   """ordernamiento por teléfono"""
   phone: Float
+}
+
+"""Datos para el ordenamiento"""
+input SortDiscountRule {
+  active: Float
+  createdAt: Float
+  dateFinal: Float
+  dateInitial: Float
+  name: Float
+  percent: Float
+  updatedAt: Float
+  value: Float
 }
 
 """Ordenamiento de los egresos"""
@@ -5383,6 +6374,15 @@ input SortStockTransfer {
   warehouseOrigin: Float
 }
 
+"""Ordenamiento del traslado de productos"""
+input SortStockTransferError {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento de los usuarios"""
 input SortUser {
   createdAt: Float
@@ -5419,6 +6419,12 @@ enum StatusDetailTransfer {
   SENT
 }
 
+enum StatusDetailTransferError {
+  CONFIRMED
+  MISSING
+  SURPLUS
+}
+
 enum StatusExpense {
   ACTIVE
   CANCELLED
@@ -5427,10 +6433,13 @@ enum StatusExpense {
 enum StatusOrder {
   CANCELLED
   CLOSED
-  INVOICED
   OPEN
-  PENDING
-  SENT
+  PENDDING
+}
+
+enum StatusOrderDetail {
+  CONFIRMED
+  NEW
 }
 
 enum StatusProduct {
@@ -5487,6 +6496,17 @@ enum StatusUser {
   ACTIVE
   INACTIVE
   SUSPEND
+}
+
+enum StatusWeb {
+  CANCELLED
+  DELIVERED
+  OPEN
+  PAYMENT_CONFIRMED
+  PENDDING
+  PENDDING_CREDIT
+  PREPARING
+  SENT
 }
 
 """Inventario por bodegas del producto"""
@@ -5702,6 +6722,27 @@ type StockTransfer {
   warehouseOrigin: Warehouse!
 }
 
+"""Errores en traslados de productos"""
+type StockTransferError {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de creación del traslado"""
+  createdAt: DateTime!
+
+  """Detalle de los productos que están en error"""
+  details: [DetailTransferError!]!
+
+  """Traslado al que está relacionado"""
+  stockTransfer: StockTransfer!
+
+  """Fecha de actualización del traslado"""
+  updatedAt: DateTime!
+
+  """Si ya fue verificados todos los errores"""
+  verified: Boolean!
+}
+
 """Resumen de la factura"""
 type SummaryInvoice {
   """Cambio de la factura"""
@@ -5773,12 +6814,62 @@ enum TypePayment {
   CREDIT
 }
 
+enum TypesRule {
+  EQUAL
+  GREATER
+  GREATERTHANOREQUAL
+  LESS
+  LESSTHANOREQUAL
+}
+
+"""Datos para actualizar la ciudad"""
+input UpadteCityInput {
+  """Código DANE"""
+  code: String
+
+  """Nombre del país"""
+  countryName: String
+
+  """Prefijo del país"""
+  countryPrefix: String
+
+  """Código postal de la ciudad por defecto"""
+  defaultPostalCode: String
+
+  """Nombre de la ciudad"""
+  name: String
+
+  """Nombre del departamento"""
+  state: String
+
+  """Tipo de zona"""
+  zone: ZoneType
+}
+
 """Datos para actualizar el atributo"""
 input UpdateAttribInput {
   """Se encuentra activa el atributo"""
   active: Boolean
 
   """Valor asignado al atributo"""
+  name: String
+}
+
+"""Datos para actualizar la autorización"""
+input UpdateAuthorizationInput {
+  """Prefijo de facturación"""
+  prefix: String
+}
+
+"""Datos para actualizar caja"""
+input UpdateBoxInput {
+  """Cantidad de la base para la caja"""
+  base: Float
+
+  """Es caja principal de la compañía"""
+  isMain: Boolean
+
+  """Nombre de la caja"""
   name: String
 }
 
@@ -5819,6 +6910,33 @@ input UpdateColorInput {
 
   """Nombre interno asignado al color"""
   name_internal: String
+}
+
+"""Datos para actualizar la compañía"""
+input UpdateCompanyInput {
+  """Dirección de la empresa"""
+  address: String
+
+  """Documento de la empresa"""
+  document: String
+
+  """Url del logo de la empresa"""
+  logo: String
+
+  """Nombre de la empresa"""
+  name: String
+
+  """Teléfono de la empresa"""
+  phone: String
+
+  """Si pertenece al régimen simplificado"""
+  regimenSimplify: Boolean
+}
+
+"""Datos para actualizar el cupón"""
+input UpdateCouponInput {
+  """Estado del cupón"""
+  status: StatusCoupon
 }
 
 """Datos para actualizar un crédito"""
@@ -5872,6 +6990,30 @@ input UpdateCustomerInput {
   phone: String
 }
 
+"""Datos para actualizar el descuento"""
+input UpdateDiscountRuleInput {
+  """Estado del descuento"""
+  active: Boolean!
+
+  """Fecha final para aplicar el descuento"""
+  dateFinal: String
+
+  """Fecha inicial para aplicar el descuento"""
+  dateInitial: String
+
+  """Nombre del descuento"""
+  name: String
+
+  """Porcentaje del descuento"""
+  percent: Float
+
+  """Reglas a aplicar"""
+  rules: [RuleInput!]
+
+  """Valor del descuento"""
+  value: Float
+}
+
 """Datos para actualizar el egreso"""
 input UpdateExpenseInput {
   """Estado del egreso"""
@@ -5891,6 +7033,36 @@ input UpdateOrderInput {
 
   """Estado del pedido"""
   status: StatusOrder
+
+  """Estado que se aplicará al pedid web"""
+  statusWeb: StatusWeb
+}
+
+"""Datos para actualizar método de pago"""
+input UpdatePaymentInput {
+  """Estado del método de pago"""
+  active: Boolean!
+
+  """Color en html que representa el método de pago """
+  color: String
+
+  """Identificador de la imagen del método de pago"""
+  logoId: String
+
+  """Mensaje para el medio de pago"""
+  message: String
+
+  """Nombre del método de pago"""
+  name: String
+
+  """Tipo de método de pago"""
+  type: TypePayment
+}
+
+"""Datos para actualizar un punto de venta"""
+input UpdatePointOfSaleInput {
+  """Fecha de cierre del punto de venta"""
+  closeDate: String
 }
 
 """Datos para actualizar el producto"""
@@ -5983,6 +7155,36 @@ input UpdateRoleInput {
   permissionIds: [String!]
 }
 
+"""Datos para actualizar la tienda"""
+input UpdateShopInput {
+  """Dirección de la tienda"""
+  address: String
+
+  """Identificador de la empresa para la tienda"""
+  companyId: String
+
+  """Identificador de la bodega predeterminada para la tienda"""
+  defaultWarehouseId: String
+
+  """Meta asiganda a la tienda"""
+  goal: Float
+
+  """Es centro de distribución"""
+  isMain: Boolean
+
+  """Nombre de la tienda"""
+  name: String
+
+  """Teléfono de la tienda"""
+  phone: String
+
+  """Estado de la tienda"""
+  status: StatusShop
+
+  """Identificador de la bodega de centro de distribución asignado"""
+  warehouseMainId: String
+}
+
 """Datos para actualizar la talla"""
 input UpdateSizeInput {
   """Se encuentra activa la talla"""
@@ -6069,6 +7271,9 @@ input UpdateUserInput {
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
+  """Identifica si el usuario es web"""
+  isWeb: Boolean
+
   """Nombre del usuario"""
   name: String
 
@@ -6089,6 +7294,21 @@ input UpdateUserInput {
 
   """Usuario registrado"""
   username: String
+}
+
+"""Datos para actualizar """
+input UpdateWarehouseInput {
+  """Estado de la bodega"""
+  active: Boolean
+
+  """Inventario máximo de productos"""
+  max: Float
+
+  """Inventario mínimo de productos"""
+  min: Float
+
+  """Nombre de la bodega"""
+  name: String
 }
 
 """Enlaces de diferences tipos"""
@@ -6117,6 +7337,9 @@ type User {
   """Cliente asignado"""
   customer: Customer
 
+  """Usado para diferenciar la creación de los usuarios"""
+  isWeb: Boolean!
+
   """Nombre de para mostrar del usuario"""
   name: String!
 
@@ -6143,6 +7366,23 @@ type User {
 
   """Cuenta de usuario"""
   username: String!
+}
+
+"""Datos para verificar los productos"""
+input VerifiedProductTransferErrorInput {
+  """Identificador del producto"""
+  productId: String!
+
+  """Motivo por el cual se verifica el producto"""
+  reason: String!
+
+  """
+  Proceso a realizar, si se envia al origen true, si se envia al destino false
+  """
+  returnInventory: Boolean!
+
+  """Identificador del traslado en error"""
+  stockTransferErrorId: String!
 }
 
 """Modelo de la bodega"""
@@ -6173,4 +7413,13 @@ type Warehouse {
 
   """Usuario que creó el usuario"""
   user: User!
+}
+
+enum ZoneType {
+  INSHOP
+  LOCAL
+  METROPOLITAN
+  NATIONAL
+  SPECIAL
+  URBAN
 }

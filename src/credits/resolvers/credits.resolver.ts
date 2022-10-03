@@ -73,7 +73,7 @@ export class CreditsResolver {
 		name: 'createCredit',
 		description: 'Asigna el crédito a un cliente',
 	})
-	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSEZ)
+	@RequirePermissions(Permissions.CREATE_CREDIT)
 	create(
 		@Args({
 			name: 'createCreditInput',
@@ -93,7 +93,7 @@ export class CreditsResolver {
 		name: 'updateCredit',
 		description: 'Actualiza el crédito de un cliente',
 	})
-	@RequirePermissions(Permissions.CREATE_INVOICING_CLOSEZ)
+	@RequirePermissions(Permissions.UPDATE_CREDIT)
 	update(
 		@Args({
 			name: 'id',
