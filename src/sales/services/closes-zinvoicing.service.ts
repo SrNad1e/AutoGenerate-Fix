@@ -137,7 +137,7 @@ export class ClosesZinvoicingService {
 		}
 
 		const closeZOld = await this.closeZInvoicingModel.findOne({
-			closeDate: dayjs(pointOfSale?.closeDate).format('DD/MM/YYYY'),
+			closeDate: new Date(dayjs(pointOfSale?.closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
 		});
 
@@ -149,6 +149,8 @@ export class ClosesZinvoicingService {
 			closeDate?.split(' ')[0],
 			pointOfSaleId,
 		);
+
+		console.log('ok summary');
 
 		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
@@ -164,6 +166,8 @@ export class ClosesZinvoicingService {
 			user,
 			companyId,
 		);
+
+		console.log('ok egresos');
 
 		const closeZ = await this.closeZInvoicingModel
 			.findOne({
@@ -210,6 +214,8 @@ export class ClosesZinvoicingService {
 			}
 		});
 
+		console.log('ok close');
+
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
 			number,
@@ -229,7 +235,7 @@ export class ClosesZinvoicingService {
 			await this.pointOfSalesService.update(
 				pointOfSaleId,
 				{
-					closeDate,
+					closeDate: dayjs(closeDate).format('YYYY/MM/DD'),
 				},
 				user,
 				companyId,
@@ -241,6 +247,8 @@ export class ClosesZinvoicingService {
 				},
 				companyId,
 			);
+
+			console.log(boxMain.name);
 
 			const cash = Object.keys(cashRegister)
 				.map((key) => parseInt(key.slice(1)) * cashRegister[key])
