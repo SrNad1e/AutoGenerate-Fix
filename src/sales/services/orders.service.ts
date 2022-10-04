@@ -890,12 +890,14 @@ export class OrdersService {
 				} else if (quantity > newDetails[index].quantity) {
 					product = await this.productsService.validateStock(
 						productId,
-						quantity,
+						quantity - newDetails[index].quantity,
 						order?.shop?.defaultWarehouse._id.toString(),
 					);
+				} else {
+					product = newDetails[index].product;
 				}
 
-				if (!product && quantity > newDetails[index].quantity) {
+				if (!product) {
 					throw new BadRequestException(`El producto ${productId}, no existe`);
 				}
 
@@ -1515,7 +1517,6 @@ export class OrdersService {
 	 * @param idPointOfSale punto de venta
 	 * @returns pedidos del punto de venta
 	 */
-
 	async getByPointOfSales(user: User) {
 		if (!user?.pointOfSale?._id) {
 			throw new NotFoundException(
