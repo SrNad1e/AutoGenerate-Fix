@@ -1368,6 +1368,9 @@ type CreditHistory {
 
 """Cliente"""
 type Customer {
+  """Fecha de mayorista"""
+  WolesalerDate: DateTime
+
   """Identificador de mongo"""
   _id: String!
 
@@ -3530,6 +3533,9 @@ type Order {
 
   """Factura generada al facturar"""
   invoice: Invoice
+
+  """Número de la factura vieja"""
+  invoiceNumber: Float @deprecated(reason: "facturas viejas")
 
   """Número de pedido"""
   number: Float!

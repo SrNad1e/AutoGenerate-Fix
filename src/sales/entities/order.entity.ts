@@ -274,6 +274,13 @@ export class Order extends Document {
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
 	updatedAt: Date;
+
+	@Field(() => Number, {
+		description: 'Número de la factura vieja',
+		nullable: true,
+		deprecationReason: 'facturas viejas',
+	})
+	invoiceNumber?: number;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

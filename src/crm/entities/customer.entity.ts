@@ -147,6 +147,10 @@ export class Customer extends Document {
 
 	@Field(() => Date, { description: 'Fecha de actualización' })
 	updatedAt: Date;
+
+	@Field(() => Date, { description: 'Fecha de mayorista', nullable: true })
+	@Prop({ type: Date })
+	WolesalerDate?: Date;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
