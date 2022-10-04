@@ -883,7 +883,7 @@ export class OrdersService {
 					if (quantity > newDetails[index].quantity) {
 						product = await this.productsService.validateStock(
 							productId,
-							quantity - newDetails[index].quantity,
+							quantity,
 							order?.shop?.defaultWarehouse._id.toString(),
 						);
 					}
