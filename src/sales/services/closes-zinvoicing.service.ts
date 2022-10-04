@@ -17,6 +17,7 @@ import { PaymentOrderClose } from '../entities/close-x-invoicing.entity';
 import { BoxService } from 'src/treasury/services/box.service';
 import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
 import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
+import { TypePayment } from 'src/treasury/entities/payment.entity';
 
 const populate: PopulateOptions[] = [
 	{
@@ -135,6 +136,15 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		const closeZOld = await this.closeZInvoicingModel.findOne({
+			closeDate: dayjs(pointOfSale?.closeDate).format('DD/MM/YYYY'),
+			pointOfSale: pointOfSale._id,
+		});
+
+		if (closeZOld) {
+			throw new NotFoundException(`El cierre ya se encuentra registrado`);
+		}
+
 		const summaryOrder = await this.ordersService.getSummaryOrder(
 			closeDate?.split(' ')[0],
 			pointOfSaleId,
@@ -236,13 +246,23 @@ export class ClosesZinvoicingService {
 				.map((key) => parseInt(key.slice(1)) * cashRegister[key])
 				.reduce((sum, item) => sum + item, 0);
 
-			const total = boxMain?.total + cash;
-
-			await this.boxesService.updateTotal(boxMain._id.toString(), total);
-
 			const box = await this.boxesService.findById(
 				pointOfSale.box._id.toString(),
 			);
+
+			const totalCash = payments.reduce(
+				(sum, item) =>
+					item.payment['type'] === TypePayment.CASH
+						? sum + item.value
+						: sum + 0,
+				0,
+			);
+
+			const diff = totalCash - cash;
+
+			const total = boxMain?.total + cash - diff;
+
+			await this.boxesService.updateTotal(boxMain._id.toString(), total);
 
 			const totalBox = box.total - cash;
 
@@ -252,7 +272,7 @@ export class ClosesZinvoicingService {
 				await this.errorsCashService.addRegister(
 					{
 						closeZId: response?._id?.toString(),
-						typeError: TypeErrorCash.SURPLUS,
+						typeError: TypeErrorCash.MISSING,
 						value: totalBox,
 					},
 					user,
@@ -264,7 +284,7 @@ export class ClosesZinvoicingService {
 				await this.errorsCashService.addRegister(
 					{
 						closeZId: response?._id?.toString(),
-						typeError: TypeErrorCash.MISSING,
+						typeError: TypeErrorCash.SURPLUS,
 						value: totalBox * -1,
 					},
 					user,
