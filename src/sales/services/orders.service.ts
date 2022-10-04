@@ -197,7 +197,14 @@ export class OrdersService {
 		//Si es un pedido POS
 		if (user?.pointOfSale && newStatus === StatusOrder.OPEN) {
 			//Inicia validación del punto de venta
-			if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
+			if (
+				dayjs().isBefore(
+					dayjs(dayjs(user.pointOfSale['closeDate']).format('YYYY/MM/DD')).add(
+						1,
+						'd',
+					),
+				)
+			) {
 				throw new NotFoundException(
 					`El punto de venta se encuentra cerrado para el día ${dayjs(
 						user?.pointOfSale['closeDate'],
@@ -871,21 +878,24 @@ export class OrdersService {
 
 				//Validamos la disponibilidad de stock total si el pedido está pendding o si no la cantidad de más
 				let product;
+
 				if (order.status === StatusOrder.PENDDING) {
+					if (quantity > newDetails[index].quantity) {
+						product = await this.productsService.validateStock(
+							productId,
+							quantity - newDetails[index].quantity,
+							order?.shop?.defaultWarehouse._id.toString(),
+						);
+					}
+				} else if (quantity > newDetails[index].quantity) {
 					product = await this.productsService.validateStock(
 						productId,
 						quantity,
 						order?.shop?.defaultWarehouse._id.toString(),
 					);
-				} else if (quantity > newDetails[index].quantity) {
-					product = await this.productsService.validateStock(
-						productId,
-						quantity - newDetails[index].quantity,
-						order?.shop?.defaultWarehouse._id.toString(),
-					);
 				}
 
-				if (!product) {
+				if (!product && quantity > newDetails[index].quantity) {
 					throw new BadRequestException(`El producto ${productId}, no existe`);
 				}
 
@@ -1500,13 +1510,12 @@ export class OrdersService {
 		};
 	}
 
-	//* INICIAN METODOS GENERALES */
-
 	/**
 	 * @description obtiene los pedidos del punto de venta
 	 * @param idPointOfSale punto de venta
 	 * @returns pedidos del punto de venta
 	 */
+
 	async getByPointOfSales(user: User) {
 		if (!user?.pointOfSale?._id) {
 			throw new NotFoundException(
@@ -1514,7 +1523,14 @@ export class OrdersService {
 			);
 		}
 
-		if (dayjs().isBefore(dayjs(user?.pointOfSale['closeDate']).add(1, 'd'))) {
+		if (
+			dayjs().isBefore(
+				dayjs(dayjs(user.pointOfSale['closeDate']).format('YYYY/MM/DD')).add(
+					1,
+					'd',
+				),
+			)
+		) {
 			throw new NotFoundException(
 				`El punto de venta se encuentra cerrado para el día ${dayjs(
 					user?.pointOfSale['closeDate'],
@@ -1531,6 +1547,8 @@ export class OrdersService {
 			.populate(populate)
 			.lean();
 	}
+
+	//* INICIAN METODOS GENERALES */
 
 	/**
 	 * @description se encarga de obtener un resumen del día
