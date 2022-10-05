@@ -128,7 +128,10 @@ export class ClosesZinvoicingService {
 			throw new NotFoundException('El punto de venta no existe');
 		}
 
-		if (dayjs(closeDate) <= dayjs(pointOfSale?.closeDate)) {
+		if (
+			dayjs(closeDate).format('DD/MM/YYYY') ===
+			dayjs(pointOfSale?.closeDate).format('DD/MM/YYYY')
+		) {
 			throw new NotFoundException(
 				`El punto de venta se encuentra cerrado para el día ${dayjs(
 					pointOfSale?.closeDate,
