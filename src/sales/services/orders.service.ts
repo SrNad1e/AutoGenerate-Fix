@@ -144,7 +144,7 @@ export class OrdersService {
 		}
 
 		if (number) {
-			filters.number = number;
+			filters.$or = [{ number }, { invoiceNumber: number }];
 		}
 
 		if (customerId) {
