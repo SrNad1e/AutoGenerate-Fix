@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -155,12 +155,13 @@ export class OrdersService {
 			filters['payments.payment._id'] = new Types.ObjectId(paymentId);
 		}
 
-		const options = {
+		const options: PaginateOptions = {
 			limit,
 			page,
 			sort,
 			populate,
 			lean: true,
+			allowDiskUse: true,
 		};
 
 		return this.orderModel.paginate(filters, options);
@@ -1545,6 +1546,7 @@ export class OrdersService {
 				status: StatusOrder.OPEN,
 				orderPos: true,
 			})
+			.allowDiskUse(true)
 			.populate(populate)
 			.lean();
 	}
