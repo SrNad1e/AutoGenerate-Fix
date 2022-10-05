@@ -280,6 +280,7 @@ export class Order extends Document {
 		nullable: true,
 		deprecationReason: 'facturas viejas',
 	})
+	@Prop({ type: Number })
 	invoiceNumber?: number;
 }
 
