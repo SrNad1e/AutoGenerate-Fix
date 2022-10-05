@@ -23,7 +23,7 @@ export class SendMailService {
 				template: './recovery-password',
 				context: {
 					name: user.name,
-					url: `${this.configService.API_URL}/auth/recover/${token}`,
+					url: `${this.configService.API_WEB}/auth/recover/${token}`,
 					catalog: `${this.configService.API_WEB}/catalogo`,
 					api: this.configService.API_URL,
 				},
