@@ -42,6 +42,10 @@ services:
       FEDEX_ACCOUNT_NUMBER: 740561073
       FEDEX_POSTAL_CODE_DEFAULT: "055411"
       FEDEX_COUNTRY_DEFAULT: CO
+      #
+      API_URL: https://qa.t0n53eq7nj176.us-east-1.cs.amazonlightsail.com
+      API_WEB: https://wholesalers.toulouse.com.co
+
     ports:
       - "8080:8080"
     volumes:

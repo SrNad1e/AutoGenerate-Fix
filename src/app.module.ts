@@ -61,6 +61,8 @@ import { SendMailModule } from './send-mail/send-mail.module';
 				FEDEX_ACCOUNT_NUMBER: Joi.string().required(),
 				FEDEX_POSTAL_CODE_DEFAULT: Joi.string().required(),
 				FEDEX_COUNTRY_DEFAULT: Joi.string().required(),
+				API_URL: Joi.string().required(),
+				API_WEB: Joi.string().required(),
 			}),
 		}),
 		DatabasesModule,
