@@ -129,8 +129,8 @@ export class ClosesZinvoicingService {
 		}
 
 		if (
-			dayjs(closeDate).format('DD/MM/YYYY') ===
-			dayjs(pointOfSale?.closeDate).format('DD/MM/YYYY')
+			dayjs(closeDate).format('YYYY/MM/DD') ===
+			dayjs(pointOfSale?.closeDate).format('YYYY/MM/DD')
 		) {
 			throw new NotFoundException(
 				`El punto de venta se encuentra cerrado para el día ${dayjs(
@@ -139,8 +139,10 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		console.log(new Date(dayjs(closeDate).format('YYYY/MM/DD')));
+
 		const closeZOld = await this.closeZInvoicingModel.findOne({
-			closeDate: new Date(dayjs(pointOfSale?.closeDate).format('YYYY/MM/DD')),
+			closeDate: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
 		});
 
