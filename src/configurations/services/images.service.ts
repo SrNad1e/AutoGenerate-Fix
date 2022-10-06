@@ -87,7 +87,11 @@ export class ImagesService {
 				},
 				original: urlOriginal.Key,
 			},
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 		return newImage.save();
 	}

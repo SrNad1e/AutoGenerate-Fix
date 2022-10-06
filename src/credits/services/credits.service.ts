@@ -123,7 +123,11 @@ export class CreditsService {
 				amount,
 				company: new Types.ObjectId(companyId),
 				available: amount,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			})
 		).populate(populate);
 	}
@@ -243,7 +247,11 @@ export class CreditsService {
 					balance,
 					frozenAmount,
 					details,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 				},
 			},
 			{

@@ -119,7 +119,11 @@ export class DiscountRulesService {
 			dateFinal: new Date(dateFinal),
 			percent,
 			value,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 
@@ -193,7 +197,11 @@ export class DiscountRulesService {
 				percent,
 				rules: newRules,
 				...params,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}

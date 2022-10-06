@@ -101,7 +101,11 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.CREDIT,
 			amount,
 			credit: newCredit,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newCreditHistory.save();
@@ -142,7 +146,11 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.DEBIT,
 			amount,
 			credit: newCredit,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newCreditHistory.save();
@@ -183,7 +191,11 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.FROZEN,
 			amount,
 			credit: newCredit,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newCreditHistory.save();
@@ -224,7 +236,11 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.THAWED,
 			amount,
 			credit: newCredit,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newCreditHistory.save();

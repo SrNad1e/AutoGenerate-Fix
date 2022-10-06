@@ -34,7 +34,11 @@ export class BoxHistoryService {
 			value: newBox?.total,
 			documentType,
 			documentId,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newBoxHistory.save();
@@ -63,7 +67,11 @@ export class BoxHistoryService {
 			value: newBox?.total,
 			documentType,
 			documentId,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newBoxHistory.save();

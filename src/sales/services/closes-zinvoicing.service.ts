@@ -231,7 +231,11 @@ export class ClosesZinvoicingService {
 			quantityBank,
 			...summaryOrder,
 			payments,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		const response = await (await newClose.save()).populate(populate);

@@ -99,7 +99,11 @@ export class RolesService {
 			changeWarehouse,
 			permissions,
 			name,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return (await newRole.save()).populate(populate);
@@ -146,7 +150,11 @@ export class RolesService {
 					active,
 					changeWarehouse,
 					name,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 				},
 			},
 			{

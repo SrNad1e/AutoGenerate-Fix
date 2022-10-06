@@ -111,7 +111,11 @@ export class ShopsService {
 
 		const newShop = new this.shopModel({
 			...params,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			company: new Types.ObjectId(companyId),
 		});
 		return newShop.save();
@@ -180,7 +184,14 @@ export class ShopsService {
 
 		return this.shopModel.findByIdAndUpdate(
 			id,
-			{ $set: params },
+			{
+				$set: params,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
+			},
 			{
 				new: true,
 				lean: true,

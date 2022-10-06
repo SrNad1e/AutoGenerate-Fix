@@ -135,7 +135,11 @@ export class ExpensesService {
 			concept,
 			company: new Types.ObjectId(companyId),
 			box: box._id,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		await this.boxHistoryService.deleteCash(
@@ -191,7 +195,11 @@ export class ExpensesService {
 		return this.expenseModel.findByIdAndUpdate(id, {
 			$set: {
 				status: StatusExpense[status],
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}

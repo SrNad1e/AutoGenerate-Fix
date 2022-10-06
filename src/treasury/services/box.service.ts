@@ -95,7 +95,11 @@ export class BoxService {
 	async create(params: CreateBoxInput, user: User, companyId: string) {
 		return this.boxModel.create({
 			...params,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			company: new Types.ObjectId(companyId),
 		});
 	}
@@ -121,7 +125,11 @@ export class BoxService {
 		return this.boxModel.findByIdAndUpdate(id, {
 			$set: {
 				...params,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}

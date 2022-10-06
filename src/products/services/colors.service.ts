@@ -80,7 +80,15 @@ export class ColorsService {
 			}
 		}
 
-		const newColor = new this.colorModel({ ...props, image: imageId, user });
+		const newColor = new this.colorModel({
+			...props,
+			image: imageId,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
+		});
 
 		return newColor.save();
 	}
@@ -114,7 +122,11 @@ export class ColorsService {
 		return this.colorModel.findByIdAndUpdate(id, {
 			...props,
 			image: imageId,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 
@@ -127,5 +139,4 @@ export class ColorsService {
 	async getByIdMysql(id: number) {
 		return this.colorModel.findOne({ id }).lean();
 	}
-
 }

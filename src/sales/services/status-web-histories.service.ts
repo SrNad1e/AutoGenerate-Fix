@@ -24,7 +24,11 @@ export class StatusWebHistoriesService {
 		return this.statusWebHistoryModel.create({
 			order: order._id,
 			status,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 }

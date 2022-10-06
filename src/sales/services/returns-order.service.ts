@@ -209,7 +209,11 @@ export class ReturnsOrderService {
 			details: detailsReturn,
 			shop: order?.shop?._id,
 			coupon: coupon._id,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		await this.ordersService.updateProducts(
