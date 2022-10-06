@@ -263,7 +263,11 @@ export class StockRequestService {
 				(company) => company._id.toString() === companyId,
 			),
 			number: (stockRequest?.number || 0) + 1,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			...options,
 		});
 		return (await newStockRequest.save()).populate(populate);
@@ -450,7 +454,11 @@ export class StockRequestService {
 							details: newDetails,
 							...options,
 							status: StatusStockRequest[status],
-							user,
+							user: {
+								username: user.username,
+								name: user.name,
+								_id: user._id,
+							},
 						},
 					},
 					{

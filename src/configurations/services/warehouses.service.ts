@@ -84,7 +84,11 @@ export class WarehousesService {
 	async create(params: CreateWarehouseInput, user: User, companyId: string) {
 		const newWarehouse = new this.warehouseModel({
 			...params,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			company: new Types.ObjectId(companyId),
 		});
 
@@ -126,7 +130,14 @@ export class WarehousesService {
 
 		return this.warehouseModel.findByIdAndUpdate(
 			id,
-			{ $set: params },
+			{
+				$set: params,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
+			},
 			{
 				new: true,
 				lean: true,

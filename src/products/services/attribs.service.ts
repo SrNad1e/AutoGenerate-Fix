@@ -65,7 +65,14 @@ export class AttribsService {
 			throw new NotFoundException('El nombre del atributo ya existe');
 		}
 
-		const newAttrib = new this.attribModel({ ...props, user });
+		const newAttrib = new this.attribModel({
+			...props,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
+		});
 
 		return newAttrib.save();
 	}
@@ -84,6 +91,13 @@ export class AttribsService {
 		if (attribName && id !== attribName._id.toString()) {
 			throw new NotFoundException('El nombre del atributo ya existe');
 		}
-		return this.attribModel.findByIdAndUpdate(id, { ...props, user });
+		return this.attribModel.findByIdAndUpdate(id, {
+			...props,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
+		});
 	}
 }

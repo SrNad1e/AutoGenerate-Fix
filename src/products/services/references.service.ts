@@ -274,7 +274,11 @@ export class ReferencesService {
 
 		const reference = new this.referenceModel({
 			...props,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			brand: brand._id,
 			categoryLevel1: categoryLevel1?._id,
 			categoryLevel2: categoryLevel2?._id,
@@ -299,7 +303,11 @@ export class ReferencesService {
 			const stock = warehouses.map((warehouse) => ({
 				warehouse: warehouse._id,
 				quantity: 0,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			}));
@@ -364,7 +372,11 @@ export class ReferencesService {
 					color: color._id,
 					size: size._id,
 					images: imageIds?.map((id) => new Types.ObjectId(id)) || [],
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 					stock,
 				});
 

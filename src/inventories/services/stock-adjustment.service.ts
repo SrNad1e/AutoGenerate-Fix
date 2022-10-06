@@ -224,7 +224,11 @@ export class StockAdjustmentService {
 			warehouse,
 			details: detailsAdjustment,
 			total,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			status: StatusStockAdjustment[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
@@ -397,7 +401,11 @@ export class StockAdjustmentService {
 						details: newDetails,
 						total,
 						status: StatusStockAdjustment[status],
-						user,
+						user: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
 					},
 				},
 				{

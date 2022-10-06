@@ -145,7 +145,11 @@ export class CustomersService {
 			documentType: documentType._id,
 			document,
 			customerType: customerType._id,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			...params,
 		});
 
@@ -233,7 +237,11 @@ export class CustomersService {
 					documentTypeId: documentTypeId
 						? new Types.ObjectId(documentTypeId)
 						: undefined,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 					addresses: newAddresses.length > 0 ? newAddresses : undefined,
 					...params,
 				},

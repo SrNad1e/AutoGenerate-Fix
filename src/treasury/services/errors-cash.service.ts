@@ -74,7 +74,11 @@ export class ErrorsCashService {
 			closeZ: closeZ._id,
 			typeError: newTypeError,
 			value,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 }

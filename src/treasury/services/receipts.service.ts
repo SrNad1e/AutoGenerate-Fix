@@ -180,7 +180,11 @@ export class ReceiptsService {
 			pointOfSale: pointOfSale._id,
 			company: new Types.ObjectId(companyId),
 			details,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		if (payment?.type === TypePayment.CASH) {
@@ -305,7 +309,11 @@ export class ReceiptsService {
 		return this.receiptModel.findByIdAndUpdate(id, {
 			$set: {
 				status: StatusReceipt[status],
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}

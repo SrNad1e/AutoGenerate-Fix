@@ -167,7 +167,11 @@ export class InvoicesService {
 			payments: newPayments,
 			summary,
 			details: newDetails,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newInvoice.save();

@@ -269,13 +269,21 @@ export class StockTransferService {
 			warehouseOrigin,
 			warehouseDestination,
 			details: detailsTransfer,
-			userOrigin: user,
+			userOrigin: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
 			),
 			number: (stockTransfer?.number || 0) + 1,
 			requests,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		const response = await newStockTransfer.save();
@@ -565,8 +573,16 @@ export class StockTransferService {
 						details: newDetails,
 						requests: requests?.map((request) => new Types.ObjectId(request)),
 						observationOrigin,
-						userDestination: user,
-						user,
+						userDestination: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
+						user: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
 					},
 				},
 				{
@@ -674,8 +690,16 @@ export class StockTransferService {
 						...options,
 						observationOrigin,
 						status: StatusStockTransfer[status],
-						userDestination: user,
-						user,
+						userDestination: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
+						user: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
 					},
 				},
 				{

@@ -107,7 +107,11 @@ export class CouponsService {
 			value,
 			title,
 			message,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 
@@ -143,7 +147,11 @@ export class CouponsService {
 			{
 				$set: {
 					status: StatusCoupon[status] || status,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 				},
 			},
 			{

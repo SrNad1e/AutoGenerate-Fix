@@ -51,7 +51,11 @@ export class AuthorizationsService {
 	) {
 		return this.authorizationModel.create({
 			...params,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			company: new Types.ObjectId(companyId),
 		});
 	}
@@ -80,7 +84,11 @@ export class AuthorizationsService {
 		return this.authorizationModel.findByIdAndUpdate(id, {
 			$set: {
 				...params,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}

@@ -1,5 +1,4 @@
 import {
-	BadGatewayException,
 	BadRequestException,
 	Injectable,
 	NotFoundException,
@@ -89,7 +88,11 @@ export class PointOfSalesService {
 			authorization: new Types.ObjectId(autorizationId),
 			box: new Types.ObjectId(boxId),
 			shop: new Types.ObjectId(shopId),
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			company: new Types.ObjectId(companyId),
 		});
 	}
@@ -115,14 +118,18 @@ export class PointOfSalesService {
 			);
 		}
 
-		if(closeDate === ''){
-			throw new BadRequestException("La fecha no puede estar vacía")
+		if (closeDate === '') {
+			throw new BadRequestException('La fecha no puede estar vacía');
 		}
 
 		return this.pointOfSaleModel.findByIdAndUpdate(id, {
 			$set: {
 				closeDate,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}

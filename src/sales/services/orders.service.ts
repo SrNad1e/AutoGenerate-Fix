@@ -244,7 +244,11 @@ export class OrdersService {
 				summary,
 				number,
 				company: new Types.ObjectId(companyId),
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 				pointOfSale: user.pointOfSale._id,
 			});
 
@@ -303,7 +307,11 @@ export class OrdersService {
 			summary,
 			shop,
 			orderPos: false,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			number,
 			status: StatusOrder.PENDDING,
 			statusWeb: StatusWeb.OPEN,
@@ -779,7 +787,11 @@ export class OrdersService {
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
 					statusWeb: newStatusWeb,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 					address,
 				},
 			},
@@ -1067,7 +1079,11 @@ export class OrdersService {
 			{
 				$set: {
 					details: newDetails,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 					summary,
 				},
 			},
@@ -1153,7 +1169,11 @@ export class OrdersService {
 				$set: {
 					details: newDetails,
 					statusWeb: newStatusWeb,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 				},
 			},
 			{
@@ -1419,7 +1439,11 @@ export class OrdersService {
 			{
 				$set: {
 					payments: newPayments,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 					summary,
 				},
 			},
@@ -1490,7 +1514,11 @@ export class OrdersService {
 			{
 				$set: {
 					payments: newPayments,
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 				},
 			},
 			{

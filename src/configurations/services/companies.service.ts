@@ -60,7 +60,11 @@ export class CompaniesService {
 
 		return this.companyModel.create({
 			...params,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 
@@ -72,7 +76,11 @@ export class CompaniesService {
 		return this.companyModel.findByIdAndUpdate(id, {
 			$set: {
 				...params,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 		});
 	}
