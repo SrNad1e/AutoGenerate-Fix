@@ -23,3 +23,7 @@ DockerFile
 /node_modules
 /coverage
 *.env
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+.git
+.gitignore

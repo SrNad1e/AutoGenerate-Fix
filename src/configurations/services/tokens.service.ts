@@ -25,9 +25,9 @@ export class TokensService {
 				.findOne({
 					code,
 					active: true,
-					/*	expirationDate: {
+					expirationDate: {
 						$gte: new Date(),
-					},*/
+					},
 				})
 				.populate(populate)
 				.lean();

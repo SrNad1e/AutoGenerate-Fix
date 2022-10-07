@@ -31,7 +31,7 @@ export class CategoriesService {
 		@InjectModel(CategoryLevel2.name)
 		private readonly categoryLevel2Model: PaginateModel<CategoryLevel2>,
 		@InjectModel(CategoryLevel3.name)
-		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3> 
+		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3>,
 	) {}
 
 	async findAll({
@@ -183,7 +183,11 @@ export class CategoriesService {
 			}
 			const newCategory = new this.categoryLevel1Model({
 				name,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			});
 			return (await newCategory.save()).populate(populate);
 		}
@@ -206,7 +210,11 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel2Model({
 				name,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			});
 			const response = await newCategory.save();
 
@@ -238,7 +246,11 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel3Model({
 				name,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			});
 			const response = await newCategory.save();
 
@@ -282,7 +294,11 @@ export class CategoriesService {
 					{
 						$set: {
 							name,
-							user,
+							user: {
+								username: user.username,
+								name: user.name,
+								_id: user._id,
+							},
 						},
 					},
 					{
@@ -329,7 +345,11 @@ export class CategoriesService {
 					$set: {
 						name,
 						parentId: categoryParent?._id,
-						user,
+						user: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
 					},
 				});
 			}
@@ -351,7 +371,11 @@ export class CategoriesService {
 									childs: categoryParent['childs'].filter(
 										(item) => item._id.toString() !== id,
 									),
-									user,
+									user: {
+										username: user.username,
+										name: user.name,
+										_id: user._id,
+									},
 								},
 							},
 							{
@@ -372,7 +396,11 @@ export class CategoriesService {
 						{
 							$set: {
 								childs: categoryParent['childs'].concat(new Types.ObjectId(id)),
-								user,
+								user: {
+									username: user.username,
+									name: user.name,
+									_id: user._id,
+								},
 							},
 						},
 						{
@@ -428,7 +456,11 @@ export class CategoriesService {
 					$set: {
 						name,
 						parentId: categoryParent?._id,
-						user,
+						user: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
 					},
 				});
 			}
@@ -451,7 +483,11 @@ export class CategoriesService {
 										categoryParent['childs']?.filter(
 											(item) => item._id.toString() !== id,
 										) || [],
-									user,
+									user: {
+										username: user.username,
+										name: user.name,
+										_id: user._id,
+									},
 								},
 							},
 							{
@@ -473,7 +509,11 @@ export class CategoriesService {
 						{
 							$set: {
 								childs: categoryParent['childs'].concat(new Types.ObjectId(id)),
-								user,
+								user: {
+									username: user.username,
+									name: user.name,
+									_id: user._id,
+								},
 							},
 						},
 						{

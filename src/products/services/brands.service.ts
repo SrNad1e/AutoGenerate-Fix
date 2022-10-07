@@ -64,7 +64,11 @@ export class BrandsService {
 		}
 		const newBrand = new this.brandModel({
 			...props,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		return newBrand.save();
@@ -84,6 +88,13 @@ export class BrandsService {
 		if (attribName && id !== attribName._id.toString()) {
 			throw new NotFoundException('El nombre de la marca ya existe');
 		}
-		return this.brandModel.findByIdAndUpdate(id, { ...props, user });
+		return this.brandModel.findByIdAndUpdate(id, {
+			...props,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
+		});
 	}
 }

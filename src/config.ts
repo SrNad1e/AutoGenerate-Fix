@@ -41,4 +41,6 @@ export default registerAs('config', () => ({
 		postalCode: process.env.FEDEX_POSTAL_CODE_DEFAULT,
 		country: process.env.FEDEX_COUNTRY_DEFAULT,
 	},
+	API_URL: process.env.API_URL,
+	API_WEB: process.env.API_WEB,
 }));

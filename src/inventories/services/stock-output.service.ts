@@ -218,7 +218,11 @@ export class StockOutputService {
 			warehouse,
 			details: detailsInput,
 			total,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 			status: StatusStockOutput[status],
 			company: user.companies.find(
 				(company) => company._id.toString() === companyId,
@@ -372,7 +376,11 @@ export class StockOutputService {
 						details: newDetails,
 						total,
 						status: StatusStockOutput[status],
-						user,
+						user: {
+							username: user.username,
+							name: user.name,
+							_id: user._id,
+						},
 					},
 				},
 				{

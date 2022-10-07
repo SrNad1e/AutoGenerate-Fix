@@ -80,7 +80,11 @@ export class PaymentsService {
 			logo: new Types.ObjectId(logoId),
 			name,
 			...params,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 
@@ -101,7 +105,11 @@ export class PaymentsService {
 				type: TypePayment[type],
 				logo: new Types.ObjectId(logoId),
 				...params,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 			{
 				lean: true,

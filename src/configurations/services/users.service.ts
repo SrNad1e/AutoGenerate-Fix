@@ -262,7 +262,11 @@ export class UsersService {
 			companies: [company?._id],
 			status: StatusUser[status],
 			...params,
-			user: userCreate,
+			user: {
+				username: userCreate.username,
+				name: userCreate.name,
+				_id: userCreate._id,
+			},
 		});
 
 		const response = await (await newUser.save()).populate(populate);
@@ -368,7 +372,11 @@ export class UsersService {
 						pointOfSale: pointOfSale?._id,
 						role: role?._id,
 						username,
-						user: userUpdate,
+						user: {
+							username: userUpdate.username,
+							name: userUpdate.name,
+							_id: userUpdate._id,
+						},
 					},
 				},
 				{ new: true },

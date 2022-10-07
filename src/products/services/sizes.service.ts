@@ -60,7 +60,14 @@ export class SizesService {
 			throw new NotFoundException('El nombre de la talla ya existe');
 		}
 
-		const newSize = new this.sizeModel({ ...props, user });
+		const newSize = new this.sizeModel({
+			...props,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
+		});
 
 		return newSize.save();
 	}
@@ -77,7 +84,14 @@ export class SizesService {
 		if (sizeName && id !== sizeName._id.toString()) {
 			throw new NotFoundException('El nombre de la talla ya existe');
 		}
-		return this.sizeModel.findByIdAndUpdate(id, { ...props, user });
+		return this.sizeModel.findByIdAndUpdate(id, {
+			...props,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
+		});
 	}
 
 	/**

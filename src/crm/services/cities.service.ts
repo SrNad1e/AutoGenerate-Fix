@@ -101,7 +101,11 @@ export class CitiesService {
 				name: countryName,
 				prefix: countryPrefix,
 			},
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 	}
 
@@ -141,7 +145,11 @@ export class CitiesService {
 					name: countryName,
 					prefix: countryPrefix,
 				},
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			},
 			{
 				lean: true,

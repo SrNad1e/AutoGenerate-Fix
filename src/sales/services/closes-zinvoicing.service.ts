@@ -128,7 +128,10 @@ export class ClosesZinvoicingService {
 			throw new NotFoundException('El punto de venta no existe');
 		}
 
-		if (dayjs(closeDate) <= dayjs(pointOfSale?.closeDate)) {
+		if (
+			dayjs(closeDate).format('YYYY/MM/DD') ===
+			dayjs(pointOfSale?.closeDate).format('YYYY/MM/DD')
+		) {
 			throw new NotFoundException(
 				`El punto de venta se encuentra cerrado para el día ${dayjs(
 					pointOfSale?.closeDate,
@@ -136,8 +139,10 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		console.log(new Date(dayjs(closeDate).format('YYYY/MM/DD')));
+
 		const closeZOld = await this.closeZInvoicingModel.findOne({
-			closeDate: new Date(dayjs(pointOfSale?.closeDate).format('YYYY/MM/DD')),
+			closeDate: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
 		});
 
@@ -226,7 +231,11 @@ export class ClosesZinvoicingService {
 			quantityBank,
 			...summaryOrder,
 			payments,
-			user,
+			user: {
+				username: user.username,
+				name: user.name,
+				_id: user._id,
+			},
 		});
 
 		const response = await (await newClose.save()).populate(populate);

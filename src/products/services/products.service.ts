@@ -356,7 +356,11 @@ export class ProductsService {
 				images: imagesId?.map((id) => new Types.ObjectId(id)),
 				barcode,
 				stock,
-				user,
+				user: {
+					username: user.username,
+					name: user.name,
+					_id: user._id,
+				},
 			})
 		).populate(populate);
 	}
@@ -414,7 +418,11 @@ export class ProductsService {
 					barcode,
 					status: newStatus,
 					images: imagesId?.map((item) => new Types.ObjectId(item)) || [],
-					user,
+					user: {
+						username: user.username,
+						name: user.name,
+						_id: user._id,
+					},
 				},
 			},
 			{
