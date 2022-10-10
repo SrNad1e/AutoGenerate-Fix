@@ -899,6 +899,8 @@ export class OrdersService {
 							quantity,
 							order?.shop?.defaultWarehouse._id.toString(),
 						);
+					} else {
+						product = newDetails[index].product;
 					}
 				} else if (quantity > newDetails[index].quantity) {
 					product = await this.productsService.validateStock(
