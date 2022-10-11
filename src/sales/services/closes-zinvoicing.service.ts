@@ -78,7 +78,10 @@ export class ClosesZinvoicingService {
 		}
 
 		if (closeDate) {
-			filters.closeDate = new Date(closeDate);
+			filters.closeDate = {
+				$gte: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
+				$lt: new Date(dayjs(closeDate).add(1, 'd').format('YYYY/MM/DD')),
+			};
 		}
 
 		if (number) {
