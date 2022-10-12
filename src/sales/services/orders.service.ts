@@ -164,8 +164,6 @@ export class OrdersService {
 			lean: true,
 			allowDiskUse: true,
 		};
-		console.log(filters);
-		
 
 		return this.orderModel.paginate(filters, options);
 	}
