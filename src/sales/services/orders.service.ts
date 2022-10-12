@@ -532,7 +532,7 @@ export class OrdersService {
 
 				if (
 					order.summary.total < 300000 &&
-					order.customer.customerType['name'] !== 'Mayorista'
+					order.customer.customerType['name'] === 'Detal'
 				) {
 					throw new BadRequestException(
 						'El monto debe ser superior o igual a $ 300.000 si no eres cliente mayorista',
