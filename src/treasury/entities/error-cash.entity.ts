@@ -1,6 +1,7 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Company } from 'src/configurations/entities/company.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CloseZInvoicing } from 'src/sales/entities/close-z-invoicing.entity';
 import { Box } from './box.entity';
@@ -55,11 +56,19 @@ export class ErrorCash extends Document {
 	@Prop({ type: String, required: true })
 	typeError: TypeErrorCash;
 
+	@Field(() => String, {
+		description: 'Compañía a la que pertenece el error',
+	})
+	@Prop({ type: Types.ObjectId, required: true })
+	company: Types.ObjectId;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la caja',
 	})
 	@Prop({ type: Object, required: true })
 	user: User;
+
+	
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;
