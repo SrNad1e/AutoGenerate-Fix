@@ -633,7 +633,7 @@ export class StockTransferService {
 				});
 
 				detailHistory = detailHistory.filter((item) => item.quantity > 0);
-
+				
 				if (detailHistory?.length > 0) {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
@@ -646,40 +646,42 @@ export class StockTransferService {
 						user,
 						companyId,
 					);
-					const detailsError = stockTransfer.details.filter(
-						(detail) =>
-							detail.quantity !== detail.quantityConfirmed &&
-							detail.status === StatusDetailTransfer.CONFIRMED,
+				}
+
+				const detailsError = stockTransfer.details.filter(
+					(detail) =>
+						detail.quantity !== detail.quantityConfirmed &&
+						detail.status === StatusDetailTransfer.CONFIRMED,
+				);
+
+
+				if (detailsError.length > 0) {
+					const detailsErrorFormat = detailsError.map((detail) => {
+						const newQuantity = detail.quantity - detail.quantityConfirmed;
+						
+						if (newQuantity > 0) {
+							return {
+								product: detail.product,
+								quantity: newQuantity,
+								status: StatusDetailTransferError.MISSING,
+							};
+						} else {
+							return {
+								product: detail.product,
+								quantity: -newQuantity,
+								status: StatusDetailTransferError.SURPLUS,
+							};
+						}
+					});
+
+					await this.stockTransferErrorsService.addRegister(
+						{
+							details:
+								detailsErrorFormat as DetailsStockTransferErrorCreateInput[],
+							stockTransferId: stockTransfer._id.toString(),
+						},
+						user,
 					);
-
-					if (detailsError.length > 0) {
-						const detailsErrorFormat = detailsError.map((detail) => {
-							const newQuantity = detail.quantity - detail.quantityConfirmed;
-
-							if (newQuantity > 0) {
-								return {
-									product: detail.product,
-									quantity: newQuantity,
-									status: StatusDetailTransferError.MISSING,
-								};
-							} else {
-								return {
-									product: detail.product,
-									quantity: -newQuantity,
-									status: StatusDetailTransferError.SURPLUS,
-								};
-							}
-						});
-
-						await this.stockTransferErrorsService.addRegister(
-							{
-								details:
-									detailsErrorFormat as DetailsStockTransferErrorCreateInput[],
-								stockTransferId: stockTransfer._id.toString(),
-							},
-							user,
-						);
-					}
 				}
 			}
 
