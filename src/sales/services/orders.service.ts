@@ -1134,7 +1134,7 @@ export class OrdersService {
 
 		const newDetails = [...order.details];
 
-		//Se valida y coonfirma los productos
+		//Se valida y confirma los productos
 		for (let i = 0; i < details.length; i++) {
 			const { productId, status } = details[i];
 
