@@ -101,6 +101,7 @@ export class OrdersService {
 		user: User,
 		companyId: string,
 	) {
+
 		const filters: FilterQuery<Order> = {};
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -111,7 +112,7 @@ export class OrdersService {
 		}
 
 		if (statusWeb) {
-			filters.statusWeb = StatusOrder[statusWeb] || statusWeb;
+			filters.statusWeb = StatusWeb[statusWeb] || statusWeb;
 		}
 
 		if (nonStatus?.length > 0) {
@@ -163,6 +164,8 @@ export class OrdersService {
 			lean: true,
 			allowDiskUse: true,
 		};
+		console.log(filters);
+		
 
 		return this.orderModel.paginate(filters, options);
 	}
