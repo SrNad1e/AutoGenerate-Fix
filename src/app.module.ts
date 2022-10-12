@@ -18,6 +18,7 @@ import { CrmModule } from './crm/crm.module';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { CreditsModule } from './credits/credits.module';
 import { SendMailModule } from './send-mail/send-mail.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
 	imports: [
@@ -74,6 +75,7 @@ import { SendMailModule } from './send-mail/send-mail.module';
 		TreasuryModule,
 		CreditsModule,
 		SendMailModule,
+		ReportsModule,
 	],
 	providers: [AppGateway],
 })
