@@ -6,6 +6,7 @@ import { CloseZInvoicing } from 'src/sales/entities/close-z-invoicing.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { CreateErrorCashInput } from '../dtos/create-errorCash.input';
 import { FiltersErrorsCashInput } from '../dtos/filters-errorsCash.input';
+import { VerifiedErrorsCashInput } from '../dtos/verified-errors-cash.input';
 import { Box } from '../entities/box.entity';
 import { ErrorCash, TypeErrorCash } from '../entities/error-cash.entity';
 import { BoxService } from './box.service';
@@ -33,35 +34,47 @@ export class ErrorsCashService {
 		@InjectModel(CloseZInvoicing.name)
 		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
 		private readonly boxesService: BoxService,
-	) { }
+	) {}
 
-	async findAll({ closeZNumber, limit = 10, page = 1, sort, typeError, value, verified }: FiltersErrorsCashInput, user: User, companyId: string) {
-
-		const filters: FilterQuery<ErrorCash> = {}
-		const newTypeError = TypeErrorCash[typeError] || typeError
+	async findAll(
+		{
+			closeZNumber,
+			limit = 10,
+			page = 1,
+			sort,
+			typeError,
+			value,
+			verified,
+		}: FiltersErrorsCashInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<ErrorCash> = {};
+		const newTypeError = TypeErrorCash[typeError] || typeError;
 
 		if (user.username !== 'admin') {
-			filters.company = new Types.ObjectId(companyId)
+			filters.company = new Types.ObjectId(companyId);
 		}
 
 		if (verified !== undefined) {
-			filters.verified = verified
+			filters.verified = verified;
 		}
 
 		if (value) {
-			filters.value = value
+			filters.value = value;
 		}
 
-
 		if (newTypeError) {
-			filters.typeError = newTypeError
+			filters.typeError = newTypeError;
 		}
 
 		if (closeZNumber) {
-			const closeZ = await this.closeZInvoicingModel.findOne({ number: closeZNumber })
+			const closeZ = await this.closeZInvoicingModel.findOne({
+				number: closeZNumber,
+			});
 
 			if (closeZ) {
-				filters.closeZ = closeZ._id
+				filters.closeZ = closeZ._id;
 			}
 		}
 
@@ -73,10 +86,35 @@ export class ErrorsCashService {
 			lean: true,
 		};
 
-
 		return this.errorCashModel.paginate(filters, options);
+	}
 
+	async verified({ errorCashId, reason }: VerifiedErrorsCashInput, user: User) {
+		const errorCash = await this.errorCashModel.findById(errorCashId);
 
+		if (!errorCash) {
+			throw new BadRequestException('El erro que intentas verificar no existe');
+		}
+
+		return this.errorCashModel.findByIdAndUpdate(
+			errorCashId,
+			{
+				$set: {
+					reason,
+					verified: true,
+					user: {
+						username: user.username,
+						_id: user._id,
+						name: user.name,
+					},
+				},
+			},
+			{
+				new: true,
+				populate,
+				lean: true,
+			},
+		);
 	}
 
 	async addRegister(
@@ -124,7 +162,7 @@ export class ErrorsCashService {
 				name: user.name,
 				_id: user._id,
 			},
-			company: new Types.ObjectId(companyId)
+			company: new Types.ObjectId(companyId),
 		});
 	}
 }

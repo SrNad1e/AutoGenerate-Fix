@@ -57,6 +57,12 @@ export class ErrorCash extends Document {
 	typeError: TypeErrorCash;
 
 	@Field(() => String, {
+		description: 'Motivo del proceso',
+		nullable: true,
+	})
+	reason?: string;
+
+	@Field(() => String, {
 		description: 'Compañía a la que pertenece el error',
 	})
 	@Prop({ type: Types.ObjectId, required: true })
@@ -67,8 +73,6 @@ export class ErrorCash extends Document {
 	})
 	@Prop({ type: Object, required: true })
 	user: User;
-
-	
 
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;
