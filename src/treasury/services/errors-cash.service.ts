@@ -96,6 +96,14 @@ export class ErrorsCashService {
 			throw new BadRequestException('El erro que intentas verificar no existe');
 		}
 
+		const box = await this.boxesService.findById(
+			errorCash.boxDestination.toString(),
+		);
+
+		const total = box.total + errorCash.value;
+
+		await this.boxesService.updateTotal(box._id.toString(), total);
+
 		return this.errorCashModel.findByIdAndUpdate(
 			errorCashId,
 			{

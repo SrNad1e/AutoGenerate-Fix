@@ -2846,6 +2846,21 @@ input FiltersStockRequestsInput {
 }
 
 """Filtros para el listado de traslados de productos"""
+input FiltersStockTransfersErrorInput {
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortStockTransferError
+
+  """Si el traslado esta o no verificado por completo"""
+  verifield: Boolean
+}
+
+"""Filtros para el listado de traslados de productos"""
 input FiltersStockTransfersInput {
   """Fecha final para la busqueda"""
   dateFinal: String
@@ -3541,10 +3556,16 @@ type Mutation {
   ): Warehouse!
 
   """Verifica un producto de un traslado en error"""
-  verifiedProductStockTransfer(
+  verifiedErrorsCash(
     """Datos para verificar errores de efectivo"""
     verifiedErrorsCashInput: VerifiedErrorsCashInput!
   ): ErrorCash!
+
+  """Verifica un producto de un traslado en error"""
+  verifiedProductStockTransfer(
+    """Datos para verificar un producto del traslado en error"""
+    verifiedProductTransferErrorInput: VerifiedProductTransferErrorInput!
+  ): StockTransferError!
 }
 
 """Opción del permiso"""
@@ -4107,6 +4128,12 @@ type Query {
     filtersDocumentTypesInput: FiltersDocumentTypesInput = {}
   ): [DocumentType!]!
 
+  """Obtiene listado de traslados en error de productos entre bodegas"""
+  errorsCash(
+    """Filtros para listado de traslados en errores de efectivo"""
+    filtersErrorsCashInput: FiltersErrorsCashInput!
+  ): ResponseErrorCash!
+
   """Se encarga de listar los egresos"""
   expenses(
     """Filtros para consultar los egresos"""
@@ -4289,9 +4316,9 @@ type Query {
 
   """Obtiene listado de traslados en error de productos entre bodegas"""
   stockTransfersError(
-    """Filtros para listado de traslados en errores de efectivo"""
-    filtersErrorsCashInput: FiltersErrorsCashInput!
-  ): ResponseErrorCash!
+    """Filtros para listado de traslados en error de productos entre bodegas"""
+    filtersStockTransfersErrorInput: FiltersStockTransfersErrorInput = {}
+  ): ResponseStockTransfersError!
 
   """Consulta todos los usuarios con base a los filtros"""
   users(
@@ -6469,6 +6496,15 @@ input SortStockTransfer {
   warehouseOrigin: Float
 }
 
+"""Ordenamiento del traslado de productos"""
+input SortStockTransferError {
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+
+  """Ordenamiento por fecha de actualización"""
+  updatedAt: Float
+}
+
 """Ordenamiento de los usuarios"""
 input SortUser {
   createdAt: Float
@@ -7466,6 +7502,23 @@ input VerifiedErrorsCashInput {
 
   """Motivo por el cual se verificar el error"""
   reason: String!
+}
+
+"""Datos para verificar los productos"""
+input VerifiedProductTransferErrorInput {
+  """Identificador del producto"""
+  productId: String!
+
+  """Motivo por el cual se verifica el producto"""
+  reason: String!
+
+  """
+  Proceso a realizar, si se envia al origen true, si se envia al destino false
+  """
+  returnInventory: Boolean!
+
+  """Identificador del traslado en error"""
+  stockTransferErrorId: String!
 }
 
 """Modelo de la bodega"""
