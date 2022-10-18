@@ -1848,6 +1848,45 @@ enum DocumentTypesRule {
   SHOPS
 }
 
+"""Errores de traslado de efectivo"""
+type ErrorCash {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Caja hacia donde se realiza el movimiento"""
+  boxDestination: Box!
+
+  """Caja desde donde se realiza el movimiento"""
+  boxOrigin: Box!
+
+  """Cierre que efectúa el error"""
+  closeZ: CloseZInvoicing
+
+  """Compañía a la que pertenece el error"""
+  company: String!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Motivo del proceso"""
+  reason: String
+
+  """Tipo de error"""
+  typeError: TypeErrorCash!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó la caja"""
+  user: User!
+
+  """Valor del movimiento"""
+  value: Float!
+
+  """Si ya fue verificados"""
+  verified: Boolean!
+}
+
 """Egreso de dinero"""
 type Expense {
   """Identificador de mongo"""
@@ -2274,6 +2313,30 @@ input FiltersDocumentTypesInput {
 
   """Nombre del tipo de documento"""
   name: String
+}
+
+"""Listado de errores de efectivo"""
+input FiltersErrorsCashInput {
+  """Número del cierre que efectúa el error"""
+  closeZNumber: Float
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Página actual"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortErrosCash
+
+  """Tipo de error"""
+  typeError: TypeErrorCash
+
+  """cantidad de efectivo"""
+  value: Float
+
+  """Si ya fue verificado"""
+  verified: Boolean
 }
 
 """Filtros para obtener el listado de egresos"""
@@ -2780,21 +2843,6 @@ input FiltersStockRequestsInput {
 
   """Id de la bodega de origen"""
   warehouseOriginId: String
-}
-
-"""Filtros para el listado de traslados de productos"""
-input FiltersStockTransfersErrorInput {
-  """Cantidad de registros"""
-  limit: Float
-
-  """Desde donde arranca la página"""
-  page: Float
-
-  """Ordenamiento (1 es ascendente, -1 es descendente)"""
-  sort: SortStockTransferError
-
-  """Si el traslado esta o no verificado por completo"""
-  verifield: Boolean
 }
 
 """Filtros para el listado de traslados de productos"""
@@ -3494,9 +3542,9 @@ type Mutation {
 
   """Verifica un producto de un traslado en error"""
   verifiedProductStockTransfer(
-    """Datos para verificar un producto del traslado en error"""
-    verifiedProductTransferErrorInput: VerifiedProductTransferErrorInput!
-  ): StockTransferError!
+    """Datos para verificar errores de efectivo"""
+    verifiedErrorsCashInput: VerifiedErrorsCashInput!
+  ): ErrorCash!
 }
 
 """Opción del permiso"""
@@ -3813,6 +3861,7 @@ enum Permissions {
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
   READ_TREASURY_BOXES
+  READ_TREASURY_ERRORS_CASH
   READ_TREASURY_EXPENSES
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
@@ -3844,6 +3893,7 @@ enum Permissions {
   UPDATE_TREASURY_EXPENSE
   UPDATE_TREASURY_PAYMENT
   UPDATE_TREASURY_RECEIPT
+  VERIFIED_TREASURY_ERRRORS_CASH
 }
 
 """Punto de venta de la tienda"""
@@ -4239,9 +4289,9 @@ type Query {
 
   """Obtiene listado de traslados en error de productos entre bodegas"""
   stockTransfersError(
-    """Filtros para listado de traslados en error de productos entre bodegas"""
-    filtersStockTransfersErrorInput: FiltersStockTransfersErrorInput = {}
-  ): ResponseStockTransfersError!
+    """Filtros para listado de traslados en errores de efectivo"""
+    filtersErrorsCashInput: FiltersErrorsCashInput!
+  ): ResponseErrorCash!
 
   """Consulta todos los usuarios con base a los filtros"""
   users(
@@ -4968,6 +5018,39 @@ type ResponseCustomers {
 type ResponseDiscountRules {
   """Lista de reglas de descuento"""
   docs: [DiscountRule!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de cajas"""
+type ResponseErrorCash {
+  """Lista de errores de efectivo"""
+  docs: [ErrorCash!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -6145,6 +6228,12 @@ input SortDiscountRule {
   value: Float
 }
 
+"""Ordenamient"""
+input SortErrosCash {
+  value: Float
+  verified: Float
+}
+
 """Ordenamiento de los egresos"""
 input SortExpense {
   createdAt: Float
@@ -6378,15 +6467,6 @@ input SortStockTransfer {
 
   """Ordenamiento por bodega de origen"""
   warehouseOrigin: Float
-}
-
-"""Ordenamiento del traslado de productos"""
-input SortStockTransferError {
-  """Ordenamiento por fecha de creación"""
-  createdAt: Float
-
-  """Ordenamiento por fecha de actualización"""
-  updatedAt: Float
 }
 
 """Ordenamiento de los usuarios"""
@@ -6811,6 +6891,11 @@ enum TypeCreditHistory {
   DEBIT
   FROZEN
   THAWED
+}
+
+enum TypeErrorCash {
+  MISSING
+  SURPLUS
 }
 
 enum TypePayment {
@@ -7374,21 +7459,13 @@ type User {
   username: String!
 }
 
-"""Datos para verificar los productos"""
-input VerifiedProductTransferErrorInput {
-  """Identificador del producto"""
-  productId: String!
+"""Datos para verificar los errores de pedido"""
+input VerifiedErrorsCashInput {
+  """Identificador del error de efectivo"""
+  errorCashId: String!
 
-  """Motivo por el cual se verifica el producto"""
+  """Motivo por el cual se verificar el error"""
   reason: String!
-
-  """
-  Proceso a realizar, si se envia al origen true, si se envia al destino false
-  """
-  returnInventory: Boolean!
-
-  """Identificador del traslado en error"""
-  stockTransferErrorId: String!
 }
 
 """Modelo de la bodega"""

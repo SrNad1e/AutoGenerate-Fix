@@ -42,7 +42,7 @@ export class StockTransferErrorsResolver {
 		description: 'Verifica un producto de un traslado en error',
 	})
 	@RequirePermissions(Permissions.INVENTORY_TRANSFERS_VERIFIED)
-	create(
+	verified(
 		@Args('verifiedProductTransferErrorInput', {
 			description: 'Datos para verificar un producto del traslado en error',
 		})
