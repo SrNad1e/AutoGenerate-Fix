@@ -14,7 +14,7 @@ export class ErrorsCashResolver {
 	constructor(private readonly errorsCashService: ErrorsCashService) {}
 
 	@Query(() => ResponseErrorCash, {
-		name: 'stockTransfersError',
+		name: 'errorsCash',
 		description:
 			'Obtiene listado de traslados en error de productos entre bodegas',
 	})
@@ -35,7 +35,7 @@ export class ErrorsCashResolver {
 	}
 
 	@Mutation(() => ErrorCash, {
-		name: 'verifiedProductStockTransfer',
+		name: 'verifiedErrorsCash',
 		description: 'Verifica un producto de un traslado en error',
 	})
 	@RequirePermissions(Permissions.VERIFIED_TREASURY_ERRRORS_CASH)
