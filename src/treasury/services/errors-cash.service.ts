@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
 import { CloseZInvoicing } from 'src/sales/entities/close-z-invoicing.entity';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { CreateErrorCashInput } from '../dtos/create-errorCash.input';
+import { FiltersErrorsCashInput } from '../dtos/filters-errorsCash.input';
+import { VerifiedErrorsCashInput } from '../dtos/verified-errors-cash.input';
 import { Box } from '../entities/box.entity';
 import { ErrorCash, TypeErrorCash } from '../entities/error-cash.entity';
 import { BoxService } from './box.service';
@@ -33,6 +35,95 @@ export class ErrorsCashService {
 		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
 		private readonly boxesService: BoxService,
 	) {}
+
+	async findAll(
+		{
+			closeZNumber,
+			limit = 10,
+			page = 1,
+			sort,
+			typeError,
+			value,
+			verified,
+		}: FiltersErrorsCashInput,
+		user: User,
+		companyId: string,
+	) {
+		const filters: FilterQuery<ErrorCash> = {};
+		const newTypeError = TypeErrorCash[typeError] || typeError;
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (verified !== undefined) {
+			filters.verified = verified;
+		}
+
+		if (value) {
+			filters.value = value;
+		}
+
+		if (newTypeError) {
+			filters.typeError = newTypeError;
+		}
+
+		if (closeZNumber) {
+			const closeZ = await this.closeZInvoicingModel.findOne({
+				number: closeZNumber,
+			});
+
+			if (closeZ) {
+				filters.closeZ = closeZ._id;
+			}
+		}
+
+		const options = {
+			limit,
+			page,
+			sort,
+			populate,
+			lean: true,
+		};
+
+		return this.errorCashModel.paginate(filters, options);
+	}
+
+	async verified({ errorCashId, reason }: VerifiedErrorsCashInput, user: User) {
+		const errorCash = await this.errorCashModel.findById(errorCashId);
+
+		if (!errorCash) {
+			throw new BadRequestException('El erro que intentas verificar no existe');
+		}
+
+		const box = await this.boxesService.findById(
+			errorCash.boxDestination.toString(),
+		);
+
+		const total = box.total + errorCash.value;
+
+		await this.boxesService.updateTotal(box._id.toString(), total);
+
+		return this.errorCashModel.findByIdAndUpdate(
+			errorCashId,
+			{
+				$set: {
+					reason,
+					verified: true,
+					user: {
+						username: user.username,
+						_id: user._id,
+						name: user.name,
+					},
+				},
+			},
+			{
+				new: true,
+				populate,
+				lean: true,
+			},
+		);
+	}
 
 	async addRegister(
 		{ closeZId, value, typeError }: CreateErrorCashInput,
@@ -79,6 +170,7 @@ export class ErrorsCashService {
 				name: user.name,
 				_id: user._id,
 			},
+			company: new Types.ObjectId(companyId),
 		});
 	}
 }

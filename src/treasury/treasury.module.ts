@@ -27,6 +27,7 @@ import {
 	CloseZInvoicing,
 	CloseZInvoicingSchema,
 } from 'src/sales/entities/close-z-invoicing.entity';
+import { ErrorsCashResolver } from './resolvers/errors-cash.resolver';
 
 @Module({
 	imports: [
@@ -95,6 +96,7 @@ import {
 		ReceiptsResolver,
 		ExpensesResolver,
 		BoxesResolver,
+		ErrorsCashResolver,
 	],
 	exports: [
 		PaymentsService,
