@@ -24,6 +24,13 @@ const populate = [
 		path: 'closeZ',
 		model: CloseZInvoicing.name,
 	},
+	{
+		path:"closeZ",
+		populate:{
+			path: "pointOfSale",
+			model: PointOfSale.name
+		}
+	}
 ];
 
 @Injectable()
