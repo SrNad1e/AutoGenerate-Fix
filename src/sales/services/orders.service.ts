@@ -40,6 +40,7 @@ import {
 import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
 import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 import { CreateOrderInput } from '../dtos/create-order-input';
+import { DataGetNetSalesInput } from '../dtos/data-net-sales.input';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
@@ -50,6 +51,7 @@ import {
 	StatusOrderDetail,
 } from '../entities/order.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
+import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
 
@@ -68,6 +70,7 @@ const populate = [
 export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
+		@InjectModel(ReturnOrder.name) private readonly returnModel: PaginateModel<ReturnOrder>,
 		private readonly customersService: CustomersService,
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
@@ -81,7 +84,7 @@ export class OrdersService {
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
-	) {}
+	) { }
 
 	async findAll(
 		{
@@ -180,7 +183,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: order?.customer?._id.toString(),
 			});
-		} catch {}
+		} catch { }
 
 		return {
 			order,
@@ -245,6 +248,7 @@ export class OrdersService {
 				summary,
 				number,
 				company: new Types.ObjectId(companyId),
+				closeDate: new Date(),
 				user: {
 					username: user.username,
 					name: user.name,
@@ -279,7 +283,7 @@ export class OrdersService {
 				credit = await this.creditsService.findOne({
 					customerId: oldOrder?.customer?._id?.toString(),
 				});
-			} catch {}
+			} catch { }
 
 			return {
 				credit,
@@ -635,7 +639,7 @@ export class OrdersService {
 						case TypePayment.CREDIT:
 							const credit = await this.creditsService.validateCredit(
 								dataUpdate.customer?._id?.toString() ||
-									order?.customer?._id?.toString(),
+								order?.customer?._id?.toString(),
 								total,
 								TypeCreditHistory.THAWED,
 							);
@@ -788,6 +792,7 @@ export class OrdersService {
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
 					statusWeb: newStatusWeb,
+					closeDate: new Date(),
 					user: {
 						username: user.username,
 						name: user.name,
@@ -1332,7 +1337,7 @@ export class OrdersService {
 						credit = await this.creditsService.findOne({
 							customerId: order?.customer?._id.toString(),
 						});
-					} catch {}
+					} catch { }
 					if (credit?.status !== StatusCredit.ACTIVE) {
 						throw new BadRequestException(
 							'El crédito del cliente se encuentra suspendido',
@@ -1536,7 +1541,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?._id.toString(),
 			});
-		} catch {}
+		} catch { }
 
 		return {
 			credit,
@@ -1597,7 +1602,7 @@ export class OrdersService {
 		const ordersCancel: any = await this.orderModel.aggregate([
 			{
 				$match: {
-					updatedAt: {
+					closeDate: {
 						$gte: dateIntial,
 						$lt: dateFinal,
 					},
@@ -1773,5 +1778,94 @@ export class OrdersService {
 			totalPaid: newTotalPaid,
 			tax: newTax,
 		};
+	}
+
+
+	/**
+	 * @description se encarga de calcular las ventas netas
+	 * @param data datos para generar las ventas
+	 * @returns valor de las ventas
+	 */
+	async getNetSales({ dateFinal, dateInitial, shopId }: DataGetNetSalesInput) {
+
+		const finalDate = dayjs(dateFinal).format("YYYY/MM/DD")
+		const initialDate = dayjs(dateInitial).format("YYYY/MM/DD")
+
+		if (dayjs(finalDate).isBefore(dayjs(initialDate))) {
+			throw new BadRequestException("Error la fecha final debe ser igual o mayor a la fecha inicial")
+		}
+
+		let shop
+
+		if (shopId) {
+			shop = await this.shopsService.findById(shopId)
+		}
+
+		const aggregateSales = [
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(initialDate),
+						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD'))
+					},
+					"shop._id": shop?._id,
+					status: StatusOrder.CLOSED
+				}
+			},
+			{
+				$group: {
+					_id: "",
+					total: {
+						$sum: "$summary.total"
+					}
+				}
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1
+				}
+			}
+		]
+
+
+		const sales = await this.orderModel.aggregate(aggregateSales)
+
+
+		const aggregateReturnOrder= [
+			{
+				$unwind: "$details"
+			},
+			{
+				$match: {
+					createdAt: {
+						$gte: new Date(initialDate),
+						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD'))
+					},
+					active: true,
+					shop: shop?._id,
+				}
+			},
+			{
+				$group: {
+					_id: "",
+					total: {
+						$sum: {
+							$multiply: ["$details.price", "$details.quantity"]
+						}
+					}
+				}
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1
+				}
+			}
+		]
+
+		const returnOrder = await this.returnModel.aggregate(aggregateReturnOrder)
+
+		return (sales[0]?.total || 0) - (returnOrder[0]?.total || 0)
 	}
 }

@@ -2366,6 +2366,15 @@ input FiltersExpensesInput {
   status: StatusExpense
 }
 
+"""Datos para consultar el estado de la meta"""
+input FiltersGoalStatusInput {
+  """Mes a evaluar la meta"""
+  month: String!
+
+  """Identificador de la tienda"""
+  shopId: String
+}
+
 """Filtros para la lista de imagenes"""
 input FiltersImagesInput {
   """Cantidad de registros"""
@@ -3585,6 +3594,9 @@ type Order {
   """Usuario que creó o editó el pedido"""
   address: Address
 
+  """Fecha de cierre del pedido"""
+  closeDate: DateTime!
+
   """Empresa a la que perteneces el pedido"""
   company: Company!
 
@@ -3886,6 +3898,7 @@ enum Permissions {
   READ_TREASURY_EXPENSES
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
+  REPORT_INVOICING_GOAL_STATUS
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_SHOP
   UPDATE_CONFIGURATION_USER
@@ -4139,6 +4152,12 @@ type Query {
     """Filtros para consultar los egresos"""
     filtersExpensesInput: FiltersExpensesInput = {}
   ): ResponseExpenses!
+
+  """Consulta usada para ver el estado de la meta"""
+  goalStatus(
+    """Filtros para obtener el stado de la meta"""
+    filtersGoalStatus: FiltersGoalStatusInput!
+  ): ResponseGoalStatus!
 
   """Listado de imagenes"""
   images(
@@ -5138,6 +5157,15 @@ type ResponseExpenses {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Datos resultado de la consulta de Estado de la meta"""
+type ResponseGoalStatus {
+  """Meta"""
+  goal: Float!
+
+  """Venta neta generada por el usuario"""
+  netSale: Float!
 }
 
 """Respuesta al listado de las imagenes"""
