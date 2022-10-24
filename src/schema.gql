@@ -5165,7 +5165,7 @@ type ResponseGoalStatus {
   goal: Float!
 
   """Venta neta generada por el usuario"""
-  netSale: Float!
+  netSales: Float!
 }
 
 """Respuesta al listado de las imagenes"""
