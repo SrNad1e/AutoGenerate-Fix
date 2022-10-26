@@ -78,6 +78,7 @@ export class CreateReferenceInput {
 
 	@Field(() => [String], {
 		description: 'Atributos de la referencia',
+		nullable: true,
 	})
-	attribIds: string[];
+	attribIds?: string[];
 }
