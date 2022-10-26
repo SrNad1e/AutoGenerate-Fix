@@ -410,7 +410,7 @@ export class StockTransferService {
 				)
 				.map((detail) => detail.productId.toString());
 
-			const newDetails = stockTransfer.details.filter(
+			let newDetails = stockTransfer.details.filter(
 				(detail) => !productsDelete.includes(detail.product._id.toString()),
 			);
 
@@ -484,13 +484,21 @@ export class StockTransferService {
 			}
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
-				const confirmedProducts = stockTransfer.details.find(
-					(detail) => detail.status === StatusDetailTransfer.NEW,
-				);
+				const confirmedProducts = stockTransfer.details
+					.filter((detail) => detail.status === StatusDetailTransfer.NEW)
+					.map((detail) => detail.product._id);
+
 				if (confirmedProducts) {
-					throw new BadRequestException(
-						'Debe confirmar todos los productos para confirmar el traslado',
-					);
+					newDetails = newDetails.map((detail) => {
+						if (confirmedProducts.includes(detail.product._id)) {
+							return {
+								...detail,
+								quantityConfirmed: 0,
+							};
+						}
+
+						return detail;
+					});
 				}
 
 				let detailHistory = newDetails.map((detail) => {
@@ -633,7 +641,7 @@ export class StockTransferService {
 				});
 
 				detailHistory = detailHistory.filter((item) => item.quantity > 0);
-				
+
 				if (detailHistory?.length > 0) {
 					const deleteStockHistoryInput: CreateStockHistoryInput = {
 						details: detailHistory,
@@ -654,11 +662,10 @@ export class StockTransferService {
 						detail.status === StatusDetailTransfer.CONFIRMED,
 				);
 
-
 				if (detailsError.length > 0) {
 					const detailsErrorFormat = detailsError.map((detail) => {
 						const newQuantity = detail.quantity - detail.quantityConfirmed;
-						
+
 						if (newQuantity > 0) {
 							return {
 								product: detail.product,
@@ -749,6 +756,7 @@ export class StockTransferService {
 		const detailsVerified = details.find((detail) =>
 			detailsArray.includes(detail.productId),
 		);
+
 		if (detailsVerified) {
 			throw new BadRequestException(
 				`El producto ${detailsVerified.productId} ya se encuentra confirmado`,
@@ -766,22 +774,37 @@ export class StockTransferService {
 			);
 
 			if (!detailVerified) {
-				throw new BadRequestException(
-					`El producto ${detailConfirm.productId} no existe en el traslado`,
+				const product = await this.productsService.findById(
+					detailConfirm.productId.toString(),
 				);
-			}
 
-			newDetails = newDetails.map((detail) => {
-				if (detail.product._id.toString() === detailConfirm.productId) {
-					return {
-						...detail,
-						status: StatusDetailTransfer.CONFIRMED,
-						quantityConfirmed: detailConfirm.quantity,
-					};
+				if (!product) {
+					throw new BadRequestException(
+						`El producto ${detailConfirm.productId.toString()} no existe`,
+					);
 				}
 
-				return detail;
-			});
+				newDetails.push({
+					product,
+					quantity: 0,
+					status: StatusDetailTransfer.CONFIRMED,
+					quantityConfirmed: detailConfirm.quantity,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				});
+			} else {
+				newDetails = newDetails.map((detail) => {
+					if (detail.product._id.toString() === detailConfirm.productId) {
+						return {
+							...detail,
+							status: StatusDetailTransfer.CONFIRMED,
+							quantityConfirmed: detailConfirm.quantity,
+						};
+					}
+
+					return detail;
+				});
+			}
 		}
 
 		return this.stockTransferModel.findByIdAndUpdate(
