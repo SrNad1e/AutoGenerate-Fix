@@ -1073,7 +1073,7 @@ input CreateReferenceInput {
   active: Boolean
 
   """Atributos de la referencia"""
-  attribIds: [String!]!
+  attribIds: [String!]
 
   """Marca de la referencia"""
   brandId: String!
