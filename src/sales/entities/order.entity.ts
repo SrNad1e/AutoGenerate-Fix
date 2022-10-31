@@ -269,6 +269,11 @@ export class Order extends Document {
 	@Prop({ type: Object })
 	conveyorOrder?: ConveyorOrder;
 
+	@Field(() => Date, { description: 'Fecha de cierre del pedido' })
+	@Prop({ type: Date })
+	closeDate: Date;
+
+
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;
 
