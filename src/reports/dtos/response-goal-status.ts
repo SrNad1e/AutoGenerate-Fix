@@ -5,7 +5,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 })
 export class ResponseGoalStatus {
 	@Field(() => Number, { description: 'Venta neta generada por el usuario' })
-	netSale: number;
+	netSales: number;
 
 	@Field(() => Number, { description: 'Meta' })
 	goal: number;

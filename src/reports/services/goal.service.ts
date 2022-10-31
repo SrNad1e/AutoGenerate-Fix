@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { StatusShop } from 'src/configurations/entities/shop.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
@@ -43,14 +43,15 @@ export class GoalService {
 			goal = shops?.docs?.reduce((sum, shop) => sum + (shop?.goal || 0), 0);
 		}
 
-		const netSales = await this.ordersService.getNetSales({
-			dateFinal: finalDate,
-			dateInitial: initialDate,
-			shopId: shop?._id?.toString(),
-		});
+		const netSales =
+			(await this.ordersService.getNetSales({
+				dateFinal: finalDate,
+				dateInitial: initialDate,
+				shopId: shop?._id?.toString(),
+			})) || 0;
 
 		return {
-			sales: netSales,
+			netSales: netSales,
 			goal,
 		};
 	}
