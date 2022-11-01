@@ -1859,8 +1859,8 @@ export class OrdersService {
 			},
 		];
 
-		const returnOrder = await this.returnModel.aggregate(aggregateReturnOrder);
+		const totalCoupons = await this.orderModel.aggregate(aggregateReturnOrder);
 
-		return (sales[0]?.total || 0) - (returnOrder[0]?.total || 0);
+		return (sales[0]?.total || 0) - (totalCoupons[0]?.total || 0);
 	}
 }
