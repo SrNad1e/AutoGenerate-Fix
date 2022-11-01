@@ -25,12 +25,12 @@ const populate = [
 		model: CloseZInvoicing.name,
 	},
 	{
-		path:"closeZ",
-		populate:{
-			path: "pointOfSale",
-			model: PointOfSale.name
-		}
-	}
+		path: 'closeZ',
+		populate: {
+			path: 'pointOfSale',
+			model: PointOfSale.name,
+		},
+	},
 ];
 
 @Injectable()
@@ -78,6 +78,7 @@ export class ErrorsCashService {
 		if (closeZNumber) {
 			const closeZ = await this.closeZInvoicingModel.findOne({
 				number: closeZNumber,
+				company: new Types.ObjectId(companyId),
 			});
 
 			if (closeZ) {
