@@ -1623,10 +1623,6 @@ export class OrdersService {
 		const aggregate = [
 			{
 				$match: {
-					updatedAt: {
-						$gte: dateIntial,
-						$lt: dateFinal,
-					},
 					status: StatusOrder.OPEN,
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
 				},
@@ -1646,7 +1642,7 @@ export class OrdersService {
 		const ordersClosed: any = await this.orderModel.aggregate([
 			{
 				$match: {
-					updatedAt: {
+					closeDate: {
 						$gte: dateIntial,
 						$lt: dateFinal,
 					},
