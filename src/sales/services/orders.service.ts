@@ -70,7 +70,8 @@ const populate = [
 export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
-		@InjectModel(ReturnOrder.name) private readonly returnModel: PaginateModel<ReturnOrder>,
+		@InjectModel(ReturnOrder.name)
+		private readonly returnModel: PaginateModel<ReturnOrder>,
 		private readonly customersService: CustomersService,
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
@@ -84,7 +85,7 @@ export class OrdersService {
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
-	) { }
+	) {}
 
 	async findAll(
 		{
@@ -104,7 +105,6 @@ export class OrdersService {
 		user: User,
 		companyId: string,
 	) {
-
 		const filters: FilterQuery<Order> = {};
 		if (user.username !== 'admin') {
 			filters.company = new Types.ObjectId(companyId);
@@ -183,7 +183,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: order?.customer?._id.toString(),
 			});
-		} catch { }
+		} catch {}
 
 		return {
 			order,
@@ -283,7 +283,7 @@ export class OrdersService {
 				credit = await this.creditsService.findOne({
 					customerId: oldOrder?.customer?._id?.toString(),
 				});
-			} catch { }
+			} catch {}
 
 			return {
 				credit,
@@ -639,7 +639,7 @@ export class OrdersService {
 						case TypePayment.CREDIT:
 							const credit = await this.creditsService.validateCredit(
 								dataUpdate.customer?._id?.toString() ||
-								order?.customer?._id?.toString(),
+									order?.customer?._id?.toString(),
 								total,
 								TypeCreditHistory.THAWED,
 							);
@@ -745,6 +745,8 @@ export class OrdersService {
 					'Mayorista',
 				);
 
+				dataUpdate.closeDate = new Date();
+
 				if (
 					!order.orderPos &&
 					newSummary.totalPaid >= 300000 &&
@@ -792,7 +794,6 @@ export class OrdersService {
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
 					statusWeb: newStatusWeb,
-					closeDate: new Date(),
 					user: {
 						username: user.username,
 						name: user.name,
@@ -1337,7 +1338,7 @@ export class OrdersService {
 						credit = await this.creditsService.findOne({
 							customerId: order?.customer?._id.toString(),
 						});
-					} catch { }
+					} catch {}
 					if (credit?.status !== StatusCredit.ACTIVE) {
 						throw new BadRequestException(
 							'El crédito del cliente se encuentra suspendido',
@@ -1541,7 +1542,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?._id.toString(),
 			});
-		} catch { }
+		} catch {}
 
 		return {
 			credit,
@@ -1776,25 +1777,25 @@ export class OrdersService {
 		};
 	}
 
-
 	/**
 	 * @description se encarga de calcular las ventas netas
 	 * @param data datos para generar las ventas
 	 * @returns valor de las ventas
 	 */
 	async getNetSales({ dateFinal, dateInitial, shopId }: DataGetNetSalesInput) {
-
-		const finalDate = dayjs(dateFinal).format("YYYY/MM/DD")
-		const initialDate = dayjs(dateInitial).format("YYYY/MM/DD")
+		const finalDate = dayjs(dateFinal).format('YYYY/MM/DD');
+		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
 
 		if (dayjs(finalDate).isBefore(dayjs(initialDate))) {
-			throw new BadRequestException("Error la fecha final debe ser igual o mayor a la fecha inicial")
+			throw new BadRequestException(
+				'Error la fecha final debe ser igual o mayor a la fecha inicial',
+			);
 		}
 
-		let shop
+		let shop;
 
 		if (shopId) {
-			shop = await this.shopsService.findById(shopId)
+			shop = await this.shopsService.findById(shopId);
 		}
 
 		const aggregateSales = [
@@ -1802,66 +1803,64 @@ export class OrdersService {
 				$match: {
 					closeDate: {
 						$gte: new Date(initialDate),
-						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD'))
+						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
-					"shop._id": shop?._id,
-					status: StatusOrder.CLOSED
-				}
+					'shop._id': shop?._id,
+					status: StatusOrder.CLOSED,
+				},
 			},
 			{
 				$group: {
-					_id: "",
+					_id: '',
 					total: {
-						$sum: "$summary.total"
-					}
-				}
+						$sum: '$summary.total',
+					},
+				},
 			},
 			{
 				$project: {
 					_id: 0,
-					total: 1
-				}
-			}
-		]
+					total: 1,
+				},
+			},
+		];
 
+		const sales = await this.orderModel.aggregate(aggregateSales);
 
-		const sales = await this.orderModel.aggregate(aggregateSales)
-
-
-		const aggregateReturnOrder= [
+		const aggregateReturnOrder = [
 			{
-				$unwind: "$details"
+				$unwind: '$details',
 			},
 			{
 				$match: {
 					createdAt: {
 						$gte: new Date(initialDate),
-						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD'))
+						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
 					active: true,
 					shop: shop?._id,
-				}
+				},
 			},
 			{
 				$group: {
-					_id: "",
+					_id: '',
 					total: {
 						$sum: {
-							$multiply: ["$details.price", "$details.quantity"]
-						}
-					}
-				}
+							$multiply: ['$details.price', '$details.quantity'],
+						},
+					},
+				},
 			},
 			{
 				$project: {
 					_id: 0,
-					total: 1
-				}
-			}
-		]
+					total: 1,
+				},
+			},
+		];
 
-		const returnOrder = await this.returnModel.aggregate(aggregateReturnOrder)
+		const returnOrder = await this.returnModel.aggregate(aggregateReturnOrder);
 
-		return (sales[0]?.total || 0) - (returnOrder[0]?.total || 0)
+		return (sales[0]?.total || 0) - (returnOrder[0]?.total || 0);
 	}
 }
