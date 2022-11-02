@@ -1827,27 +1827,26 @@ export class OrdersService {
 
 		const sales = await this.orderModel.aggregate(aggregateSales);
 
-		const aggregateReturnOrder = [
+		const aggregateCoupons = [
 			{
-				$unwind: '$details',
+				$unwind: '$payments',
 			},
 			{
 				$match: {
-					createdAt: {
+					'payments.payment.type': 'bonus',
+					closeDate: {
 						$gte: new Date(initialDate),
 						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
-					active: true,
+					status: 'closed',
 					shop: shop?._id,
 				},
 			},
 			{
 				$group: {
-					_id: '',
+					_id: ['$shop.name', '$payments.payment.type'],
 					total: {
-						$sum: {
-							$multiply: ['$details.price', '$details.quantity'],
-						},
+						$sum: '$payments.total',
 					},
 				},
 			},
@@ -1859,7 +1858,7 @@ export class OrdersService {
 			},
 		];
 
-		const totalCoupons = await this.orderModel.aggregate(aggregateReturnOrder);
+		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
 
 		return (sales[0]?.total || 0) - (totalCoupons[0]?.total || 0);
 	}
