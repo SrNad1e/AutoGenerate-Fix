@@ -55,8 +55,8 @@ export class CloseZInvoicing extends Document {
 		description: 'Devoluciones generadas',
 		nullable: true,
 	})
-	@Prop({ type: Array, default: [] })
-	refunds: RefundOrderClose[];
+	@Prop({ type: Array, default: {} })
+	refunds: RefundOrderClose;
 
 	@Field(() => [PaymentOrderClose], {
 		description: 'Listado de pagos',

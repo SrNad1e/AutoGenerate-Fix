@@ -16,6 +16,7 @@ import {
 } from '../entities/close-x-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
+import { ReturnsOrderService } from './returns-order.service';
 
 const populate: PopulateOptions[] = [
 	{
@@ -53,6 +54,7 @@ export class ClosesXInvoicingService {
 		private readonly ordersService: OrdersService,
 		private readonly expensesService: ExpensesService,
 		private readonly receiptsService: ReceiptsService,
+		private readonly returnsOrderService: ReturnsOrderService,
 	) {}
 
 	async findAll(
@@ -192,6 +194,12 @@ export class ClosesXInvoicingService {
 			}
 		});
 
+		const refunds = await this.returnsOrderService.resumeDay({
+			pointOfSaleId: pointOfSale._id.toString(),
+			dateFinal,
+			dateInitial,
+		});
+
 		const newClose = new this.closeXInvoicingModel({
 			cashRegister: cashRegister,
 			number,
@@ -201,6 +209,7 @@ export class ClosesXInvoicingService {
 			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
 			...summaryOrder,
+			refunds,
 			payments,
 			user: {
 				username: user.username,

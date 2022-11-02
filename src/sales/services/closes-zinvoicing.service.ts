@@ -18,6 +18,7 @@ import { BoxService } from 'src/treasury/services/box.service';
 import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
 import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
+import { ReturnsOrderService } from './returns-order.service';
 
 const populate: PopulateOptions[] = [
 	{
@@ -57,7 +58,8 @@ export class ClosesZinvoicingService {
 		private readonly receiptsService: ReceiptsService,
 		private readonly boxesService: BoxService,
 		private readonly errorsCashService: ErrorsCashService,
-	) {}
+		private readonly returnsOrderService: ReturnsOrderService,
+		) {}
 
 	async findAll(
 		{
@@ -158,8 +160,6 @@ export class ClosesZinvoicingService {
 			pointOfSaleId,
 		);
 
-		console.log('ok summary');
-
 		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
 
@@ -175,7 +175,6 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-		console.log('ok egresos');
 
 		const closeZ = await this.closeZInvoicingModel
 			.findOne({
@@ -222,7 +221,11 @@ export class ClosesZinvoicingService {
 			}
 		});
 
-		console.log('ok close');
+		const refunds = await this.returnsOrderService.resumeDay({
+			pointOfSaleId: pointOfSale._id.toString(),
+			dateFinal,
+			dateInitial,
+		});
 
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
@@ -233,6 +236,7 @@ export class ClosesZinvoicingService {
 			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
 			...summaryOrder,
+			refunds,
 			payments,
 			user: {
 				username: user.username,
