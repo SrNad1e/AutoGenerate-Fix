@@ -191,10 +191,19 @@ export class ProductsService {
 			project['stock'] = ['$stock'];
 		}
 
+		//filtro custom para los productos obligatorio
+
+		const newSort = {
+			"reference.name": 1,
+			"color.name":1,
+			"size.weight":1,
+			...sort,
+		}
+
 		const options = {
 			limit,
 			page,
-			sort,
+			sort: newSort,
 			lean: true,
 		};
 
