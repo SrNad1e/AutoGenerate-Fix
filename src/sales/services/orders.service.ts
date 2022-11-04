@@ -658,6 +658,7 @@ export class OrdersService {
 					}
 				}
 
+				console.log(paymentsForProcess);
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
 
 				if (paymentsForProcess.length > 0) {
@@ -1428,14 +1429,18 @@ export class OrdersService {
 			);
 		}
 
-		let newPayments = [...order.payments];
+		const paymentIds = payments.map((p) => p.paymentId);
+
+		let newPayments = order.payments.filter(
+			({ payment }) => !paymentIds.includes(payment?._id?.toString()),
+		);
 
 		const paymentsForProcess = [];
 
 		for (let i = 0; i < payments.length; i++) {
 			const { paymentId, status } = payments[i];
 
-			const index = newPayments.findIndex(
+			const index = order.payments.findIndex(
 				(payment) => payment.payment._id.toString() === paymentId,
 			);
 
@@ -1446,9 +1451,9 @@ export class OrdersService {
 				});
 			}
 
-			paymentsForProcess.push(newPayments[index]);
+			paymentsForProcess.push(order.payments[index]);
 
-			newPayments.slice(0, index);
+			//newPayments.slice(0, index);
 		}
 
 		//procesar los pagos
@@ -1460,6 +1465,7 @@ export class OrdersService {
 			order as Order,
 			user,
 			companyId,
+			order.customer._id.toString(),
 		);
 
 		newPayments = newPayments.concat(paymentsProccess);
@@ -1879,11 +1885,17 @@ export class OrdersService {
 						user,
 						companyId,
 					);
-					newPayments.push(order?.payments[i]);
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+					});
 
 					break;
 				case TypePayment.CREDIT:
-					newPayments.push(payments[i]);
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+					});
 
 					await this.creditHistoryService.thawedCreditHistory(
 						order?._id?.toString(),
