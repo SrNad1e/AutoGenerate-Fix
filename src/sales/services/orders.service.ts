@@ -133,16 +133,16 @@ export class OrdersService {
 				throw new BadRequestException('Debe enviarse una fecha final');
 			}
 
-			filters['createdAt'] = {
-				$gte: new Date(dateInitial),
+			filters['closeDate'] = {
+				$gte: new Date(dayjs(dateInitial).format('YYYY/MM/DD')),
 				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 			};
 		} else if (dateFinal) {
 			if (!dateInitial) {
 				throw new BadRequestException('Debe enviarse una fecha inicial');
 			}
-			filters['createdAt'] = {
-				$gte: new Date(dateInitial),
+			filters['closeDate'] = {
+				$gte: new Date(dayjs(dateInitial).format('YYYY/MM/DD')),
 				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 			};
 		}
