@@ -311,6 +311,7 @@ export class OrdersService {
 			address,
 			summary,
 			shop,
+			closeDate: new Date(),
 			orderPos: false,
 			user: {
 				username: user.username,
