@@ -1666,12 +1666,52 @@ export class OrdersService {
 			},
 		]);
 
+		const aggregateCoupons = [
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					'payments.payment.type': 'bonus',
+					closeDate: {
+						$gte: new Date(dateIntial),
+						$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+					},
+					status: 'closed',
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: ['$shop.name', '$payments.payment.type'],
+					total: {
+						$sum: '$payments.total',
+					},
+					quantity:{
+						$sum: 1
+					}
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1,
+					quantity: 1
+				},
+			},
+		];
+
+		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
+
+
 		return {
 			summaryOrder: {
 				quantityClosed: ordersClosed[0]?.total || 0,
 				quantityOpen: ordersOpen[0]?.total || 0,
 				quantityCancel: ordersCancel[0]?.total || 0,
 				value: ordersClosed[0]?.value || 0,
+				valueCoupons: totalCoupons[0]?.total || 0,
+				quantityCoupons: totalCoupons[0]?.quantity || 0,
 			},
 		};
 	}
@@ -1827,27 +1867,26 @@ export class OrdersService {
 
 		const sales = await this.orderModel.aggregate(aggregateSales);
 
-		const aggregateReturnOrder = [
+		const aggregateCoupons = [
 			{
-				$unwind: '$details',
+				$unwind: '$payments',
 			},
 			{
 				$match: {
-					createdAt: {
+					'payments.payment.type': 'bonus',
+					closeDate: {
 						$gte: new Date(initialDate),
 						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
-					active: true,
+					status: 'closed',
 					shop: shop?._id,
 				},
 			},
 			{
 				$group: {
-					_id: '',
+					_id: ['$shop.name', '$payments.payment.type'],
 					total: {
-						$sum: {
-							$multiply: ['$details.price', '$details.quantity'],
-						},
+						$sum: '$payments.total',
 					},
 				},
 			},
@@ -1859,8 +1898,8 @@ export class OrdersService {
 			},
 		];
 
-		const returnOrder = await this.returnModel.aggregate(aggregateReturnOrder);
+		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
 
-		return (sales[0]?.total || 0) - (returnOrder[0]?.total || 0);
+		return (sales[0]?.total || 0) - (totalCoupons[0]?.total || 0);
 	}
 }
