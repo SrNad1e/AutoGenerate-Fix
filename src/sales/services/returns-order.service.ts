@@ -264,9 +264,13 @@ export class ReturnsOrderService {
 		dateInitial,
 		pointOfSaleId,
 	}: ResumeDayReturnsOrderInput) {
+		console.log(dateFinal);
+		console.log(dateInitial);
+		console.log(pointOfSaleId);
+
 		const resume = await this.returnOrderModel.aggregate([
 			{
-				$unwind: "$details"
+				$unwind: '$details',
 			},
 			{
 				$match: {
@@ -298,6 +302,7 @@ export class ReturnsOrderService {
 				},
 			},
 		]);
+		console.log(resume);
 
 		return resume[0] || {};
 	}
