@@ -1904,6 +1904,11 @@ export class OrdersService {
 		return (sales[0]?.total || 0) - (totalCoupons[0]?.total || 0);
 	}
 
+	/**
+	 * @description se encarga de generar consolidado de medios de pago
+	 * @param data datos necesarios para realizar la consulta
+	 * @returns array de tipo #PaymentOrderClose
+	 */
 	async getPaymentsOrder({
 		dateFinal,
 		dateInitial,
@@ -1959,6 +1964,6 @@ export class OrdersService {
 			},
 		];
 
-		return await this.orderModel.aggregate(aggreagtePayments);
+		return (await this.orderModel.aggregate(aggreagtePayments)) || [];
 	}
 }
