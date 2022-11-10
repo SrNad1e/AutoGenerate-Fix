@@ -4525,7 +4525,7 @@ type ReferenceData {
 
 """Resumen de los pagos"""
 type RefundOrderClose {
-  """Cantidad de devoluciones"""
+  """Cantidad de productos devueltos"""
   quantity: Float
 
   """Valor de las devoluciones"""
@@ -5872,8 +5872,8 @@ type ReturnOrder {
   """Pedido de la devolución"""
   order: Order!
 
-  """Tienda"""
-  shop: Shop!
+  """Punto de venta"""
+  pointOfSale: Shop!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -6943,11 +6943,17 @@ type SummaryOrderClose {
   """Cantidad de las ordenes finalizadas"""
   quantityClosed: Float!
 
+  """Cantidad de los cupones redimidos"""
+  quantityCoupons: Float!
+
   """Cantidad de las ordenes abiertas"""
   quantityOpen: Float!
 
   """Valor de las ordenes finalizadas"""
   value: Float!
+
+  """Valor de los cupones redimidos"""
+  valueCoupons: Float!
 }
 
 enum TypeCreditHistory {

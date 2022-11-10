@@ -135,16 +135,16 @@ export class OrdersService {
 				throw new BadRequestException('Debe enviarse una fecha final');
 			}
 
-			filters['createdAt'] = {
-				$gte: new Date(dateInitial),
+			filters['closeDate'] = {
+				$gte: new Date(dayjs(dateInitial).format('YYYY/MM/DD')),
 				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 			};
 		} else if (dateFinal) {
 			if (!dateInitial) {
 				throw new BadRequestException('Debe enviarse una fecha inicial');
 			}
-			filters['createdAt'] = {
-				$gte: new Date(dateInitial),
+			filters['closeDate'] = {
+				$gte: new Date(dayjs(dateInitial).format('YYYY/MM/DD')),
 				$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
 			};
 		}
@@ -313,6 +313,7 @@ export class OrdersService {
 			address,
 			summary,
 			shop,
+			closeDate: new Date(),
 			orderPos: false,
 			user: {
 				username: user.username,
@@ -1618,12 +1619,52 @@ export class OrdersService {
 			},
 		]);
 
+		const aggregateCoupons = [
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					'payments.payment.type': 'bonus',
+					closeDate: {
+						$gte: new Date(dateIntial),
+						$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+					},
+					status: 'closed',
+					pointOfSale: new Types.ObjectId(pointOfSaleId),
+				},
+			},
+			{
+				$group: {
+					_id: ['$shop.name', '$payments.payment.type'],
+					total: {
+						$sum: '$payments.total',
+					},
+					quantity:{
+						$sum: 1
+					}
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1,
+					quantity: 1
+				},
+			},
+		];
+
+		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
+
+
 		return {
 			summaryOrder: {
 				quantityClosed: ordersClosed[0]?.total || 0,
 				quantityOpen: ordersOpen[0]?.total || 0,
 				quantityCancel: ordersCancel[0]?.total || 0,
 				value: ordersClosed[0]?.value || 0,
+				valueCoupons: totalCoupons[0]?.total || 0,
+				quantityCoupons: totalCoupons[0]?.quantity || 0,
 			},
 		};
 	}

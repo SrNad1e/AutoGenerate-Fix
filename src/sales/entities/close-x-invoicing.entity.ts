@@ -57,6 +57,12 @@ export class SummaryOrderClose {
 
 	@Field(() => Number, { description: 'Valor de las ordenes finalizadas' })
 	value: number;
+
+	@Field(() => Number, { description: 'Valor de los cupones redimidos' })
+	valueCoupons: number;
+
+	@Field(() => Number, { description: 'Cantidad de los cupones redimidos' })
+	quantityCoupons: number;
 }
 
 @ObjectType({ description: 'Resumen de los pagos' })
@@ -76,7 +82,7 @@ export class PaymentOrderClose {
 @ObjectType({ description: 'Resumen de los pagos' })
 export class RefundOrderClose {
 	@Field(() => Number, {
-		description: 'Cantidad de devoluciones',
+		description: 'Cantidad de productos devueltos',
 		nullable: true,
 	})
 	quantity: number;
@@ -130,8 +136,8 @@ export class CloseXInvoicing extends Document {
 		description: 'Devoluciones generadas',
 		nullable: true,
 	})
-	@Prop({ type: Array, default: [] })
-	refunds: RefundOrderClose[];
+	@Prop({ type: Array, default: {} })
+	refunds: RefundOrderClose;
 
 	@Field(() => [PaymentOrderClose], {
 		description: 'Listado de pagos',

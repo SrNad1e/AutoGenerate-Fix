@@ -287,8 +287,10 @@ export class StockRequestService {
 			}
 
 			if (
-				user.username !== 'admin' &&
-				stockRequest.company._id.toString() !== companyId
+				(user.username !== 'admin' &&
+					stockRequest.company._id.toString() !== companyId) ||
+				user.shop['defaultWarehouse']['_id'].toString() !==
+					stockRequest.warehouseDestination._id.toString()
 			) {
 				throw new UnauthorizedException(
 					`El usuario no se encuentra autorizado para hacer cambios en la solicitud`,

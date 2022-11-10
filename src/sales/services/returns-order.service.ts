@@ -14,6 +14,9 @@ import { CouponsService } from 'src/crm/services/coupons.service';
 import { Coupon } from 'src/crm/entities/coupon.entity';
 import { Shop } from 'src/configurations/entities/shop.entity';
 import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHistory-input';
+import { PointOfSalesService } from './point-of-sales.service';
+import { PointOfSale } from '../entities/pointOfSale.entity';
+import { ResumeDayReturnsOrderInput } from '../dtos/resume-day-returns.order.input';
 
 const populate = [
 	{
@@ -25,8 +28,15 @@ const populate = [
 		model: Coupon.name,
 	},
 	{
-		path: 'shop',
-		model: Shop.name,
+		path: 'pointOfSale',
+		model: PointOfSale.name,
+	},
+	{
+		path: 'pointOfSale',
+		populate: {
+			path: 'shop',
+			model: Shop.name,
+		},
 	},
 ];
 
@@ -38,6 +48,7 @@ export class ReturnsOrderService {
 		private readonly ordersService: OrdersService,
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly couponsService: CouponsService,
+		private readonly pointOfSalesService: PointOfSalesService,
 	) {}
 
 	async findAll(
@@ -65,7 +76,20 @@ export class ReturnsOrderService {
 		}
 
 		if (shopId) {
-			filters.shop = new Types.ObjectId(shopId);
+			const pointOfSales = await this.pointOfSalesService.findAll(
+				{
+					limit: 20,
+					page: 1,
+					shopId,
+				},
+				user,
+				companyId,
+			);
+			const pointOfSaleIds = pointOfSales?.docs?.map(
+				(pointOfSale) => pointOfSale._id,
+			);
+
+			filters.pointOfSale = { $in: pointOfSaleIds };
 		}
 
 		if (dateInitial) {
@@ -207,7 +231,7 @@ export class ReturnsOrderService {
 			company: new Types.ObjectId(companyId),
 			order: order?._id,
 			details: detailsReturn,
-			shop: order?.shop?._id,
+			pointOfSale: order?.pointOfSale?._id,
 			coupon: coupon._id,
 			user: {
 				username: user.username,
@@ -233,5 +257,48 @@ export class ReturnsOrderService {
 		);
 
 		return responseReturnOrder.populate(populate);
+	}
+
+	async resumeDay({
+		dateFinal,
+		dateInitial,
+		pointOfSaleId,
+	}: ResumeDayReturnsOrderInput) {
+		const resume = await this.returnOrderModel.aggregate([
+			{
+				$unwind: "$details"
+			},
+			{
+				$match: {
+					createdAt: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+				},
+			},
+			{
+				$group: {
+					_id: '$pointOfSale',
+					total: {
+						$sum: { $multiply: ['$details.price', '$details.quantity'] },
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return resume[0] || {};
 	}
 }
