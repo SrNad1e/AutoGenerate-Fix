@@ -59,6 +59,15 @@ const populate = [
 				path: 'authorization',
 				model: AuthorizationDian.name,
 			},
+			{
+				path: 'shop',
+				populate: [
+					{
+						path: 'defaultWarehouse',
+						model: Warehouse.name,
+					},
+				],
+			},
 		],
 	},
 
