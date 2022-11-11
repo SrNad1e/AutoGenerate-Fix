@@ -536,8 +536,6 @@ export class StockTransferService {
 					);
 
 					if (detailsError.length > 0) {
-						console.log(detailsError);
-
 						const detailsErrorFormat = detailsError.map((detail) => {
 							const newQuantity = detail.quantity - detail.quantityConfirmed;
 

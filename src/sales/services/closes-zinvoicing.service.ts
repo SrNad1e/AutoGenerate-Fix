@@ -59,7 +59,7 @@ export class ClosesZinvoicingService {
 		private readonly boxesService: BoxService,
 		private readonly errorsCashService: ErrorsCashService,
 		private readonly returnsOrderService: ReturnsOrderService,
-		) {}
+	) {}
 
 	async findAll(
 		{
@@ -144,8 +144,6 @@ export class ClosesZinvoicingService {
 			);
 		}
 
-		console.log(new Date(dayjs(closeDate).format('YYYY/MM/DD')));
-
 		const closeZOld = await this.closeZInvoicingModel.findOne({
 			closeDate: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
@@ -174,7 +172,6 @@ export class ClosesZinvoicingService {
 			user,
 			companyId,
 		);
-
 
 		const closeZ = await this.closeZInvoicingModel
 			.findOne({
@@ -263,8 +260,6 @@ export class ClosesZinvoicingService {
 				},
 				companyId,
 			);
-
-			console.log(boxMain.name);
 
 			const cash = Object.keys(cashRegister)
 				.map((key) => parseInt(key.slice(1)) * cashRegister[key])
