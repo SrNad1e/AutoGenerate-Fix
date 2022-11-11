@@ -163,7 +163,7 @@ export class InvoicesService {
 			authorization: { ...pointOfSale?.authorization },
 			customer,
 			company: new Types.ObjectId(companyId),
-			shop: user.shop,
+			shop: user.shop._id,
 			payments: newPayments,
 			summary,
 			details: newDetails,
