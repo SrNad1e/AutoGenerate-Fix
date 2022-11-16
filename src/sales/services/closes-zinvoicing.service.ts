@@ -59,7 +59,7 @@ export class ClosesZinvoicingService {
 		private readonly boxesService: BoxService,
 		private readonly errorsCashService: ErrorsCashService,
 		private readonly returnsOrderService: ReturnsOrderService,
-		) {}
+	) {}
 
 	async findAll(
 		{
@@ -144,8 +144,6 @@ export class ClosesZinvoicingService {
 			);
 		}
 
-		console.log(new Date(dayjs(closeDate).format('YYYY/MM/DD')));
-
 		const closeZOld = await this.closeZInvoicingModel.findOne({
 			closeDate: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
@@ -161,7 +159,9 @@ export class ClosesZinvoicingService {
 		);
 
 		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate?.split(' ')[0])
+			.add(1, 'd')
+			.format('YYYY/MM/DD');
 
 		const expenses = await this.expensesService.findAll(
 			{
@@ -175,7 +175,6 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-
 		const closeZ = await this.closeZInvoicingModel
 			.findOne({
 				company: new Types.ObjectId(companyId),
@@ -187,38 +186,10 @@ export class ClosesZinvoicingService {
 
 		const number = (closeZ?.number || 0) + 1;
 
-		const receipts = await this.receiptsService.findAll(
-			{
-				status: StatusReceipt.ACTIVE,
-				limit: 200,
-				pointOfSaleId: pointOfSale._id.toString(),
-				dateInitial,
-				dateFinal,
-			},
-			user,
-			companyId,
-		);
-
-		const payments: PaymentOrderClose[] = [];
-
-		receipts.docs.forEach((receipt) => {
-			const paymentIndex = payments.findIndex(
-				(item) => item.payment.toString() === receipt.payment._id.toString(),
-			);
-
-			if (paymentIndex >= 0) {
-				payments[paymentIndex] = {
-					...payments[paymentIndex],
-					quantity: payments[paymentIndex].quantity + 1,
-					value: payments[paymentIndex].value + receipt.value,
-				};
-			} else {
-				payments.push({
-					payment: receipt.payment._id,
-					quantity: 1,
-					value: receipt.value,
-				});
-			}
+		const payments = await this.ordersService.getPaymentsOrder({
+			dateInitial,
+			dateFinal,
+			shopId: pointOfSale.shop._id.toString(),
 		});
 
 		const refunds = await this.returnsOrderService.resumeDay({
@@ -263,8 +234,6 @@ export class ClosesZinvoicingService {
 				},
 				companyId,
 			);
-
-			console.log(boxMain.name);
 
 			const cash = Object.keys(cashRegister)
 				.map((key) => parseInt(key.slice(1)) * cashRegister[key])

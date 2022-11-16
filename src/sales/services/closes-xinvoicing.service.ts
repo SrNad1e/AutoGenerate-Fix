@@ -139,7 +139,9 @@ export class ClosesXInvoicingService {
 		);
 
 		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate?.split(' ')[0])
+			.add(1, 'd')
+			.format('YYYY/MM/DD');
 
 		const expenses = await this.expensesService.findAll(
 			{
@@ -160,38 +162,10 @@ export class ClosesXInvoicingService {
 
 		const number = (closeX?.number || 0) + 1;
 
-		const receipts = await this.receiptsService.findAll(
-			{
-				status: StatusReceipt.ACTIVE,
-				limit: 200,
-				pointOfSaleId: pointOfSale._id.toString(),
-				dateInitial,
-				dateFinal,
-			},
-			user,
-			companyId,
-		);
-
-		const payments: PaymentOrderClose[] = [];
-
-		receipts.docs.forEach((receipt) => {
-			const paymentIndex = payments.findIndex(
-				(item) => item.payment.toString() === receipt.payment._id.toString(),
-			);
-
-			if (paymentIndex >= 0) {
-				payments[paymentIndex] = {
-					...payments[paymentIndex],
-					quantity: payments[paymentIndex].quantity + 1,
-					value: payments[paymentIndex].value + receipt.value,
-				};
-			} else {
-				payments.push({
-					payment: receipt.payment._id,
-					quantity: 1,
-					value: receipt.value,
-				});
-			}
+		const payments = await this.ordersService.getPaymentsOrder({
+			dateInitial,
+			dateFinal,
+			shopId: pointOfSale.shop._id.toString(),
 		});
 
 		const refunds = await this.returnsOrderService.resumeDay({

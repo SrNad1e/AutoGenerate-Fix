@@ -40,6 +40,7 @@ import {
 import { ConfirmPaymentsOrderInput } from '../dtos/confirm-payments-order.input';
 import { ConfirmProductsOrderInput } from '../dtos/confirm-products-order.input';
 import { CreateOrderInput } from '../dtos/create-order-input';
+import { DataGetPaymentsOrderInput } from '../dtos/data-get-payments-order.input';
 import { DataGetNetSalesInput } from '../dtos/data-net-sales.input';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
@@ -1901,5 +1902,68 @@ export class OrdersService {
 		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
 
 		return (sales[0]?.total || 0) - (totalCoupons[0]?.total || 0);
+	}
+
+	/**
+	 * @description se encarga de generar consolidado de medios de pago
+	 * @param data datos necesarios para realizar la consulta
+	 * @returns array de tipo #PaymentOrderClose
+	 */
+	async getPaymentsOrder({
+		dateFinal,
+		dateInitial,
+		shopId,
+	}: DataGetPaymentsOrderInput) {
+		const finalDate = dayjs(dateFinal).format('YYYY/MM/DD');
+		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
+
+		if (dayjs(finalDate).isBefore(dayjs(initialDate))) {
+			throw new BadRequestException(
+				'Error la fecha final debe ser igual o mayor a la fecha inicial',
+			);
+		}
+
+		let shop;
+
+		if (shopId) {
+			shop = await this.shopsService.findById(shopId);
+		}
+
+		const aggreagtePayments = [
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(initialDate),
+						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
+					},
+					'shop._id': shop?._id,
+					status: StatusOrder.CLOSED,
+				},
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					value: {
+						$sum: '$payments.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: '$_id',
+					value: 1,
+					quantity: 1,
+				},
+			},
+		];
+
+		return (await this.orderModel.aggregate(aggreagtePayments)) || [];
 	}
 }
