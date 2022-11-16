@@ -231,7 +231,7 @@ export class ReturnsOrderService {
 			company: new Types.ObjectId(companyId),
 			order: order?._id,
 			details: detailsReturn,
-			pointOfSale: order?.pointOfSale?._id,
+			pointOfSale: user.pointOfSale['_id'],
 			coupon: coupon._id,
 			user: {
 				username: user.username,
@@ -248,7 +248,7 @@ export class ReturnsOrderService {
 		await this.stockHistoryService.addStock(
 			{
 				details,
-				warehouseId: order?.shop?.defaultWarehouse?._id?.toString(),
+				warehouseId: user.pointOfSale['shop']?.defaultWarehouse._id?.toString(),
 				documentId: responseReturnOrder?._id?.toString(),
 				documentType: DocumentTypeStockHistory.RETURNORDER,
 			},
@@ -266,7 +266,7 @@ export class ReturnsOrderService {
 	}: ResumeDayReturnsOrderInput) {
 		const resume = await this.returnOrderModel.aggregate([
 			{
-				$unwind: "$details"
+				$unwind: '$details',
 			},
 			{
 				$match: {

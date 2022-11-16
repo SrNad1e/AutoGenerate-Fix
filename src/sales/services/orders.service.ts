@@ -229,7 +229,7 @@ export class OrdersService {
 
 			//Se consulta la tienda asignada al punto de venta
 			const shop = await this.shopsService.findById(
-				user.pointOfSale['shop'].toString(),
+				user.pointOfSale['shop']['_id'].toString(),
 			);
 
 			if (!shop) {
@@ -1688,22 +1688,21 @@ export class OrdersService {
 					total: {
 						$sum: '$payments.total',
 					},
-					quantity:{
-						$sum: 1
-					}
+					quantity: {
+						$sum: 1,
+					},
 				},
 			},
 			{
 				$project: {
 					_id: 0,
 					total: 1,
-					quantity: 1
+					quantity: 1,
 				},
 			},
 		];
 
 		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
-
 
 		return {
 			summaryOrder: {
