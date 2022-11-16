@@ -1880,7 +1880,7 @@ export class OrdersService {
 						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
 					status: 'closed',
-					shop: shop?._id,
+					'shop._id': shop?._id,
 				},
 			},
 			{
