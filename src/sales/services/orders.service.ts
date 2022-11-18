@@ -6,13 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import {
-	AggregatePaginateModel,
-	FilterQuery,
-	PaginateModel,
-	PaginateOptions,
-	Types,
-} from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -76,9 +70,7 @@ const populate = [
 @Injectable()
 export class OrdersService {
 	constructor(
-		@InjectModel(Order.name)
-		private readonly orderModel: AggregatePaginateModel<Order> &
-			PaginateModel<Order>,
+		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
 		@InjectModel(ReturnOrder.name)
 		private readonly returnModel: PaginateModel<ReturnOrder>,
 		private readonly customersService: CustomersService,
@@ -138,6 +130,10 @@ export class OrdersService {
 			filters.orderPos = orderPos;
 		}
 
+		if (shopId) {
+			filters.shop = new Types.ObjectId(shopId);
+		}
+
 		if (dateInitial) {
 			if (!dateFinal) {
 				throw new BadRequestException('Debe enviarse una fecha final');
@@ -178,7 +174,7 @@ export class OrdersService {
 			allowDiskUse: true,
 		};
 
-		///return this.orderModel.aggregatePaginate([{ $match: filters }];
+		return this.orderModel.paginate(filters, options);
 	}
 
 	async findById(id: string) {
