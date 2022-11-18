@@ -198,9 +198,16 @@ export class ClosesZinvoicingService {
 			dateInitial,
 		});
 
+		const paymentsCredit = await this.receiptsService.getPaymentsCredit(
+			dateInitial,
+			dateFinal,
+			pointOfSale._id.toString(),
+		);
+
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
 			number,
+			paymentsCredit,
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],

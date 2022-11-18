@@ -696,6 +696,7 @@ export class OrdersService {
 						const valuesReceipt = {
 							value: total,
 							paymentId: payment?._id?.toString(),
+							isCredit: false,
 							pointOfSaleId: pointOfSale?._id?.toString(),
 							concept: `Abono a pedido ${order?.number}`,
 							boxId:

@@ -39,4 +39,9 @@ export class CreateReceiptInput {
 		nullable: true,
 	})
 	details?: DetailReceiptOrder[];
+
+	@Field(() => Boolean, {
+		description: 'Cruza crédito el recibo',
+	})
+	isCredit: boolean;
 }

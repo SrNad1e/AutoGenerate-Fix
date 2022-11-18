@@ -40,6 +40,13 @@ const populate: PopulateOptions[] = [
 		},
 	},
 	{
+		path: 'paymentsCredit',
+		populate: {
+			path: 'payment',
+			model: 'Payment',
+		},
+	},
+	{
 		path: 'expenses',
 		model: Expense.name,
 	},
@@ -174,10 +181,17 @@ export class ClosesXInvoicingService {
 			dateInitial,
 		});
 
+		const paymentsCredit = await this.receiptsService.getPaymentsCredit(
+			dateInitial,
+			dateFinal,
+			pointOfSale._id.toString(),
+		);
+
 		const newClose = new this.closeXInvoicingModel({
 			cashRegister: cashRegister,
 			number,
 			company: new Types.ObjectId(companyId),
+			paymentsCredit,
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
 			closeDate: new Date(closeDate.split(' ')[0]),

@@ -33,6 +33,12 @@ export class Receipt extends Document {
 	@Prop({ type: Number, default: 0 })
 	number: number;
 
+	@Field(() => Boolean, {
+		description: 'Valida si el recibo de caja es crédito',
+	})
+	@Prop({ type: Boolean, default: false })
+	isCredit: boolean;
+
 	@Field(() => Number, { description: 'Valor del recibo de caja' })
 	@Prop({ type: Number, default: 0 })
 	value: number;
