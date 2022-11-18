@@ -6,7 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
+import {
+	AggregatePaginateModel,
+	FilterQuery,
+	PaginateModel,
+	PaginateOptions,
+	Types,
+} from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -70,7 +76,9 @@ const populate = [
 @Injectable()
 export class OrdersService {
 	constructor(
-		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
+		@InjectModel(Order.name)
+		private readonly orderModel: AggregatePaginateModel<Order> &
+			PaginateModel<Order>,
 		@InjectModel(ReturnOrder.name)
 		private readonly returnModel: PaginateModel<ReturnOrder>,
 		private readonly customersService: CustomersService,
@@ -99,6 +107,7 @@ export class OrdersService {
 			paymentId,
 			sort,
 			statusWeb,
+			shopId,
 			nonStatus,
 			limit = 10,
 			page = 1,
@@ -169,7 +178,7 @@ export class OrdersService {
 			allowDiskUse: true,
 		};
 
-		return this.orderModel.paginate(filters, options);
+		///return this.orderModel.aggregatePaginate([{ $match: filters }];
 	}
 
 	async findById(id: string) {
