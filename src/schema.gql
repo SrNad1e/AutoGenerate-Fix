@@ -211,8 +211,26 @@ type AuthorizationDian {
   """Fecha de creación"""
   createdAt: DateTime!
 
+  """Fecha de finalización de la resolución"""
+  dateFinal: DateTime
+
+  """Fecha de inicio de la resolución"""
+  dateInitial: DateTime
+
+  """Numero final de la resolución"""
+  numberFinal: Float
+
+  """Numero inicial de la resolución"""
+  numberInitial: Float
+
   """Prefijo de autorización"""
   prefix: String!
+
+  """Si es una habilitación true"""
+  qualification: Boolean!
+
+  """Resolución de la autorización o de la habilitación"""
+  resolution: String
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -613,6 +631,9 @@ type Company {
   """Documento de la compañía"""
   document: String!
 
+  """Correo de la compañia"""
+  email: String!
+
   """Url del logo de la compañía"""
   logo: String!
 
@@ -775,8 +796,26 @@ input CreateAttribInput {
 
 """Datos para la creación de una autorización"""
 input CreateAuthorizationInput {
+  """Fecha de finalización de la resolución"""
+  dateFinal: DateTime
+
+  """Fecha de inicio de la resolución"""
+  dateInitial: DateTime
+
+  """Numero final de la resolución"""
+  numberFinal: Float
+
+  """Numero inicial de la resolución"""
+  numberInitial: Float
+
   """Prefijo de facturación"""
   prefix: String!
+
+  """Si es una habilitación true"""
+  qualification: Boolean
+
+  """resolución de facturacion"""
+  resolution: String
 }
 
 """Datos para crear la caja"""
@@ -885,6 +924,9 @@ input CreateCompanyInput {
 
   """Documento de la empresa"""
   document: String!
+
+  """Email de la empresa"""
+  email: String!
 
   """Url del logo de la empresa"""
   logo: String!
@@ -7018,8 +7060,26 @@ input UpdateAttribInput {
 
 """Datos para actualizar la autorización"""
 input UpdateAuthorizationInput {
+  """Fecha de finalización de la resolución"""
+  dateFinal: DateTime
+
+  """Fecha de inicio de la resolución"""
+  dateInitial: DateTime
+
+  """Numero final de la resolución"""
+  numberFinal: Float
+
+  """Numero inicial de la resolución"""
+  numberInitial: Float
+
   """Prefijo de facturación"""
   prefix: String
+
+  """Si es una habilitación true"""
+  qualification: Boolean
+
+  """resolución de facturacion"""
+  resolution: String
 }
 
 """Datos para actualizar caja"""
@@ -7080,6 +7140,9 @@ input UpdateCompanyInput {
 
   """Documento de la empresa"""
   document: String
+
+  """Email de la empresa"""
+  email: String
 
   """Url del logo de la empresa"""
   logo: String

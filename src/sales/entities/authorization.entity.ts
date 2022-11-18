@@ -14,10 +14,49 @@ export class AuthorizationDian extends Document {
 	prefix: string;
 
 	@Field(() => String, {
+		description: 'Resolución de la autorización o de la habilitación',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	resolution?: string;
+
+	@Field(() => Boolean, { description: 'Si es una habilitación true' })
+	@Prop({ type: Boolean, default: false })
+	qualification: boolean;
+
+	@Field(() => String, {
 		description: 'Compañía a la que pertenece la autorización',
 	})
 	@Prop({ type: Types.ObjectId, required: true })
 	company: Types.ObjectId;
+
+	@Prop({ type: Date })
+	@Field(() => Date, {
+		description: 'Fecha de inicio de la resolución',
+		nullable: true,
+	})
+	dateInitial?: Date;
+
+	@Prop({ type: Date })
+	@Field(() => Date, {
+		description: 'Fecha de finalización de la resolución',
+		nullable: true,
+	})
+	dateFinal?: Date;
+
+	@Prop({ type: Number })
+	@Field(() => Number, {
+		description: 'Numero inicial de la resolución',
+		nullable: true,
+	})
+	numberInitial?: Number;
+
+	@Prop({ type: Number })
+	@Field(() => Number, {
+		description: 'Numero final de la resolución',
+		nullable: true,
+	})
+	numberFinal?: Number;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la autorización de facturación',

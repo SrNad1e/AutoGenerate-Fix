@@ -4,4 +4,40 @@ import { Field, InputType } from '@nestjs/graphql';
 export class CreateAuthorizationInput {
 	@Field(() => String, { description: 'Prefijo de facturación' })
 	prefix: string;
+
+	@Field(() => String, {
+		description: 'resolución de facturacion',
+		nullable: true,
+	})
+	resolution?: string;
+
+	@Field(() => Boolean, {
+		description: 'Si es una habilitación true',
+		nullable: true,
+	})
+	qualification?: boolean;
+
+	@Field(() => Date, {
+		description: 'Fecha de inicio de la resolución',
+		nullable: true,
+	})
+	dateInitial?: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de finalización de la resolución',
+		nullable: true,
+	})
+	dateFinal?: Date;
+
+	@Field(() => Number, {
+		description: 'Numero inicial de la resolución',
+		nullable: true,
+	})
+	numberInitial?: Number;
+
+	@Field(() => Number, {
+		description: 'Numero final de la resolución',
+		nullable: true,
+	})
+	numberFinal?: Number;
 }
