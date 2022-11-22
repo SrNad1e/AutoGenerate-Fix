@@ -164,7 +164,7 @@ export class CloseXInvoicing extends Document {
 		description: 'Medios de pago usados para cruzar créditos',
 		nullable: true,
 	})
-	@Prop({ type: Object })
+	@Prop({ type: Array })
 	paymentsCredit?: PaymentCredit[];
 
 	@Field(() => Number, {
