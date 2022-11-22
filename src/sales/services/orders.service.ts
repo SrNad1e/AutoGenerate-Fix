@@ -738,7 +738,15 @@ export class OrdersService {
 							user,
 							companyId,
 						);
-						newPayments.push(order?.payments[i]);
+
+						if (order.summary.total < order.payments[i].total) {
+							newPayments.push({
+								...order?.payments[i],
+								total: order.summary.total,
+							});
+						} else {
+							newPayments.push(order?.payments[i]);
+						}
 					}
 				}
 
