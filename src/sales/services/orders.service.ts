@@ -131,7 +131,7 @@ export class OrdersService {
 		}
 
 		if (shopId) {
-			filters.shop = new Types.ObjectId(shopId);
+			filters['shop._id'] = new Types.ObjectId(shopId);
 		}
 
 		if (dateInitial) {
