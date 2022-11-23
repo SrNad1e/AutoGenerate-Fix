@@ -67,17 +67,27 @@ class SummarySalesReport {
 
 @ObjectType({ description: 'Reportde de ventas generales' })
 export class ResponseReportSales {
-	@Field(() => [SalesReport], { description: 'Ventas detalladas' })
-	salesReport: SalesReport[];
+	@Field(() => [SalesReport], {
+		description: 'Ventas detalladas',
+		nullable: true,
+	})
+	salesReport?: SalesReport[];
 
-	@Field(() => [PaymentsSalesReport], { description: 'Medios de pago' })
-	paymentsSalesReport: PaymentsSalesReport[];
+	@Field(() => [PaymentsSalesReport], {
+		description: 'Medios de pago',
+		nullable: true,
+	})
+	paymentsSalesReport?: PaymentsSalesReport[];
 
 	@Field(() => [CustomerSalesReport], {
 		description: 'Ventas por tipo de cliente',
+		nullable: true,
 	})
-	customersSalesReport: CustomerSalesReport[];
+	customersSalesReport?: CustomerSalesReport[];
 
-	@Field(() => SummarySalesReport, { description: 'Resumen de ventas' })
-	summarySalesReport: SummarySalesReport;
+	@Field(() => SummarySalesReport, {
+		description: 'Resumen de ventas',
+		nullable: true,
+	})
+	summarySalesReport?: SummarySalesReport;
 }

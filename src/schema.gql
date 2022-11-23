@@ -5508,16 +5508,16 @@ type ResponseReferences {
 """Reportde de ventas generales"""
 type ResponseReportSales {
   """Ventas por tipo de cliente"""
-  customersSalesReport: [CustomerSalesReport!]!
+  customersSalesReport: [CustomerSalesReport!]
 
   """Medios de pago"""
-  paymentsSalesReport: [PaymentsSalesReport!]!
+  paymentsSalesReport: [PaymentsSalesReport!]
 
   """Ventas detalladas"""
-  salesReport: [SalesReport!]!
+  salesReport: [SalesReport!]
 
   """Resumen de ventas"""
-  summarySalesReport: SummarySalesReport!
+  summarySalesReport: SummarySalesReport
 }
 
 """Lista de devoluciones de ordenes"""
