@@ -5508,7 +5508,7 @@ type ResponseReferences {
 """Reportde de ventas generales"""
 type ResponseReportSales {
   """Ventas por tipo de cliente"""
-  customerSalesReport: [CustomerSalesReport!]!
+  customersSalesReport: [CustomerSalesReport!]!
 
   """Medios de pago"""
   paymentsSalesReport: [PaymentsSalesReport!]!

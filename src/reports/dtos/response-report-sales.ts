@@ -76,7 +76,7 @@ export class ResponseReportSales {
 	@Field(() => [CustomerSalesReport], {
 		description: 'Ventas por tipo de cliente',
 	})
-	customerSalesReport: CustomerSalesReport[];
+	customersSalesReport: CustomerSalesReport[];
 
 	@Field(() => SummarySalesReport, { description: 'Resumen de ventas' })
 	summarySalesReport: SummarySalesReport;

@@ -1618,7 +1618,6 @@ export class OrdersService {
 		}
 
 		const filters = {
-			'shop._id': new Types.ObjectId(shopId),
 			company: new Types.ObjectId(companyId),
 			status: StatusOrder.CLOSED,
 			closeDate: {
@@ -1626,6 +1625,10 @@ export class OrdersService {
 				$lte: finalDate,
 			},
 		};
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
+		}
 
 		//consultar los pagos por valor y cantidad
 		const paymentsSalesReport = await this.orderModel.aggregate([
@@ -1705,7 +1708,10 @@ export class OrdersService {
 					},
 					cost: {
 						$sum: {
-							$multiply: ['$details.quantity', '$details.cost'],
+							$multiply: [
+								'$details.quantity',
+								'$details.product.reference.cost',
+							],
 						},
 					},
 				},
@@ -1719,13 +1725,18 @@ export class OrdersService {
 						$subtract: ['$total', '$cost'],
 					},
 					margin: {
-						$divide: ['$cmv', '$total'],
+						$divide: [
+							{
+								$subtract: ['$total', '$cost'],
+							},
+							'$total',
+						],
 					},
 				},
 			},
 		]);
 
-		let unwind;
+		const aggregate = [];
 		let group: any = {
 			$group: {
 				_id: '$shop._id',
@@ -1743,9 +1754,9 @@ export class OrdersService {
 
 		//validar si es agrupado por categorías
 		if (isGroupByCategory) {
-			unwind = {
+			aggregate.push({
 				$unwind: '$details',
-			};
+			});
 
 			group = {
 				$group: {
@@ -1767,7 +1778,7 @@ export class OrdersService {
 		//consultar las ventas por valor y cantidad
 
 		const salesReport = await this.orderModel.aggregate([
-			{ ...unwind },
+			...aggregate,
 			{
 				$lookup: {
 					from: 'CategoryLevel1',

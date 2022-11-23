@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/configurations/entities/user.entity';
 import { FiltersSalesReportInput } from 'src/sales/dtos/filters-sales-report.input';
 import { OrdersService } from 'src/sales/services/orders.service';
 
