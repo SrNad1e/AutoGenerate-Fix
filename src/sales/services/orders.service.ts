@@ -657,15 +657,6 @@ export class OrdersService {
 					} else {
 						newPayments.push(payment);
 					}
-
-					if (order.summary.total < payment.total) {
-						newPayments.push({
-							...payment,
-							total: order.summary.total,
-						});
-					} else {
-						newPayments.push(order?.payments[i]);
-					}
 				}
 
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
@@ -1991,6 +1982,14 @@ export class OrdersService {
 						user,
 						companyId,
 					);
+					if (order.summary.total < total) {
+						newPayments.push({
+							...payments[i],
+							total: order.summary.total,
+						});
+					} else {
+						newPayments.push(order?.payments[i]);
+					}
 					newPayments.push(order?.payments[i]);
 
 					break;
@@ -2018,6 +2017,7 @@ export class OrdersService {
 						paymentId: payment?._id?.toString(),
 						pointOfSaleId: pointOfSale?._id?.toString(),
 						concept: `Abono a pedido ${order?.number}`,
+						isCredit: false,
 						boxId:
 							payment?.type === 'cash'
 								? pointOfSale['box']?.toString()

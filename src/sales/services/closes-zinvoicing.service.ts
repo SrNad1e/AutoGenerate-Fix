@@ -198,9 +198,16 @@ export class ClosesZinvoicingService {
 			dateInitial,
 		});
 
+		const paymentsCredit = await this.receiptsService.getPaymentsCredit(
+			dateInitial,
+			dateFinal,
+			pointOfSale._id.toString(),
+		);
+
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
 			number,
+			paymentsCredit,
 			company: new Types.ObjectId(companyId),
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
@@ -251,7 +258,15 @@ export class ClosesZinvoicingService {
 				0,
 			);
 
-			const diff = totalCash - cash;
+			const totalcashCredits = paymentsCredit.reduce(
+				(sum, item) =>
+					item.payment['type'] === TypePayment.CASH
+						? sum + item.value
+						: sum + 0,
+				0,
+			);
+
+			const diff = totalCash - cash - totalcashCredits;
 
 			const total = boxMain?.total + cash - diff;
 
