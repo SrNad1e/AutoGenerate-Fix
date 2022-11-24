@@ -659,7 +659,6 @@ export class OrdersService {
 					}
 				}
 
-				console.log(paymentsForProcess);
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
 
 				if (paymentsForProcess.length > 0) {
@@ -727,6 +726,7 @@ export class OrdersService {
 					status: newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
+					payments: newPayments,
 					statusWeb: newStatusWeb,
 					user: {
 						username: user.username,
@@ -1994,13 +1994,6 @@ export class OrdersService {
 					} else {
 						newPayments.push(order?.payments[i]);
 					}
-
-					break;
-				case TypePayment.CREDIT:
-					newPayments.push({
-						...payments[i],
-						status: StatusOrderDetail.CONFIRMED,
-					});
 
 					break;
 				case TypePayment.CREDIT:
