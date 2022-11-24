@@ -659,6 +659,7 @@ export class OrdersService {
 					}
 				}
 
+				console.log(paymentsForProcess);
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
 
 				if (paymentsForProcess.length > 0) {
@@ -1429,7 +1430,11 @@ export class OrdersService {
 			);
 		}
 
-		let newPayments = [...order.payments];
+		const paymentIds = payments.map((p) => p.paymentId);
+
+		let newPayments = order.payments.filter(
+			({ payment }) => !paymentIds.includes(payment?._id?.toString()),
+		);
 
 		const paymentsForProcess = [];
 
@@ -1762,7 +1767,6 @@ export class OrdersService {
 			tax: newTax,
 		};
 	}
-
 	/**
 	 * @description se encarga de calcular las ventas netas
 	 * @param data datos para generar las ventas
