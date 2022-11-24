@@ -34,4 +34,10 @@ export class CreateInvoiceInput {
 
 	@Field(() => [DetailInvoiceInput], { description: 'Productos de la factura' })
 	details: DetailInvoiceInput[];
+
+	@Field(() => String, { description: 'Identificador del punto de venta' })
+	pointOfSaleId: string;
+
+	@Field(() => Date, { description: 'Fecha de factura', nullable: true })
+	createdAt?: Date;
 }
