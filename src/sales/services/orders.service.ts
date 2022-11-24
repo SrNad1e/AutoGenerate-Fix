@@ -1436,7 +1436,7 @@ export class OrdersService {
 		for (let i = 0; i < payments.length; i++) {
 			const { paymentId } = payments[i];
 
-			const index = newPayments.findIndex(
+			const index = order.payments.findIndex(
 				(payment) => payment.payment._id.toString() === paymentId,
 			);
 
@@ -1447,9 +1447,8 @@ export class OrdersService {
 				});
 			}
 
-			paymentsForProcess.push(newPayments[index]);
-
-			newPayments.slice(0, index);
+			paymentsForProcess.push(order.payments[index]);
+			newPayments.splice(index, 1);
 		}
 
 		//procesar los pagos
@@ -1461,6 +1460,7 @@ export class OrdersService {
 			order as Order,
 			user,
 			companyId,
+			order.customer._id.toString(),
 		);
 
 		newPayments = newPayments.concat(paymentsProccess);
@@ -1990,12 +1990,16 @@ export class OrdersService {
 					} else {
 						newPayments.push(order?.payments[i]);
 					}
-					newPayments.push(order?.payments[i]);
 
 					break;
 				case TypePayment.CREDIT:
-					newPayments.push(payments[i]);
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+					});
 
+					break;
+				case TypePayment.CREDIT:
 					await this.creditHistoryService.thawedCreditHistory(
 						order?._id?.toString(),
 						total,
@@ -2010,6 +2014,10 @@ export class OrdersService {
 						companyId,
 					);
 
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+					});
 					break;
 				default:
 					const valuesReceipt = {
