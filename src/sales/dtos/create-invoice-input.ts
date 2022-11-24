@@ -26,18 +26,6 @@ export class DetailInvoiceInput {
 
 @InputType({ description: 'Datos para crear una factura' })
 export class CreateInvoiceInput {
-	@Field(() => String, { description: 'Identificación del cliente' })
-	customerId: string;
-
-	@Field(() => [PaymentInvoiceInput], { description: 'Medios de pago' })
-	payments: PaymentInvoiceInput[];
-
-	@Field(() => [DetailInvoiceInput], { description: 'Productos de la factura' })
-	details: DetailInvoiceInput[];
-
-	@Field(() => String, { description: 'Identificador del punto de venta' })
-	pointOfSaleId: string;
-
-	@Field(() => Date, { description: 'Fecha de factura', nullable: true })
-	createdAt?: Date;
+	@Field(() => String, { description: 'Identificador de pedido' })
+	orderId: string;
 }

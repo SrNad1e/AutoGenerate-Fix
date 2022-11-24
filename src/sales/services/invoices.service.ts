@@ -1,4 +1,9 @@
 import {
+	SummaryInvoice,
+	DetailInvoice,
+	PaymentInvoice,
+} from './../entities/invoice.entity';
+import {
 	DetailInvoiceInput,
 	PaymentInvoiceInput,
 } from './../dtos/create-invoice-input';
@@ -19,6 +24,7 @@ import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
+import { AuthorizationsService } from './authorizations.service';
 
 @Injectable()
 export class InvoicesService {
@@ -27,11 +33,9 @@ export class InvoicesService {
 		private readonly invoiceModel: PaginateModel<Invoice>,
 		@InjectModel(Order.name)
 		private readonly orderModel: PaginateModel<Order>,
-		private readonly customersService: CustomersService,
 		private readonly pointOfSalesService: PointOfSalesService,
-		private readonly paymentsService: PaymentsService,
-		private readonly productsService: ProductsService,
 		private readonly shopsService: ShopsService,
+		private readonly authorizationsService: AuthorizationsService,
 	) {}
 
 	async findAll(
@@ -84,17 +88,56 @@ export class InvoicesService {
 		return this.invoiceModel.paginate(filters, options);
 	}
 
-	async create(
-		{
-			customerId,
-			details,
+	async create({ orderId }: CreateInvoiceInput, user: User) {
+		const order = await this.orderModel.findById(orderId);
+		if (!order) {
+			throw new BadRequestException('La orden de venta no existe');
+		}
+
+		const pointOfSale = await this.pointOfSalesService.findById(
+			order?.pointOfSale.toString(),
+		);
+
+		const summary: SummaryInvoice = {
+			total: order.summary.total,
+			change: order.summary.change,
+			subtotal: order.summary.subtotal,
+			tax: order.summary.tax,
+			discount: order.summary.discount,
+			totalPaid: order.summary.totalPaid,
+		};
+
+		const payments: PaymentInvoice[] = order.payments.map((payment) => ({
+			payment: payment.payment,
+			total: payment.total,
+		}));
+
+		const autorization = await this.authorizationsService.findById(
+			pointOfSale.authorization._id.toString(),
+		);
+
+		const invoice = new this.invoiceModel({
+			authorization: autorization,
+			number: autorization.numberCurrent + 1,
+			customer: order.customer,
+			company: order.company,
+			shop: order.shop,
 			payments,
-			createdAt,
-			pointOfSaleId,
-		}: CreateInvoiceInput,
-		user: User,
-		companyId: string,
-	) {}
+			summary,
+			details: order.details,
+			user: order.user,
+			createdAt: order.closeDate,
+		});
+
+		await this.authorizationsService.update(
+			autorization._id.toString(),
+			{ numberCurrent: autorization.numberCurrent + 1 },
+			user,
+			order.company.toString(),
+		);
+
+		return invoice.save();
+	}
 
 	async generateInvoices({
 		cash,
@@ -217,12 +260,12 @@ export class InvoicesService {
 			while (total < cashTotal && posUp < posDown - 1) {
 				let order = orders[posUp];
 				total += order.total;
-				ordersInvoicing.push(order);
+				ordersInvoicing.push(order._id.toString());
 				posUp++;
 				if (total < cashTotal) {
 					order = orders[posDown];
 					total += order.total;
-					ordersInvoicing.push(order);
+					ordersInvoicing.push(order._id.toString());
 					posDown--;
 				} else {
 					if (total > cashTotal) {
@@ -238,35 +281,12 @@ export class InvoicesService {
 			}
 
 			//generar factura de los pedidos
-			const dataInvoices: CreateInvoiceInput[] = [];
+			for (let i = 0; i < ordersInvoicing.length; i++) {
+				const orderId = ordersInvoicing[i];
+				await this.create({ orderId }, { username: 'admin' } as User);
+			}
 
-			ordersInvoicing.forEach((order) => {
-				const details: DetailInvoiceInput[] = order.details.map((detail) => ({
-					productId: detail.product._id.toString(),
-					quantity: detail.quantity,
-					price: detail.price,
-					discount: detail.discount,
-				}));
-
-				const payments: PaymentInvoiceInput[] = order.payments.map(
-					(payment) => ({
-						paymentId: payment.payment._id.toString(),
-						total: payment.total,
-					}),
-				);
-
-				const dataInvoice: CreateInvoiceInput = {
-					customerId: order.customerId,
-					details,
-					payments,
-					createdAt: order.closeDate,
-					pointOfSaleId: order.pointOfSaleId,
-				};
-				dataInvoices.push(dataInvoice);
-			});
-			invoiceQuantity += dataInvoices.length;
-
-			await this.invoiceModel.insertMany(dataInvoices);
+			invoiceQuantity += ordersInvoicing.length;
 		}
 
 		return {

@@ -44,6 +44,16 @@ export class AuthorizationsService {
 		return this.authorizationModel.paginate(filters, options);
 	}
 
+	async findById(id: string) {
+		const authorization = await this.authorizationModel.findById(id);
+
+		if (!authorization) {
+			throw new BadRequestException('La autorización no existe');
+		}
+
+		return authorization;
+	}
+
 	async create(
 		params: CreateAuthorizationInput,
 		user: User,

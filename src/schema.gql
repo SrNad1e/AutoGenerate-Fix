@@ -217,6 +217,9 @@ type AuthorizationDian {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
+  """Numero actual"""
+  numberCurrent: Float!
+
   """Numero final de la resolución"""
   numberFinal: Float
 
@@ -801,6 +804,9 @@ input CreateAuthorizationInput {
 
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
+
+  """Numero actual de la resolución"""
+  numberCurrent: Float
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -7065,6 +7071,9 @@ input UpdateAuthorizationInput {
 
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
+
+  """Numero actual de la resolución"""
+  numberCurrent: Float
 
   """Numero final de la resolución"""
   numberFinal: Float
