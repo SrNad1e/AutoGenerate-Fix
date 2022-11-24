@@ -32,6 +32,7 @@ import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHisto
 import { StockHistoryService } from 'src/inventories/services/stock-history.service';
 import { StatusProduct } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
+import { ResponseReportSales } from 'src/reports/dtos/response-report-sales';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
@@ -1571,7 +1572,7 @@ export class OrdersService {
 			shopId,
 		}: FiltersSalesReportInput,
 		companyId: string,
-	) {
+	): Promise<ResponseReportSales> {
 		const newGroupDates = GroupDates[groupDates] || groupDates;
 
 		let finalDate;
