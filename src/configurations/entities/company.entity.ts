@@ -33,6 +33,10 @@ export class Company extends Document {
 	phone: string;
 
 	@Prop({ type: String, required: true })
+	@Field(() => String, { description: 'Correo de la compañia' })
+	email: string;
+
+	@Prop({ type: String, required: true })
 	@Field(() => String, { description: 'Url del logo de la compañía' })
 	logo: string;
 

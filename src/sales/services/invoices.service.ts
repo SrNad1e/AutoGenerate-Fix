@@ -1,26 +1,41 @@
+import {
+	SummaryInvoice,
+	DetailInvoice,
+	PaymentInvoice,
+} from './../entities/invoice.entity';
+import {
+	DetailInvoiceInput,
+	PaymentInvoiceInput,
+} from './../dtos/create-invoice-input';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
+import { ShopsService } from 'src/configurations/services/shops.service';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { ProductsService } from 'src/products/services/products.service';
+import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { CreateInvoiceInput } from '../dtos/create-invoice-input';
+import { DataGenerateInvoicesInput } from '../dtos/data-generate-invoices.input';
 import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { Invoice } from '../entities/invoice.entity';
+import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
+import { AuthorizationsService } from './authorizations.service';
 
 @Injectable()
 export class InvoicesService {
 	constructor(
 		@InjectModel(Invoice.name)
 		private readonly invoiceModel: PaginateModel<Invoice>,
-		private readonly customersService: CustomersService,
+		@InjectModel(Order.name)
+		private readonly orderModel: PaginateModel<Order>,
 		private readonly pointOfSalesService: PointOfSalesService,
-		private readonly paymentsService: PaymentsService,
-		private readonly productsService: ProductsService,
+		private readonly shopsService: ShopsService,
+		private readonly authorizationsService: AuthorizationsService,
 	) {}
 
 	async findAll(
@@ -73,107 +88,211 @@ export class InvoicesService {
 		return this.invoiceModel.paginate(filters, options);
 	}
 
-	async create(
-		{ customerId, details, payments }: CreateInvoiceInput,
-		user: User,
-		companyId: string,
-	) {
-		if (!user.pointOfSale) {
-			throw new BadRequestException(
-				'El usuario no tiene punto de venta asignado',
-			);
+	async create({ orderId }: CreateInvoiceInput, user: User) {
+		const order = await this.orderModel.findById(orderId);
+		if (!order) {
+			throw new BadRequestException('La orden de venta no existe');
 		}
+
 		const pointOfSale = await this.pointOfSalesService.findById(
-			user.pointOfSale._id.toString(),
+			order?.pointOfSale.toString(),
 		);
 
-		if (!pointOfSale) {
-			throw new BadRequestException('El punto de venta asignado no existe');
-		}
-
-		if (!pointOfSale?.authorization?._id) {
-			throw new BadRequestException(
-				'Autorización no existe o se encuentra vencida',
-			);
-		}
-
-		const customer = await this.customersService.findById(customerId);
-
-		if (!customer) {
-			throw new BadRequestException('El cliente no existe');
-		}
-
-		const newPayments = [];
-
-		for (let i = 0; i < payments.length; i++) {
-			const item = payments[i];
-			const payment = await this.paymentsService.findById(item.paymentId);
-
-			if (!payment) {
-				throw new BadRequestException('Uno de los medios de pago no existe');
-			}
-
-			newPayments.push({
-				payment,
-				total: item.total,
-			});
-		}
-
-		const newDetails = [];
-
-		for (let i = 0; i < details.length; i++) {
-			const item = details[i];
-
-			const product = await this.productsService.findById(item.productId);
-
-			if (!product) {
-				throw new BadRequestException('Uno de los productos no existe');
-			}
-
-			newDetails.push({
-				product,
-				quantity: item.quantity,
-				price: item?.price,
-				discount: item?.discount,
-			});
-		}
-
-		let summary = {
-			subtotal: details.reduce(
-				(sum, item) => sum + item.price * item.quantity,
-				0,
-			),
-			discount: details.reduce(
-				(sum, item) => sum + item.discount * item.quantity,
-				0,
-			),
-			tax: 0,
-			totalPaid: payments.reduce((sum, item) => sum + item.total, 0),
-			total: 0,
-			change: 0,
+		const summary: SummaryInvoice = {
+			total: order.summary.total,
+			change: order.summary.change,
+			subtotal: order.summary.subtotal,
+			tax: order.summary.tax,
+			discount: order.summary.discount,
+			totalPaid: order.summary.totalPaid,
 		};
 
-		summary = {
-			...summary,
-			total: summary.subtotal - summary.discount,
-			change: summary.totalPaid - summary.subtotal - summary.discount,
-		};
+		const payments: PaymentInvoice[] = order.payments.map((payment) => ({
+			payment: payment.payment,
+			total: payment.total,
+		}));
 
-		const newInvoice = new this.invoiceModel({
-			authorization: { ...pointOfSale?.authorization },
-			customer,
-			company: new Types.ObjectId(companyId),
-			shop: user.shop._id,
-			payments: newPayments,
+		const autorization = await this.authorizationsService.findById(
+			pointOfSale.authorization._id.toString(),
+		);
+
+		const invoice = new this.invoiceModel({
+			authorization: autorization,
+			number: autorization.numberCurrent + 1,
+			customer: order.customer,
+			company: order.company,
+			shop: order.shop,
+			payments,
 			summary,
-			details: newDetails,
-			user: {
-				username: user.username,
-				name: user.name,
-				_id: user._id,
-			},
+			details: order.details,
+			user: order.user,
+			createdAt: order.closeDate,
 		});
 
-		return newInvoice.save();
+		await this.authorizationsService.update(
+			autorization._id.toString(),
+			{ numberCurrent: autorization.numberCurrent + 1 },
+			user,
+			order.company.toString(),
+		);
+
+		return invoice.save();
+	}
+
+	async generateInvoices({
+		cash,
+		dateFinal,
+		dateInitial,
+		shopId,
+	}: DataGenerateInvoicesInput) {
+		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
+		const finalInitial = dayjs(dateInitial).format('YYYY/MM/DD');
+
+		//validar rangos de fecha
+		if (dayjs(finalDate).isBefore(finalInitial)) {
+			throw new BadRequestException(
+				'La fecha final no puede ser menor a la fecha inicial',
+			);
+		}
+		const shop = await this.shopsService.findById(shopId);
+
+		//validar la tienda
+		if (!shop) {
+			throw new BadRequestException('La tienda no existe');
+		}
+
+		//Peso de dia a dia con respecto a la venta total
+		let totalOrdersDay = await this.orderModel.aggregate([
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(dateInitial),
+						$lte: new Date(dateFinal),
+					},
+					'shop._id': new Types.ObjectId(shopId),
+					status: 'closed',
+				},
+			},
+			{
+				$group: {
+					_id: {
+						$dayOfMonth: '$closeDate',
+					},
+					total: {
+						$sum: '$summary.total',
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					day: '$_id',
+					total: 1,
+				},
+			},
+			{
+				$sort: {
+					day: 1,
+				},
+			},
+		]);
+
+		//calcular valor correspondiente al día dependiendo del peso
+		const totalSales = totalOrdersDay.reduce(
+			(sum, item) => sum + item.total,
+			0,
+		);
+
+		totalOrdersDay = totalOrdersDay.map((item) => {
+			const weight = item.total / totalSales;
+			const cashTotal = cash * weight;
+
+			return {
+				...item,
+				weight,
+				cashTotal,
+			};
+		});
+
+		//obtener los pedidos día a dia que se van a facturar
+
+		let invoiceQuantity = 0;
+		let valueMissing = 0;
+		for (let i = 0; i < totalOrdersDay.length; i++) {
+			const { day, cashTotal } = totalOrdersDay[i];
+
+			const orders = await this.orderModel
+				.find({
+					closeDate: {
+						$gte: new Date(
+							dayjs(dateInitial)
+								.add(day - 1, 'd')
+								.format('YYYY/MM/DD'),
+						),
+						$lte: new Date(
+							dayjs(dateInitial)
+								.add(day - 1, 'd')
+								.format('YYYY/MM/DD'),
+						),
+					},
+					'shop._id': new Types.ObjectId('6331b982aa2af68a4ecad2ed'),
+					status: 'closed',
+					'payments.payment.type': {
+						$not: {
+							$in: [TypePayment.CREDIT, TypePayment.BANK, TypePayment.BONUS],
+						},
+					},
+				})
+				.projection({
+					_id: 1,
+					total: 'summary.total',
+					closeDate: 1,
+					customerId: '$customer._id',
+					details: 1,
+					pointOfSaleId: '$pointOfSale',
+				});
+
+			let total = 0;
+			const ordersInvoicing = [];
+			let posUp = 0;
+			let posDown = orders.length - 1;
+
+			while (total < cashTotal && posUp < posDown - 1) {
+				let order = orders[posUp];
+				total += order.total;
+				ordersInvoicing.push(order._id.toString());
+				posUp++;
+				if (total < cashTotal) {
+					order = orders[posDown];
+					total += order.total;
+					ordersInvoicing.push(order._id.toString());
+					posDown--;
+				} else {
+					if (total > cashTotal) {
+						total -= order.total;
+						ordersInvoicing.pop();
+					}
+					break;
+				}
+			}
+
+			if (total < cashTotal) {
+				valueMissing += cashTotal - total;
+			}
+
+			//generar factura de los pedidos
+			for (let i = 0; i < ordersInvoicing.length; i++) {
+				const orderId = ordersInvoicing[i];
+				await this.create({ orderId }, { username: 'admin' } as User);
+			}
+
+			invoiceQuantity += ordersInvoicing.length;
+		}
+
+		return {
+			invoiceQuantity,
+			valueMissing,
+			valueInvoicing: cash - valueMissing,
+		};
 	}
 }
