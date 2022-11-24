@@ -6,7 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
+import {
+	Aggregate,
+	FilterQuery,
+	PaginateModel,
+	PaginateOptions,
+	Types,
+} from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -43,6 +49,10 @@ import { CreateOrderInput } from '../dtos/create-order-input';
 import { DataGetPaymentsOrderInput } from '../dtos/data-get-payments-order.input';
 import { DataGetNetSalesInput } from '../dtos/data-net-sales.input';
 import { FiltersOrdersInput } from '../dtos/filters-orders.input';
+import {
+	FiltersSalesReportInput,
+	GroupDates,
+} from '../dtos/filters-sales-report.input';
 import { UpdateOrderInput } from '../dtos/update-order-input';
 import { Invoice } from '../entities/invoice.entity';
 import {
@@ -1549,6 +1559,256 @@ export class OrdersService {
 		return {
 			credit,
 			order: newOrder,
+		};
+	}
+
+	async reportSales(
+		{
+			dateFinal,
+			dateInitial,
+			isGroupByCategory,
+			groupDates,
+			shopId,
+		}: FiltersSalesReportInput,
+		companyId: string,
+	) {
+		const newGroupDates = GroupDates[groupDates] || groupDates;
+
+		let finalDate;
+		let initialDate;
+
+		//validar la tienda
+		if (shopId) {
+			const shop = await this.shopsService.findById(shopId);
+			if (!shop) {
+				throw new BadRequestException('La tienda no existe');
+			}
+		}
+
+		//generar los rangos de fechas
+		switch (newGroupDates) {
+			case GroupDates.DAY:
+				finalDate = new Date(dayjs(dateFinal).add(1, 'd').format('YYYY-MM-DD'));
+
+				initialDate = new Date(dayjs(dateInitial).format('YYYY-MM-DD'));
+				break;
+
+			case GroupDates.MONTH:
+				finalDate = new Date(
+					dayjs(dateFinal).endOf('month').format('YYYY-MM-DD'),
+				);
+
+				initialDate = new Date(
+					dayjs(dateInitial).startOf('month').format('YYYY-MM-DD'),
+				);
+				break;
+
+			case GroupDates.YEAR:
+				finalDate = new Date(
+					dayjs(dateFinal).endOf('year').format('YYYY-MM-DD'),
+				);
+
+				initialDate = new Date(
+					dayjs(dateInitial).startOf('year').format('YYYY-MM-DD'),
+				);
+				break;
+
+			default:
+				break;
+		}
+
+		const filters = {
+			company: new Types.ObjectId(companyId),
+			status: StatusOrder.CLOSED,
+			closeDate: {
+				$gte: initialDate,
+				$lte: finalDate,
+			},
+		};
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
+		}
+
+		//consultar los pagos por valor y cantidad
+		const paymentsSalesReport = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					payment: { $first: '$payments.payment' },
+					total: {
+						$sum: '$payments.payment.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		//consultar las ventas por tipo de cliente
+		const customersSalesReport = await this.orderModel.aggregate([
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$customer.customerType._id',
+					typeCustomer: { $first: '$customer.customerType' },
+					total: {
+						$sum: '$summary.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					typeCustomer: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		//consultar summary de ventas valor, cantidad de facturas, margen %, cmv
+		const summarySalesReport = await this.orderModel.aggregate([
+			{
+				$unwind: '$details',
+			},
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: null,
+					total: {
+						$sum: {
+							$multiply: ['$details.quantity', '$details.price'],
+						},
+					},
+					quantity: {
+						$sum: 1,
+					},
+					cost: {
+						$sum: {
+							$multiply: [
+								'$details.quantity',
+								'$details.product.reference.cost',
+							],
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1,
+					quantity: 1,
+					cmv: {
+						$subtract: ['$total', '$cost'],
+					},
+					margin: {
+						$divide: [
+							{
+								$subtract: ['$total', '$cost'],
+							},
+							'$total',
+						],
+					},
+				},
+			},
+		]);
+
+		const aggregate = [];
+		let group: any = {
+			$group: {
+				_id: '$shop._id',
+				shop: {
+					$first: '$shop',
+				},
+				total: {
+					$sum: '$summary.total',
+				},
+				quantity: {
+					$sum: 1,
+				},
+			},
+		};
+
+		//validar si es agrupado por categorías
+		if (isGroupByCategory) {
+			aggregate.push({
+				$unwind: '$details',
+			});
+
+			group = {
+				$group: {
+					_id: ['$shop._id', '$details.product.reference.categoryLevel1._id'],
+					category: {
+						$first: '$details.product.reference.categoryLevel1',
+					},
+					total: {
+						$sum: {
+							$multiply: ['$details.quantity', '$details.price'],
+						},
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			};
+		}
+		//consultar las ventas por valor y cantidad
+
+		const salesReport = await this.orderModel.aggregate([
+			...aggregate,
+			{
+				$lookup: {
+					from: 'CategoryLevel1',
+					localField: 'categoryLevel1',
+					foreignField: '_id',
+					as: 'categoryLevel1',
+				},
+			},
+			{
+				$match: filters,
+			},
+			{
+				...group,
+			},
+			{
+				$project: {
+					_id: 0,
+					shop: 1,
+					category: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return {
+			paymentsSalesReport,
+			customersSalesReport,
+			summarySalesReport: summarySalesReport[0],
+			salesReport,
 		};
 	}
 
