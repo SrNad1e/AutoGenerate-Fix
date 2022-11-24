@@ -726,6 +726,7 @@ export class OrdersService {
 					status: newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
+					payments: newPayments,
 					statusWeb: newStatusWeb,
 					user: {
 						username: user.username,
@@ -1982,7 +1983,14 @@ export class OrdersService {
 						user,
 						companyId,
 					);
-					newPayments.push(order?.payments[i]);
+					if (order.summary.total < total) {
+						newPayments.push({
+							...payments[i],
+							total: order.summary.total,
+						});
+					} else {
+						newPayments.push(order?.payments[i]);
+					}
 
 					break;
 				case TypePayment.CREDIT:
