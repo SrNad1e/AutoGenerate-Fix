@@ -1,12 +1,5 @@
-import {
-	SummaryInvoice,
-	DetailInvoice,
-	PaymentInvoice,
-} from './../entities/invoice.entity';
-import {
-	DetailInvoiceInput,
-	PaymentInvoiceInput,
-} from './../dtos/create-invoice-input';
+import { PointOfSale } from './../entities/pointOfSale.entity';
+import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -14,10 +7,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
-import { CustomersService } from 'src/crm/services/customers.service';
-import { ProductsService } from 'src/products/services/products.service';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
-import { PaymentsService } from 'src/treasury/services/payments.service';
 import { CreateInvoiceInput } from '../dtos/create-invoice-input';
 import { DataGenerateInvoicesInput } from '../dtos/data-generate-invoices.input';
 import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
@@ -25,6 +15,7 @@ import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { AuthorizationsService } from './authorizations.service';
+import { ResponseInvoicing } from '../dtos/response-invoicing';
 
 @Injectable()
 export class InvoicesService {
@@ -88,14 +79,16 @@ export class InvoicesService {
 		return this.invoiceModel.paginate(filters, options);
 	}
 
-	async create({ orderId }: CreateInvoiceInput, user: User) {
+	async create({ orderId, pointOfSaleId }: CreateInvoiceInput, user: User) {
 		const order = await this.orderModel.findById(orderId);
 		if (!order) {
 			throw new BadRequestException('La orden de venta no existe');
 		}
 
+		console.log(order);
+
 		const pointOfSale = await this.pointOfSalesService.findById(
-			order?.pointOfSale.toString(),
+			order?.pointOfSale?.toString() || pointOfSaleId,
 		);
 
 		const summary: SummaryInvoice = {
@@ -144,12 +137,12 @@ export class InvoicesService {
 		dateFinal,
 		dateInitial,
 		shopId,
-	}: DataGenerateInvoicesInput) {
+	}: DataGenerateInvoicesInput): Promise<ResponseInvoicing> {
 		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
-		const finalInitial = dayjs(dateInitial).format('YYYY/MM/DD');
+		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
 
 		//validar rangos de fecha
-		if (dayjs(finalDate).isBefore(finalInitial)) {
+		if (dayjs(finalDate).isBefore(initialDate)) {
 			throw new BadRequestException(
 				'La fecha final no puede ser menor a la fecha inicial',
 			);
@@ -161,16 +154,20 @@ export class InvoicesService {
 			throw new BadRequestException('La tienda no existe');
 		}
 
+		console.log('finalDate', finalDate);
+		console.log('initialDate', initialDate);
+
 		//Peso de dia a dia con respecto a la venta total
 		let totalOrdersDay = await this.orderModel.aggregate([
 			{
 				$match: {
 					closeDate: {
-						$gte: new Date(dateInitial),
-						$lte: new Date(dateFinal),
+						$gte: new Date(initialDate),
+						$lt: new Date(finalDate),
 					},
 					'shop._id': new Types.ObjectId(shopId),
 					status: 'closed',
+					'payments.payment.type': TypePayment.CASH,
 				},
 			},
 			{
@@ -181,6 +178,9 @@ export class InvoicesService {
 					total: {
 						$sum: '$summary.total',
 					},
+					number: {
+						$first: '$number',
+					},
 				},
 			},
 			{
@@ -188,6 +188,7 @@ export class InvoicesService {
 					_id: 0,
 					day: '$_id',
 					total: 1,
+					number: 1,
 				},
 			},
 			{
@@ -215,42 +216,40 @@ export class InvoicesService {
 		});
 
 		//obtener los pedidos día a dia que se van a facturar
-
 		let invoiceQuantity = 0;
 		let valueMissing = 0;
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, cashTotal } = totalOrdersDay[i];
 
-			const orders = await this.orderModel
-				.find({
-					closeDate: {
-						$gte: new Date(
-							dayjs(dateInitial)
-								.add(day - 1, 'd')
-								.format('YYYY/MM/DD'),
-						),
-						$lte: new Date(
-							dayjs(dateInitial)
-								.add(day - 1, 'd')
-								.format('YYYY/MM/DD'),
-						),
-					},
-					'shop._id': new Types.ObjectId('6331b982aa2af68a4ecad2ed'),
-					status: 'closed',
-					'payments.payment.type': {
-						$not: {
-							$in: [TypePayment.CREDIT, TypePayment.BANK, TypePayment.BONUS],
+			const dI = dayjs(dateInitial)
+				.add(day - 1, 'd')
+				.format('YYYY/MM/DD');
+
+			const dF = dayjs(dateInitial).add(day, 'd').format('YYYY/MM/DD');
+
+			const orders = await this.orderModel.aggregate([
+				{
+					$match: {
+						closeDate: {
+							$gte: new Date(dI),
+							$lt: new Date(dF),
+						},
+						'shop._id': new Types.ObjectId('6331b982aa2af68a4ecad2ed'),
+						status: 'closed',
+						'payments.payment.type': {
+							$not: {
+								$in: [TypePayment.CREDIT, TypePayment.BANK, TypePayment.BONUS],
+							},
 						},
 					},
-				})
-				.projection({
-					_id: 1,
-					total: 'summary.total',
-					closeDate: 1,
-					customerId: '$customer._id',
-					details: 1,
-					pointOfSaleId: '$pointOfSale',
-				});
+				},
+				{
+					$project: {
+						_id: 1,
+						total: '$summary.total',
+					},
+				},
+			]);
 
 			let total = 0;
 			const ordersInvoicing = [];
@@ -280,10 +279,23 @@ export class InvoicesService {
 				valueMissing += cashTotal - total;
 			}
 
+			const pointOfSales = await this.pointOfSalesService.findAll(
+				{
+					shopId,
+				},
+				{
+					username: 'admin',
+				} as User,
+				'',
+			);
+
 			//generar factura de los pedidos
 			for (let i = 0; i < ordersInvoicing.length; i++) {
 				const orderId = ordersInvoicing[i];
-				await this.create({ orderId }, { username: 'admin' } as User);
+				await this.create(
+					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
+					{ username: 'admin' } as User,
+				);
 			}
 
 			invoiceQuantity += ordersInvoicing.length;
