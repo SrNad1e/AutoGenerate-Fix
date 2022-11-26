@@ -6015,7 +6015,7 @@ type ReturnOrder {
   order: Order!
 
   """Punto de venta"""
-  pointOfSale: Shop!
+  pointOfSale: PointOfSale!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
