@@ -6,13 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import {
-	Aggregate,
-	FilterQuery,
-	PaginateModel,
-	PaginateOptions,
-	Types,
-} from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -738,7 +732,7 @@ export class OrdersService {
 					status: newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
-					payments: newPayments,
+					payments: newPayments.length > 0 ? newPayments : undefined,
 					statusWeb: newStatusWeb,
 					user: {
 						username: user.username,
