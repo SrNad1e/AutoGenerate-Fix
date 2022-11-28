@@ -726,7 +726,7 @@ export class OrdersService {
 					status: newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
-					payments: newPayments,
+					payments: newPayments.length > 0 ? newPayments : undefined,
 					statusWeb: newStatusWeb,
 					user: {
 						username: user.username,
