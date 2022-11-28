@@ -529,15 +529,15 @@ export class StockTransferService {
 						companyId,
 					);
 
-					const detailsError = newDetails.filter(
-						(detail) =>
-							detail.quantity !== detail.quantityConfirmed &&
-							detail.status === StatusDetailTransfer.CONFIRMED,
+					const detailsError = stockTransfer.details.filter(
+						(detail) => detail.quantity !== detail.quantityConfirmed /*&&
+							detail.status === StatusDetailTransfer.CONFIRMED,*/,
 					);
 
 					if (detailsError.length > 0) {
 						const detailsErrorFormat = detailsError.map((detail) => {
-							const newQuantity = detail.quantity - detail.quantityConfirmed;
+							const newQuantity =
+								detail.quantity - (detail.quantityConfirmed || 0);
 
 							if (newQuantity > 0) {
 								return {
