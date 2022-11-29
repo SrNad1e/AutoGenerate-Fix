@@ -1770,7 +1770,7 @@ export class OrdersService {
 	 * @returns valor de las ventas
 	 */
 	async getNetSales({ dateFinal, dateInitial, shopId }: DataGetNetSalesInput) {
-		const finalDate = dayjs(dateFinal).format('YYYY/MM/DD');
+		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
 		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
 
 		if (dayjs(finalDate).isBefore(dayjs(initialDate))) {
@@ -1823,10 +1823,10 @@ export class OrdersService {
 					'payments.payment.type': 'bonus',
 					closeDate: {
 						$gte: new Date(initialDate),
-						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
+						$lt: new Date(finalDate),
 					},
 					status: 'closed',
-					shop: shop?._id,
+					'shop._id': shop?._id,
 				},
 			},
 			{
