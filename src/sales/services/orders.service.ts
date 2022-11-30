@@ -48,6 +48,7 @@ import { Invoice } from '../entities/invoice.entity';
 import {
 	DetailOrder,
 	Order,
+	PaymentOrder,
 	StatusOrder,
 	StatusOrderDetail,
 } from '../entities/order.entity';
@@ -362,7 +363,7 @@ export class OrdersService {
 		let newStatusWeb = StatusWeb[statusWeb] || statusWeb;
 		const newDetails: DetailOrder[] = [];
 		const dataUpdate: Partial<Order> = {};
-		const newPayments = [];
+		let newPayments = [];
 
 		//Se valida si se realiza cambio del cliente
 		if (customerId) {
@@ -619,45 +620,6 @@ export class OrdersService {
 
 			//Si se procede a cerrar el pedido
 			if (newStatus === StatusOrder.CLOSED) {
-				//Validar los medios de pago(estado del bono, crédito y valor total del pedido)
-				let coupon;
-				for (let i = 0; i < order?.payments?.length; i++) {
-					const { payment, code, total } = order?.payments[i];
-
-					switch (payment.type) {
-						case TypePayment.BONUS:
-							if (!code) {
-								throw new BadRequestException(
-									'El medio de pago cupón debe tener código',
-								);
-							}
-							coupon = await this.couponsService.validateCoupon(
-								code,
-								user,
-								companyId,
-							);
-
-							break;
-						case TypePayment.CREDIT:
-							const credit = await this.creditsService.validateCredit(
-								dataUpdate.customer?._id?.toString() ||
-									order?.customer?._id?.toString(),
-								total,
-								TypeCreditHistory.THAWED,
-							);
-
-							if (!credit) {
-								throw new BadRequestException(
-									'No se ha podido acreditar el pago, crédito con errores',
-								);
-							}
-							break;
-
-						default:
-							break;
-					}
-				}
-
 				//Calcular el resumen
 				const newSummary = await this.calculateSummary({
 					...(order as Order),
@@ -685,61 +647,30 @@ export class OrdersService {
 					dataUpdate.pointOfSale = user?.pointOfSale?._id;
 				}
 
+				const paymentsForProcess = [];
+
 				//Se crean los recibos de caja
 				for (let i = 0; i < order?.payments?.length; i++) {
-					const { total, payment } = order?.payments[i];
-					if (
-						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
-					) {
-						const pointOfSale = order.pointOfSale || user.pointOfSale;
-
-						const valuesReceipt = {
-							value: total,
-							paymentId: payment?._id?.toString(),
-							pointOfSaleId: pointOfSale?._id?.toString(),
-							concept: `Abono a pedido ${order?.number}`,
-							boxId:
-								payment?.type === 'cash'
-									? pointOfSale['box']?.toString()
-									: undefined,
-						};
-
-						const { receipt } = await this.receiptsService.create(
-							valuesReceipt,
-							user,
-							companyId,
-						);
-						newPayments.push({
-							...order?.payments[i],
-							receipt: receipt?._id,
-						});
-					} else if (payment.type === TypePayment.CREDIT) {
-						newPayments.push(order?.payments[i]);
-
-						await this.creditHistoryService.thawedCreditHistory(
-							order?._id?.toString(),
-							total,
-							user,
-							companyId,
-						);
-
-						await this.creditHistoryService.addCreditHistory(
-							order?._id?.toString(),
-							total,
-							user,
-							companyId,
-						);
+					const payment = order?.payments[i];
+					if (payment.status === StatusOrderDetail.NEW) {
+						paymentsForProcess.push(payment);
 					} else {
-						await this.couponsService.update(
-							coupon._id.toString(),
-							{
-								status: StatusCoupon.REDEEMED,
-							},
-							user,
-							companyId,
-						);
-						newPayments.push(order?.payments[i]);
+						newPayments.push(payment);
 					}
+				}
+
+				const pointOfSale = order.pointOfSale || user.pointOfSale;
+
+				if (paymentsForProcess.length > 0) {
+					const paymentsProccess = await this.proccessPayments(
+						paymentsForProcess,
+						pointOfSale as unknown as PointOfSale,
+						order as Order,
+						user,
+						companyId,
+					);
+
+					newPayments = newPayments.concat(paymentsProccess);
 				}
 
 				//Se pasa el cliente a mayoristas
@@ -795,6 +726,7 @@ export class OrdersService {
 					status: newStatus,
 					details: newDetails.length > 0 ? newDetails : undefined,
 					summary: newSummary,
+					payments: newPayments.length > 0 ? newPayments : undefined,
 					statusWeb: newStatusWeb,
 					user: {
 						username: user.username,
@@ -1230,6 +1162,20 @@ export class OrdersService {
 			}
 		}
 
+		//se valida si hay bono debe ser menor al total de la factura
+
+		const validateBonus = payments.find((payment) => payment.code);
+
+		if (
+			validateBonus &&
+			validateBonus.total >= order.summary.total &&
+			payments.length > 1
+		) {
+			throw new BadRequestException(
+				`El valor del bono no puede combinar con otros medios de pagos si es mayor o igual al valor del pedido`,
+			);
+		}
+
 		let newPayments = [...order.payments];
 
 		//Se seleccionan los medios de pago a eliminar
@@ -1498,10 +1444,12 @@ export class OrdersService {
 			);
 		}
 
-		const newPayments = [...order.payments];
+		let newPayments = [...order.payments];
+
+		const paymentsForProcess = [];
 
 		for (let i = 0; i < payments.length; i++) {
-			const { paymentId, status } = payments[i];
+			const { paymentId } = payments[i];
 
 			const index = newPayments.findIndex(
 				(payment) => payment.payment._id.toString() === paymentId,
@@ -1514,11 +1462,23 @@ export class OrdersService {
 				});
 			}
 
-			newPayments[index] = {
-				...newPayments[index],
-				status: StatusOrderDetail[status],
-			};
+			paymentsForProcess.push(newPayments[index]);
+
+			newPayments.slice(0, index);
 		}
+
+		//procesar los pagos
+		const pointOfSale = order.pointOfSale || user.pointOfSale;
+
+		const paymentsProccess = await this.proccessPayments(
+			paymentsForProcess,
+			pointOfSale as unknown as PointOfSale,
+			order as Order,
+			user,
+			companyId,
+		);
+
+		newPayments = newPayments.concat(paymentsProccess);
 
 		const newOrder = await this.orderModel.findByIdAndUpdate(
 			orderId,
@@ -1824,7 +1784,7 @@ export class OrdersService {
 	 * @returns valor de las ventas
 	 */
 	async getNetSales({ dateFinal, dateInitial, shopId }: DataGetNetSalesInput) {
-		const finalDate = dayjs(dateFinal).format('YYYY/MM/DD');
+		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
 		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
 
 		if (dayjs(finalDate).isBefore(dayjs(initialDate))) {
@@ -1877,10 +1837,10 @@ export class OrdersService {
 					'payments.payment.type': 'bonus',
 					closeDate: {
 						$gte: new Date(initialDate),
-						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
+						$lt: new Date(finalDate),
 					},
 					status: 'closed',
-					shop: shop?._id,
+					'shop._id': shop?._id,
 				},
 			},
 			{
@@ -1965,5 +1925,133 @@ export class OrdersService {
 		];
 
 		return (await this.orderModel.aggregate(aggreagtePayments)) || [];
+	}
+	/*
+	 * @description Se encarga de procesar los medios de pago
+	 * @param payments medios de pago a procesar
+	 * @param pointOfSale punto de venta que procesa los medios de pago
+	 * @param order pedido que afectan los medios de pago
+	 * @param user usuario que esta realizando la afectación
+	 * @param companyId compañia a la que está afectando la operación
+	 * @param customerId cliente para validar carteras
+	 * @returns Array de métodos de pago ya procesados
+	 */
+	async proccessPayments(
+		payments: PaymentOrder[],
+		pointOfSale: PointOfSale,
+		order: Order,
+		user: User,
+		companyId: string,
+		customerId?: string,
+	) {
+		let coupon;
+		const newPayments = [];
+		//Se realizan validaciones
+		for (let i = 0; i < payments?.length; i++) {
+			const { payment, code, total } = payments[i];
+
+			switch (payment.type) {
+				case TypePayment.BONUS:
+					if (!code) {
+						throw new BadRequestException(
+							'El medio de pago cupón debe tener código',
+						);
+					}
+					coupon = await this.couponsService.validateCoupon(
+						code,
+						user,
+						companyId,
+					);
+
+					break;
+				case TypePayment.CREDIT:
+					const credit = await this.creditsService.validateCredit(
+						customerId,
+						total,
+						TypeCreditHistory.THAWED,
+					);
+
+					if (!credit) {
+						throw new BadRequestException(
+							'No se ha podido acreditar el pago, crédito con errores',
+						);
+					}
+
+					break;
+				default:
+					break;
+			}
+		}
+
+		//se procesan los medios de pago
+		for (let i = 0; i < payments?.length; i++) {
+			const { payment, total } = payments[i];
+
+			switch (payment.type) {
+				case TypePayment.BONUS:
+					await this.couponsService.update(
+						coupon._id.toString(),
+						{
+							status: StatusCoupon.REDEEMED,
+						},
+						user,
+						companyId,
+					);
+					if (order.summary.total < total) {
+						newPayments.push({
+							...payments[i],
+							total: order.summary.total,
+						});
+					} else {
+						newPayments.push(order?.payments[i]);
+					}
+
+					break;
+				case TypePayment.CREDIT:
+					newPayments.push(payments[i]);
+
+					await this.creditHistoryService.thawedCreditHistory(
+						order?._id?.toString(),
+						total,
+						user,
+						companyId,
+					);
+
+					await this.creditHistoryService.addCreditHistory(
+						order?._id?.toString(),
+						total,
+						user,
+						companyId,
+					);
+
+					break;
+				default:
+					const valuesReceipt = {
+						value: total,
+						paymentId: payment?._id?.toString(),
+						pointOfSaleId: pointOfSale?._id?.toString(),
+						concept: `Abono a pedido ${order?.number}`,
+						boxId:
+							payment?.type === 'cash'
+								? pointOfSale['box']?.toString()
+								: undefined,
+					};
+
+					const { receipt } = await this.receiptsService.create(
+						valuesReceipt,
+						user,
+						companyId,
+					);
+
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+						receipt: receipt?._id,
+					});
+					break;
+			}
+		}
+
+		return newPayments;
 	}
 }
