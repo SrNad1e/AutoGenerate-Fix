@@ -1168,6 +1168,20 @@ export class OrdersService {
 			}
 		}
 
+		//se valida si hay bono debe ser menor al total de la factura
+
+		const validateBonus = payments.find((payment) => payment.code);
+
+		if (
+			validateBonus &&
+			validateBonus.total >= order.summary.total &&
+			payments.length > 1
+		) {
+			throw new BadRequestException(
+				`El valor del bono no puede combinar con otros medios de pagos si es mayor o igual al valor del pedido`,
+			);
+		}
+
 		let newPayments = [...order.payments];
 
 		//Se seleccionan los medios de pago a eliminar
