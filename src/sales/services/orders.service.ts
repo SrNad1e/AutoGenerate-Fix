@@ -1172,9 +1172,14 @@ export class OrdersService {
 
 		const validateBonus = payments.find((payment) => payment.code);
 
+		const paymentSurplus = payments.reduce(
+			(sum, payment) => sum + payment.total,
+			0,
+		);
+
 		if (
 			validateBonus &&
-			validateBonus.total >= order.summary.total &&
+			paymentSurplus >= order.summary.total &&
 			payments.length > 1
 		) {
 			throw new BadRequestException(
@@ -2256,14 +2261,10 @@ export class OrdersService {
 						user,
 						companyId,
 					);
-					if (order.summary.total < total) {
-						newPayments.push({
-							...payments[i],
-							total: order.summary.total,
-						});
-					} else {
-						newPayments.push(order?.payments[i]);
-					}
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+					});
 
 					break;
 				case TypePayment.CREDIT:
