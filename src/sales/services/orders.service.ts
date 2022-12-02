@@ -1167,9 +1167,14 @@ export class OrdersService {
 
 		const validateBonus = payments.find((payment) => payment.code);
 
+		const paymentSurplus = payments.reduce(
+			(sum, payment) => sum + payment.total,
+			0,
+		);
+
 		if (
 			validateBonus &&
-			validateBonus.total >= order.summary.total &&
+			paymentSurplus >= order.summary.total &&
 			payments.length > 1
 		) {
 			throw new BadRequestException(
