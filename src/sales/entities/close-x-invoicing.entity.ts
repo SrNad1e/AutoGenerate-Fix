@@ -94,6 +94,20 @@ export class RefundOrderClose {
 	value: number;
 }
 
+@ObjectType({ description: 'Pagos que cruzan créditos' })
+export class PaymentCredit {
+	@Field(() => Number, { description: 'Cantidad de las pagos del medio' })
+	quantity: number;
+
+	@Field(() => Number, { description: 'Valor del medio de pago' })
+	value: number;
+
+	@Field(() => Payment, {
+		description: 'Medio de pago',
+	})
+	payment: Types.ObjectId;
+}
+
 @Schema({ timestamps: true, collection: 'closesXInvoicing' })
 @ObjectType({ description: 'Cierre X de facturación' })
 export class CloseXInvoicing extends Document {
@@ -145,6 +159,13 @@ export class CloseXInvoicing extends Document {
 	})
 	@Prop({ type: Object, default: [] })
 	payments: PaymentOrderClose[];
+
+	@Field(() => [PaymentCredit], {
+		description: 'Medios de pago usados para cruzar créditos',
+		nullable: true,
+	})
+	@Prop({ type: Array })
+	paymentsCredit?: PaymentCredit[];
 
 	@Field(() => Number, {
 		description: 'Transacciones reportadas por el usuario',

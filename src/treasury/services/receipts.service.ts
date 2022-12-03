@@ -126,6 +126,7 @@ export class ReceiptsService {
 			boxId,
 			pointOfSaleId,
 			details,
+			isCredit = false,
 		}: CreateReceiptInput,
 		user: User,
 		companyId: string,
@@ -176,6 +177,7 @@ export class ReceiptsService {
 			value,
 			concept,
 			box: box?._id,
+			isCredit,
 			payment: payment,
 			pointOfSale: pointOfSale._id,
 			company: new Types.ObjectId(companyId),
@@ -316,5 +318,46 @@ export class ReceiptsService {
 				},
 			},
 		});
+	}
+
+	/**
+	 * @description se encarga de consultar consolidado de créditos pagados
+	 * @param dateInitial fecha inicial de la consulta
+	 * @param dateFinal fecha final de la consulta
+	 * @param pointOfSaleId punto de venta si se requiere para filtrar el valor
+	 * @returns valor consolidado de los créditos pagados
+	 */
+	async getPaymentsCredit(
+		dateInitial: string,
+		dateFinal: string,
+		pointOfSaleId?: string,
+	) {
+		const receiptsCredit = await this.receiptModel.aggregate([
+			{
+				$match: {
+					createdAt: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+					isCredit: true,
+				},
+			},
+			{
+				$group: {
+					_id: "$payment.type",
+					value: {
+						$sum: "$value",
+					},
+					quantity: {
+						$sum: 1,
+					}
+				}
+			}
+		]);
+
+		return receiptsCredit;
 	}
 }
