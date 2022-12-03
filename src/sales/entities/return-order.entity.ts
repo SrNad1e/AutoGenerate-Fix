@@ -7,7 +7,6 @@ import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Order } from './order.entity';
 import { Coupon } from 'src/crm/entities/coupon.entity';
-import { Shop } from 'src/configurations/entities/shop.entity';
 import { PointOfSale } from './pointOfSale.entity';
 
 @ObjectType({ description: 'Productos de la devolucion' })
@@ -34,7 +33,7 @@ export class ReturnOrder extends Document {
 	@Prop({ type: Number, requiere: true })
 	number: number;
 
-	@Field(() => Shop, { description: 'Punto de venta' })
+	@Field(() => PointOfSale, { description: 'Punto de venta' })
 	@Prop({ type: Types.ObjectId, ref: PointOfSale.name, requiere: true })
 	pointOfSale: Types.ObjectId;
 
