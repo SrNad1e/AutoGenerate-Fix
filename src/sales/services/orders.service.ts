@@ -1164,7 +1164,7 @@ export class OrdersService {
 		}
 
 		//se valida si hay bono debe ser menor al total de la factura
-
+		/*
 		const validateBonus = payments.find((payment) => payment.code);
 
 		const paymentSurplus = payments.reduce(
@@ -1180,7 +1180,7 @@ export class OrdersService {
 			throw new BadRequestException(
 				`El valor del bono no puede combinar con otros medios de pagos si es mayor o igual al valor del pedido`,
 			);
-		}
+		}*/
 
 		let newPayments = [...order.payments];
 
