@@ -1513,8 +1513,7 @@ export class OrdersService {
 			}
 
 			paymentsForProcess.push(order.payments[index]);
-
-			//newPayments.slice(0, index);
+			newPayments.splice(index, 1);
 		}
 
 		//procesar los pagos
@@ -2054,11 +2053,6 @@ export class OrdersService {
 
 					break;
 				case TypePayment.CREDIT:
-					newPayments.push({
-						...payments[i],
-						status: StatusOrderDetail.CONFIRMED,
-					});
-
 					await this.creditHistoryService.thawedCreditHistory(
 						order?._id?.toString(),
 						total,
@@ -2073,6 +2067,10 @@ export class OrdersService {
 						companyId,
 					);
 
+					newPayments.push({
+						...payments[i],
+						status: StatusOrderDetail.CONFIRMED,
+					});
 					break;
 				default:
 					const valuesReceipt = {
