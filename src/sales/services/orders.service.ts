@@ -656,9 +656,49 @@ export class OrdersService {
 
 				//Se crean los recibos de caja
 				for (let i = 0; i < order?.payments?.length; i++) {
-					const payment = order?.payments[i];
-					if (payment.status === StatusOrderDetail.NEW) {
-						paymentsForProcess.push(payment);
+					const { total, payment } = order?.payments[i];
+					if (
+						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
+					) {
+						const pointOfSale = order.pointOfSale || user.pointOfSale;
+
+						const valuesReceipt = {
+							value: total,
+							paymentId: payment?._id?.toString(),
+							isCredit: false,
+							pointOfSaleId: pointOfSale?._id?.toString(),
+							concept: `Abono a pedido ${order?.number}`,
+							boxId:
+								payment?.type === 'cash'
+									? pointOfSale['box']?.toString()
+									: undefined,
+						};
+
+						const { receipt } = await this.receiptsService.create(
+							valuesReceipt,
+							user,
+							companyId,
+						);
+						newPayments.push({
+							...order?.payments[i],
+							receipt: receipt?._id,
+						});
+					} else if (payment.type === TypePayment.CREDIT) {
+						newPayments.push(order?.payments[i]);
+
+						await this.creditHistoryService.thawedCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
+
+						await this.creditHistoryService.addCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
 					} else {
 						newPayments.push(payment);
 					}
@@ -1169,7 +1209,7 @@ export class OrdersService {
 		}
 
 		//se valida si hay bono debe ser menor al total de la factura
-
+		/*
 		const validateBonus = payments.find((payment) => payment.code);
 
 		const paymentSurplus = payments.reduce(
@@ -1185,7 +1225,7 @@ export class OrdersService {
 			throw new BadRequestException(
 				`El valor del bono no puede combinar con otros medios de pagos si es mayor o igual al valor del pedido`,
 			);
-		}
+		}*/
 
 		let newPayments = [...order.payments];
 
