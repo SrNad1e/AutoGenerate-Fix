@@ -709,6 +709,7 @@ export class OrdersService {
 						order as Order,
 						user,
 						companyId,
+						order.customer._id.toString(),
 					);
 
 					newPayments = newPayments.concat(paymentsProccess);
