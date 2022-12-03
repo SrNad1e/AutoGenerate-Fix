@@ -144,8 +144,8 @@ export class ProductsService {
 			filters.size = new Types.ObjectId(sizeId);
 		}
 
-		if (StatusProduct[status]) {
-			filters.status = StatusProduct[status];
+		if (StatusProduct[status] || status) {
+			filters.status = StatusProduct[status] || status;
 		}
 
 		if (name) {
@@ -194,11 +194,11 @@ export class ProductsService {
 		//filtro custom para los productos obligatorio
 
 		const newSort = {
-			"reference.name": 1,
-			"color.name":1,
-			"size.weight":1,
+			'reference.name': 1,
+			'color.name': 1,
+			'size.weight': 1,
 			...sort,
-		}
+		};
 
 		const options = {
 			limit,
