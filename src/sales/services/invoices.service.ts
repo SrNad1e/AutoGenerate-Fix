@@ -85,8 +85,6 @@ export class InvoicesService {
 			throw new BadRequestException('La orden de venta no existe');
 		}
 
-		console.log(order);
-
 		const pointOfSale = await this.pointOfSalesService.findById(
 			order?.pointOfSale?.toString() || pointOfSaleId,
 		);
@@ -223,7 +221,9 @@ export class InvoicesService {
 		);
 
 		//obtener los pedidos día a dia que se van a facturar
+		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;
+		let valueInvoicingBank = 0;
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, cashTotal } = totalOrdersDay[i];
 
@@ -253,6 +253,28 @@ export class InvoicesService {
 					$project: {
 						_id: 1,
 						total: '$summary.total',
+						closeDate: 1,
+					},
+				},
+			]);
+
+			const ordersBank = await this.orderModel.aggregate([
+				{
+					$match: {
+						closeDate: {
+							$gte: new Date(dI),
+							$lt: new Date(dF),
+						},
+						'shop._id': new Types.ObjectId(shopId),
+						status: 'closed',
+						'payments.payment.type': TypePayment.BANK,
+					},
+				},
+				{
+					$project: {
+						_id: 1,
+						total: '$summary.total',
+						closeDate: 1,
 					},
 				},
 			]);
@@ -266,72 +288,54 @@ export class InvoicesService {
 			while (total < cashTotal && posUp < posDown - 1) {
 				let order = orders[posUp];
 				total += order.total;
-				ordersInvoicing.push(order._id.toString());
+				ordersInvoicing.push({
+					orderId: order._id.toString(),
+					closeDate: order.closeDate,
+				});
 				posUp++;
 				if (total < cashTotal) {
 					order = orders[posDown];
 					total += order.total;
-					ordersInvoicing.push(order._id.toString());
+					ordersInvoicing.push({
+						orderId: order._id.toString(),
+						closeDate: order.closeDate,
+					});
 					posDown--;
 				} else {
 					break;
 				}
 			}
 
+			invoiceQuantityCash += ordersInvoicing.length;
+
+			ordersInvoicing.concat(ordersBank.map(({ _id }) => _id.toString()));
+
+			valueInvoicingBank =
+				valueInvoicingBank +
+				ordersBank.reduce((sum, order) => sum + order.total, 0);
+
+			invoiceQuantityBank = invoiceQuantityBank + ordersBank.length;
+
+			//ordenar por fecha
+
+			ordersInvoicing.sort((a, b) => {
+				if (dayjs(a.closeDate).isBefore(dayjs(b.closeDate))) {
+					return 1;
+				}
+				if (dayjs(a.closeDate).isAfter(dayjs(b.closeDate))) {
+					return -1;
+				}
+				return 0;
+			});
+
 			//generar factura de los pedidos en efectivo
 			for (let i = 0; i < ordersInvoicing.length; i++) {
-				const orderId = ordersInvoicing[i];
+				const { orderId } = ordersInvoicing[i];
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
 				);
 			}
-
-			invoiceQuantityCash += ordersInvoicing.length;
-		}
-
-		//generar factura de los pedidos en bank
-
-		const ordersBank = await this.orderModel.aggregate([
-			{
-				$match: {
-					closeDate: {
-						$gte: new Date(initialDate),
-						$lt: new Date(finalDate),
-					},
-					'shop._id': new Types.ObjectId(shopId),
-					status: 'closed',
-					'payments.payment.type': TypePayment.BANK,
-				},
-			},
-			{
-				$project: {
-					_id: 1,
-					total: '$summary.total',
-				},
-			},
-		]);
-
-		console.log('ordersBank', ordersBank);
-
-		const invoiceQuantityBank = ordersBank.length;
-
-		const valueInvoicingBank = ordersBank.reduce(
-			(sum, order) => sum + order.total,
-			0,
-		);
-
-		for (let i = 0; i < ordersBank.length; i++) {
-			const { _id } = ordersBank[i];
-			await this.create(
-				{
-					orderId: _id.toString(),
-					pointOfSaleId: pointOfSales?.docs[0]?._id?.toString(),
-				},
-				{
-					username: 'admin',
-				} as User,
-			);
 		}
 
 		return {
