@@ -8,6 +8,7 @@ export class ResumeDayReturnsOrderInput {
 	@Field(() => String, {
 		description:
 			'Punto de venta para consultar las devoluciones o vacío si se necesitan todas',
+		nullable: true,
 	})
 	pointOfSaleId?: string;
 

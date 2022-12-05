@@ -7,6 +7,7 @@ import { PointOfSale } from './pointOfSale.entity';
 import { Expense } from 'src/treasury/entities/expense.entity';
 import {
 	CashRegister,
+	PaymentCredit,
 	PaymentOrderClose,
 	RefundOrderClose,
 	SummaryOrderClose,
@@ -38,6 +39,13 @@ export class CloseZInvoicing extends Document {
 	})
 	@Prop({ type: Types.ObjectId, ref: PointOfSale.name, required: true })
 	pointOfSale: Types.ObjectId;
+
+	@Field(() => [PaymentCredit], {
+		description: 'Medios de pago usados para cruzar créditos',
+		nullable: true,
+	})
+	@Prop({ type: Object })
+	paymentsCredit?: PaymentCredit[];
 
 	@Field(() => Date, { description: 'Fecha de cierre' })
 	@Prop({ type: Date, required: true })

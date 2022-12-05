@@ -264,10 +264,6 @@ export class ReturnsOrderService {
 		dateInitial,
 		pointOfSaleId,
 	}: ResumeDayReturnsOrderInput) {
-		console.log(dateFinal);
-		console.log(dateInitial);
-		console.log(pointOfSaleId);
-
 		const resume = await this.returnOrderModel.aggregate([
 			{
 				$unwind: '$details',
@@ -286,7 +282,7 @@ export class ReturnsOrderService {
 			{
 				$group: {
 					_id: '$pointOfSale',
-					total: {
+					value: {
 						$sum: { $multiply: ['$details.price', '$details.quantity'] },
 					},
 					quantity: {
@@ -297,12 +293,11 @@ export class ReturnsOrderService {
 			{
 				$project: {
 					_id: 0,
-					total: 1,
+					value: 1,
 					quantity: 1,
 				},
 			},
 		]);
-		console.log(resume);
 
 		return resume[0] || {};
 	}

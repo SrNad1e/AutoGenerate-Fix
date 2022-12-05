@@ -529,16 +529,15 @@ export class StockTransferService {
 						companyId,
 					);
 
-					const detailsError = newDetails.filter(
-						(detail) =>
-							detail.quantity !== detail.quantityConfirmed &&
-							detail.status === StatusDetailTransfer.CONFIRMED,
+					const detailsError = stockTransfer.details.filter(
+						(detail) => detail.quantity !== detail.quantityConfirmed /*&&
+							detail.status === StatusDetailTransfer.CONFIRMED,*/,
 					);
 
 					if (detailsError.length > 0) {
-
 						const detailsErrorFormat = detailsError.map((detail) => {
-							const newQuantity = detail.quantity - detail.quantityConfirmed;
+							const newQuantity =
+								detail.quantity - (detail.quantityConfirmed || 0);
 
 							if (newQuantity > 0) {
 								return {
@@ -627,7 +626,7 @@ export class StockTransferService {
 
 			if (StatusStockTransfer[status] === StatusStockTransfer.CONFIRMED) {
 				let detailHistory = stockTransfer?.details.map((detail) => {
-					if (detail.quantity <= detail.quantityConfirmed) {
+					if (detail.quantity <= (detail.quantityConfirmed || 0)) {
 						return {
 							productId: detail.product._id.toString(),
 							quantity: detail.quantity,
@@ -635,7 +634,7 @@ export class StockTransferService {
 					}
 					return {
 						productId: detail.product._id.toString(),
-						quantity: detail.quantityConfirmed,
+						quantity: detail.quantityConfirmed || 0,
 					};
 				});
 
@@ -656,14 +655,14 @@ export class StockTransferService {
 				}
 
 				const detailsError = stockTransfer.details.filter(
-					(detail) =>
-						detail.quantity !== detail.quantityConfirmed &&
-						detail.status === StatusDetailTransfer.CONFIRMED,
+					(detail) => detail.quantity !== detail.quantityConfirmed /*&&
+						detail.status === StatusDetailTransfer.CONFIRMED,*/,
 				);
 
 				if (detailsError.length > 0) {
 					const detailsErrorFormat = detailsError.map((detail) => {
-						const newQuantity = detail.quantity - detail.quantityConfirmed;
+						const newQuantity =
+							detail.quantity - (detail.quantityConfirmed || 0);
 
 						if (newQuantity > 0) {
 							return {

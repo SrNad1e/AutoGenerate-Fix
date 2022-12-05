@@ -4,6 +4,7 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { log } from 'console';
 import {
 	AggregatePaginateModel,
 	FilterQuery,

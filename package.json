@@ -20,7 +20,7 @@
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
 		"build:qa": "aws lightsail push-container-image --region us-east-1 --service-name qa --label qa --image apirest-nest_app:latest",
-		"build:prod": "aws lightsail push-container-image --region us-east-1 --service-name production --label production --image apirest-nest_app:latest",
+		"build:prod": "aws lightsail push-container-image --region us-east-1 --service-name production --label production --image apirest-nest-app:latest",
 		"build:training": "aws lightsail push-container-image --region us-east-1 --service-name training --label training --image apirest-nest_app:latest"
 	},
 	"dependencies": {
