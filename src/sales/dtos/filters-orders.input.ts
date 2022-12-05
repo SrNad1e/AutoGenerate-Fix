@@ -87,4 +87,7 @@ export class FiltersOrdersInput {
 
 	@Field({ description: 'Trae los pedidos POS solamente', nullable: true })
 	orderPos?: boolean;
+
+	@Field({ description: 'Filtro por tienda', nullable: true })
+	shopId?: string;
 }

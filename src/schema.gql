@@ -2509,6 +2509,9 @@ input FiltersOrdersInput {
   """Identificador del medio de pago"""
   paymentId: String
 
+  """Filtro por tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortOrder
 
