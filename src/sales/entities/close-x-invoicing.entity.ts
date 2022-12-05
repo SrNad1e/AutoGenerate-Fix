@@ -105,7 +105,7 @@ export class PaymentCredit {
 	@Field(() => Payment, {
 		description: 'Medio de pago',
 	})
-	payment: Types.ObjectId;
+	payment: Payment;
 }
 
 @Schema({ timestamps: true, collection: 'closesXInvoicing' })

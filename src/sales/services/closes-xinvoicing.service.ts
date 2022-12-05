@@ -36,13 +36,6 @@ const populate: PopulateOptions[] = [
 		},
 	},
 	{
-		path: 'paymentsCredit',
-		populate: {
-			path: 'payment',
-			model: 'Payment',
-		},
-	},
-	{
 		path: 'expenses',
 		model: Expense.name,
 	},
@@ -117,7 +110,11 @@ export class ClosesXInvoicingService {
 			populate,
 			lean: true,
 		};
-		return this.closeXInvoicingModel.paginate(filters, options);
+
+		const response = await this.closeXInvoicingModel.paginate(filters, options);
+		console.log(response.docs[0].paymentsCredit);
+
+		return response;
 	}
 
 	async create(

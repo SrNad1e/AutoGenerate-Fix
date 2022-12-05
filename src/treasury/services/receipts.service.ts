@@ -348,12 +348,23 @@ export class ReceiptsService {
 			{
 				$group: {
 					_id: '$payment.type',
+					payment: {
+						$first: '$payment',
+					},
 					value: {
 						$sum: '$value',
 					},
 					quantity: {
 						$sum: 1,
 					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: 1,
+					value: 1,
+					quantity: 1,
 				},
 			},
 		]);
