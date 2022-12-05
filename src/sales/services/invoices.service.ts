@@ -280,7 +280,7 @@ export class InvoicesService {
 			]);
 
 			let total = 0;
-			const ordersInvoicing = [];
+			let ordersInvoicing = [];
 			let posUp = 0;
 			let posDown = orders.length - 1;
 
@@ -308,7 +308,12 @@ export class InvoicesService {
 
 			invoiceQuantityCash += ordersInvoicing.length;
 
-			ordersInvoicing.concat(ordersBank.map(({ _id }) => _id.toString()));
+			ordersInvoicing = ordersInvoicing.concat(
+				ordersBank.map(({ _id, closeDate }) => ({
+					orderId: _id.toString(),
+					closeDate: closeDate,
+				})),
+			);
 
 			valueInvoicingBank =
 				valueInvoicingBank +
@@ -319,10 +324,10 @@ export class InvoicesService {
 			//ordenar por fecha
 
 			ordersInvoicing.sort((a, b) => {
-				if (dayjs(a.closeDate).isBefore(dayjs(b.closeDate))) {
+				if (dayjs(a.closeDate).isAfter(dayjs(b.closeDate))) {
 					return 1;
 				}
-				if (dayjs(a.closeDate).isAfter(dayjs(b.closeDate))) {
+				if (dayjs(a.closeDate).isBefore(dayjs(b.closeDate))) {
 					return -1;
 				}
 				return 0;
@@ -337,6 +342,9 @@ export class InvoicesService {
 				);
 			}
 		}
+
+		//sumar facturas generadas y agregar al ultimo numero generado
+		//cambiar la fecha de la ultima facturación
 
 		return {
 			invoiceQuantityCash,
