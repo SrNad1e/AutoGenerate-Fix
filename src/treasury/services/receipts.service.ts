@@ -347,15 +347,15 @@ export class ReceiptsService {
 			},
 			{
 				$group: {
-					_id: "$payment.type",
+					_id: '$payment.type',
 					value: {
-						$sum: "$value",
+						$sum: '$value',
 					},
 					quantity: {
 						$sum: 1,
-					}
-				}
-			}
+					},
+				},
+			},
 		]);
 
 		return receiptsCredit;
