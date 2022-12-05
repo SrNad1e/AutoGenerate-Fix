@@ -1498,6 +1498,21 @@ type CustomerType {
   user: User!
 }
 
+"""Datos para generar la facturación"""
+input DataGenerateInvoicesInput {
+  """Efectivo para facturar"""
+  cash: Float!
+
+  """Fecha final para la facturación"""
+  dateFinal: String!
+
+  """Fecha inicial para la facturación"""
+  dateInitial: String!
+
+  """Identificador de la tienda a facturar"""
+  shopId: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -4268,6 +4283,12 @@ type Query {
     filtersInvoices: FiltersInvoicesInput = {}
   ): ResponseInvoices!
 
+  """Generador de facturas"""
+  invoicing(
+    """Datos para generar la facturación"""
+    dataGenerateInvoicesInput: DataGenerateInvoicesInput!
+  ): ResponseInvoicing!
+
   """Obtiene la orden por el id"""
   orderId(
     """identificador del pedido"""
@@ -5335,6 +5356,21 @@ type ResponseInvoices {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Resultado de facturación"""
+type ResponseInvoicing {
+  """Cantidad de facturas generadas"""
+  invoiceQuantityBank: Float!
+
+  """Cantidad de facturas generadas"""
+  invoiceQuantityCash: Float!
+
+  """Valor total facturado"""
+  valueInvoicingBank: Float!
+
+  """Valor total facturado"""
+  valueInvoicingCash: Float!
 }
 
 """Respuesta para obtener la orden"""

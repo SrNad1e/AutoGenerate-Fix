@@ -3,11 +3,14 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType({ description: 'Resultado de facturación' })
 export class ResponseInvoicing {
 	@Field(() => Number, { description: 'Cantidad de facturas generadas' })
-	invoiceQuantity: number;
+	invoiceQuantityCash: number;
 
-	@Field(() => Number, { description: 'Valor no facturado' })
-	valueMissing: number;
+	@Field(() => Number, { description: 'Cantidad de facturas generadas' })
+	invoiceQuantityBank: number;
 
 	@Field(() => Number, { description: 'Valor total facturado' })
-	valueInvoicing: number;
+	valueInvoicingCash: number;
+
+	@Field(() => Number, { description: 'Valor total facturado' })
+	valueInvoicingBank: number;
 }

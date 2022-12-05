@@ -154,9 +154,6 @@ export class InvoicesService {
 			throw new BadRequestException('La tienda no existe');
 		}
 
-		console.log('finalDate', finalDate);
-		console.log('initialDate', initialDate);
-
 		//Peso de dia a dia con respecto a la venta total
 		let totalOrdersDay = await this.orderModel.aggregate([
 			{
@@ -215,9 +212,18 @@ export class InvoicesService {
 			};
 		});
 
+		const pointOfSales = await this.pointOfSalesService.findAll(
+			{
+				shopId,
+			},
+			{
+				username: 'admin',
+			} as User,
+			'',
+		);
+
 		//obtener los pedidos día a dia que se van a facturar
-		let invoiceQuantity = 0;
-		let valueMissing = 0;
+		let invoiceQuantityCash = 0;
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, cashTotal } = totalOrdersDay[i];
 
@@ -234,7 +240,7 @@ export class InvoicesService {
 							$gte: new Date(dI),
 							$lt: new Date(dF),
 						},
-						'shop._id': new Types.ObjectId('6331b982aa2af68a4ecad2ed'),
+						'shop._id': new Types.ObjectId(shopId),
 						status: 'closed',
 						'payments.payment.type': {
 							$not: {
@@ -256,6 +262,7 @@ export class InvoicesService {
 			let posUp = 0;
 			let posDown = orders.length - 1;
 
+			//TODO mandar por encima de lo pendiente por facturar
 			while (total < cashTotal && posUp < posDown - 1) {
 				let order = orders[posUp];
 				total += order.total;
@@ -267,29 +274,11 @@ export class InvoicesService {
 					ordersInvoicing.push(order._id.toString());
 					posDown--;
 				} else {
-					if (total > cashTotal) {
-						total -= order.total;
-						ordersInvoicing.pop();
-					}
 					break;
 				}
 			}
 
-			if (total < cashTotal) {
-				valueMissing += cashTotal - total;
-			}
-
-			const pointOfSales = await this.pointOfSalesService.findAll(
-				{
-					shopId,
-				},
-				{
-					username: 'admin',
-				} as User,
-				'',
-			);
-
-			//generar factura de los pedidos
+			//generar factura de los pedidos en efectivo
 			for (let i = 0; i < ordersInvoicing.length; i++) {
 				const orderId = ordersInvoicing[i];
 				await this.create(
@@ -298,13 +287,58 @@ export class InvoicesService {
 				);
 			}
 
-			invoiceQuantity += ordersInvoicing.length;
+			invoiceQuantityCash += ordersInvoicing.length;
+		}
+
+		//generar factura de los pedidos en bank
+
+		const ordersBank = await this.orderModel.aggregate([
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(initialDate),
+						$lt: new Date(finalDate),
+					},
+					'shop._id': new Types.ObjectId(shopId),
+					status: 'closed',
+					'payments.payment.type': TypePayment.BANK,
+				},
+			},
+			{
+				$project: {
+					_id: 1,
+					total: '$summary.total',
+				},
+			},
+		]);
+
+		console.log('ordersBank', ordersBank);
+
+		const invoiceQuantityBank = ordersBank.length;
+
+		const valueInvoicingBank = ordersBank.reduce(
+			(sum, order) => sum + order.total,
+			0,
+		);
+
+		for (let i = 0; i < ordersBank.length; i++) {
+			const { _id } = ordersBank[i];
+			await this.create(
+				{
+					orderId: _id.toString(),
+					pointOfSaleId: pointOfSales?.docs[0]?._id?.toString(),
+				},
+				{
+					username: 'admin',
+				} as User,
+			);
 		}
 
 		return {
-			invoiceQuantity,
-			valueMissing,
-			valueInvoicing: cash - valueMissing,
+			invoiceQuantityCash,
+			invoiceQuantityBank,
+			valueInvoicingBank,
+			valueInvoicingCash: cash,
 		};
 	}
 }
