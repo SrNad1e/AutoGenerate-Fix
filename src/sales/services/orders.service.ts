@@ -695,7 +695,7 @@ export class OrdersService {
 							companyId,
 						);
 					} else {
-						newPayments.push(payment);
+						newPayments.push(order?.payments[i]);
 					}
 				}
 
