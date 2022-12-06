@@ -238,6 +238,12 @@ export class InvoicesService {
 			);
 		}
 
+		if (dayjs(autorization.lastDateInvoicing).isAfter(dayjs(dateInitial))) {
+			throw new BadRequestException(
+				'En el rango hay fechas ya facturadas, intente nuevamenta',
+			);
+		}
+
 		//obtener los pedidos día a dia que se van a facturar
 		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;

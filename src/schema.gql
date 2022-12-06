@@ -3404,6 +3404,12 @@ type Mutation {
     shopId: String!
   ): StockRequest!
 
+  """Generador de facturas"""
+  invoicing(
+    """Datos para generar la facturación"""
+    dataGenerateInvoicesInput: DataGenerateInvoicesInput!
+  ): ResponseInvoicing!
+
   """Se encarga de realizar el ingreso al sistema por el usuario"""
   login(
     """Datos de usuario para realizar el login"""
@@ -4312,12 +4318,6 @@ type Query {
     """Filtros de lista de facturas"""
     filtersInvoices: FiltersInvoicesInput = {}
   ): ResponseInvoices!
-
-  """Generador de facturas"""
-  invoicing(
-    """Datos para generar la facturación"""
-    dataGenerateInvoicesInput: DataGenerateInvoicesInput!
-  ): ResponseInvoicing!
 
   """Obtiene la orden por el id"""
   orderId(

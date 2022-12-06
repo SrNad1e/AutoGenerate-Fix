@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
 	Permissions,
@@ -37,7 +37,7 @@ export class InvoicesResolver {
 		);
 	}
 
-	@Query(() => ResponseInvoicing, {
+	@Mutation(() => ResponseInvoicing, {
 		name: 'invoicing',
 		description: 'Generador de facturas',
 	})
