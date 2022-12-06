@@ -79,7 +79,11 @@ export class InvoicesService {
 		return this.invoiceModel.paginate(filters, options);
 	}
 
-	async create({ orderId, pointOfSaleId }: CreateInvoiceInput, user: User) {
+	async create(
+		{ orderId, pointOfSaleId }: CreateInvoiceInput,
+		user: User,
+		invoiceNumber?: number,
+	) {
 		const order = await this.orderModel.findById(orderId);
 		if (!order) {
 			throw new BadRequestException('La orden de venta no existe');
@@ -109,23 +113,16 @@ export class InvoicesService {
 
 		const invoice = new this.invoiceModel({
 			authorization: autorization,
-			number: autorization.numberCurrent + 1,
+			number: invoiceNumber ? invoiceNumber : autorization.lastNumber + 1,
 			customer: order.customer,
 			company: order.company,
 			shop: order.shop,
 			payments,
 			summary,
 			details: order.details,
-			user: order.user,
+			user: user || order.user,
 			createdAt: order.closeDate,
 		});
-
-		await this.authorizationsService.update(
-			autorization._id.toString(),
-			{ numberCurrent: autorization.numberCurrent + 1 },
-			user,
-			order.company.toString(),
-		);
 
 		return invoice.save();
 	}
@@ -220,6 +217,27 @@ export class InvoicesService {
 			'',
 		);
 
+		const autorization = await this.authorizationsService.findById(
+			pointOfSales.docs[0]?.authorization?._id.toString(),
+		);
+
+		//validar la autorización si tiene numeración, si esta vencida
+		if (!autorization) {
+			throw new BadRequestException('La autorización no existe');
+		}
+
+		if (autorization.numberFinal <= autorization.lastNumber) {
+			throw new BadRequestException(
+				'La autorización no tiene números disponibles',
+			);
+		}
+
+		if (dayjs(autorization.dateFinal).endOf('d').isBefore(dayjs(dateFinal))) {
+			throw new BadRequestException(
+				'La autorización no esta vigente para la fecha final',
+			);
+		}
+
 		//obtener los pedidos día a dia que se van a facturar
 		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;
@@ -284,7 +302,6 @@ export class InvoicesService {
 			let posUp = 0;
 			let posDown = orders.length - 1;
 
-			//TODO mandar por encima de lo pendiente por facturar
 			while (total < cashTotal && posUp < posDown - 1) {
 				let order = orders[posUp];
 				total += order.total;
@@ -339,12 +356,21 @@ export class InvoicesService {
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
+					autorization.lastNumber + i + 1,
 				);
 			}
 		}
 
-		//sumar facturas generadas y agregar al ultimo numero generado
-		//cambiar la fecha de la ultima facturación
+		await this.authorizationsService.update(
+			autorization._id.toString(),
+			{
+				lastNumber:
+					autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
+				lastDateInvoicing: new Date(finalDate),
+			},
+			{ username: 'admin' } as User,
+			shop.company.toString(),
+		);
 
 		return {
 			invoiceQuantityCash,

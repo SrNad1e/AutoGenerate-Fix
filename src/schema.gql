@@ -217,8 +217,11 @@ type AuthorizationDian {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
-  """Numero actual"""
-  numberCurrent: Float!
+  """Última fecha de facturación"""
+  lastDateInvoicing: DateTime
+
+  """Ultimo numero usado para facturar"""
+  lastNumber: Float!
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -511,6 +514,9 @@ type CloseXInvoicing {
   """Listado de pagos"""
   payments: [PaymentOrderClose!]
 
+  """Medios de pago usados para cruzar créditos"""
+  paymentsCredit: [PaymentCredit!]
+
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
 
@@ -555,6 +561,9 @@ type CloseZInvoicing {
 
   """Listado de pagos"""
   payments: [PaymentOrderClose!]
+
+  """Medios de pago usados para cruzar créditos"""
+  paymentsCredit: [PaymentCredit!]
 
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
@@ -804,9 +813,6 @@ input CreateAuthorizationInput {
 
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
-
-  """Numero actual de la resolución"""
-  numberCurrent: Float
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -1105,6 +1111,9 @@ input CreateReceiptInput {
   """Pedidos a los que afecta el recibo"""
   details: [DetailReceiptOrder!]
 
+  """Cruza crédito el recibo"""
+  isCredit: Boolean!
+
   """Identificador del medio de pago"""
   paymentId: String!
 
@@ -1197,8 +1206,17 @@ input CreateShopInput {
   """Dirección de la tienda"""
   address: String!
 
+  """Nombre comercial de la tienda"""
+  companyName: String
+
   """Identificador de la bodega predeterminada para la tienda"""
   defaultWarehouseId: String!
+
+  """Documento de la tienda"""
+  document: String
+
+  """Email de la tienda"""
+  email: String
 
   """Meta asiganda a la tienda"""
   goal: Float
@@ -3790,6 +3808,18 @@ input PaymentConfirm {
   status: StatusOrderDetail
 }
 
+"""Pagos que cruzan créditos"""
+type PaymentCredit {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de las pagos del medio"""
+  quantity: Float!
+
+  """Valor del medio de pago"""
+  value: Float!
+}
+
 """Medios de pago de la factura"""
 type PaymentInvoice {
   """Método de pago usado"""
@@ -4510,6 +4540,9 @@ type Receipt {
 
   """Detalle del cruce del recibo"""
   details: [DetailReceipt!]!
+
+  """Valida si el recibo de caja es crédito"""
+  isCredit: Boolean!
 
   """Consecutivo del recibo de caja"""
   number: Float!
@@ -6027,7 +6060,7 @@ type ReturnOrder {
   order: Order!
 
   """Punto de venta"""
-  pointOfSale: Shop!
+  pointOfSale: PointOfSale!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
@@ -6141,11 +6174,20 @@ type Shop {
   """Empresa que usa la tienda"""
   company: Warehouse!
 
+  """Nombre comercial de la tienda"""
+  companyName: String
+
   """Fecha de creación"""
   createdAt: DateTime!
 
   """Bodega predeterminada para la tienda"""
   defaultWarehouse: Warehouse!
+
+  """Documento de la tienda(NIT)"""
+  document: String
+
+  """Correo de la tienda"""
+  email: String
 
   """Meta asiganda a la tienda"""
   goal: Float!
@@ -7210,8 +7252,11 @@ input UpdateAuthorizationInput {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
-  """Numero actual de la resolución"""
-  numberCurrent: Float
+  """Fecha de cierre"""
+  lastDateInvoicing: DateTime
+
+  """Ultimo número usado para facturar"""
+  lastNumber: Float!
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -7534,8 +7579,17 @@ input UpdateShopInput {
   """Identificador de la empresa para la tienda"""
   companyId: String
 
+  """Nombre comercial de la tienda"""
+  companyName: String
+
   """Identificador de la bodega predeterminada para la tienda"""
   defaultWarehouseId: String
+
+  """Documento de la tienda"""
+  document: String
+
+  """Email de la tienda"""
+  email: String
 
   """Meta asiganda a la tienda"""
   goal: Float
