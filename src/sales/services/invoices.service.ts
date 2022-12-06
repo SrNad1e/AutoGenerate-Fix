@@ -1,3 +1,4 @@
+import { log } from 'console';
 import { PointOfSale } from './../entities/pointOfSale.entity';
 import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -133,8 +134,14 @@ export class InvoicesService {
 		dateInitial,
 		shopId,
 	}: DataGenerateInvoicesInput): Promise<ResponseInvoicing> {
-		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
-		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
+		const finalDate = dayjs(dateFinal)
+			.locale('co')
+			.add(1, 'd')
+			.format('YYYY/MM/DD');
+		const initialDate = dayjs(dateInitial)
+			.locale('co')
+			.startOf('d')
+			.format('YYYY/MM/DD');
 
 		//validar rangos de fecha
 		if (dayjs(finalDate).isBefore(initialDate)) {
@@ -173,12 +180,24 @@ export class InvoicesService {
 					number: {
 						$first: '$number',
 					},
+					month: {
+						$first: {
+							$month: '$closeDate',
+						},
+					},
+					year: {
+						$first: {
+							$year: '$closeDate',
+						},
+					},
 				},
 			},
 			{
 				$project: {
 					_id: 0,
 					day: '$_id',
+					month: 1,
+					year: 1,
 					total: 1,
 					number: 1,
 				},
@@ -248,14 +267,13 @@ export class InvoicesService {
 		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;
 		let valueInvoicingBank = 0;
+		let valueInvoicingCash = 0;
 		for (let i = 0; i < totalOrdersDay.length; i++) {
-			const { day, cashTotal } = totalOrdersDay[i];
+			const { day, year, month, cashTotal } = totalOrdersDay[i];
 
-			const dI = dayjs(dateInitial)
-				.add(day - 1, 'd')
-				.format('YYYY/MM/DD');
+			const dI = `${year}/${month}/${day}`;
 
-			const dF = dayjs(dateInitial).add(day, 'd').format('YYYY/MM/DD');
+			const dF = dayjs(dI).add(1, 'd').format('YYYY/MM/DD');
 
 			const orders = await this.orderModel.aggregate([
 				{
@@ -315,6 +333,7 @@ export class InvoicesService {
 					orderId: order._id.toString(),
 					closeDate: order.closeDate,
 				});
+
 				posUp++;
 				if (total < cashTotal) {
 					order = orders[posDown];
@@ -328,7 +347,7 @@ export class InvoicesService {
 					break;
 				}
 			}
-
+			valueInvoicingCash = total;
 			invoiceQuantityCash += ordersInvoicing.length;
 
 			ordersInvoicing = ordersInvoicing.concat(
@@ -365,24 +384,24 @@ export class InvoicesService {
 					autorization.lastNumber + i + 1,
 				);
 			}
-		}
 
-		await this.authorizationsService.update(
-			autorization._id.toString(),
-			{
-				lastNumber:
-					autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
-				lastDateInvoicing: new Date(finalDate),
-			},
-			{ username: 'admin' } as User,
-			shop.company.toString(),
-		);
+			await this.authorizationsService.update(
+				autorization._id.toString(),
+				{
+					lastNumber:
+						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
+					lastDateInvoicing: new Date(finalDate),
+				},
+				{ username: 'admin' } as User,
+				shop.company.toString(),
+			);
+		}
 
 		return {
 			invoiceQuantityCash,
 			invoiceQuantityBank,
 			valueInvoicingBank,
-			valueInvoicingCash: cash,
+			valueInvoicingCash,
 		};
 	}
 }
