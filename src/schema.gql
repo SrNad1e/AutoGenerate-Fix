@@ -7118,7 +7118,7 @@ input UpdateAuthorizationInput {
   lastDateInvoicing: DateTime
 
   """Ultimo número usado para facturar"""
-  lastNumber: Float!
+  lastNumber: Float
 
   """Numero final de la resolución"""
   numberFinal: Float
