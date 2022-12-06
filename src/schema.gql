@@ -217,6 +217,12 @@ type AuthorizationDian {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
+  """Última fecha de facturación"""
+  lastDateInvoicing: DateTime
+
+  """Ultimo numero usado para facturar"""
+  lastNumber: Float!
+
   """Numero final de la resolución"""
   numberFinal: Float
 
@@ -1200,8 +1206,17 @@ input CreateShopInput {
   """Dirección de la tienda"""
   address: String!
 
+  """Nombre comercial de la tienda"""
+  companyName: String
+
   """Identificador de la bodega predeterminada para la tienda"""
   defaultWarehouseId: String!
+
+  """Documento de la tienda"""
+  document: String
+
+  """Email de la tienda"""
+  email: String
 
   """Meta asiganda a la tienda"""
   goal: Float
@@ -6036,11 +6051,20 @@ type Shop {
   """Empresa que usa la tienda"""
   company: Warehouse!
 
+  """Nombre comercial de la tienda"""
+  companyName: String
+
   """Fecha de creación"""
   createdAt: DateTime!
 
   """Bodega predeterminada para la tienda"""
   defaultWarehouse: Warehouse!
+
+  """Documento de la tienda(NIT)"""
+  document: String
+
+  """Correo de la tienda"""
+  email: String
 
   """Meta asiganda a la tienda"""
   goal: Float!
@@ -7090,6 +7114,12 @@ input UpdateAuthorizationInput {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
+  """Fecha de cierre"""
+  lastDateInvoicing: DateTime
+
+  """Ultimo número usado para facturar"""
+  lastNumber: Float!
+
   """Numero final de la resolución"""
   numberFinal: Float
 
@@ -7411,8 +7441,17 @@ input UpdateShopInput {
   """Identificador de la empresa para la tienda"""
   companyId: String
 
+  """Nombre comercial de la tienda"""
+  companyName: String
+
   """Identificador de la bodega predeterminada para la tienda"""
   defaultWarehouseId: String
+
+  """Documento de la tienda"""
+  document: String
+
+  """Email de la tienda"""
+  email: String
 
   """Meta asiganda a la tienda"""
   goal: Float

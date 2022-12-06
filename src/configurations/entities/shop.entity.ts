@@ -23,6 +23,23 @@ export class Shop extends Document {
 	@Prop({ type: String, required: true, unique: true })
 	name: string;
 
+	@Field(() => String, { description: 'Correo de la tienda', nullable: true })
+	@Prop({ type: String })
+	email?: string;
+	@Field(() => String, {
+		description: 'Documento de la tienda(NIT)',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	document?: string;
+
+	@Field(() => String, {
+		description: 'Nombre comercial de la tienda',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	companyName?: string;
+
 	@Field(() => StatusShop, {
 		description: 'Estado de la tienda',
 	})

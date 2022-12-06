@@ -33,11 +33,11 @@ export class CreateAuthorizationInput {
 		description: 'Numero inicial de la resolución',
 		nullable: true,
 	})
-	numberInitial?: Number;
+	numberInitial?: number;
 
 	@Field(() => Number, {
 		description: 'Numero final de la resolución',
 		nullable: true,
 	})
-	numberFinal?: Number;
+	numberFinal?: number;
 }
