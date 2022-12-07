@@ -1,12 +1,6 @@
-import {
-	SummaryInvoice,
-	DetailInvoice,
-	PaymentInvoice,
-} from './../entities/invoice.entity';
-import {
-	DetailInvoiceInput,
-	PaymentInvoiceInput,
-} from './../dtos/create-invoice-input';
+import { log } from 'console';
+import { PointOfSale } from './../entities/pointOfSale.entity';
+import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -14,10 +8,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
-import { CustomersService } from 'src/crm/services/customers.service';
-import { ProductsService } from 'src/products/services/products.service';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
-import { PaymentsService } from 'src/treasury/services/payments.service';
 import { CreateInvoiceInput } from '../dtos/create-invoice-input';
 import { DataGenerateInvoicesInput } from '../dtos/data-generate-invoices.input';
 import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
@@ -25,6 +16,7 @@ import { Invoice } from '../entities/invoice.entity';
 import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { AuthorizationsService } from './authorizations.service';
+import { ResponseInvoicing } from '../dtos/response-invoicing';
 
 @Injectable()
 export class InvoicesService {
@@ -88,14 +80,18 @@ export class InvoicesService {
 		return this.invoiceModel.paginate(filters, options);
 	}
 
-	async create({ orderId }: CreateInvoiceInput, user: User) {
+	async create(
+		{ orderId, pointOfSaleId }: CreateInvoiceInput,
+		user: User,
+		invoiceNumber?: number,
+	) {
 		const order = await this.orderModel.findById(orderId);
 		if (!order) {
 			throw new BadRequestException('La orden de venta no existe');
 		}
 
 		const pointOfSale = await this.pointOfSalesService.findById(
-			order?.pointOfSale.toString(),
+			order?.pointOfSale?.toString() || pointOfSaleId,
 		);
 
 		const summary: SummaryInvoice = {
@@ -118,23 +114,16 @@ export class InvoicesService {
 
 		const invoice = new this.invoiceModel({
 			authorization: autorization,
-			number: autorization.numberCurrent + 1,
+			number: invoiceNumber ? invoiceNumber : autorization.lastNumber + 1,
 			customer: order.customer,
 			company: order.company,
 			shop: order.shop,
 			payments,
 			summary,
 			details: order.details,
-			user: order.user,
+			user: user || order.user,
 			createdAt: order.closeDate,
 		});
-
-		await this.authorizationsService.update(
-			autorization._id.toString(),
-			{ numberCurrent: autorization.numberCurrent + 1 },
-			user,
-			order.company.toString(),
-		);
 
 		return invoice.save();
 	}
@@ -144,12 +133,18 @@ export class InvoicesService {
 		dateFinal,
 		dateInitial,
 		shopId,
-	}: DataGenerateInvoicesInput) {
-		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
-		const finalInitial = dayjs(dateInitial).format('YYYY/MM/DD');
+	}: DataGenerateInvoicesInput): Promise<ResponseInvoicing> {
+		const finalDate = dayjs(dateFinal)
+			.locale('co')
+			.add(1, 'd')
+			.format('YYYY/MM/DD');
+		const initialDate = dayjs(dateInitial)
+			.locale('co')
+			.startOf('d')
+			.format('YYYY/MM/DD');
 
 		//validar rangos de fecha
-		if (dayjs(finalDate).isBefore(finalInitial)) {
+		if (dayjs(finalDate).isBefore(initialDate)) {
 			throw new BadRequestException(
 				'La fecha final no puede ser menor a la fecha inicial',
 			);
@@ -166,11 +161,12 @@ export class InvoicesService {
 			{
 				$match: {
 					closeDate: {
-						$gte: new Date(dateInitial),
-						$lte: new Date(dateFinal),
+						$gte: new Date(initialDate),
+						$lt: new Date(finalDate),
 					},
 					'shop._id': new Types.ObjectId(shopId),
 					status: 'closed',
+					'payments.payment.type': TypePayment.CASH,
 				},
 			},
 			{
@@ -181,13 +177,29 @@ export class InvoicesService {
 					total: {
 						$sum: '$summary.total',
 					},
+					number: {
+						$first: '$number',
+					},
+					month: {
+						$first: {
+							$month: '$closeDate',
+						},
+					},
+					year: {
+						$first: {
+							$year: '$closeDate',
+						},
+					},
 				},
 			},
 			{
 				$project: {
 					_id: 0,
 					day: '$_id',
+					month: 1,
+					year: 1,
 					total: 1,
+					number: 1,
 				},
 			},
 			{
@@ -214,85 +226,182 @@ export class InvoicesService {
 			};
 		});
 
+		const pointOfSales = await this.pointOfSalesService.findAll(
+			{
+				shopId,
+			},
+			{
+				username: 'admin',
+			} as User,
+			'',
+		);
+
+		const autorization = await this.authorizationsService.findById(
+			pointOfSales.docs[0]?.authorization?._id.toString(),
+		);
+
+		//validar la autorización si tiene numeración, si esta vencida
+		if (!autorization) {
+			throw new BadRequestException('La autorización no existe');
+		}
+
+		if (autorization.numberFinal <= autorization.lastNumber) {
+			throw new BadRequestException(
+				'La autorización no tiene números disponibles',
+			);
+		}
+
+		if (dayjs(autorization.dateFinal).endOf('d').isBefore(dayjs(dateFinal))) {
+			throw new BadRequestException(
+				'La autorización no esta vigente para la fecha final',
+			);
+		}
+
+		if (dayjs(autorization.lastDateInvoicing).isAfter(dayjs(dateInitial))) {
+			throw new BadRequestException(
+				'En el rango hay fechas ya facturadas, intente nuevamenta',
+			);
+		}
+
 		//obtener los pedidos día a dia que se van a facturar
-
-		let invoiceQuantity = 0;
-		let valueMissing = 0;
+		let invoiceQuantityBank = 0;
+		let invoiceQuantityCash = 0;
+		let valueInvoicingBank = 0;
+		let valueInvoicingCash = 0;
 		for (let i = 0; i < totalOrdersDay.length; i++) {
-			const { day, cashTotal } = totalOrdersDay[i];
+			const { day, year, month, cashTotal } = totalOrdersDay[i];
 
-			const orders = await this.orderModel
-				.find({
-					closeDate: {
-						$gte: new Date(
-							dayjs(dateInitial)
-								.add(day - 1, 'd')
-								.format('YYYY/MM/DD'),
-						),
-						$lte: new Date(
-							dayjs(dateInitial)
-								.add(day - 1, 'd')
-								.format('YYYY/MM/DD'),
-						),
-					},
-					'shop._id': new Types.ObjectId('6331b982aa2af68a4ecad2ed'),
-					status: 'closed',
-					'payments.payment.type': {
-						$not: {
-							$in: [TypePayment.CREDIT, TypePayment.BANK, TypePayment.BONUS],
+			const dI = `${year}/${month}/${day}`;
+
+			const dF = dayjs(dI).add(1, 'd').format('YYYY/MM/DD');
+
+			const orders = await this.orderModel.aggregate([
+				{
+					$match: {
+						closeDate: {
+							$gte: new Date(dI),
+							$lt: new Date(dF),
+						},
+						'shop._id': new Types.ObjectId(shopId),
+						status: 'closed',
+						'payments.payment.type': {
+							$not: {
+								$in: [TypePayment.CREDIT, TypePayment.BANK, TypePayment.BONUS],
+							},
 						},
 					},
-				})
-				.projection({
-					_id: 1,
-					total: 'summary.total',
-					closeDate: 1,
-					customerId: '$customer._id',
-					details: 1,
-					pointOfSaleId: '$pointOfSale',
-				});
+				},
+				{
+					$project: {
+						_id: 1,
+						total: '$summary.total',
+						closeDate: 1,
+					},
+				},
+			]);
+
+			const ordersBank = await this.orderModel.aggregate([
+				{
+					$match: {
+						closeDate: {
+							$gte: new Date(dI),
+							$lt: new Date(dF),
+						},
+						'shop._id': new Types.ObjectId(shopId),
+						status: 'closed',
+						'payments.payment.type': TypePayment.BANK,
+					},
+				},
+				{
+					$project: {
+						_id: 1,
+						total: '$summary.total',
+						closeDate: 1,
+					},
+				},
+			]);
 
 			let total = 0;
-			const ordersInvoicing = [];
+			let ordersInvoicing = [];
 			let posUp = 0;
 			let posDown = orders.length - 1;
 
 			while (total < cashTotal && posUp < posDown - 1) {
 				let order = orders[posUp];
 				total += order.total;
-				ordersInvoicing.push(order._id.toString());
+				ordersInvoicing.push({
+					orderId: order._id.toString(),
+					closeDate: order.closeDate,
+				});
+
 				posUp++;
 				if (total < cashTotal) {
 					order = orders[posDown];
 					total += order.total;
-					ordersInvoicing.push(order._id.toString());
+					ordersInvoicing.push({
+						orderId: order._id.toString(),
+						closeDate: order.closeDate,
+					});
 					posDown--;
 				} else {
-					if (total > cashTotal) {
-						total -= order.total;
-						ordersInvoicing.pop();
-					}
 					break;
 				}
 			}
+			valueInvoicingCash = total;
+			invoiceQuantityCash += ordersInvoicing.length;
 
-			if (total < cashTotal) {
-				valueMissing += cashTotal - total;
-			}
+			ordersInvoicing = ordersInvoicing.concat(
+				ordersBank.map(({ _id, closeDate }) => ({
+					orderId: _id.toString(),
+					closeDate: closeDate,
+				})),
+			);
 
-			//generar factura de los pedidos
+			valueInvoicingBank =
+				valueInvoicingBank +
+				ordersBank.reduce((sum, order) => sum + order.total, 0);
+
+			invoiceQuantityBank = invoiceQuantityBank + ordersBank.length;
+
+			//ordenar por fecha
+
+			ordersInvoicing.sort((a, b) => {
+				if (dayjs(a.closeDate).isAfter(dayjs(b.closeDate))) {
+					return 1;
+				}
+				if (dayjs(a.closeDate).isBefore(dayjs(b.closeDate))) {
+					return -1;
+				}
+				return 0;
+			});
+
+			//generar factura de los pedidos en efectivo
 			for (let i = 0; i < ordersInvoicing.length; i++) {
-				const orderId = ordersInvoicing[i];
-				await this.create({ orderId }, { username: 'admin' } as User);
+				const { orderId } = ordersInvoicing[i];
+				await this.create(
+					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
+					{ username: 'admin' } as User,
+					autorization.lastNumber + i + 1,
+				);
 			}
 
-			invoiceQuantity += ordersInvoicing.length;
+			await this.authorizationsService.update(
+				autorization._id.toString(),
+				{
+					lastNumber:
+						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
+					lastDateInvoicing: new Date(finalDate),
+				},
+				{ username: 'admin' } as User,
+				shop.company.toString(),
+			);
 		}
 
 		return {
-			invoiceQuantity,
-			valueMissing,
-			valueInvoicing: cash - valueMissing,
+			invoiceQuantityCash,
+			invoiceQuantityBank,
+			valueInvoicingBank,
+			valueInvoicingCash,
 		};
 	}
 }

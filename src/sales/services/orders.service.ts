@@ -1653,7 +1653,7 @@ export class OrdersService {
 					_id: '$payments.payment._id',
 					payment: { $first: '$payments.payment' },
 					total: {
-						$sum: '$payments.payment.total',
+						$sum: '$payments.total',
 					},
 					quantity: {
 						$sum: 1,

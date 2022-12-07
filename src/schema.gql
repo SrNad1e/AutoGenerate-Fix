@@ -217,16 +217,11 @@ type AuthorizationDian {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
-<<<<<<< HEAD
-  """Numero actual"""
-  numberCurrent: Float!
-=======
   """Última fecha de facturación"""
   lastDateInvoicing: DateTime
 
   """Ultimo numero usado para facturar"""
   lastNumber: Float!
->>>>>>> 3381
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -818,9 +813,6 @@ input CreateAuthorizationInput {
 
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
-
-  """Numero actual de la resolución"""
-  numberCurrent: Float
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -1522,6 +1514,21 @@ type CustomerType {
 
   """Usuario que creó o editó el tipo de cliente"""
   user: User!
+}
+
+"""Datos para generar la facturación"""
+input DataGenerateInvoicesInput {
+  """Efectivo para facturar"""
+  cash: Float!
+
+  """Fecha final para la facturación"""
+  dateFinal: String!
+
+  """Fecha inicial para la facturación"""
+  dateInitial: String!
+
+  """Identificador de la tienda a facturar"""
+  shopId: String!
 }
 
 """
@@ -3399,6 +3406,12 @@ type Mutation {
     """Tienda para validar el inventario"""
     shopId: String!
   ): StockRequest!
+
+  """Generador de facturas"""
+  invoicing(
+    """Datos para generar la facturación"""
+    dataGenerateInvoicesInput: DataGenerateInvoicesInput!
+  ): ResponseInvoicing!
 
   """Se encarga de realizar el ingreso al sistema por el usuario"""
   login(
@@ -5381,6 +5394,21 @@ type ResponseInvoices {
   totalPages: Float!
 }
 
+"""Resultado de facturación"""
+type ResponseInvoicing {
+  """Cantidad de facturas generadas"""
+  invoiceQuantityBank: Float!
+
+  """Cantidad de facturas generadas"""
+  invoiceQuantityCash: Float!
+
+  """Valor total facturado"""
+  valueInvoicingBank: Float!
+
+  """Valor total facturado"""
+  valueInvoicingCash: Float!
+}
+
 """Respuesta para obtener la orden"""
 type ResponseOrder {
   """Crédito que tiene el cliente"""
@@ -7227,16 +7255,11 @@ input UpdateAuthorizationInput {
   """Fecha de inicio de la resolución"""
   dateInitial: DateTime
 
-<<<<<<< HEAD
-  """Numero actual de la resolución"""
-  numberCurrent: Float
-=======
   """Fecha de cierre"""
   lastDateInvoicing: DateTime
 
   """Ultimo número usado para facturar"""
   lastNumber: Float
->>>>>>> 3381
 
   """Numero final de la resolución"""
   numberFinal: Float

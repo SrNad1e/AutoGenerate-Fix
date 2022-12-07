@@ -28,4 +28,10 @@ export class DetailInvoiceInput {
 export class CreateInvoiceInput {
 	@Field(() => String, { description: 'Identificador de pedido' })
 	orderId: string;
+
+	@Field(() => String, {
+		description: 'Identificador de punto de venta',
+		nullable: true,
+	})
+	pointOfSaleId?: string;
 }
