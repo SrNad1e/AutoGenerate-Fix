@@ -1787,10 +1787,10 @@ export class OrdersService {
 			...aggregate,
 			{
 				$lookup: {
-					from: 'CategoryLevel1',
-					localField: 'category',
+					from: 'categorylevel1',
+					localField: 'details.product.reference.categoryLevel1',
 					foreignField: '_id',
-					as: 'category',
+					as: 'categoryLevel1',
 				},
 			},
 			{
