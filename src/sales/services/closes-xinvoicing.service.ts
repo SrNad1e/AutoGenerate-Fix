@@ -5,15 +5,11 @@ import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
-import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
-import {
-	CloseXInvoicing,
-	PaymentOrderClose,
-} from '../entities/close-x-invoicing.entity';
+import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 import { ReturnsOrderService } from './returns-order.service';
@@ -34,13 +30,6 @@ const populate: PopulateOptions[] = [
 	},
 	{
 		path: 'payments',
-		populate: {
-			path: 'payment',
-			model: 'Payment',
-		},
-	},
-	{
-		path: 'paymentsCredit',
 		populate: {
 			path: 'payment',
 			model: 'Payment',
@@ -121,7 +110,11 @@ export class ClosesXInvoicingService {
 			populate,
 			lean: true,
 		};
-		return this.closeXInvoicingModel.paginate(filters, options);
+
+		const response = await this.closeXInvoicingModel.paginate(filters, options);
+		console.log(response.docs[0].paymentsCredit);
+
+		return response;
 	}
 
 	async create(
@@ -145,9 +138,10 @@ export class ClosesXInvoicingService {
 			pointOfSaleId,
 		);
 
-		const dateInitial = dayjs(closeDate?.split(' ')[0]).format('YYYY/MM/DD');
-		const dateFinal = dayjs(closeDate?.split(' ')[0])
+		const dateInitial = dayjs(closeDate).startOf('d').format('YYYY/MM/DD');
+		const dateFinal = dayjs(closeDate)
 			.add(1, 'd')
+			.startOf('d')
 			.format('YYYY/MM/DD');
 
 		const expenses = await this.expensesService.findAll(
