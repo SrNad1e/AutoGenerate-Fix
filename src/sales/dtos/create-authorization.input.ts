@@ -40,10 +40,4 @@ export class CreateAuthorizationInput {
 		nullable: true,
 	})
 	numberFinal?: number;
-
-	@Field(() => Number, {
-		description: 'Numero actual de la resolución',
-		nullable: true,
-	})
-	numberCurrent?: number;
 }

@@ -51,18 +51,25 @@ export class AuthorizationDian extends Document {
 	})
 	numberInitial?: number;
 
-	@Prop({ type: Number, default: 0 })
-	@Field(() => Number, {
-		description: 'Numero actual',
-	})
-	numberCurrent: number;
-
 	@Prop({ type: Number })
 	@Field(() => Number, {
 		description: 'Numero final de la resolución',
 		nullable: true,
 	})
 	numberFinal?: number;
+
+	@Prop({ type: Number, default: 0 })
+	@Field(() => Number, {
+		description: 'Ultimo numero usado para facturar',
+	})
+	lastNumber?: number;
+
+	@Prop({ type: Date })
+	@Field(() => Date, {
+		description: 'Última fecha de facturación',
+		nullable: true,
+	})
+	lastDateInvoicing?: Date;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la autorización de facturación',

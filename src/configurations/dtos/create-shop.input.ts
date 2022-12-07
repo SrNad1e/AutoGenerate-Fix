@@ -5,6 +5,24 @@ export class CreateShopInput {
 	@Field(() => String, { description: 'Nombre de la tienda' })
 	name: string;
 
+	@Field(() => String, {
+		description: 'Documento de la tienda',
+		nullable: true,
+	})
+	document?: string;
+
+	@Field(() => String, {
+		description: 'Email de la tienda',
+		nullable: true,
+	})
+	email?: string;
+
+	@Field(() => String, {
+		description: 'Nombre comercial de la tienda',
+		nullable: true,
+	})
+	companyName?: string;
+
 	@Field(() => String, { description: 'Dirección de la tienda' })
 	address: string;
 
