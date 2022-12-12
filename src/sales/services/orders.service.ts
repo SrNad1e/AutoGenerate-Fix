@@ -656,8 +656,13 @@ export class OrdersService {
 
 				//Se crean los recibos de caja
 				for (let i = 0; i < order?.payments?.length; i++) {
-					const { total, payment } = order?.payments[i];
-					if (
+					const payment = order?.payments[i];
+
+					if (payment?.status === StatusOrderDetail.NEW) {
+						paymentsForProcess.push(payment);
+					}
+
+					/*	if (
 						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
 					) {
 						const pointOfSale = order.pointOfSale || user.pointOfSale;
@@ -701,10 +706,9 @@ export class OrdersService {
 						);
 					} else {
 						newPayments.push(order?.payments[i]);
-					}
+					}*/
 				}
 
-				console.log(paymentsForProcess);
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
 
 				if (paymentsForProcess.length > 0) {
