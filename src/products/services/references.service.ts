@@ -31,8 +31,23 @@ import { DiscountRulesService } from 'src/crm/services/discount-rules.service';
 const populate = [
 	{ path: 'brand', model: Brand.name },
 	{ path: 'categoryLevel1', model: CategoryLevel1.name },
-	{ path: 'categoryLevel2', model: CategoryLevel2.name },
-	{ path: 'categoryLevel3', model: CategoryLevel3.name },
+	{
+		path: 'categoryLevel1',
+		populate: {
+			path: 'childs',
+			model: CategoryLevel2.name,
+		},
+	},
+	{
+		path: 'categoryLevel1',
+		populate: {
+			path: 'childs',
+			populate: {
+				path: 'childs',
+				model: CategoryLevel3.name,
+			},
+		},
+	},
 	{ path: 'attribs', model: Attrib.name },
 	{ path: 'companies', model: Company.name },
 ];
