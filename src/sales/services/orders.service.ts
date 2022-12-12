@@ -100,6 +100,7 @@ export class OrdersService {
 			paymentId,
 			sort,
 			statusWeb,
+			shopId,
 			nonStatus,
 			limit = 10,
 			page = 1,
@@ -128,6 +129,10 @@ export class OrdersService {
 
 		if (orderPos !== undefined) {
 			filters.orderPos = orderPos;
+		}
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
 		}
 
 		if (dateInitial) {
