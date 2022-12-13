@@ -1763,6 +1763,9 @@ export class OrdersService {
 				shop: {
 					$first: '$shop',
 				},
+				date: {
+					$first: '$closeDate',
+				},
 				total: {
 					$sum: '$summary.total',
 				},
@@ -1783,6 +1786,9 @@ export class OrdersService {
 					_id: ['$shop._id', '$details.product.reference.categoryLevel1._id'],
 					category: {
 						$first: '$categoryLevel1',
+					},
+					date: {
+						$first: '$closeDate',
 					},
 					shop: {
 						$first: '$shop',
@@ -1823,6 +1829,7 @@ export class OrdersService {
 				$project: {
 					_id: 0,
 					shop: 1,
+					date: 1,
 					category: { $arrayElemAt: ['$category', 0] },
 					total: 1,
 					quantity: 1,

@@ -6,6 +6,9 @@ import { Payment } from 'src/treasury/entities/payment.entity';
 
 @ObjectType({ description: 'Ventas detalladas con base a los filtros' })
 class SalesReport {
+	@Field(() => Date, { description: 'Fecha de la venta' })
+	date: Date;
+
 	@Field(() => Shop, { description: 'Tienda' })
 	shop: Shop;
 
