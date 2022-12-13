@@ -490,6 +490,9 @@ type CloseXInvoicing {
   """Listado de pagos"""
   payments: [PaymentOrderClose!]
 
+  """Medios de pago usados para cruzar créditos"""
+  paymentsCredit: [PaymentCredit!]
+
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
 
@@ -534,6 +537,9 @@ type CloseZInvoicing {
 
   """Listado de pagos"""
   payments: [PaymentOrderClose!]
+
+  """Medios de pago usados para cruzar créditos"""
+  paymentsCredit: [PaymentCredit!]
 
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
@@ -1056,6 +1062,9 @@ input CreateReceiptInput {
 
   """Pedidos a los que afecta el recibo"""
   details: [DetailReceiptOrder!]
+
+  """Cruza crédito el recibo"""
+  isCredit: Boolean!
 
   """Identificador del medio de pago"""
   paymentId: String!
@@ -2452,6 +2461,9 @@ input FiltersOrdersInput {
   """Identificador del medio de pago"""
   paymentId: String
 
+  """Filtro por tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortOrder
 
@@ -3727,6 +3739,18 @@ input PaymentConfirm {
   status: StatusOrderDetail
 }
 
+"""Pagos que cruzan créditos"""
+type PaymentCredit {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de las pagos del medio"""
+  quantity: Float!
+
+  """Valor del medio de pago"""
+  value: Float!
+}
+
 """Medios de pago de la factura"""
 type PaymentInvoice {
   """Método de pago usado"""
@@ -4441,6 +4465,9 @@ type Receipt {
 
   """Detalle del cruce del recibo"""
   details: [DetailReceipt!]!
+
+  """Valida si el recibo de caja es crédito"""
+  isCredit: Boolean!
 
   """Consecutivo del recibo de caja"""
   number: Float!
@@ -5943,7 +5970,7 @@ type ReturnOrder {
   order: Order!
 
   """Punto de venta"""
-  pointOfSale: Shop!
+  pointOfSale: PointOfSale!
 
   """Fecha de actualización"""
   updatedAt: DateTime!
