@@ -13,6 +13,13 @@ import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
 
+const populate = [
+	{
+		path: 'shop',
+		model: 'Shops',
+	},
+];
+
 @Injectable()
 export class AuthorizationsService {
 	constructor(
@@ -41,6 +48,7 @@ export class AuthorizationsService {
 			page,
 			sort,
 			lean: true,
+			populate,
 		};
 
 		return this.authorizationModel.paginate(filters, options);
