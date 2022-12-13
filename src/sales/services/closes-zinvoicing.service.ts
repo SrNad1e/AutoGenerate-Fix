@@ -12,8 +12,6 @@ import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-inp
 import { User } from 'src/configurations/entities/user.entity';
 import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
-import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
-import { PaymentOrderClose } from '../entities/close-x-invoicing.entity';
 import { BoxService } from 'src/treasury/services/box.service';
 import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
 import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
@@ -36,6 +34,13 @@ const populate: PopulateOptions[] = [
 	},
 	{
 		path: 'payments',
+		populate: {
+			path: 'payment',
+			model: 'Payment',
+		},
+	},
+	{
+		path: 'paymentsCredit',
 		populate: {
 			path: 'payment',
 			model: 'Payment',
