@@ -347,10 +347,7 @@ export class ReceiptsService {
 			},
 			{
 				$group: {
-					_id: '$payment.type',
-					payment: {
-						$first: '$payment',
-					},
+					_id: '$payment._id',
 					value: {
 						$sum: '$value',
 					},
@@ -360,12 +357,7 @@ export class ReceiptsService {
 				},
 			},
 			{
-				$project: {
-					_id: 0,
-					payment: 1,
-					value: 1,
-					quantity: 1,
-				},
+				$project: { _id: 0, value: 1, qunatity: 1, payment: '$_id' },
 			},
 		]);
 
