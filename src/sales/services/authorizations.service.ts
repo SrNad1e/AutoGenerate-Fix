@@ -16,7 +16,7 @@ import { AuthorizationDian } from '../entities/authorization.entity';
 const populate = [
 	{
 		path: 'shop',
-		model: 'Shops',
+		model: 'Shop',
 	},
 ];
 
