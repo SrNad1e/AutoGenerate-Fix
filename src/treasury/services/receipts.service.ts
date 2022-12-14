@@ -357,7 +357,7 @@ export class ReceiptsService {
 				},
 			},
 			{
-				$project: { _id: 0, value: 1, qunatity: 1, payment: '$_id' },
+				$project: { _id: 0, value: 1, quantity: 1, payment: '$_id' },
 			},
 		]);
 
