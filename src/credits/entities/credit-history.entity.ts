@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
+import { Order } from 'src/sales/entities/order.entity';
 import { Credit } from './credit.entity';
 
 export enum TypeCreditHistory {
@@ -25,6 +26,10 @@ export class CreditHistory extends Document {
 	})
 	@Prop({ type: String, required: true })
 	type: TypeCreditHistory;
+
+	@Field(() => Order, { description: 'Pedido que gestiona el crédito' })
+	@Prop({ type: Types.ObjectId, ref: Order.name })
+	order: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Valor del movimiento' })
 	@Prop({ type: Number })

@@ -1365,6 +1365,9 @@ type CreditHistory {
   """Crédito que genera el movimiento"""
   credit: Credit!
 
+  """Pedido que gestiona el crédito"""
+  order: Order!
+
   """Tipo de movimiento de cartera"""
   type: TypeCreditHistory!
 
