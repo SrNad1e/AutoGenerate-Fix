@@ -1697,7 +1697,7 @@ export class OrdersService {
 					'payments.payment.type': 'bonus',
 					closeDate: {
 						$gte: new Date(dateIntial),
-						$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+						$lt: new Date(dateFinal),
 					},
 					status: 'closed',
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
@@ -1837,6 +1837,7 @@ export class OrdersService {
 			tax: newTax,
 		};
 	}
+
 	/**
 	 * @description se encarga de calcular las ventas netas
 	 * @param data datos para generar las ventas
@@ -1863,7 +1864,7 @@ export class OrdersService {
 				$match: {
 					closeDate: {
 						$gte: new Date(initialDate),
-						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
+						$lt: new Date(finalDate),
 					},
 					'shop._id': shop?._id,
 					status: StatusOrder.CLOSED,
@@ -1985,6 +1986,7 @@ export class OrdersService {
 
 		return (await this.orderModel.aggregate(aggreagtePayments)) || [];
 	}
+
 	/*
 	 * @description Se encarga de procesar los medios de pago
 	 * @param payments medios de pago a procesar

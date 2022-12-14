@@ -191,11 +191,11 @@ export class ClosesZinvoicingService {
 
 		const number = (closeZ?.number || 0) + 1;
 
-		const payments = await this.ordersService.getPaymentsOrder({
+		const payments = await this.receiptsService.getPaymentsNoCredit(
 			dateInitial,
 			dateFinal,
-			shopId: pointOfSale.shop._id.toString(),
-		});
+			pointOfSale._id.toString(),
+		);
 
 		const refunds = await this.returnsOrderService.resumeDay({
 			pointOfSaleId: pointOfSale._id.toString(),
