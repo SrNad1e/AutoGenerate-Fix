@@ -36,6 +36,13 @@ const populate: PopulateOptions[] = [
 		},
 	},
 	{
+		path: 'paymentsCredit',
+		populate: {
+			path: 'payment',
+			model: 'Payment',
+		},
+	},
+	{
 		path: 'expenses',
 		model: Expense.name,
 	},
