@@ -363,4 +363,53 @@ export class ReceiptsService {
 
 		return receiptsCredit;
 	}
+
+	/**
+	 * @description se encarga de consultar consolidado de pagos generados
+	 * @param dateInitial fecha inicial de la consulta
+	 * @param dateFinal fecha final de la consulta
+	 * @param pointOfSaleId punto de venta si se requiere para filtrar el valor
+	 * @returns valor consolidado de los créditos pagados
+	 */
+	async getPaymentsNoCredit(
+		dateInitial: string,
+		dateFinal: string,
+		pointOfSaleId?: string,
+	) {
+		const receiptsCredit = await this.receiptModel.aggregate([
+			{
+				$match: {
+					createdAt: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+					isCredit: false,
+				},
+			},
+			{
+				$group: {
+					_id: '$payment._id',
+					value: {
+						$sum: '$value',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: '$_id',
+					value: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return receiptsCredit;
+	}
 }
