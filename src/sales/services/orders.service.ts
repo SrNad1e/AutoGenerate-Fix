@@ -28,6 +28,7 @@ import { StatusProduct } from 'src/products/entities/product.entity';
 import { ProductsService } from 'src/products/services/products.service';
 import { ResponseReportSales } from 'src/reports/dtos/response-report-sales';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
+import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { PaymentsService } from 'src/treasury/services/payments.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import {
@@ -664,7 +665,10 @@ export class OrdersService {
 					const payment = order?.payments[i];
 
 					if (payment?.status === StatusOrderDetail.NEW) {
-						paymentsForProcess.push(payment);
+						paymentsForProcess.push({
+							...payment,
+							status: StatusOrderDetail.CONFIRMED,
+						});
 					}
 
 					/*	if (
@@ -1515,6 +1519,7 @@ export class OrdersService {
 				'El usuario no tiene permisos para actualizar el pedido',
 			);
 		}
+
 		if (!order) {
 			throw new BadRequestException(
 				'El pedido que intenta actualizar no existe',
@@ -1536,7 +1541,7 @@ export class OrdersService {
 		const paymentsForProcess = [];
 
 		for (let i = 0; i < payments.length; i++) {
-			const { paymentId } = payments[i];
+			const { paymentId, status } = payments[i];
 
 			const index = order.payments.findIndex(
 				(payment) => payment.payment._id.toString() === paymentId,
@@ -1549,8 +1554,8 @@ export class OrdersService {
 				});
 			}
 
-			paymentsForProcess.push(order.payments[index]);
-			newPayments.splice(index, 1);
+			paymentsForProcess.push({ ...order.payments[index], status });
+			//newPayments.splice(index, 1);
 		}
 
 		//procesar los pagos
@@ -2284,9 +2289,11 @@ export class OrdersService {
 	) {
 		let coupon;
 		const newPayments = [];
+
 		//Se realizan validaciones
 		for (let i = 0; i < payments?.length; i++) {
-			const { payment, code, total } = payments[i];
+			const { payment, code, total, status } = payments[i];
+			const statusPayment = StatusOrderDetail[status] || status;
 
 			switch (payment.type) {
 				case TypePayment.BONUS:
@@ -2295,26 +2302,39 @@ export class OrdersService {
 							'El medio de pago cupón debe tener código',
 						);
 					}
-					coupon = await this.couponsService.validateCoupon(
-						code,
-						user,
-						companyId,
-					);
 
-					break;
-				case TypePayment.CREDIT:
-					const credit = await this.creditsService.validateCredit(
-						customerId,
-						total,
-						TypeCreditHistory.THAWED,
-					);
-
-					if (!credit) {
-						throw new BadRequestException(
-							'No se ha podido acreditar el pago, crédito con errores',
+					if (statusPayment === StatusOrderDetail.CONFIRMED) {
+						coupon = await this.couponsService.validateCoupon(
+							code,
+							user,
+							companyId,
 						);
 					}
 
+					if (statusPayment === StatusOrderDetail.NEW) {
+						coupon = await this.couponsService.findOne(
+							{
+								code,
+							},
+							user,
+							companyId,
+						);
+					}
+					break;
+				case TypePayment.CREDIT:
+					if (statusPayment === StatusOrderDetail.CONFIRMED) {
+						const credit = await this.creditsService.validateCredit(
+							customerId,
+							total,
+							TypeCreditHistory.THAWED,
+						);
+
+						if (!credit) {
+							throw new BadRequestException(
+								'No se ha podido acreditar el pago, crédito con errores',
+							);
+						}
+					}
 					break;
 				default:
 					break;
@@ -2323,68 +2343,130 @@ export class OrdersService {
 
 		//se procesan los medios de pago
 		for (let i = 0; i < payments?.length; i++) {
-			const { payment, total } = payments[i];
+			const { payment, total, status, receipt } = payments[i];
+			const statusPayment = StatusOrderDetail[status] || status;
 
 			switch (payment.type) {
 				case TypePayment.BONUS:
-					await this.couponsService.update(
-						coupon._id.toString(),
-						{
-							status: StatusCoupon.REDEEMED,
-						},
-						user,
-						companyId,
-					);
-					newPayments.push({
-						...payments[i],
-						status: StatusOrderDetail.CONFIRMED,
-					});
+					if (statusPayment === StatusOrderDetail.CONFIRMED) {
+						await this.couponsService.update(
+							coupon._id.toString(),
+							{
+								status: StatusCoupon.REDEEMED,
+							},
+							user,
+							companyId,
+						);
+						newPayments.push({
+							...payments[i],
+							status: StatusOrderDetail.CONFIRMED,
+						});
+					}
+
+					if (statusPayment === StatusOrderDetail.NEW) {
+						await this.couponsService.update(
+							coupon._id.toString(),
+							{
+								status: StatusCoupon.ACTIVE,
+							},
+							user,
+							companyId,
+						);
+						newPayments.push({
+							...payments[i],
+							status: StatusOrderDetail.NEW,
+						});
+					}
 
 					break;
 				case TypePayment.CREDIT:
-					await this.creditHistoryService.thawedCreditHistory(
-						order?._id?.toString(),
-						total,
-						user,
-						companyId,
-					);
+					if (statusPayment === StatusOrderDetail.CONFIRMED) {
+						await this.creditHistoryService.thawedCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
+						await this.creditHistoryService.addCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
 
-					await this.creditHistoryService.addCreditHistory(
-						order?._id?.toString(),
-						total,
-						user,
-						companyId,
-					);
+						newPayments.push({
+							...payments[i],
+							status: StatusOrderDetail.CONFIRMED,
+						});
+					}
 
-					newPayments.push({
-						...payments[i],
-						status: StatusOrderDetail.CONFIRMED,
-					});
+					if (statusPayment === StatusOrderDetail.NEW) {
+						await this.creditHistoryService.deleteCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
+
+						await this.creditHistoryService.frozenCreditHistory(
+							order?._id?.toString(),
+							total,
+							user,
+							companyId,
+						);
+
+						newPayments.push({
+							...payments[i],
+							status: StatusOrderDetail.NEW,
+						});
+					}
+
 					break;
 				default:
-					const valuesReceipt = {
-						value: total,
-						paymentId: payment?._id?.toString(),
-						pointOfSaleId: pointOfSale?._id?.toString(),
-						concept: `Abono a pedido ${order?.number}`,
-						isCredit: false,
-						boxId:
-							payment?.type === 'cash'
-								? pointOfSale['box']?.toString()
-								: undefined,
-					};
+					if (statusPayment === StatusOrderDetail.CONFIRMED) {
+						const valuesReceipt = {
+							value: total,
+							paymentId: payment?._id?.toString(),
+							pointOfSaleId: pointOfSale?._id?.toString(),
+							concept: `Abono a pedido ${order?.number}`,
+							isCredit: false,
+							boxId:
+								payment?.type === 'cash'
+									? pointOfSale['box']?.toString()
+									: undefined,
+						};
 
-					const { receipt } = await this.receiptsService.create(
-						valuesReceipt,
-						user,
-						companyId,
-					);
+						const { receipt } = await this.receiptsService.create(
+							valuesReceipt,
+							user,
+							companyId,
+						);
 
-					newPayments.push({
-						...payments[i],
-						status: StatusOrderDetail.CONFIRMED,
-						receipt: receipt?._id,
-					});
+						newPayments.push({
+							...payments[i],
+							status: StatusOrderDetail.CONFIRMED,
+							receipt: receipt?._id,
+						});
+					}
+
+					if (statusPayment === StatusOrderDetail.NEW) {
+						//anular recibo de caja
+
+						await this.receiptsService.update(
+							receipt._id.toString(),
+							{
+								status: StatusReceipt.CANCELLED,
+							},
+							user,
+							companyId,
+							order?._id?.toString(),
+						);
+
+						newPayments.push({
+							...payments[i],
+							status: StatusOrderDetail.NEW,
+						});
+					}
 					break;
 			}
 		}
