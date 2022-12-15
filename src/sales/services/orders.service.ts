@@ -584,6 +584,18 @@ export class OrdersService {
 
 			//Si se procede a cancelar el pedido
 			if (StatusOrder.CANCELLED === newStatus) {
+				//se validan que no se hallan confirmado pagos
+
+				const paymentsConfirm = !!order.payments.find(
+					({ status }) => status === StatusOrderDetail.CONFIRMED,
+				);
+
+				if (paymentsConfirm) {
+					throw new BadRequestException(
+						'El pedido no puede ser cancelado, ya hay pagos confirmados',
+					);
+				}
+
 				if ([StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
 					const details = order?.details?.map((detail) => ({
 						productId: detail?.product?._id.toString(),
