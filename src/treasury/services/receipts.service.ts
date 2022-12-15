@@ -352,6 +352,7 @@ export class ReceiptsService {
 						$gte: new Date(dateInitial),
 						$lt: new Date(dateFinal),
 					},
+					status: StatusReceipt.ACTIVE,
 					pointOfSale: pointOfSaleId
 						? new Types.ObjectId(pointOfSaleId)
 						: undefined,
@@ -396,6 +397,7 @@ export class ReceiptsService {
 						$gte: new Date(dateInitial),
 						$lt: new Date(dateFinal),
 					},
+					status: StatusReceipt.ACTIVE,
 					pointOfSale: pointOfSaleId
 						? new Types.ObjectId(pointOfSaleId)
 						: undefined,
