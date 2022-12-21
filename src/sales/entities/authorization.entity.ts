@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { Shop } from 'src/configurations/entities/shop.entity';
 import { User } from 'src/configurations/entities/user.entity';
 
 @Schema({ timestamps: true, collection: 'authorizationDIAN' })
@@ -70,6 +71,12 @@ export class AuthorizationDian extends Document {
 		nullable: true,
 	})
 	lastDateInvoicing?: Date;
+
+	@Field(() => Shop, {
+		description: 'Tienda a la que pertenece',
+	})
+	@Prop({ type: Types.ObjectId, required: true })
+	shop: Types.ObjectId;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó la autorización de facturación',

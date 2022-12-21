@@ -238,6 +238,9 @@ type AuthorizationDian {
   """Resolución de la autorización o de la habilitación"""
   resolution: String
 
+  """Tienda a la que pertenece"""
+  shop: Shop!
+
   """Fecha de actualización"""
   updatedAt: DateTime!
 
@@ -828,6 +831,9 @@ input CreateAuthorizationInput {
 
   """resolución de facturacion"""
   resolution: String
+
+  """Id de la tienda"""
+  shopId: String!
 }
 
 """Datos para crear la caja"""
@@ -7278,6 +7284,9 @@ input UpdateAuthorizationInput {
 
   """resolución de facturacion"""
   resolution: String
+
+  """Id de la tienda"""
+  shopId: String
 }
 
 """Datos para actualizar caja"""
