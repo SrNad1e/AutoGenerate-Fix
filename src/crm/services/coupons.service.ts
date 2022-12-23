@@ -121,6 +121,8 @@ export class CouponsService {
 		user: User,
 		companyId: string,
 	) {
+		const statusCoupon = StatusCoupon[status] || status;
+
 		const coupon = await this.couponModel.findById(id);
 
 		if (!coupon) {
@@ -138,7 +140,10 @@ export class CouponsService {
 			);
 		}
 
-		if (coupon.status === StatusCoupon.REDEEMED) {
+		if (
+			coupon.status === StatusCoupon.REDEEMED &&
+			statusCoupon === StatusCoupon.REDEEMED
+		) {
 			throw new BadRequestException('El cupón ya fue redimido');
 		}
 
