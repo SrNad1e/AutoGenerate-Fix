@@ -2500,6 +2500,9 @@ input FiltersInvoicesInput {
   """Desde donde arranca la página"""
   page: Float
 
+  """Identificador del punto de venta"""
+  pointOfSaleId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
 }

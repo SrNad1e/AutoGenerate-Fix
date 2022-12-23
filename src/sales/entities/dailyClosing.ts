@@ -62,8 +62,8 @@ export class DailyClosing extends Document {
 	summary: SummaryClose;
 
 	@Field(() => [SummaryPayment], { description: 'Resumen de pagos del cierre' })
-	@Prop({ type: [Types.ObjectId], ref: SummaryPayment.name, default: [] })
-	summaryPayments: Types.ObjectId[];
+	@Prop({ type: Array, default: [] })
+	summaryPayments: SummaryPayment[];
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cierre',
