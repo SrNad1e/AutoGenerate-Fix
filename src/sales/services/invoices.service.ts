@@ -38,6 +38,7 @@ export class InvoicesService {
 			page = 1,
 			dateFinal,
 			dateInitial,
+			pointOfSaleId,
 		}: FiltersInvoicesInput,
 		user: User,
 		companyId: string,
@@ -70,6 +71,16 @@ export class InvoicesService {
 			};
 		}
 
+		if (pointOfSaleId) {
+			const pointOfSale = await this.pointOfSalesService.findById(
+				pointOfSaleId,
+			);
+
+			if (pointOfSale) {
+				filters.authorization = pointOfSale?.authorization?._id;
+			}
+		}
+
 		const options = {
 			limit,
 			page,
@@ -78,6 +89,18 @@ export class InvoicesService {
 		};
 
 		return this.invoiceModel.paginate(filters, options);
+	}
+
+	async findById(id: string, user: User, companyId: string) {
+		const filters: FilterQuery<Invoice> = {};
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		filters._id = new Types.ObjectId(id);
+
+		return this.invoiceModel.findOne(filters);
 	}
 
 	async create(
@@ -120,6 +143,7 @@ export class InvoicesService {
 			shop: order.shop,
 			payments,
 			summary,
+			order: order._id,
 			details: order.details,
 			user: user || order.user,
 			createdAt: order.closeDate,
