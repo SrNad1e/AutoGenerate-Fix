@@ -109,7 +109,7 @@ export class AuthorizationsService {
 		return this.authorizationModel.findByIdAndUpdate(id, {
 			$set: {
 				...params,
-				shop: shop._id,
+				shop: shop?._id,
 				user: {
 					username: user.username,
 					name: user.name,
