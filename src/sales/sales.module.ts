@@ -44,6 +44,7 @@ import {
 import { StatusWebHistoriesService } from './services/status-web-histories.service';
 import { DailyClosingService } from './services/daily-closing.service';
 import { DailyClosing, DailyClosingSchema } from './entities/dailyClosing';
+import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 
 @Module({
 	imports: [
@@ -135,6 +136,7 @@ import { DailyClosing, DailyClosingSchema } from './entities/dailyClosing';
 		AuthorizationsResolver,
 		StatusWebHistoriesService,
 		DailyClosingService,
+		DailyClosingResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
