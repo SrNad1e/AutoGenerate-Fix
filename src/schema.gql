@@ -3128,6 +3128,9 @@ type Invoice {
   """Número de factura"""
   number: Float!
 
+  """Pedido basado para la factura"""
+  order: Order!
+
   """Métodos de pago usados en la factura"""
   payments: [PaymentInvoice!]
 
@@ -7106,6 +7109,18 @@ type StockTransferError {
   verified: Boolean!
 }
 
+"""Resumen del cierre"""
+type SummaryClose {
+  """Subtotal del cierre"""
+  subtotal: Float!
+
+  """Impuestos del cierre"""
+  tax: Float!
+
+  """Total del cierre"""
+  total: Float!
+}
+
 """Resumen de la factura"""
 type SummaryInvoice {
   """Cambio de la factura"""
@@ -7167,6 +7182,18 @@ type SummaryOrderClose {
 
   """Valor de los cupones redimidos"""
   valueCoupons: Float!
+}
+
+"""Resumen pagos del cierre"""
+type SummaryPayment {
+  """Medios de pago"""
+  payment: Payment!
+
+  """Cantidad"""
+  quantity: Float!
+
+  """Total pagado"""
+  total: Float!
 }
 
 """Resumen de ventas"""

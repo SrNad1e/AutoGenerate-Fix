@@ -119,6 +119,7 @@ export class InvoicesService {
 			shop: order.shop,
 			payments,
 			summary,
+			order: order._id,
 			details: order.details,
 			user: user || order.user,
 			createdAt: order.closeDate,
