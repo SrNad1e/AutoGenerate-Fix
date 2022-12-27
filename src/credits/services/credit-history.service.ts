@@ -100,6 +100,7 @@ export class CreditHistoryService {
 		const newCreditHistory = new this.creditHistoryModel({
 			type: TypeCreditHistory.CREDIT,
 			amount,
+			order: order._id,
 			credit: newCredit,
 			user: {
 				username: user.username,
@@ -146,6 +147,7 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.DEBIT,
 			amount,
 			credit: newCredit,
+			order: order._id,
 			user: {
 				username: user.username,
 				name: user.name,
@@ -191,6 +193,7 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.FROZEN,
 			amount,
 			credit: newCredit,
+			order: order?._id,
 			user: {
 				username: user.username,
 				name: user.name,
@@ -235,6 +238,7 @@ export class CreditHistoryService {
 		const newCreditHistory = new this.creditHistoryModel({
 			type: TypeCreditHistory.THAWED,
 			amount,
+			order: order?._id,
 			credit: newCredit,
 			user: {
 				username: user.username,

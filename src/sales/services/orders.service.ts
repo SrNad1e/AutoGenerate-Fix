@@ -1218,14 +1218,52 @@ export class OrdersService {
 			);
 		}
 
+		let creditUpdate;
+		let creditNew;
+		let creditDelete;
+
 		//Se valida que los medios de pago no vengan nulos o en 0
 		for (let i = 0; i < payments.length; i++) {
-			const payment = payments[i];
+			const { total, paymentId, action } = payments[i];
 
-			if (payment?.total <= 0) {
+			if (total <= 0) {
 				throw new BadRequestException(
 					`Los medios de pago no pueden ser menores o iguales a 0`,
 				);
+			}
+			const payment = await this.paymentsService.findById(paymentId);
+
+			if (!payment) {
+				throw new BadRequestException(
+					`El medio de pago ${paymentId} no existe`,
+				);
+			}
+
+			if (payment.type === TypePayment.CREDIT) {
+				const actionPayment = ActionPaymentsOrder[action] || action;
+
+				switch (actionPayment) {
+					case ActionPaymentsOrder.CREATE:
+						creditNew = {
+							payment,
+							total,
+						};
+						break;
+					case ActionPaymentsOrder.UPDATE:
+						creditUpdate = {
+							payment,
+							total,
+						};
+						break;
+					case ActionPaymentsOrder.DELETE:
+						creditDelete = {
+							payment,
+							total,
+						};
+						break;
+					default:
+						break;
+				}
 			}
 		}
 
@@ -1411,22 +1449,6 @@ export class OrdersService {
 			(item) => item.payment?.type === TypePayment.CREDIT,
 		);
 
-		const creditUpdate = payments.find(
-			(item) => item.paymentId === creditOrder?.payment?._id.toString(),
-		);
-
-		const newCredit = newPayments.find(
-			(item) => item.payment?.type === TypePayment.CREDIT,
-		);
-
-		const creditDelete = order.payments.find(
-			({ payment }) =>
-				payment?.type === TypePayment.CREDIT &&
-				!!newPayments.find(
-					(item) => item.payment._id.toString() === payment._id.toString(),
-				),
-		);
-
 		if (creditUpdate) {
 			await this.creditHistoryService.thawedCreditHistory(
 				orderId,
@@ -1441,10 +1463,10 @@ export class OrdersService {
 				user,
 				order.company._id.toString(),
 			);
-		} else if (newCredit) {
+		} else if (creditNew) {
 			await this.creditHistoryService.frozenCreditHistory(
 				orderId,
-				newCredit.total,
+				creditNew.total,
 				user,
 				order.company._id.toString(),
 			);
