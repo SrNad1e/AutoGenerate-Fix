@@ -584,6 +584,18 @@ export class OrdersService {
 
 			//Si se procede a cancelar el pedido
 			if (StatusOrder.CANCELLED === newStatus) {
+				//se validan que no se hallan confirmado pagos
+
+				const paymentsConfirm = !!order.payments.find(
+					({ status }) => status === StatusOrderDetail.CONFIRMED,
+				);
+
+				if (paymentsConfirm) {
+					throw new BadRequestException(
+						'El pedido no puede ser cancelado, ya hay pagos confirmados',
+					);
+				}
+
 				if ([StatusOrder.OPEN, StatusOrder.PENDDING].includes(order?.status)) {
 					const details = order?.details?.map((detail) => ({
 						productId: detail?.product?._id.toString(),
@@ -1702,7 +1714,7 @@ export class OrdersService {
 					'payments.payment.type': 'bonus',
 					closeDate: {
 						$gte: new Date(dateIntial),
-						$lt: new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD')),
+						$lt: new Date(dateFinal),
 					},
 					status: 'closed',
 					pointOfSale: new Types.ObjectId(pointOfSaleId),
@@ -1842,6 +1854,7 @@ export class OrdersService {
 			tax: newTax,
 		};
 	}
+
 	/**
 	 * @description se encarga de calcular las ventas netas
 	 * @param data datos para generar las ventas
@@ -1868,7 +1881,7 @@ export class OrdersService {
 				$match: {
 					closeDate: {
 						$gte: new Date(initialDate),
-						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
+						$lt: new Date(finalDate),
 					},
 					'shop._id': shop?._id,
 					status: StatusOrder.CLOSED,
@@ -1990,6 +2003,7 @@ export class OrdersService {
 
 		return (await this.orderModel.aggregate(aggreagtePayments)) || [];
 	}
+
 	/*
 	 * @description Se encarga de procesar los medios de pago
 	 * @param payments medios de pago a procesar
