@@ -1495,6 +1495,18 @@ type Customer {
   user: User!
 }
 
+"""Ventas de tipos de clientes"""
+type CustomerSalesReport {
+  """Cantidad de ventas"""
+  quantity: Float!
+
+  """Valor total de las ventas"""
+  total: Float!
+
+  """Tipo de cliente"""
+  typeCustomer: CustomerType!
+}
+
 """Tipos de clientes"""
 type CustomerType {
   """Identificación de mongo"""
@@ -1511,6 +1523,21 @@ type CustomerType {
 
   """Usuario que creó o editó el tipo de cliente"""
   user: User!
+}
+
+"""Datos para generar la facturación"""
+input DataGenerateInvoicesInput {
+  """Efectivo para facturar"""
+  cash: Float!
+
+  """Fecha final para la facturación"""
+  dateFinal: String!
+
+  """Fecha inicial para la facturación"""
+  dateInitial: String!
+
+  """Identificador de la tienda a facturar"""
+  shopId: String!
 }
 
 """
@@ -2755,6 +2782,24 @@ input FiltersRolesInput {
   sort: SortRole
 }
 
+"""Filtros para el reporte de ventas"""
+input FiltersSalesReportInput {
+  """Fecha final del reporte"""
+  dateFinal: String!
+
+  """Fecha inicial del reporte"""
+  dateInitial: String!
+
+  """Agrupar por dia, mes o año"""
+  groupDates: GroupDates!
+
+  """Si es true se agrupan por categoria"""
+  isGroupByCategory: Boolean!
+
+  """Id de la tienda"""
+  shopId: String
+}
+
 """Filtros usados para consultar las tiendas"""
 input FiltersShopsInput {
   """Identificador de la tienda"""
@@ -3028,6 +3073,12 @@ input FiltersWarehousesInput {
 
   """Ordenamiento"""
   sort: SortWarehouse
+}
+
+enum GroupDates {
+  DAY
+  MONTH
+  YEAR
 }
 
 """Indexación de las imagenes"""
@@ -3364,6 +3415,12 @@ type Mutation {
     """Tienda para validar el inventario"""
     shopId: String!
   ): StockRequest!
+
+  """Generador de facturas"""
+  invoicing(
+    """Datos para generar la facturación"""
+    dataGenerateInvoicesInput: DataGenerateInvoicesInput!
+  ): ResponseInvoicing!
 
   """Se encarga de realizar el ingreso al sistema por el usuario"""
   login(
@@ -3841,6 +3898,18 @@ input PaymentsOrderInput {
   total: Float!
 }
 
+"""Medios de pago"""
+type PaymentsSalesReport {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de veces de uso del medio de pago"""
+  quantity: Float!
+
+  """Valor total recaudado con el recibo de pago"""
+  total: Float!
+}
+
 """Permisos a los que tiene el usuario"""
 type Permission {
   """Identificador de mongo"""
@@ -3989,6 +4058,7 @@ enum Permissions {
   READ_TREASURY_PAYMENTS
   READ_TREASURY_RECEIPTS
   REPORT_INVOICING_GOAL_STATUS
+  REPORT_INVOICING_SALES
   UPDATE_CONFIGURATION_ROLE
   UPDATE_CONFIGURATION_SHOP
   UPDATE_CONFIGURATION_USER
@@ -4329,6 +4399,12 @@ type Query {
     """Filtros para las referencias"""
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!
+
+  """Consulta las ventas por rango de fechas"""
+  reportSales(
+    """Filtros para obtener las ventas"""
+    filtersSalesReportInput: FiltersSalesReportInput!
+  ): ResponseReportSales!
 
   """Lista de devoluciones de pedidos"""
   returnsOrder(
@@ -5330,6 +5406,21 @@ type ResponseInvoices {
   totalPages: Float!
 }
 
+"""Resultado de facturación"""
+type ResponseInvoicing {
+  """Cantidad de facturas generadas"""
+  invoiceQuantityBank: Float!
+
+  """Cantidad de facturas generadas"""
+  invoiceQuantityCash: Float!
+
+  """Valor total facturado"""
+  valueInvoicingBank: Float!
+
+  """Valor total facturado"""
+  valueInvoicingCash: Float!
+}
+
 """Respuesta para obtener la orden"""
 type ResponseOrder {
   """Crédito que tiene el cliente"""
@@ -5544,6 +5635,21 @@ type ResponseReferences {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Reportde de ventas generales"""
+type ResponseReportSales {
+  """Ventas por tipo de cliente"""
+  customersSalesReport: [CustomerSalesReport!]
+
+  """Medios de pago"""
+  paymentsSalesReport: [PaymentsSalesReport!]
+
+  """Ventas detalladas"""
+  salesReport: [SalesReport!]
+
+  """Resumen de ventas"""
+  summarySalesReport: SummarySalesReport
 }
 
 """Lista de devoluciones de ordenes"""
@@ -6027,6 +6133,23 @@ input RuleInput {
 
   """Tipo de regla que deben cumplir los documentos"""
   type: TypesRule!
+}
+
+"""Ventas detalladas con base a los filtros"""
+type SalesReport {
+  """Categoría"""
+  category: CategoryLevel1
+
+  """
+  Cantidad de productos de la categoría vendidos o cantidad de pedidos generados
+  """
+  quantity: Float!
+
+  """Tienda"""
+  shop: Shop!
+
+  """Valor total de la venta"""
+  total: Float!
 }
 
 """Datos de medidas para el envío de los productos"""
@@ -7059,6 +7182,21 @@ type SummaryOrderClose {
 
   """Valor de los cupones redimidos"""
   valueCoupons: Float!
+}
+
+"""Resumen de ventas"""
+type SummarySalesReport {
+  """CMV"""
+  cmv: Float!
+
+  """Margen de ventas en porcentaje"""
+  margin: Float!
+
+  """Cantidad de ventas"""
+  quantity: Float!
+
+  """Valor total de las ventas"""
+  total: Float!
 }
 
 enum TypeCreditHistory {

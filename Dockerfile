@@ -1,5 +1,5 @@
 FROM node:16.13.1
-ENV TZ="America/Bogota"
+#ENV TZ="America/Bogota"
 
 COPY ["package.json","yarn.lock","/app/"]
 
