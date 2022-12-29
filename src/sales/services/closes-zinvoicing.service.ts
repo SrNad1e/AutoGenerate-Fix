@@ -149,6 +149,21 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		if (pointOfSale.closing) {
+			throw new NotFoundException(
+				'El punto de venta se encuentra en proceso de cierre, espere unos minutos y revise el listado',
+			);
+		}
+
+		await this.pointOfSalesService.update(
+			pointOfSaleId,
+			{
+				closing: true,
+			},
+			user,
+			companyId,
+		);
+
 		const closeZOld = await this.closeZInvoicingModel.findOne({
 			closeDate: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
@@ -306,6 +321,15 @@ export class ClosesZinvoicingService {
 			}
 
 			await this.boxesService.updateTotal(box._id.toString(), 0);
+		} else {
+			await this.pointOfSalesService.update(
+				pointOfSaleId,
+				{
+					closing: false,
+				},
+				user,
+				companyId,
+			);
 		}
 
 		return {

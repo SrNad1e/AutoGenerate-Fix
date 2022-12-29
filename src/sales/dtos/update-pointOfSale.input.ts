@@ -7,4 +7,10 @@ export class UpdatePointOfSaleInput {
 		nullable: true,
 	})
 	closeDate?: string;
+
+	@Field(() => Boolean, {
+		description: 'Cerrando punto de venta',
+		nullable: true,
+	})
+	closing?: boolean;
 }
