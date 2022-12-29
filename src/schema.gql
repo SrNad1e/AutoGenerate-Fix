@@ -3971,6 +3971,9 @@ type PointOfSale {
   """Fecha de cierre"""
   closeDate: DateTime
 
+  """Se encuentra en proceso de cierre"""
+  closing: Boolean
+
   """Compañia a la que pertenece el punto de venta"""
   company: Company!
 
@@ -7254,6 +7257,9 @@ input UpdatePaymentInput {
 input UpdatePointOfSaleInput {
   """Fecha de cierre del punto de venta"""
   closeDate: String
+
+  """Cerrando punto de venta"""
+  closing: Boolean
 }
 
 """Datos para actualizar el producto"""

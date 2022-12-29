@@ -51,6 +51,13 @@ export class PointOfSale extends Document {
 	@Prop({ type: Date, default: new Date() })
 	closeDate: Date;
 
+	@Field(() => Boolean, {
+		description: 'Se encuentra en proceso de cierre',
+		nullable: true,
+	})
+	@Prop({ type: Boolean, default: false })
+	closing: boolean;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el punto de venta',
 	})
