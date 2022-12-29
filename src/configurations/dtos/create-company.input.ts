@@ -22,4 +22,7 @@ export class CreateCompanyInput {
 
 	@Field(() => String, { description: 'Url del logo de la empresa' })
 	logo: string;
+
+	@Field(() => String, { description: 'Email de la empresa' })
+	email: string;
 }

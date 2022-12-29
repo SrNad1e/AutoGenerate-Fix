@@ -7,16 +7,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
+import { ShopsService } from 'src/configurations/services/shops.service';
 import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
 import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
+
+const populate = [
+	{
+		path: 'shop',
+		model: 'Shop',
+	},
+];
 
 @Injectable()
 export class AuthorizationsService {
 	constructor(
 		@InjectModel(AuthorizationDian.name)
 		private readonly authorizationModel: PaginateModel<AuthorizationDian>,
+		private readonly shopsService: ShopsService,
 	) {}
 
 	async findAll(
@@ -39,18 +48,26 @@ export class AuthorizationsService {
 			page,
 			sort,
 			lean: true,
+			populate,
 		};
 
 		return this.authorizationModel.paginate(filters, options);
 	}
 
 	async create(
-		params: CreateAuthorizationInput,
+		{ shopId, ...params }: CreateAuthorizationInput,
 		user: User,
 		companyId: string,
 	) {
+		const shop = await this.shopsService.findById(shopId);
+
+		if (!shop) {
+			throw new BadRequestException('La tienda no existe');
+		}
+
 		return this.authorizationModel.create({
 			...params,
+			shop: shop._id,
 			user: {
 				username: user.username,
 				name: user.name,
@@ -62,7 +79,7 @@ export class AuthorizationsService {
 
 	async update(
 		id: string,
-		params: UpdateAuthorizationInput,
+		{ shopId, ...params }: UpdateAuthorizationInput,
 		user: User,
 		companyId: string,
 	) {
@@ -70,6 +87,14 @@ export class AuthorizationsService {
 
 		if (!authorization) {
 			throw new BadRequestException('La autorización no existe');
+		}
+		let shop;
+		if (shopId) {
+			shop = await this.shopsService.findById(shopId);
+
+			if (!shop) {
+				throw new BadRequestException('La tienda no existe');
+			}
 		}
 
 		if (
@@ -84,6 +109,7 @@ export class AuthorizationsService {
 		return this.authorizationModel.findByIdAndUpdate(id, {
 			$set: {
 				...params,
+				shop: shop?._id,
 				user: {
 					username: user.username,
 					name: user.name,
