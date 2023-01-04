@@ -1935,7 +1935,7 @@ export class OrdersService {
 			},
 			{
 				$group: {
-					_id: '$_id',
+					_id: '$pointOfSale',
 					total: {
 						$sum: 1,
 					},
@@ -1952,7 +1952,7 @@ export class OrdersService {
 			},
 			{
 				$group: {
-					_id: '$_id',
+					_id: '$pointOfSale',
 					total: {
 						$sum: 1,
 					},
@@ -2024,7 +2024,6 @@ export class OrdersService {
 		];
 
 		const totalCoupons = await this.orderModel.aggregate(aggregateCoupons);
-
 		return {
 			summaryOrder: {
 				quantityClosed: ordersClosed[0]?.total || 0,
