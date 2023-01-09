@@ -109,11 +109,11 @@ export class PointOfSalesService {
 			throw new NotFoundException('El punto de venta no existe');
 		}
 
-		if (pointOfSale.closing && closing) {
+		/*if (pointOfSale.closing && closing) {
 			throw new BadRequestException(
 				'El punto de venta ya se está cerrando espere porfavor y revise el listado de cierres',
 			);
-		}
+		}*/
 
 		if (
 			user.username !== 'admin' &&
