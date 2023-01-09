@@ -6266,6 +6266,9 @@ type SalesReport {
   """Categoría"""
   category: CategoryLevel1
 
+  """Fecha de la venta"""
+  date: DateTime!
+
   """
   Cantidad de productos de la categoría vendidos o cantidad de pedidos generados
   """

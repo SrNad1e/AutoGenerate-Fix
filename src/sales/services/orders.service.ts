@@ -1797,6 +1797,9 @@ export class OrdersService {
 				shop: {
 					$first: '$shop',
 				},
+				date: {
+					$first: '$closeDate',
+				},
 				total: {
 					$sum: '$summary.total',
 				},
@@ -1816,7 +1819,13 @@ export class OrdersService {
 				$group: {
 					_id: ['$shop._id', '$details.product.reference.categoryLevel1._id'],
 					category: {
-						$first: '$details.product.reference.categoryLevel1',
+						$first: '$categoryLevel1',
+					},
+					date: {
+						$first: '$closeDate',
+					},
+					shop: {
+						$first: '$shop',
 					},
 					total: {
 						$sum: {
@@ -1830,13 +1839,16 @@ export class OrdersService {
 			};
 		}
 		//consultar las ventas por valor y cantidad
+		/*	console.log(aggregate);
+		console.log(group);
+		console.log(filters);*/
 
 		const salesReport = await this.orderModel.aggregate([
 			...aggregate,
 			{
 				$lookup: {
-					from: 'CategoryLevel1',
-					localField: 'categoryLevel1',
+					from: 'categorylevel1',
+					localField: 'details.product.reference.categoryLevel1',
 					foreignField: '_id',
 					as: 'categoryLevel1',
 				},
@@ -1851,7 +1863,8 @@ export class OrdersService {
 				$project: {
 					_id: 0,
 					shop: 1,
-					category: 1,
+					date: 1,
+					category: { $arrayElemAt: ['$category', 0] },
 					total: 1,
 					quantity: 1,
 				},
