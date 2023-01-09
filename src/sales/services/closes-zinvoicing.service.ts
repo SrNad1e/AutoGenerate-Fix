@@ -149,11 +149,11 @@ export class ClosesZinvoicingService {
 			);
 		}
 
-		if (pointOfSale.closing) {
+		/*if (pointOfSale.closing) {
 			throw new NotFoundException(
 				'El punto de venta se encuentra en proceso de cierre, espere unos minutos y revise el listado',
 			);
-		}
+		}*/
 
 		await this.pointOfSalesService.update(
 			pointOfSaleId,
