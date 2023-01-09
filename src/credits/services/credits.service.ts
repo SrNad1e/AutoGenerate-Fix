@@ -245,7 +245,7 @@ export class CreditsService {
 				);
 			}
 
-			available = available + amount;
+			available = amount - credit?.balance;
 		}
 
 		return this.creditModel.findByIdAndUpdate(
