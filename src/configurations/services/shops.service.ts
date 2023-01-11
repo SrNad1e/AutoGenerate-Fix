@@ -213,11 +213,8 @@ export class ShopsService {
 	 * @description se encarga de consultar la tienda mayorista
 	 * @returns tienda mayorista
 	 */
-	async getShopWholesale() {
-		return this.shopModel
-			.findOne({ name: 'Mayoristas' })
-			.populate(populate)
-			.lean();
+	async getShopWholesale(shopId: string) {
+		return this.shopModel.findById(shopId).populate(populate).lean();
 	}
 
 	/*async migrate() {
