@@ -8,4 +8,9 @@ export class CreateOrderInput {
 		description: 'Estado del pedido',
 	})
 	status: StatusOrder;
+
+	@Field(() => String, {
+		description: 'Identificador de la tienda del pedido',
+	})
+	shopId?: string;
 }

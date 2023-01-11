@@ -1054,6 +1054,9 @@ input CreateExpenseInput {
 
 """Datos para crear el pedido"""
 input CreateOrderInput {
+  """Identificador de la tienda del pedido"""
+  shopId: String!
+
   """Estado del pedido"""
   status: StatusOrder!
 }

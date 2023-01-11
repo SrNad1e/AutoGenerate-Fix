@@ -204,7 +204,11 @@ export class OrdersService {
 		};
 	}
 
-	async create({ status }: CreateOrderInput, user: User, companyId: string) {
+	async create(
+		{ status, shopId }: CreateOrderInput,
+		user: User,
+		companyId: string,
+	) {
 		const newStatus = StatusOrder[status] || status;
 
 		//Se valida el estado enviado por el usuario
@@ -306,7 +310,7 @@ export class OrdersService {
 
 		//Si no tiene pedido se procede a organizar la creación
 
-		const shop = await this.shopsService.getShopWholesale();
+		const shop = await this.shopsService.getShopWholesale(shopId);
 
 		const number = await this.generateNumber(companyId);
 
