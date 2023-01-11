@@ -11,6 +11,7 @@ import { Order, OrderSchema } from 'src/sales/entities/order.entity';
 import { CreditsResolver } from './resolvers/credits.resolver';
 import { CrmModule } from 'src/crm/crm.module';
 import { CreditHistoryResolver } from './resolvers/credit-history.resolver';
+import { Receipt, ReceiptSchema } from 'src/treasury/entities/receipt.entity';
 
 @Module({
 	imports: [
@@ -27,6 +28,10 @@ import { CreditHistoryResolver } from './resolvers/credit-history.resolver';
 			{
 				name: Order.name,
 				schema: OrderSchema,
+			},
+			{
+				name: Receipt.name,
+				schema: ReceiptSchema,
 			},
 		]),
 	],

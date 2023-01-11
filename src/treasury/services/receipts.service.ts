@@ -1,3 +1,4 @@
+import { TypeDocument } from './../../credits/entities/credit-history.entity';
 import {
 	BadRequestException,
 	Injectable,
@@ -208,6 +209,8 @@ export class ReceiptsService {
 				const { orderId, amount } = details[i];
 
 				creditHistory = await this.creditHistoryService.deleteCreditHistory(
+					receipt.number,
+					TypeDocument.RECEIPT,
 					orderId,
 					amount,
 					user,
@@ -283,6 +286,8 @@ export class ReceiptsService {
 					const { orderId, amount } = receipt.details[i];
 
 					await this.creditHistoryService.addCreditHistory(
+						receipt.number,
+						TypeDocument.RECEIPT,
 						orderId,
 						amount,
 						user,
