@@ -133,6 +133,7 @@ export class CreditHistoryService {
 		const newCreditHistory = new this.creditHistoryModel({
 			type: TypeCreditHistory.CREDIT,
 			amount,
+			documentNumber,
 			documentType,
 			credit: newCredit,
 			user: {
