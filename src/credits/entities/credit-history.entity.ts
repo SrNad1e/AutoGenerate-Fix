@@ -27,9 +27,12 @@ export class CreditHistory extends Document {
 	@Prop({ type: String, required: true })
 	type: TypeCreditHistory;
 
-	@Field(() => Order, { description: 'Pedido que gestiona el crédito' })
+	@Field(() => Order, {
+		description: 'Pedido que gestiona el crédito',
+		nullable: true,
+	})
 	@Prop({ type: Types.ObjectId, ref: Order.name })
-	order: Types.ObjectId;
+	order?: Types.ObjectId;
 
 	@Field(() => Number, { description: 'Valor del movimiento' })
 	@Prop({ type: Number })

@@ -1429,7 +1429,7 @@ type CreditHistory {
   credit: Credit!
 
   """Pedido que gestiona el crédito"""
-  order: Order!
+  order: Order
 
   """Tipo de movimiento de cartera"""
   type: TypeCreditHistory!

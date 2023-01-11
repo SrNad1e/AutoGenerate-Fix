@@ -11,6 +11,13 @@ import {
 } from '../entities/credit-history.entity';
 import { CreditsService } from './credits.service';
 
+const populate = [
+	{
+		path: 'order',
+		model: Order.name,
+	},
+];
+
 @Injectable()
 export class CreditHistoryService {
 	constructor(
@@ -60,6 +67,7 @@ export class CreditHistoryService {
 			lean: true,
 			sort,
 			page,
+			populate,
 			limit,
 		};
 
