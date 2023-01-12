@@ -1431,8 +1431,11 @@ type CreditHistory {
   """Crédito que genera el movimiento"""
   credit: Credit!
 
-  """Pedido que gestiona el crédito"""
-  order: Order!
+  """Número del documento que relaiza el proceso del pedido"""
+  documentNumber: Float
+
+  """Tipo de documento que genera el movimiento"""
+  documentType: TypeDocument
 
   """Tipo de movimiento de cartera"""
   type: TypeCreditHistory!
@@ -2341,6 +2344,9 @@ input FiltersCreditHistoryInput {
 
   """Identificador del cliente"""
   customerId: String
+
+  """Número del documento que realiza el nmovimiento"""
+  documentNumber: Float
 
   """Cantidad de registros"""
   limit: Float
@@ -7369,6 +7375,11 @@ enum TypeCreditHistory {
   DEBIT
   FROZEN
   THAWED
+}
+
+enum TypeDocument {
+  ORDER
+  RECEIPT
 }
 
 enum TypeErrorCash {

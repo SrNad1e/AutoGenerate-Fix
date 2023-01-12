@@ -4,7 +4,6 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { log } from 'console';
 import {
 	AggregatePaginateModel,
 	FilterQuery,
@@ -245,7 +244,7 @@ export class CreditsService {
 				);
 			}
 
-			available = amount - credit?.balance;
+			available = amount - credit?.balance - credit?.frozenAmount;
 		}
 
 		return this.creditModel.findByIdAndUpdate(

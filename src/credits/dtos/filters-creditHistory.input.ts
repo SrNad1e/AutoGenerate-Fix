@@ -46,6 +46,12 @@ export class FiltersCreditHistoryInput {
 	})
 	amount?: number;
 
+	@Field(() => Number, {
+		description: 'Número del documento que realiza el nmovimiento',
+		nullable: true,
+	})
+	documentNumber?: number;
+
 	@Field(() => TypeCreditHistory, {
 		description: 'Tipo del histórico de movimiento',
 		nullable: true,

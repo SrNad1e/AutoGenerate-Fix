@@ -1,3 +1,4 @@
+import { TypeDocument } from './../../credits/entities/credit-history.entity';
 import {
 	BadRequestException,
 	Injectable,
@@ -208,6 +209,8 @@ export class ReceiptsService {
 				const { orderId, amount } = details[i];
 
 				creditHistory = await this.creditHistoryService.deleteCreditHistory(
+					receipt.number,
+					TypeDocument.RECEIPT,
 					orderId,
 					amount,
 					user,
@@ -283,6 +286,8 @@ export class ReceiptsService {
 					const { orderId, amount } = receipt.details[i];
 
 					await this.creditHistoryService.addCreditHistory(
+						receipt.number,
+						TypeDocument.RECEIPT,
 						orderId,
 						amount,
 						user,
@@ -390,7 +395,7 @@ export class ReceiptsService {
 		dateFinal: string,
 		pointOfSaleId?: string,
 	) {
-		const receiptsCredit = await this.receiptModel.aggregate([
+		const receiptsNoCredit = await this.receiptModel.aggregate([
 			{
 				$match: {
 					createdAt: {
@@ -425,6 +430,44 @@ export class ReceiptsService {
 			},
 		]);
 
-		return receiptsCredit;
+		const paymentsCredit = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					status: StatusOrder.CLOSED,
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+					'payments.payment.type': TypePayment.CREDIT,
+				},
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					value: {
+						$sum: '$payments.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: '$_id',
+					value: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return [...receiptsNoCredit, ...paymentsCredit];
 	}
 }
