@@ -8,8 +8,10 @@ import { FiltersCreditHistoryInput } from '../dtos/filters-creditHistory.input';
 import {
 	CreditHistory,
 	TypeCreditHistory,
+	TypeDocument,
 } from '../entities/credit-history.entity';
 import { CreditsService } from './credits.service';
+import { Receipt } from 'src/treasury/entities/receipt.entity';
 
 @Injectable()
 export class CreditHistoryService {
@@ -18,6 +20,8 @@ export class CreditHistoryService {
 		private readonly creditHistoryModel: PaginateModel<CreditHistory>,
 		@InjectModel(Order.name)
 		private readonly orderModel: PaginateModel<Order>,
+		@InjectModel(Receipt.name)
+		private readonly receiptModel: PaginateModel<Receipt>,
 		private readonly creditsService: CreditsService,
 	) {}
 
@@ -67,15 +71,44 @@ export class CreditHistoryService {
 	}
 
 	async addCreditHistory(
+		documentNumber: number,
+		typeDocument: TypeDocument,
 		orderId: string,
 		amount: number,
 		user: User,
 		companyId: string,
 	) {
+		const documentType = TypeDocument[typeDocument] || typeDocument;
+
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
-			throw new NotFoundException('Pedido no encontrado');
+			throw new NotFoundException(`No se encontró el pedido`);
+		}
+
+		switch (documentType) {
+			case TypeDocument.RECEIPT:
+				const receipt = await this.receiptModel.findOne({
+					number: documentNumber,
+				});
+
+				if (!receipt) {
+					throw new NotFoundException(`No se encontró el recibo`);
+				}
+
+				break;
+
+			case TypeDocument.ORDER:
+				const order = await this.orderModel.findOne({ number: documentNumber });
+
+				if (!order) {
+					throw new NotFoundException(`No se encontró el pedido`);
+				}
+
+				break;
+
+			default:
+				break;
 		}
 
 		const credit = await this.creditsService.validateCredit(
@@ -100,7 +133,8 @@ export class CreditHistoryService {
 		const newCreditHistory = new this.creditHistoryModel({
 			type: TypeCreditHistory.CREDIT,
 			amount,
-			order: order._id,
+			documentNumber,
+			documentType,
 			credit: newCredit,
 			user: {
 				username: user.username,
@@ -113,15 +147,44 @@ export class CreditHistoryService {
 	}
 
 	async deleteCreditHistory(
+		documentNumber: number,
+		typeDocument: TypeDocument,
 		orderId: string,
 		amount: number,
 		user: User,
 		companyId: string,
 	) {
+		const documentType = TypeDocument[typeDocument] || typeDocument;
+
 		const order = await this.orderModel.findById(orderId);
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
+		}
+
+		switch (documentType) {
+			case TypeDocument.RECEIPT:
+				const receipt = await this.receiptModel.findOne({
+					number: documentNumber,
+				});
+
+				if (!receipt) {
+					throw new NotFoundException(`No se encontró el recibo`);
+				}
+
+				break;
+
+			case TypeDocument.ORDER:
+				const order = await this.orderModel.findOne({ number: documentNumber });
+
+				if (!order) {
+					throw new NotFoundException(`No se encontró el pedido`);
+				}
+
+				break;
+
+			default:
+				break;
 		}
 
 		const credit = await this.creditsService.validateCredit(
@@ -147,7 +210,8 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.DEBIT,
 			amount,
 			credit: newCredit,
-			order: order._id,
+			documentNumber,
+			documentType,
 			user: {
 				username: user.username,
 				name: user.name,
@@ -159,12 +223,15 @@ export class CreditHistoryService {
 	}
 
 	async frozenCreditHistory(
-		orderId: string,
+		documentNumber: number,
 		amount: number,
 		user: User,
 		companyId: string,
 	) {
-		const order = await this.orderModel.findById(orderId);
+		const order = await this.orderModel.findOne({
+			number: documentNumber,
+			company: new Types.ObjectId(companyId),
+		});
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
@@ -193,7 +260,8 @@ export class CreditHistoryService {
 			type: TypeCreditHistory.FROZEN,
 			amount,
 			credit: newCredit,
-			order: order?._id,
+			documentType: TypeDocument.ORDER,
+			documentNumber,
 			user: {
 				username: user.username,
 				name: user.name,
@@ -205,12 +273,15 @@ export class CreditHistoryService {
 	}
 
 	async thawedCreditHistory(
-		orderId: string,
+		documentNumber: number,
 		amount: number,
 		user: User,
 		companyId: string,
 	) {
-		const order = await this.orderModel.findById(orderId);
+		const order = await this.orderModel.findOne({
+			number: documentNumber,
+			company: new Types.ObjectId(companyId),
+		});
 
 		if (!order) {
 			throw new NotFoundException('Pedido no encontrado');
@@ -238,7 +309,8 @@ export class CreditHistoryService {
 		const newCreditHistory = new this.creditHistoryModel({
 			type: TypeCreditHistory.THAWED,
 			amount,
-			order: order?._id,
+			documentNumber,
+			documentType: TypeDocument.ORDER,
 			credit: newCredit,
 			user: {
 				username: user.username,
