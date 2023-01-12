@@ -273,7 +273,6 @@ export class Order extends Document {
 	@Prop({ type: Date })
 	closeDate: Date;
 
-
 	@Field(() => Date, { description: 'Fecha de creación' })
 	createdAt: Date;
 
