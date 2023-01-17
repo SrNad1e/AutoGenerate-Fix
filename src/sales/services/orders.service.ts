@@ -6,13 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import {
-	Aggregate,
-	FilterQuery,
-	PaginateModel,
-	PaginateOptions,
-	Types,
-} from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -1799,15 +1793,11 @@ export class OrdersService {
 						},
 					},
 					quantity: {
-						$sum: 1,
+						$sum: '$details.quantity',
 					},
 				},
 			};
 		}
-		//consultar las ventas por valor y cantidad
-		/*	console.log(aggregate);
-		console.log(group);
-		console.log(filters);*/
 
 		const salesReport = await this.orderModel.aggregate([
 			...aggregate,
