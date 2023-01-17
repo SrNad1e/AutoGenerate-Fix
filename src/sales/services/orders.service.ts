@@ -1649,28 +1649,32 @@ export class OrdersService {
 		//generar los rangos de fechas
 		switch (newGroupDates) {
 			case GroupDates.DAY:
-				finalDate = new Date(dayjs(dateFinal).add(1, 'd').format('YYYY-MM-DD'));
+				finalDate = new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD'));
 
-				initialDate = new Date(dayjs(dateInitial).format('YYYY-MM-DD'));
+				initialDate = new Date(dayjs(dateInitial).format('YYYY/MM/DD'));
+
+				console.log('finalDate', finalDate);
+				console.log('initialDate', initialDate);
+
 				break;
 
 			case GroupDates.MONTH:
 				finalDate = new Date(
-					dayjs(dateFinal).endOf('month').format('YYYY-MM-DD'),
+					dayjs(dateFinal).endOf('month').format('YYYY/MM/DD'),
 				);
 
 				initialDate = new Date(
-					dayjs(dateInitial).startOf('month').format('YYYY-MM-DD'),
+					dayjs(dateInitial).startOf('month').format('YYYY/MM/DD'),
 				);
 				break;
 
 			case GroupDates.YEAR:
 				finalDate = new Date(
-					dayjs(dateFinal).endOf('year').format('YYYY-MM-DD'),
+					dayjs(dateFinal).endOf('year').format('YYYY/MM/DD'),
 				);
 
 				initialDate = new Date(
-					dayjs(dateInitial).startOf('year').format('YYYY-MM-DD'),
+					dayjs(dateInitial).startOf('year').format('YYYY/MM/DD'),
 				);
 				break;
 
