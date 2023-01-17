@@ -1840,15 +1840,11 @@ export class OrdersService {
 						},
 					},
 					quantity: {
-						$sum: 1,
+						$sum: '$details.quantity',
 					},
 				},
 			};
 		}
-		//consultar las ventas por valor y cantidad
-		/*	console.log(aggregate);
-		console.log(group);
-		console.log(filters);*/
 
 		const salesReport = await this.orderModel.aggregate([
 			...aggregate,
