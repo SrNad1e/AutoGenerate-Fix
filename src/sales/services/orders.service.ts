@@ -6,13 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
-import {
-	Aggregate,
-	FilterQuery,
-	PaginateModel,
-	PaginateOptions,
-	Types,
-} from 'mongoose';
+import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -1651,10 +1645,6 @@ export class OrdersService {
 				finalDate = new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD'));
 
 				initialDate = new Date(dayjs(dateInitial).format('YYYY/MM/DD'));
-
-				console.log('finalDate', finalDate);
-				console.log('initialDate', initialDate);
-
 				break;
 
 			case GroupDates.MONTH:
