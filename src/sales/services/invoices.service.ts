@@ -361,24 +361,24 @@ export class InvoicesService {
 			//generar factura de los pedidos en efectivo
 			for (let i = 0; i < ordersInvoicing.length; i++) {
 				const { orderId } = ordersInvoicing[i];
+
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
 					autorization.lastNumber + i + 1,
 				);
 			}
+			await this.authorizationsService.update(
+				autorization._id.toString(),
+				{
+					lastNumber:
+						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
+					lastDateInvoicing: new Date(initialDate),
+				},
+				{ username: 'admin' } as User,
+				shop.company.toString(),
+			);
 		}
-
-		await this.authorizationsService.update(
-			autorization._id.toString(),
-			{
-				lastNumber:
-					autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
-				lastDateInvoicing: new Date(initialDate),
-			},
-			{ username: 'admin' } as User,
-			shop.company.toString(),
-		);
 
 		return {
 			invoiceQuantityCash,
