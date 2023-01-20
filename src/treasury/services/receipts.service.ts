@@ -20,7 +20,7 @@ import { PaymentsService } from './payments.service';
 import { UpdateReceiptInput } from '../dtos/update-receipt.input';
 import { TypePayment } from '../entities/payment.entity';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
-import { Order } from 'src/sales/entities/order.entity';
+import { Order, StatusOrder } from 'src/sales/entities/order.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 
@@ -229,6 +229,7 @@ export class ReceiptsService {
 		{ status }: UpdateReceiptInput,
 		user: User,
 		companyId: string,
+		orderId?: string,
 	) {
 		const receipt = await this.receiptModel.findById(id).lean();
 
@@ -248,69 +249,81 @@ export class ReceiptsService {
 		}
 
 		if (StatusReceipt[status] === StatusReceipt.CANCELLED) {
-			if (!receipt.details) {
-				throw new BadRequestException(
-					'El recibo paga el total de una factura y no se puede anular',
+			if (receipt?.details) {
+				const ordersId = receipt.details.map(
+					({ orderId }) => new Types.ObjectId(orderId),
 				);
-			}
-
-			const ordersId = receipt.details.map(
-				({ orderId }) => new Types.ObjectId(orderId),
-			);
-			const orders = await this.orderModel.find({
-				_id: {
-					$in: ordersId,
-				},
-			});
-
-			if (orders.length === 0) {
-				throw new Error(
-					'Se ha presentado un error sin identificar, comunique al administrador',
-				);
-			}
-
-			const credit = await this.creditsService.findOne({
-				customerId: orders[0].customer?._id?.toString(),
-			});
-
-			if (!credit) {
-				throw new NotFoundException(`El cliente no tiene cartera asignada`);
-			}
-
-			if (receipt.value > credit.available) {
-				throw new BadRequestException(
-					'El crédito no tiene suficiente cupo para anuar el recibo',
-				);
-			}
-
-			for (let i = 0; i < receipt.details.length; i++) {
-				const { orderId, amount } = receipt.details[i];
-
-				await this.creditHistoryService.addCreditHistory(
-					orderId,
-					amount,
-					user,
-					companyId,
-				);
-			}
-
-			if (receipt?.payment?.type === TypePayment.CASH) {
-				await this.boxHistoryService.deleteCash(
-					{
-						boxId: receipt?.box.toString(),
-						documentId: id,
-						documentType: StatusBoxHistory.RECEIPT,
-						value: receipt?.value,
+				const orders = await this.orderModel.find({
+					_id: {
+						$in: ordersId,
 					},
-					user,
-					companyId,
+				});
+
+				if (orders.length === 0) {
+					throw new Error(
+						'Se ha presentado un error sin identificar, comunique al administrador',
+					);
+				}
+
+				const credit = await this.creditsService.findOne({
+					customerId: orders[0].customer?._id?.toString(),
+				});
+
+				if (!credit) {
+					throw new NotFoundException(`El cliente no tiene cartera asignada`);
+				}
+
+				if (receipt.value > credit.available) {
+					throw new BadRequestException(
+						'El crédito no tiene suficiente cupo para anuar el recibo',
+					);
+				}
+
+				for (let i = 0; i < receipt.details.length; i++) {
+					const { orderId, amount } = receipt.details[i];
+
+					await this.creditHistoryService.addCreditHistory(
+						orderId,
+						amount,
+						user,
+						companyId,
+					);
+				}
+
+				if (receipt?.payment?.type === TypePayment.CASH) {
+					await this.boxHistoryService.deleteCash(
+						{
+							boxId: receipt?.box.toString(),
+							documentId: id,
+							documentType: StatusBoxHistory.RECEIPT,
+							value: receipt?.value,
+						},
+						user,
+						companyId,
+					);
+				}
+			} else if (orderId) {
+				const order = await this.orderModel.findById(orderId).lean();
+
+				if (!order) {
+					throw new NotFoundException(`El pedido ${orderId} no existe`);
+				}
+
+				if (order?.status !== StatusOrder.PENDDING) {
+					throw new BadRequestException(
+						'No se puede cancelar el recibo, el pedido ya fue despachado',
+					);
+				}
+			} else {
+				throw new BadRequestException(
+					'No se puede cancelar el recibo, debe suministrar un id de pedido',
 				);
 			}
 		}
 
 		return this.receiptModel.findByIdAndUpdate(id, {
 			$set: {
-				status: StatusReceipt[status],
+				status: StatusReceipt[status] || status,
 				user: {
 					username: user.username,
 					name: user.name,
@@ -339,6 +352,7 @@ export class ReceiptsService {
 						$gte: new Date(dateInitial),
 						$lt: new Date(dateFinal),
 					},
+					status: StatusReceipt.ACTIVE,
 					pointOfSale: pointOfSaleId
 						? new Types.ObjectId(pointOfSaleId)
 						: undefined,
@@ -347,17 +361,108 @@ export class ReceiptsService {
 			},
 			{
 				$group: {
-					_id: "$payment.type",
+					_id: '$payment._id',
 					value: {
-						$sum: "$value",
+						$sum: '$value',
 					},
 					quantity: {
 						$sum: 1,
-					}
-				}
-			}
+					},
+				},
+			},
+			{
+				$project: { _id: 0, value: 1, quantity: 1, payment: '$_id' },
+			},
 		]);
 
 		return receiptsCredit;
+	}
+
+	/**
+	 * @description se encarga de consultar consolidado de pagos generados
+	 * @param dateInitial fecha inicial de la consulta
+	 * @param dateFinal fecha final de la consulta
+	 * @param pointOfSaleId punto de venta si se requiere para filtrar el valor
+	 * @returns valor consolidado de los créditos pagados
+	 */
+	async getPaymentsNoCredit(
+		dateInitial: string,
+		dateFinal: string,
+		pointOfSaleId?: string,
+	) {
+		const receiptsNoCredit = await this.receiptModel.aggregate([
+			{
+				$match: {
+					createdAt: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					status: StatusReceipt.ACTIVE,
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+					isCredit: false,
+				},
+			},
+			{
+				$group: {
+					_id: '$payment._id',
+					value: {
+						$sum: '$value',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: '$_id',
+					value: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		const paymentsCredit = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					status: StatusOrder.CLOSED,
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+					'payments.payment.type': TypePayment.CREDIT,
+				},
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					value: {
+						$sum: '$payments.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: '$_id',
+					value: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return [...receiptsNoCredit, ...paymentsCredit];
 	}
 }

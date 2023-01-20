@@ -12,8 +12,6 @@ import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-inp
 import { User } from 'src/configurations/entities/user.entity';
 import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
-import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
-import { PaymentOrderClose } from '../entities/close-x-invoicing.entity';
 import { BoxService } from 'src/treasury/services/box.service';
 import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
 import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
@@ -36,6 +34,13 @@ const populate: PopulateOptions[] = [
 	},
 	{
 		path: 'payments',
+		populate: {
+			path: 'payment',
+			model: 'Payment',
+		},
+	},
+	{
+		path: 'paymentsCredit',
 		populate: {
 			path: 'payment',
 			model: 'Payment',
@@ -144,6 +149,21 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		/*if (pointOfSale.closing) {
+			throw new NotFoundException(
+				'El punto de venta se encuentra en proceso de cierre, espere unos minutos y revise el listado',
+			);
+		}*/
+
+		await this.pointOfSalesService.update(
+			pointOfSaleId,
+			{
+				closing: true,
+			},
+			user,
+			companyId,
+		);
+
 		const closeZOld = await this.closeZInvoicingModel.findOne({
 			closeDate: new Date(dayjs(closeDate).format('YYYY/MM/DD')),
 			pointOfSale: pointOfSale._id,
@@ -186,11 +206,11 @@ export class ClosesZinvoicingService {
 
 		const number = (closeZ?.number || 0) + 1;
 
-		const payments = await this.ordersService.getPaymentsOrder({
+		const payments = await this.receiptsService.getPaymentsNoCredit(
 			dateInitial,
 			dateFinal,
-			shopId: pointOfSale.shop._id.toString(),
-		});
+			pointOfSale._id.toString(),
+		);
 
 		const refunds = await this.returnsOrderService.resumeDay({
 			pointOfSaleId: pointOfSale._id.toString(),
@@ -301,6 +321,15 @@ export class ClosesZinvoicingService {
 			}
 
 			await this.boxesService.updateTotal(box._id.toString(), 0);
+		} else {
+			await this.pointOfSalesService.update(
+				pointOfSaleId,
+				{
+					closing: false,
+				},
+				user,
+				companyId,
+			);
 		}
 
 		return {

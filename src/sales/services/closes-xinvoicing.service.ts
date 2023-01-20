@@ -5,15 +5,11 @@ import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
-import { StatusReceipt } from 'src/treasury/entities/receipt.entity';
 import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { FiltersClosesXInvoicingInput } from '../dtos/filters-closes-x-invoicing-input';
-import {
-	CloseXInvoicing,
-	PaymentOrderClose,
-} from '../entities/close-x-invoicing.entity';
+import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 import { ReturnsOrderService } from './returns-order.service';
@@ -169,11 +165,11 @@ export class ClosesXInvoicingService {
 
 		const number = (closeX?.number || 0) + 1;
 
-		const payments = await this.ordersService.getPaymentsOrder({
+		const payments = await this.receiptsService.getPaymentsNoCredit(
 			dateInitial,
 			dateFinal,
-			shopId: pointOfSale.shop._id.toString(),
-		});
+			pointOfSale._id.toString(),
+		);
 
 		const refunds = await this.returnsOrderService.resumeDay({
 			pointOfSaleId: pointOfSale._id.toString(),

@@ -14,6 +14,7 @@ export class UpdateAuthorizationInput extends PartialType(
 
 	@Field(() => Number, {
 		description: 'Ultimo número usado para facturar',
+		nullable: true,
 	})
 	lastNumber?: number;
 }

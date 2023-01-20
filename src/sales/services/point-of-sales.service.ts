@@ -99,7 +99,7 @@ export class PointOfSalesService {
 
 	async update(
 		id: string,
-		{ closeDate }: UpdatePointOfSaleInput,
+		{ closeDate, closing }: UpdatePointOfSaleInput,
 		user: User,
 		companyId: string,
 	) {
@@ -108,6 +108,12 @@ export class PointOfSalesService {
 		if (!pointOfSale) {
 			throw new NotFoundException('El punto de venta no existe');
 		}
+
+		/*if (pointOfSale.closing && closing) {
+			throw new BadRequestException(
+				'El punto de venta ya se está cerrando espere porfavor y revise el listado de cierres',
+			);
+		}*/
 
 		if (
 			user.username !== 'admin' &&
@@ -125,6 +131,7 @@ export class PointOfSalesService {
 		return this.pointOfSaleModel.findByIdAndUpdate(id, {
 			$set: {
 				closeDate,
+				closing,
 				user: {
 					username: user.username,
 					name: user.name,

@@ -40,4 +40,7 @@ export class CreateAuthorizationInput {
 		nullable: true,
 	})
 	numberFinal?: number;
+
+	@Field(() => String, { description: 'Id de la tienda' })
+	shopId: string;
 }

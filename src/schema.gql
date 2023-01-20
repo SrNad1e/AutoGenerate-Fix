@@ -238,6 +238,9 @@ type AuthorizationDian {
   """Resolución de la autorización o de la habilitación"""
   resolution: String
 
+  """Tienda a la que pertenece"""
+  shop: Shop!
+
   """Fecha de actualización"""
   updatedAt: DateTime!
 
@@ -828,6 +831,9 @@ input CreateAuthorizationInput {
 
   """resolución de facturacion"""
   resolution: String
+
+  """Id de la tienda"""
+  shopId: String!
 }
 
 """Datos para crear la caja"""
@@ -1421,6 +1427,9 @@ type CreditHistory {
 
   """Crédito que genera el movimiento"""
   credit: Credit!
+
+  """Pedido que gestiona el crédito"""
+  order: Order!
 
   """Tipo de movimiento de cartera"""
   type: TypeCreditHistory!
@@ -2587,6 +2596,9 @@ input FiltersOrdersInput {
 
   """Identificador del medio de pago"""
   paymentId: String
+
+  """Filtro por tienda"""
+  shopId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortOrder
@@ -4169,6 +4181,9 @@ type PointOfSale {
 
   """Fecha de cierre"""
   closeDate: DateTime
+
+  """Se encuentra en proceso de cierre"""
+  closing: Boolean
 
   """Compañia a la que pertenece el punto de venta"""
   company: Company!
@@ -7415,7 +7430,7 @@ input UpdateAuthorizationInput {
   lastDateInvoicing: DateTime
 
   """Ultimo número usado para facturar"""
-  lastNumber: Float!
+  lastNumber: Float
 
   """Numero final de la resolución"""
   numberFinal: Float
@@ -7431,6 +7446,9 @@ input UpdateAuthorizationInput {
 
   """resolución de facturacion"""
   resolution: String
+
+  """Id de la tienda"""
+  shopId: String
 }
 
 """Datos para actualizar caja"""
@@ -7638,6 +7656,9 @@ input UpdatePaymentInput {
 input UpdatePointOfSaleInput {
   """Fecha de cierre del punto de venta"""
   closeDate: String
+
+  """Cerrando punto de venta"""
+  closing: Boolean
 }
 
 """Datos para actualizar el producto"""
