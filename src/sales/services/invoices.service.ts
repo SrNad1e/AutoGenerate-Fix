@@ -1,5 +1,3 @@
-import { log } from 'console';
-import { PointOfSale } from './../entities/pointOfSale.entity';
 import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -17,6 +15,8 @@ import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { AuthorizationsService } from './authorizations.service';
 import { ResponseInvoicing } from '../dtos/response-invoicing';
+
+require('dayjs/locale/es-mx');
 
 @Injectable()
 export class InvoicesService {
@@ -168,7 +168,7 @@ export class InvoicesService {
 			.format('YYYY/MM/DD');
 
 		//validar rangos de fecha
-		if (dayjs(finalDate).isBefore(initialDate)) {
+		if (dayjs(finalDate).isBefore(dateInitial)) {
 			throw new BadRequestException(
 				'La fecha final no puede ser menor a la fecha inicial',
 			);
@@ -295,9 +295,11 @@ export class InvoicesService {
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, year, month, cashTotal } = totalOrdersDay[i];
 
-			const dI = `${year}/${month}/${day}`;
+			const dI = dayjs(initialDate).add(i, 'd').format('YYYY/MM/DD');
 
-			const dF = dayjs(dI).add(1, 'd').format('YYYY/MM/DD');
+			const dF = dayjs(dateInitial)
+				.add(i + 1, 'd')
+				.format('YYYY/MM/DD');
 
 			const orders = await this.orderModel.aggregate([
 				{
@@ -402,19 +404,19 @@ export class InvoicesService {
 			//generar factura de los pedidos en efectivo
 			for (let i = 0; i < ordersInvoicing.length; i++) {
 				const { orderId } = ordersInvoicing[i];
+
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
 					autorization.lastNumber + i + 1,
 				);
 			}
-
 			await this.authorizationsService.update(
 				autorization._id.toString(),
 				{
 					lastNumber:
 						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
-					lastDateInvoicing: new Date(finalDate),
+					lastDateInvoicing: new Date(initialDate),
 				},
 				{ username: 'admin' } as User,
 				shop.company.toString(),
