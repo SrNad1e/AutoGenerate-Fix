@@ -77,9 +77,11 @@ export class InvoicesService {
 			);
 
 			if (pointOfSale) {
-				filters.authorization = pointOfSale?.authorization?._id;
+				filters['authorization._id'] = pointOfSale?.authorization?._id;
 			}
 		}
+
+		console.log(filters);
 
 		const options = {
 			limit,
