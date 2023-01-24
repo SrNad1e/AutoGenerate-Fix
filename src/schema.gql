@@ -1666,6 +1666,9 @@ type DetailInvoice {
 
   """Cantidad de productos en la factura"""
   quantity: Float!
+
+  """Impuestos"""
+  tax: Float!
 }
 
 """Productos del pedido"""
