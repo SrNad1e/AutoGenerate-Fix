@@ -30,7 +30,10 @@ const populate: PopulateOptions[] = [
 	},
 	{
 		path: 'invoices',
-		model: 'Invoice',
+		populate: {
+			path: 'order',
+			model: 'Order',
+		},
 	},
 	{
 		path: 'summaryPayments',
