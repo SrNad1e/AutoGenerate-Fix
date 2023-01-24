@@ -17,7 +17,16 @@ const populate: PopulateOptions[] = [
 	},
 	{
 		path: 'pointOfSale',
-		model: 'PointOfSale',
+		populate: [
+			{
+				path: 'shop',
+				model: 'Shop',
+			},
+			{
+				path: 'box',
+				model: 'Box',
+			},
+		],
 	},
 	{
 		path: 'invoices',
