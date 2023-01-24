@@ -8,6 +8,6 @@ export class GenerateDailyClosingInput {
 	@Field(() => String, { description: 'Fecha inicial' })
 	dateFinal: string;
 
-	@Field(() => String, { description: 'Id de punto de venta' })
-	pointOfSaleId: string;
+	@Field(() => String, { description: 'Id de la tienda' })
+	shopId: string;
 }

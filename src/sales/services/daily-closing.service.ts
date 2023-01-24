@@ -192,51 +192,61 @@ export class DailyClosingService {
 	 * @returns objeto de respuesta
 	 */
 	async generateDailyClosing(
-		{ pointOfSaleId, dateFinal, dateInitial }: GenerateDailyClosingInput,
+		{ shopId, dateFinal, dateInitial }: GenerateDailyClosingInput,
 		user: User,
 		companyId: string,
 	) {
-		const pointOfSale = await this.pointOfSalesService.findById(pointOfSaleId);
+		const pointOfSalesData = await this.pointOfSalesService.findAll(
+			{ shopId },
+			user,
+			companyId,
+		);
 
-		if (!pointOfSale) {
-			throw new BadRequestException('El punto de venta no existe');
+		if (pointOfSalesData.docs.length > 0) {
+			throw new BadRequestException(
+				'No existen puntos de venta para esta tienda',
+			);
 		}
 
 		//validar cuantos días son
 
 		const days = dayjs(dateFinal).diff(dayjs(dateInitial), 'day');
 
-		for (let i = 0; i <= days; i++) {
-			const date = dayjs(dateInitial).add(i, 'day');
+		for (let j = 0; j < pointOfSalesData.docs.length; j++) {
+			const { _id } = pointOfSalesData.docs[j];
 
-			const invoices = await this.invoicesService.findAll(
-				{
-					dateInitial: date.format('YYYY-MM-DD'),
-					dateFinal: date.format('YYYY-MM-DD'),
-					pointOfSaleId,
-					limit: 500,
-					active: true,
-				},
-				user,
-				companyId,
-			);
+			for (let i = 0; i <= days; i++) {
+				const date = dayjs(dateInitial).add(i, 'day');
 
-			//generar cierre
+				const invoices = await this.invoicesService.findAll(
+					{
+						dateInitial: date.format('YYYY-MM-DD'),
+						dateFinal: date.format('YYYY-MM-DD'),
+						pointOfSaleId: _id.toString(),
+						limit: 500,
+						active: true,
+					},
+					user,
+					companyId,
+				);
 
-			await this.create(
-				{
-					closeDate: date.format('YYYY-MM-DD'),
-					invoicesId: invoices.docs.map((d) => d._id.toString()),
-					pointOfSaleId,
-				},
-				user,
-				companyId,
-			);
+				//generar cierre
+
+				await this.create(
+					{
+						closeDate: date.format('YYYY-MM-DD'),
+						invoicesId: invoices.docs.map((d) => d._id.toString()),
+						pointOfSaleId: _id.toString(),
+					},
+					user,
+					companyId,
+				);
+			}
 		}
 
 		return {
 			message: 'Cierres diarios generados',
-			quantity: days,
+			quantity: days * pointOfSalesData.docs.length,
 		};
 	}
 }

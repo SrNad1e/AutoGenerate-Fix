@@ -3138,8 +3138,8 @@ input GenerateDailyClosingInput {
   """Fecha inicial"""
   dateInitial: String!
 
-  """Id de punto de venta"""
-  pointOfSaleId: String!
+  """Id de la tienda"""
+  shopId: String!
 }
 
 enum GroupDates {
