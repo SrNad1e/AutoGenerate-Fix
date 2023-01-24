@@ -73,13 +73,17 @@ export class DailyClosingService {
 			};
 		}
 
-		const pointOfSale = await this.pointOfSalesService.findById(pointOfSaleId);
+		if (pointOfSaleId) {
+			const pointOfSale = await this.pointOfSalesService.findById(
+				pointOfSaleId,
+			);
 
-		if (!pointOfSale) {
-			throw new Error('El punto de venta no existe');
+			if (!pointOfSale) {
+				throw new Error('El punto de venta no existe');
+			}
+
+			filters.pointOfSale = pointOfSale._id;
 		}
-
-		filters.pointOfSale = pointOfSale._id;
 
 		const options = {
 			limit,
