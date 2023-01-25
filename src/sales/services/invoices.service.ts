@@ -81,8 +81,6 @@ export class InvoicesService {
 			}
 		}
 
-		console.log(filters);
-
 		const options = {
 			limit,
 			page,

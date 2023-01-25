@@ -156,7 +156,7 @@ export class DailyClosingService {
 					const { payment } = invoice.payments[j];
 
 					const paymentIndex = summaryPayments.findIndex(
-						(d) => d.payment === payment._id,
+						(d) => d.payment._id.toString() === payment._id.toString(),
 					);
 
 					if (paymentIndex === -1) {
@@ -224,8 +224,6 @@ export class DailyClosingService {
 
 		const days = dayjs(dateFinal).diff(dayjs(dateInitial), 'day');
 
-		console.log(days);
-
 		for (let j = 0; j < pointOfSalesData.docs.length; j++) {
 			const { _id } = pointOfSalesData.docs[j];
 
@@ -243,8 +241,6 @@ export class DailyClosingService {
 					user,
 					companyId,
 				);
-
-				console.log(invoices.docs);
 
 				//generar cierre
 
