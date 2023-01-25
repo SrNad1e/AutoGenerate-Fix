@@ -121,9 +121,9 @@ export class InvoicesService {
 
 		//generar iva para las facturas
 
-		const tax = order.summary.subtotal / 1.19;
+		const subtotal = order.summary.subtotal / 1.19;
 
-		const subtotal = order.summary.subtotal - tax;
+		const tax = order.summary.subtotal - subtotal;
 
 		const summary: SummaryInvoice = {
 			total: order.summary.total,
