@@ -1,4 +1,3 @@
-import { PointOfSale } from './../entities/pointOfSale.entity';
 import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,6 +15,8 @@ import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { AuthorizationsService } from './authorizations.service';
 import { ResponseInvoicing } from '../dtos/response-invoicing';
+
+require('dayjs/locale/es-mx');
 
 @Injectable()
 export class InvoicesService {
@@ -37,6 +38,7 @@ export class InvoicesService {
 			page = 1,
 			dateFinal,
 			dateInitial,
+			pointOfSaleId,
 		}: FiltersInvoicesInput,
 		user: User,
 		companyId: string,
@@ -69,6 +71,16 @@ export class InvoicesService {
 			};
 		}
 
+		if (pointOfSaleId) {
+			const pointOfSale = await this.pointOfSalesService.findById(
+				pointOfSaleId,
+			);
+
+			if (pointOfSale) {
+				filters['authorization._id'] = pointOfSale?.authorization?._id;
+			}
+		}
+
 		const options = {
 			limit,
 			page,
@@ -77,6 +89,18 @@ export class InvoicesService {
 		};
 
 		return this.invoiceModel.paginate(filters, options);
+	}
+
+	async findById(id: string, user: User, companyId: string) {
+		const filters: FilterQuery<Invoice> = {};
+
+		if (user.username !== 'admin') {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		filters._id = new Types.ObjectId(id);
+
+		return this.invoiceModel.findOne(filters);
 	}
 
 	async create(
@@ -93,11 +117,17 @@ export class InvoicesService {
 			order?.pointOfSale?.toString() || pointOfSaleId,
 		);
 
+		//generar iva para las facturas
+
+		const subtotal = order.summary.subtotal / 1.19;
+
+		const tax = order.summary.subtotal - subtotal;
+
 		const summary: SummaryInvoice = {
 			total: order.summary.total,
 			change: order.summary.change,
-			subtotal: order.summary.subtotal,
-			tax: order.summary.tax,
+			subtotal,
+			tax,
 			discount: order.summary.discount,
 			totalPaid: order.summary.totalPaid,
 		};
@@ -111,6 +141,11 @@ export class InvoicesService {
 			pointOfSale.authorization._id.toString(),
 		);
 
+		const details = order.details.map((detail) => {
+			const tax = detail.price / 1.19;
+			return { ...detail, tax };
+		});
+
 		const invoice = new this.invoiceModel({
 			authorization: autorization,
 			number: invoiceNumber ? invoiceNumber : autorization.lastNumber + 1,
@@ -119,7 +154,8 @@ export class InvoicesService {
 			shop: order.shop,
 			payments,
 			summary,
-			details: order.details,
+			order: order._id,
+			details,
 			user: user || order.user,
 			createdAt: order.closeDate,
 		});
@@ -137,7 +173,7 @@ export class InvoicesService {
 		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
 
 		//validar rangos de fecha
-		if (dayjs(finalDate).isBefore(initialDate)) {
+		if (dayjs(finalDate).isBefore(dateInitial)) {
 			throw new BadRequestException(
 				'La fecha final no puede ser menor a la fecha inicial',
 			);
@@ -248,14 +284,15 @@ export class InvoicesService {
 		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;
 		let valueInvoicingBank = 0;
+
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, cashTotal } = totalOrdersDay[i];
 
-			const dI = dayjs(dateInitial)
-				.add(day - 1, 'd')
-				.format('YYYY/MM/DD');
+			const dI = dayjs(initialDate).add(i, 'd').format('YYYY/MM/DD');
 
-			const dF = dayjs(dateInitial).add(day, 'd').format('YYYY/MM/DD');
+			const dF = dayjs(dateInitial)
+				.add(i + 1, 'd')
+				.format('YYYY/MM/DD');
 
 			const orders = await this.orderModel.aggregate([
 				{
@@ -359,24 +396,24 @@ export class InvoicesService {
 			//generar factura de los pedidos en efectivo
 			for (let i = 0; i < ordersInvoicing.length; i++) {
 				const { orderId } = ordersInvoicing[i];
+
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
 					autorization.lastNumber + i + 1,
 				);
 			}
+			await this.authorizationsService.update(
+				autorization._id.toString(),
+				{
+					lastNumber:
+						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
+					lastDateInvoicing: new Date(initialDate),
+				},
+				{ username: 'admin' } as User,
+				shop.company.toString(),
+			);
 		}
-
-		await this.authorizationsService.update(
-			autorization._id.toString(),
-			{
-				lastNumber:
-					autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
-				lastDateInvoicing: new Date(finalDate),
-			},
-			{ username: 'admin' } as User,
-			shop.company.toString(),
-		);
 
 		return {
 			invoiceQuantityCash,

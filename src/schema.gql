@@ -1528,6 +1528,39 @@ type CustomerType {
   user: User!
 }
 
+"""Cierre diario"""
+type DailyClosing {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha de cierre"""
+  closeDate: DateTime!
+
+  """Compañía a la que pertence el cierre"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Facturas del cierre"""
+  invoices: [Invoice!]!
+
+  """Punto de venta que registra el cierre"""
+  pointOfSale: PointOfSale!
+
+  """Resumen del cierre"""
+  summary: SummaryClose!
+
+  """Resumen de pagos del cierre"""
+  summaryPayments: [SummaryPayment!]!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cierre"""
+  user: User!
+}
+
 """Datos para generar la facturación"""
 input DataGenerateInvoicesInput {
   """Efectivo para facturar"""
@@ -1636,6 +1669,9 @@ type DetailInvoice {
 
   """Cantidad de productos en la factura"""
   quantity: Float!
+
+  """Impuestos"""
+  tax: Float!
 }
 
 """Productos del pedido"""
@@ -2390,6 +2426,25 @@ input FiltersCustomersInput {
   sort: SortCustomer
 }
 
+"""Filtros para cierre fiscal"""
+input FiltersDailyClosing {
+  """Fecha final del cierre del cierre"""
+  dateFinal: String
+
+  """Fecha inicial del cierre del cierre"""
+  dateInitial: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Desde donde arranca la página"""
+  page: Float
+  pointOfSaleId: String
+
+  """Ordenamiento (1 es ascendente, -1 es descendente)"""
+  sort: SortDailyClosing
+}
+
 """Filtros para consultar las reglas de descuentos"""
 input FiltersDiscountRulesInput {
   """Si el descuento se encuentra activo"""
@@ -2514,6 +2569,9 @@ input FiltersInvoicesInput {
 
   """Desde donde arranca la página"""
   page: Float
+
+  """Identificador del punto de venta"""
+  pointOfSaleId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
@@ -3081,6 +3139,18 @@ input FiltersWarehousesInput {
   sort: SortWarehouse
 }
 
+"""Datos para crear cierre diario por fechas"""
+input GenerateDailyClosingInput {
+  """Fecha inicial"""
+  dateFinal: String!
+
+  """Fecha inicial"""
+  dateInitial: String!
+
+  """Id de la tienda"""
+  shopId: String!
+}
+
 enum GroupDates {
   DAY
   MONTH
@@ -3145,6 +3215,9 @@ type Invoice {
 
   """Número de factura"""
   number: Float!
+
+  """Pedido basado para la factura"""
+  order: Order!
 
   """Métodos de pago usados en la factura"""
   payments: [PaymentInvoice!]
@@ -3415,6 +3488,12 @@ type Mutation {
     """Datos para la creación de la bodega"""
     createWarehouseInput: CreateWarehouseInput!
   ): Warehouse!
+
+  """Genera los cierres diarios"""
+  generateDailyClosing(
+    """Datos para crear generar los cierres fiscales"""
+    generateDailyClosingInput: GenerateDailyClosingInput = {}
+  ): ResponseGenerateDailyClosing!
 
   """Autogenera una solicitud de productos por bodega"""
   generateStockRequest(
@@ -4013,6 +4092,7 @@ enum Permissions {
   CREATE_TREASURY_EXPENSE
   CREATE_TREASURY_PAYMENT
   CREATE_TREASURY_RECEIPT
+  GENERATE_INVOICING_DAILY_CLOSING
   INVENTORY_TRANSFERS_VERIFIED
   PRINT_CRM_COUPON
   PRINT_INVENTORY_ADJUSTMENT
@@ -4054,6 +4134,7 @@ enum Permissions {
   READ_INVOICING_AUTHORIZATIONS
   READ_INVOICING_CLOSESX
   READ_INVOICING_CLOSESZ
+  READ_INVOICING_DAILY_CLOSING
   READ_INVOICING_INVOICES
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
@@ -4297,6 +4378,12 @@ type Query {
     """Filtros para consultar el listado de clientes"""
     filtersCustomerInput: FiltersCustomersInput = {}
   ): ResponseCustomers!
+
+  """Lista de cierres fiscales"""
+  dailyClosings(
+    """Filtros de lista de cierres fiscales"""
+    filtersDailyClosing: FiltersDailyClosing = {}
+  ): ResponseDailyClosing!
 
   """Listado de descuentos"""
   discountRules(
@@ -5238,6 +5325,39 @@ type ResponseCustomers {
   totalPages: Float!
 }
 
+"""Lista de cierres fiscales"""
+type ResponseDailyClosing {
+  """Lista de cierres fiscales"""
+  docs: [DailyClosing!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Respuesta del listado de reglas de descuento"""
 type ResponseDiscountRules {
   """Lista de reglas de descuento"""
@@ -5335,6 +5455,15 @@ type ResponseExpenses {
 
   """Total de páginas"""
   totalPages: Float!
+}
+
+"""Respuesta de la creación de los cierres diarios de facturación"""
+type ResponseGenerateDailyClosing {
+  """Mensaje de respuesta"""
+  message: String!
+
+  """Cantidad de cierres diarios creados"""
+  quantity: Float!
 }
 
 """Datos resultado de la consulta de Estado de la meta"""
@@ -6505,6 +6634,15 @@ input SortCustomer {
   phone: Float
 }
 
+"""Ordenamiento de cierre z"""
+input SortDailyClosing {
+  """Ordenamiento por fecha de cierre"""
+  closeDate: Float
+
+  """Ordenamiento por fecha de creación"""
+  createdAt: Float
+}
+
 """Datos para el ordenamiento"""
 input SortDiscountRule {
   active: Float
@@ -7127,6 +7265,18 @@ type StockTransferError {
   verified: Boolean!
 }
 
+"""Resumen del cierre"""
+type SummaryClose {
+  """Subtotal del cierre"""
+  subtotal: Float!
+
+  """Impuestos del cierre"""
+  tax: Float!
+
+  """Total del cierre"""
+  total: Float!
+}
+
 """Resumen de la factura"""
 type SummaryInvoice {
   """Cambio de la factura"""
@@ -7188,6 +7338,18 @@ type SummaryOrderClose {
 
   """Valor de los cupones redimidos"""
   valueCoupons: Float!
+}
+
+"""Resumen pagos del cierre"""
+type SummaryPayment {
+  """Medios de pago"""
+  payment: Payment!
+
+  """Cantidad"""
+  quantity: Float!
+
+  """Total pagado"""
+  total: Float!
 }
 
 """Resumen de ventas"""

@@ -42,6 +42,9 @@ import {
 	StatusWebHistorySchema,
 } from './entities/status-web-history';
 import { StatusWebHistoriesService } from './services/status-web-histories.service';
+import { DailyClosingService } from './services/daily-closing.service';
+import { DailyClosing, DailyClosingSchema } from './entities/dailyClosing';
+import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 
 @Module({
 	imports: [
@@ -92,6 +95,14 @@ import { StatusWebHistoriesService } from './services/status-web-histories.servi
 					return schema;
 				},
 			},
+			{
+				name: DailyClosing.name,
+				useFactory: async () => {
+					const schema = DailyClosingSchema;
+					schema.index({ pointOfSale: 1, closeDate: -1 }, { unique: true });
+					return schema;
+				},
+			},
 		]),
 		MongooseModule.forFeature([
 			{
@@ -124,6 +135,8 @@ import { StatusWebHistoriesService } from './services/status-web-histories.servi
 		AuthorizationsService,
 		AuthorizationsResolver,
 		StatusWebHistoriesService,
+		DailyClosingService,
+		DailyClosingResolver,
 	],
 	exports: [OrdersService, PointOfSalesService],
 })

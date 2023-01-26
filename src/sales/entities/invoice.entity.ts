@@ -9,6 +9,7 @@ import { Customer } from 'src/crm/entities/customer.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 import { AuthorizationDian } from './authorization.entity';
+import { Order } from './order.entity';
 
 @ObjectType({ description: 'Productos de la factura' })
 export class DetailInvoice {
@@ -20,6 +21,9 @@ export class DetailInvoice {
 
 	@Field(() => Number, { description: 'Descuento del producto en la factura' })
 	discount: number;
+
+	@Field(() => Number, { description: 'Impuestos' })
+	tax: number;
 
 	@Field(() => Number, { description: 'Precio del producto en la factura' })
 	price: number;
@@ -77,6 +81,14 @@ export class Invoice extends Document {
 		required: true,
 	})
 	customer: Customer;
+
+	@Field(() => Order, { description: 'Pedido basado para la factura' })
+	@Prop({
+		type: Types.ObjectId,
+		ref: 'Order',
+		required: true,
+	})
+	order: Types.ObjectId;
 
 	@Field(() => Company, {
 		description: 'Empresa a la que perteneces la factura',

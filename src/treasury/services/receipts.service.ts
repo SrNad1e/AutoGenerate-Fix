@@ -395,7 +395,7 @@ export class ReceiptsService {
 		dateFinal: string,
 		pointOfSaleId?: string,
 	) {
-		const receiptsCredit = await this.receiptModel.aggregate([
+		const receiptsNoCredit = await this.receiptModel.aggregate([
 			{
 				$match: {
 					createdAt: {
@@ -430,6 +430,44 @@ export class ReceiptsService {
 			},
 		]);
 
-		return receiptsCredit;
+		const paymentsCredit = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: {
+					closeDate: {
+						$gte: new Date(dateInitial),
+						$lt: new Date(dateFinal),
+					},
+					status: StatusOrder.CLOSED,
+					pointOfSale: pointOfSaleId
+						? new Types.ObjectId(pointOfSaleId)
+						: undefined,
+					'payments.payment.type': TypePayment.CREDIT,
+				},
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					value: {
+						$sum: '$payments.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: '$_id',
+					value: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return [...receiptsNoCredit, ...paymentsCredit];
 	}
 }

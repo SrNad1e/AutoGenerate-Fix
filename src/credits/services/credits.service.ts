@@ -237,6 +237,16 @@ export class CreditsService {
 			}
 		}
 
+		if (amount) {
+			if (amount < credit?.amount && available < amount) {
+				throw new BadRequestException(
+					`El crédito del cliente no tiene cupo disponible, cupo $ ${available}`,
+				);
+			}
+
+			available = amount - credit?.balance - credit?.frozenAmount;
+		}
+
 		return this.creditModel.findByIdAndUpdate(
 			id,
 			{

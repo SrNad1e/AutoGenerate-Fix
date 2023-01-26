@@ -21,7 +21,7 @@ export class FiltersInvoicesInput {
 		description: 'Ordenamiento (1 es ascendente, -1 es descendente)',
 		nullable: true,
 	})
-	sort: SortInovice;
+	sort?: SortInovice;
 
 	@Field(() => String, {
 		description: 'Fecha inicial para la busqueda',
@@ -34,6 +34,12 @@ export class FiltersInvoicesInput {
 		nullable: true,
 	})
 	dateFinal: string;
+
+	@Field(() => String, {
+		description: 'Identificador del punto de venta',
+		nullable: true,
+	})
+	pointOfSaleId: string;
 
 	@Field(() => Boolean, {
 		description: 'Si la factura de encuentra se encuentra activa',
