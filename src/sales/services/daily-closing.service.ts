@@ -183,9 +183,11 @@ export class DailyClosingService {
 			};
 		}
 
+		console.log(closeDate);
+
 		const dailyClosing = new this.dailyClosingModel({
 			company: new Types.ObjectId(companyId),
-			closeDate: new Date(dayjs(closeDate).format('YYYY-MM-DD')),
+			closeDate: new Date(closeDate),
 			pointOfSale: pointOfSale._id,
 			invoices,
 			summary,
@@ -246,7 +248,7 @@ export class DailyClosingService {
 
 				await this.create(
 					{
-						closeDate: date.format('YYYY-MM-DD'),
+						closeDate: date.format('YYYY/MM/DD'),
 						invoicesId: invoices.docs.map((d) => d._id.toString()),
 						pointOfSaleId: _id.toString(),
 					},
