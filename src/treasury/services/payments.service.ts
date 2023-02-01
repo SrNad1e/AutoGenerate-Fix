@@ -32,7 +32,7 @@ export class PaymentsService {
 		active,
 		limit = 10,
 		name,
-		shop_id,
+		shopId,
 		page = 1,
 		sort,
 		type,
@@ -54,9 +54,9 @@ export class PaymentsService {
 			filters.type = type;
 		}
 
-		if (shop_id) {
+		if (shopId) {
 			filters.shops = {
-				$in: [new Types.ObjectId(shop_id)],
+				$in: [new Types.ObjectId(shopId)],
 			};
 		}
 

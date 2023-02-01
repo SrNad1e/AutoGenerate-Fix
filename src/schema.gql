@@ -2631,7 +2631,7 @@ input FiltersPaymentsInput {
   page: Float
 
   """Tienda para consultar el medio de pago"""
-  shop_id: String
+  shopId: String
 
   """Ordenamiento"""
   sort: SortPayment
