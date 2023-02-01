@@ -34,6 +34,12 @@ export class FiltersPaymentsInput {
 	})
 	type?: string;
 
+	@Field(() => String, {
+		description: 'Tienda para consultar el medio de pago',
+		nullable: true,
+	})
+	shop_id?: string;
+
 	@Field(() => Boolean, {
 		description: 'Estado del tipo de los médios de pago',
 		nullable: true,

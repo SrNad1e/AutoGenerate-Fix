@@ -27,6 +27,7 @@ export class PaymentsService {
 		active,
 		limit = 10,
 		name,
+		shop_id,
 		page = 1,
 		sort,
 		type,
@@ -48,6 +49,12 @@ export class PaymentsService {
 			filters.type = type;
 		}
 
+		if (shop_id) {
+			filters.shops = {
+				$in: [new Types.ObjectId(shop_id)],
+			};
+		}
+
 		const options = {
 			limit,
 			page,
@@ -64,7 +71,7 @@ export class PaymentsService {
 	}
 
 	async create(
-		{ type, name, logoId, ...params }: CreatePaymentInput,
+		{ type, name, logoId, shopIds, ...params }: CreatePaymentInput,
 		user: User,
 	) {
 		const payment = await this.paymentModel.findOne({ name });
@@ -75,10 +82,13 @@ export class PaymentsService {
 			);
 		}
 
+		const shops = shopIds.map((shopId) => new Types.ObjectId(shopId));
+
 		return this.paymentModel.create({
 			type: TypePayment[type],
 			logo: new Types.ObjectId(logoId),
 			name,
+			shops,
 			...params,
 			user: {
 				username: user.username,
@@ -90,7 +100,7 @@ export class PaymentsService {
 
 	async update(
 		id: string,
-		{ type, logoId, ...params }: UpdatePaymentInput,
+		{ type, logoId, shopIds, ...params }: UpdatePaymentInput,
 		user: User,
 	) {
 		const payment = await this.findById(id);
@@ -99,11 +109,14 @@ export class PaymentsService {
 			throw new BadGatewayException('El método de pago');
 		}
 
+		const shops = shopIds?.map((shopId) => new Types.ObjectId(shopId));
+
 		return this.paymentModel.findByIdAndUpdate(
 			id,
 			{
 				type: TypePayment[type],
 				logo: new Types.ObjectId(logoId),
+				shops,
 				...params,
 				user: {
 					username: user.username,

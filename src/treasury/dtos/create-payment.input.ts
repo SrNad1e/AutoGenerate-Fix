@@ -26,4 +26,9 @@ export class CreatePaymentInput {
 		nullable: true,
 	})
 	message?: string;
+
+	@Field(() => [String], {
+		description: 'Identificador de tiendas que usan el método de pago',
+	})
+	shopIds: string[];
 }

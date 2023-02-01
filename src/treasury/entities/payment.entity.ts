@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { Image } from 'src/configurations/entities/image.entity';
+import { Shop } from 'src/configurations/entities/shop.entity';
 
 export enum TypePayment {
 	CASH = 'cash',
@@ -29,6 +30,12 @@ export class Payment extends Document {
 	})
 	@Prop({ type: String, required: true })
 	type: TypePayment;
+
+	@Field(() => [Shop], {
+		description: 'Tipo de medio de pago',
+	})
+	@Prop({ type: Array, default: [] })
+	shops: Types.ObjectId[];
 
 	@Field(() => String, {
 		description: 'Color del medio de pago',
