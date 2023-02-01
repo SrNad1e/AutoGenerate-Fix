@@ -2,6 +2,7 @@ import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { Image } from 'src/configurations/entities/image.entity';
+import { Shop } from 'src/configurations/entities/shop.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreatePaymentInput } from '../dtos/create-payment.input';
 
@@ -13,6 +14,10 @@ const populate = [
 	{
 		path: 'logo',
 		model: Image.name,
+	},
+	{
+		path: 'shops',
+		model: Shop.name,
 	},
 ];
 
