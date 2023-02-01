@@ -1075,6 +1075,9 @@ input CreatePaymentInput {
   """Nombre del método de pago"""
   name: String!
 
+  """Identificador de tiendas que usan el método de pago"""
+  shopIds: [String!]!
+
   """Tipo de método de pago"""
   type: TypePayment!
 }
@@ -1672,6 +1675,9 @@ type DetailInvoice {
 
   """Cantidad de productos en la factura"""
   quantity: Float!
+
+  """Impuestos"""
+  tax: Float!
 }
 
 """Productos del pedido"""
@@ -2632,6 +2638,9 @@ input FiltersPaymentsInput {
 
   """Página actual"""
   page: Float
+
+  """Tienda para consultar el medio de pago"""
+  shopId: String
 
   """Ordenamiento"""
   sort: SortPayment
@@ -3891,6 +3900,9 @@ type Payment {
 
   """Nombre del medio de pago"""
   name: String!
+
+  """Tipo de medio de pago"""
+  shops: [Shop!]!
 
   """Tipo de medio de pago"""
   type: TypePayment!
@@ -7664,6 +7676,9 @@ input UpdatePaymentInput {
 
   """Nombre del método de pago"""
   name: String
+
+  """Identificador de tiendas que usan el método de pago"""
+  shopIds: [String!]
 
   """Tipo de método de pago"""
   type: TypePayment

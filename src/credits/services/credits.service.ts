@@ -212,7 +212,7 @@ export class CreditsService {
 						return detail;
 					});
 
-					details = newDetails.filter((detail) => detail.total > 0);
+					details = newDetails.filter((detail) => detail.balance > 0);
 					break;
 				case TypeCreditHistory.FROZEN:
 					if (detailAddCredit?.total > available) {

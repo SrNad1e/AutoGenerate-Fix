@@ -17,11 +17,23 @@ const populate: PopulateOptions[] = [
 	},
 	{
 		path: 'pointOfSale',
-		model: 'PointOfSale',
+		populate: [
+			{
+				path: 'shop',
+				model: 'Shop',
+			},
+			{
+				path: 'box',
+				model: 'Box',
+			},
+		],
 	},
 	{
 		path: 'invoices',
-		model: 'Invoice',
+		populate: {
+			path: 'order',
+			model: 'Order',
+		},
 	},
 	{
 		path: 'summaryPayments',
@@ -144,7 +156,7 @@ export class DailyClosingService {
 					const { payment } = invoice.payments[j];
 
 					const paymentIndex = summaryPayments.findIndex(
-						(d) => d.payment === payment._id,
+						(d) => d.payment._id.toString() === payment._id.toString(),
 					);
 
 					if (paymentIndex === -1) {
@@ -171,10 +183,12 @@ export class DailyClosingService {
 			};
 		}
 
+		console.log(closeDate);
+
 		const dailyClosing = new this.dailyClosingModel({
 			company: new Types.ObjectId(companyId),
-			closeDate: new Date(dayjs(closeDate).format('YYYY-MM-DD')),
-			pointOfSaleId: pointOfSale._id,
+			closeDate: new Date(closeDate),
+			pointOfSale: pointOfSale._id,
 			invoices,
 			summary,
 			summaryPayments,
@@ -197,12 +211,12 @@ export class DailyClosingService {
 		companyId: string,
 	) {
 		const pointOfSalesData = await this.pointOfSalesService.findAll(
-			{ shopId },
+			{ shopId, limit: 200, page: 1 },
 			user,
 			companyId,
 		);
 
-		if (pointOfSalesData.docs.length > 0) {
+		if (pointOfSalesData.docs.length === 0) {
 			throw new BadRequestException(
 				'No existen puntos de venta para esta tienda',
 			);
@@ -220,10 +234,10 @@ export class DailyClosingService {
 
 				const invoices = await this.invoicesService.findAll(
 					{
-						dateInitial: date.format('YYYY-MM-DD'),
-						dateFinal: date.format('YYYY-MM-DD'),
+						dateInitial: date.format('YYYY/MM/DD'),
+						dateFinal: date.format('YYYY/MM/DD'),
 						pointOfSaleId: _id.toString(),
-						limit: 500,
+						limit: 5000,
 						active: true,
 					},
 					user,
@@ -234,7 +248,7 @@ export class DailyClosingService {
 
 				await this.create(
 					{
-						closeDate: date.format('YYYY-MM-DD'),
+						closeDate: date.format('YYYY/MM/DD'),
 						invoicesId: invoices.docs.map((d) => d._id.toString()),
 						pointOfSaleId: _id.toString(),
 					},
@@ -246,7 +260,7 @@ export class DailyClosingService {
 
 		return {
 			message: 'Cierres diarios generados',
-			quantity: days * pointOfSalesData.docs.length,
+			quantity: (days + 1) * pointOfSalesData.docs.length,
 		};
 	}
 }

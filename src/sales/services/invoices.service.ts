@@ -77,7 +77,7 @@ export class InvoicesService {
 			);
 
 			if (pointOfSale) {
-				filters.authorization = pointOfSale?.authorization?._id;
+				filters['authorization._id'] = pointOfSale?.authorization?._id;
 			}
 		}
 
@@ -117,11 +117,17 @@ export class InvoicesService {
 			order?.pointOfSale?.toString() || pointOfSaleId,
 		);
 
+		//generar iva para las facturas
+
+		const subtotal = order.summary.subtotal / 1.19;
+
+		const tax = order.summary.subtotal - subtotal;
+
 		const summary: SummaryInvoice = {
 			total: order.summary.total,
 			change: order.summary.change,
-			subtotal: order.summary.subtotal,
-			tax: order.summary.tax,
+			subtotal,
+			tax,
 			discount: order.summary.discount,
 			totalPaid: order.summary.totalPaid,
 		};
@@ -135,6 +141,11 @@ export class InvoicesService {
 			pointOfSale.authorization._id.toString(),
 		);
 
+		const details = order.details.map((detail) => {
+			const tax = detail.price / 1.19;
+			return { ...detail, tax };
+		});
+
 		const invoice = new this.invoiceModel({
 			authorization: autorization,
 			number: invoiceNumber ? invoiceNumber : autorization.lastNumber + 1,
@@ -144,7 +155,7 @@ export class InvoicesService {
 			payments,
 			summary,
 			order: order._id,
-			details: order.details,
+			details,
 			user: user || order.user,
 			createdAt: order.closeDate,
 		});
