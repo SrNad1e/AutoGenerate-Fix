@@ -743,7 +743,7 @@ export class StockTransferService {
 			throw new BadRequestException('El traslado no se encuentra enviado');
 		}
 
-		const detailsArray = stockTransfer.details
+		/*const detailsArray = stockTransfer.details
 			.filter(
 				(detail) =>
 					detail.status === StatusDetailTransfer.CONFIRMED &&
@@ -759,7 +759,7 @@ export class StockTransferService {
 			throw new BadRequestException(
 				`El producto ${detailsVerified.productId} ya se encuentra confirmado`,
 			);
-		}
+		}*/
 
 		let newDetails = [...stockTransfer.details];
 
