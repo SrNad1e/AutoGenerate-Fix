@@ -33,6 +33,10 @@ export class Receipt extends Document {
 	@Prop({ type: Number, default: 0 })
 	number: number;
 
+	@Field(() => String, { description: 'Prefijo recibo de caja' })
+	@Prop({ type: String, required: true })
+	prefix: string;
+
 	@Field(() => Boolean, {
 		description: 'Valida si el recibo de caja es crédito',
 	})

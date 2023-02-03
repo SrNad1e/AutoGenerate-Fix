@@ -28,6 +28,10 @@ import {
 	CloseZInvoicingSchema,
 } from 'src/sales/entities/close-z-invoicing.entity';
 import { ErrorsCashResolver } from './resolvers/errors-cash.resolver';
+import {
+	ReceiptNumber,
+	ReceiptNumberSchema,
+} from './entities/receipt-number.entity';
 
 @Module({
 	imports: [
@@ -53,7 +57,15 @@ import { ErrorsCashResolver } from './resolvers/errors-cash.resolver';
 				name: Receipt.name,
 				useFactory: async () => {
 					const schema = ReceiptSchema;
-					schema.index({ number: 1, company: -1 }, { unique: true });
+					schema.index({ number: 1, prefix: 1, company: 1 }, { unique: true });
+					return schema;
+				},
+			},
+			{
+				name: ReceiptNumber.name,
+				useFactory: async () => {
+					const schema = ReceiptNumberSchema;
+					schema.index({ prefix: 1, company: -1 }, { unique: true });
 					return schema;
 				},
 			},
