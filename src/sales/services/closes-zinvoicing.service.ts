@@ -225,6 +225,21 @@ export class ClosesZinvoicingService {
 			pointOfSale._id.toString(),
 		);
 
+		const paymentsOrder = await this.ordersService.getPaymentsOrder({
+			dateInitial,
+			dateFinal,
+			pointOfSaleId: pointOfSale._id.toString(),
+		});
+
+		const paymentsCoupons = paymentsOrder.filter(
+			(p) =>
+				!payments.find(
+					(pay) => pay.payment.toString() === p.payment.toString(),
+				),
+		);
+
+		const newPayments = payments.concat(paymentsCoupons);
+
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
 			number,
@@ -236,7 +251,7 @@ export class ClosesZinvoicingService {
 			quantityBank,
 			...summaryOrder,
 			refunds,
-			payments,
+			payments: newPayments,
 			user: {
 				username: user.username,
 				name: user.name,
