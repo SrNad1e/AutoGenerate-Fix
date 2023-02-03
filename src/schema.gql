@@ -1446,9 +1446,6 @@ type CreditHistory {
 
 """Cliente"""
 type Customer {
-  """Fecha de mayorista"""
-  WolesalerDate: DateTime
-
   """Identificador de mongo"""
   _id: String!
 
@@ -1496,6 +1493,9 @@ type Customer {
 
   """Usuario que creó o editó el cliente"""
   user: User!
+
+  """Fecha de mayorista"""
+  wolesalerDate: DateTime
 }
 
 """Ventas de tipos de clientes"""

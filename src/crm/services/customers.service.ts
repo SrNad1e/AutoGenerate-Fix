@@ -31,11 +31,11 @@ export class CustomersService {
 	constructor(
 		@InjectModel(Customer.name)
 		private readonly customerModel: PaginateModel<Customer>,
+		@InjectModel(Order.name)
+		private readonly orderModel: PaginateModel<Order>,
 		private readonly documentTypesService: DocumentTypesService,
 		private readonly customerTypeService: CustomerTypeService,
 		private readonly citiesService: CitiesService,
-		@InjectModel(Order.name)
-		private readonly orderModel: PaginateModel<Order>,
 	) {}
 
 	async findAll({
@@ -226,6 +226,15 @@ export class CustomersService {
 			};
 		}
 
+		const customerType = await this.customerTypeService.findOne('Mayorista');
+
+		let wolesalerDate;
+		//validar que el usuario se valla a actuvar como mayorista
+
+		if (customerTypeId === customerType._id.toString()) {
+			wolesalerDate = new Date();
+		}
+
 		const newCustomer = await this.customerModel.findByIdAndUpdate(
 			{ _id: id },
 			{
@@ -243,6 +252,7 @@ export class CustomersService {
 						_id: user._id,
 					},
 					addresses: newAddresses.length > 0 ? newAddresses : undefined,
+					wolesalerDate,
 					...params,
 				},
 			},
