@@ -13,6 +13,7 @@ import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
 import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
+import { ClosesZinvoicingService } from './closes-zinvoicing.service';
 
 const populate = [
 	{
@@ -28,6 +29,7 @@ export class AuthorizationsService {
 		private readonly authorizationModel: PaginateModel<AuthorizationDian>,
 		private readonly shopsService: ShopsService,
 		private readonly receiptsService: ReceiptsService,
+		private readonly closeZService: ClosesZinvoicingService,
 	) {}
 
 	async findAll(
@@ -78,6 +80,7 @@ export class AuthorizationsService {
 		}
 
 		await this.receiptsService.createReceiptNumber(prefix, companyId);
+		await this.closeZService.createCloseZNumber(prefix, companyId);
 
 		return this.authorizationModel.create({
 			...params,

@@ -26,6 +26,10 @@ export class CloseZInvoicing extends Document {
 	@Prop({ type: Object, requiere: true })
 	cashRegister: CashRegister;
 
+	@Field(() => String, { description: 'Prefijo del número' })
+	@Prop({ type: String, requiere: true })
+	prefix: string;
+
 	@Field(() => Number, { description: 'Número consecutivo' })
 	@Prop({ type: Number, requiere: true })
 	number: number;
