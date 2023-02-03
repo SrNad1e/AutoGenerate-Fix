@@ -198,11 +198,6 @@ export class ReceiptsService {
 			},
 		});
 
-		await this.updateReceiptNumber(
-			pointOfSale?.authorization?.prefix,
-			companyId,
-		);
-
 		if (payment?.type === TypePayment.CASH) {
 			await this.boxHistoryService.addCash(
 				{
@@ -231,6 +226,11 @@ export class ReceiptsService {
 		}
 
 		const receiptNew = await (await newReceipt.save()).populate(populate);
+
+		await this.updateReceiptNumber(
+			pointOfSale?.authorization?.prefix,
+			companyId,
+		);
 
 		return {
 			receipt: receiptNew['_doc'],
