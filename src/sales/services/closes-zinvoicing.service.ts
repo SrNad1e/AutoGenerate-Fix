@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CloseZInvoicingNumber } from './../entities/close-z-invoicing-number.entity';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
@@ -57,6 +62,8 @@ export class ClosesZinvoicingService {
 	constructor(
 		@InjectModel(CloseZInvoicing.name)
 		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
+		@InjectModel(CloseZInvoicingNumber.name)
+		private readonly closeZInvoicingNumberModel: PaginateModel<CloseZInvoicingNumber>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
 		private readonly expensesService: ExpensesService,
@@ -339,5 +346,55 @@ export class ClosesZinvoicingService {
 				authorization: response?.pointOfSale['authorization']._doc,
 			},
 		};
+	}
+
+	async getCloseZNumber(companyId: string, prefix: string) {
+		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+
+		if (!closeZNumber) {
+			throw new BadRequestException(
+				'El prefijo del recibo no existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		return closeZNumber.lastNumber + 1;
+	}
+
+	async createCloseZNumber(prefix: string, companyId: string) {
+		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+
+		if (closeZNumber) {
+			throw new BadRequestException(
+				'Ya existe una numeración de cierre Z con el mismo prefijo',
+			);
+		}
+
+		return this.closeZInvoicingNumberModel.create({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+	}
+
+	async updateCloseZNumber(prefix: string, companyId: string) {
+		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+
+		if (!closeZNumber) {
+			throw new BadRequestException(
+				'El prefijo del cierre no existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		closeZNumber.lastNumber += 1;
+
+		return closeZNumber.save();
 	}
 }
