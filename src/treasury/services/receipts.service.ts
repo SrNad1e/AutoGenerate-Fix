@@ -1,3 +1,4 @@
+import { AuthorizationDian } from './../../sales/entities/authorization.entity';
 import {
 	BadRequestException,
 	Injectable,
@@ -23,6 +24,7 @@ import { CreditHistoryService } from 'src/credits/services/credit-history.servic
 import { Order, StatusOrder } from 'src/sales/entities/order.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
+import { ReceiptNumber } from '../entities/receipt-number.entity';
 
 const populate = [
 	{
@@ -36,6 +38,8 @@ export class ReceiptsService {
 	constructor(
 		@InjectModel(Receipt.name)
 		private readonly receiptModel: PaginateModel<Receipt>,
+		@InjectModel(ReceiptNumber.name)
+		private readonly receiptNumberModel: PaginateModel<ReceiptNumber>,
 		@InjectModel(PointOfSale.name)
 		private readonly PointOfSaleModel: PaginateModel<PointOfSale>,
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
@@ -143,7 +147,12 @@ export class ReceiptsService {
 		let pointOfSale;
 
 		if (pointOfSaleId) {
-			pointOfSale = await this.PointOfSaleModel.findById(pointOfSaleId);
+			pointOfSale = await this.PointOfSaleModel.findById(
+				pointOfSaleId,
+			).populate({
+				path: 'authorization',
+				model: AuthorizationDian.name,
+			});
 			if (!pointOfSale) {
 				throw new NotFoundException('El punto de venta no existe');
 			}
@@ -166,16 +175,16 @@ export class ReceiptsService {
 			}
 		}
 
-		const receipt = await this.receiptModel
-			.findOne({ category: new Types.ObjectId(companyId) })
-			.sort({ _id: -1 });
-
-		const number = (receipt?.number || 0) + 1;
+		const number = await this.getReceiptNumber(
+			pointOfSale?.authorization?.prefix,
+			companyId,
+		);
 
 		const newReceipt = new this.receiptModel({
 			number,
 			value,
 			concept,
+			prefix: pointOfSale?.authorization?.prefix,
 			box: box?._id,
 			isCredit,
 			payment: payment,
@@ -188,6 +197,11 @@ export class ReceiptsService {
 				_id: user._id,
 			},
 		});
+
+		await this.updateReceiptNumber(
+			pointOfSale?.authorization?.prefix,
+			companyId,
+		);
 
 		if (payment?.type === TypePayment.CASH) {
 			await this.boxHistoryService.addCash(
@@ -331,6 +345,57 @@ export class ReceiptsService {
 				},
 			},
 		});
+	}
+
+	async getReceiptNumber(prefix: string, companyId: string) {
+		const receiptNumber = await this.receiptNumberModel.findOne({
+			prefix,
+			company: new Types.ObjectId(companyId),
+		});
+
+		if (!receiptNumber) {
+			throw new NotFoundException(
+				'El prefijo del recibo no existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		return receiptNumber?.lastNumber + 1;
+	}
+
+	async createReceiptNumber(prefix: string, companyId: string) {
+		const receiptNumber = await this.receiptNumberModel.findOne({
+			prefix,
+			company: new Types.ObjectId(companyId),
+		});
+
+		if (receiptNumber) {
+			throw new BadRequestException(
+				'El prefijo del recibo ya existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		return this.receiptNumberModel.create({
+			prefix,
+			lastNumber: 0,
+			company: new Types.ObjectId(companyId),
+		});
+	}
+
+	async updateReceiptNumber(prefix: string, companyId: string) {
+		const receiptNumber = await this.receiptNumberModel.findOne({
+			prefix,
+			company: new Types.ObjectId(companyId),
+		});
+
+		if (!receiptNumber) {
+			throw new NotFoundException(
+				'El prefijo del recibo no existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		receiptNumber.lastNumber += 1;
+
+		return receiptNumber.save();
 	}
 
 	/**
