@@ -61,6 +61,7 @@ import {
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
+import { PointOfSalesService } from './point-of-sales.service';
 import { StatusWebHistoriesService } from './status-web-histories.service';
 
 const populate = [
@@ -78,8 +79,6 @@ const populate = [
 export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
-		@InjectModel(ReturnOrder.name)
-		private readonly returnModel: PaginateModel<ReturnOrder>,
 		private readonly customersService: CustomersService,
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
@@ -93,6 +92,7 @@ export class OrdersService {
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
+		private readonly pointofSalesService: PointOfSalesService,
 	) {}
 
 	async findAll(
@@ -2225,7 +2225,7 @@ export class OrdersService {
 	async getPaymentsOrder({
 		dateFinal,
 		dateInitial,
-		shopId,
+		pointOfSaleId,
 	}: DataGetPaymentsOrderInput) {
 		const finalDate = dayjs(dateFinal).format('YYYY/MM/DD');
 		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
@@ -2236,10 +2236,10 @@ export class OrdersService {
 			);
 		}
 
-		let shop;
+		let pointOfSale;
 
-		if (shopId) {
-			shop = await this.shopsService.findById(shopId);
+		if (pointOfSaleId) {
+			pointOfSale = await this.pointofSalesService.findById(pointOfSaleId);
 		}
 
 		const aggreagtePayments = [
@@ -2252,7 +2252,7 @@ export class OrdersService {
 						$gte: new Date(initialDate),
 						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
-					'shop._id': shop?._id,
+					pointOfSale: pointOfSale?._id,
 					status: StatusOrder.CLOSED,
 				},
 			},
