@@ -12,6 +12,7 @@ import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
 import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
+import { ClosesZinvoicingService } from './closes-zinvoicing.service';
 
 const populate = [
 	{
@@ -26,6 +27,7 @@ export class AuthorizationsService {
 		@InjectModel(AuthorizationDian.name)
 		private readonly authorizationModel: PaginateModel<AuthorizationDian>,
 		private readonly shopsService: ShopsService,
+		private readonly closeZService: ClosesZinvoicingService,
 	) {}
 
 	async findAll(
@@ -65,7 +67,7 @@ export class AuthorizationsService {
 	}
 
 	async create(
-		{ shopId, ...params }: CreateAuthorizationInput,
+		{ shopId, prefix, ...params }: CreateAuthorizationInput,
 		user: User,
 		companyId: string,
 	) {
@@ -75,8 +77,11 @@ export class AuthorizationsService {
 			throw new BadRequestException('La tienda no existe');
 		}
 
+		await this.closeZService.createCloseZNumber(prefix, companyId);
+
 		return this.authorizationModel.create({
 			...params,
+			prefix,
 			shop: shop._id,
 			user: {
 				username: user.username,

@@ -202,16 +202,10 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-		const closeZ = await this.closeZInvoicingModel
-			.findOne({
-				company: new Types.ObjectId(companyId),
-			})
-			.sort({
-				_id: -1,
-			})
-			.lean();
-
-		const number = (closeZ?.number || 0) + 1;
+		const number = await this.getCloseZNumber(
+			pointOfSale?.authorization['prefix'],
+			companyId,
+		);
 
 		const payments = await this.receiptsService.getPaymentsNoCredit(
 			dateInitial,
@@ -339,6 +333,11 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		await this.updateCloseZNumber(
+			pointOfSale?.authorization['prefix'],
+			companyId,
+		);
+
 		return {
 			...response['_doc'],
 			pointOfSale: {
@@ -348,7 +347,7 @@ export class ClosesZinvoicingService {
 		};
 	}
 
-	async getCloseZNumber(companyId: string, prefix: string) {
+	async getCloseZNumber(prefix: string, companyId: string) {
 		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
 			company: new Types.ObjectId(companyId),
 			prefix,
