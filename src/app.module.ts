@@ -19,9 +19,11 @@ import { ConfigurationsModule } from './configurations/configurations.module';
 import { CreditsModule } from './credits/credits.module';
 import { SendMailModule } from './send-mail/send-mail.module';
 import { ReportsModule } from './reports/reports.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
 	imports: [
+		ScheduleModule.forRoot(),
 		GraphQLModule.forRoot({
 			autoSchemaFile: 'src/schema.gql',
 			sortSchema: true,
