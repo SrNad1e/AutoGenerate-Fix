@@ -39,6 +39,8 @@ export class InvoicesService {
 			dateFinal,
 			dateInitial,
 			pointOfSaleId,
+			paymentIds,
+			shopId,
 		}: FiltersInvoicesInput,
 		user: User,
 		companyId: string,
@@ -79,6 +81,15 @@ export class InvoicesService {
 			if (pointOfSale) {
 				filters['authorization._id'] = pointOfSale?.authorization?._id;
 			}
+		}
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
+		}
+
+		if (paymentIds) {
+			const ids = paymentIds.map((id) => new Types.ObjectId(id));
+			filters['payments.payment._id'] = { $in: ids };
 		}
 
 		const options = {

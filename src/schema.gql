@@ -1455,9 +1455,6 @@ type CreditHistory {
 
 """Cliente"""
 type Customer {
-  """Fecha de mayorista"""
-  WolesalerDate: DateTime
-
   """Identificador de mongo"""
   _id: String!
 
@@ -1488,6 +1485,9 @@ type Customer {
   """Nombres del cliente"""
   firstName: String!
 
+  """Primera compra del cliente"""
+  firstPurchase: Boolean!
+
   """Cliente por defecto"""
   isDefault: Boolean!
 
@@ -1505,6 +1505,9 @@ type Customer {
 
   """Usuario que creó o editó el cliente"""
   user: User!
+
+  """Fecha de mayorista"""
+  wolesalerDate: DateTime
 }
 
 """Ventas de tipos de clientes"""
@@ -2579,8 +2582,14 @@ input FiltersInvoicesInput {
   """Desde donde arranca la página"""
   page: Float
 
+  """Identificador de los medios de pago"""
+  paymentIds: [String!]
+
   """Identificador del punto de venta"""
   pointOfSaleId: String
+
+  """Identificador de la tienda"""
+  shopId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
