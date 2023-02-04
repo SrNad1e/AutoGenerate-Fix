@@ -209,7 +209,7 @@ export class ReceiptsService {
 				const { orderId, amount } = details[i];
 
 				creditHistory = await this.creditHistoryService.deleteCreditHistory(
-					receipt.number,
+					number,
 					TypeDocument.RECEIPT,
 					orderId,
 					amount,
