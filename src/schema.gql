@@ -3244,18 +3244,6 @@ type LoginResponse {
   user: User!
 }
 
-"""Datos para hacer login"""
-input LoginUserInput {
-  """Identificador de la compañía"""
-  companyId: String!
-
-  """Contraseña de usuario"""
-  password: String!
-
-  """Usuario registrado"""
-  username: String!
-}
-
 type Mutation {
   """Se encarga de agregar medios de pago"""
   addPaymentsOrder(
@@ -3508,10 +3496,7 @@ type Mutation {
   ): ResponseInvoicing!
 
   """Se encarga de realizar el ingreso al sistema por el usuario"""
-  login(
-    """Datos de usuario para realizar el login"""
-    loginUserInput: LoginUserInput!
-  ): LoginResponse!
+  login: LoginResponse!
 
   """Se encarga de enviar correo de recuperación de contraseña"""
   recoveryPassword(

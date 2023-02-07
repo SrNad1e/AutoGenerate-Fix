@@ -15,13 +15,7 @@ export class AuthResolver {
 		description: 'Se encarga de realizar el ingreso al sistema por el usuario',
 	})
 	@UseGuards(GqlAuthGuard)
-	async login(
-		@Args('loginUserInput', {
-			description: 'Datos de usuario para realizar el login',
-		})
-		_: LoginUserInput,
-		@Context() context,
-	): Promise<LoginResponse> {
+	async login(@Context() context): Promise<LoginResponse> {
 		return this.authService.login(context.user);
 	}
 
