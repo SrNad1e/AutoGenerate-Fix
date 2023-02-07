@@ -3267,9 +3267,6 @@ type LoginResponse {
 
 """Datos para hacer login"""
 input LoginUserInput {
-  """Identificador de la compañía"""
-  companyId: String!
-
   """Contraseña de usuario"""
   password: String!
 
@@ -7980,8 +7977,8 @@ type User {
   """Identificador de mongo"""
   _id: String!
 
-  """Empresas a la que pertenece el usuario"""
-  companies: [Company!]!
+  """Compañía de acceso para el usuario"""
+  company: Company!
 
   """Nombre de usuario"""
   createdAt: DateTime!

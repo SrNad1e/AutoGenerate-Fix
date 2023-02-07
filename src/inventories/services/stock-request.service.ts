@@ -259,9 +259,7 @@ export class StockRequestService {
 			warehouseDestination,
 			details: detailsRequest,
 			status: StatusStockRequest[status],
-			company: user.companies.find(
-				(company) => company._id.toString() === companyId,
-			),
+			company: user.company,
 			number: (stockRequest?.number || 0) + 1,
 			user: {
 				username: user.username,

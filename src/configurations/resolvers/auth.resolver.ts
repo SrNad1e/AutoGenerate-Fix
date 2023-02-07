@@ -22,10 +22,7 @@ export class AuthResolver {
 		_: LoginUserInput,
 		@Context() context,
 	): Promise<LoginResponse> {
-		return this.authService.login(
-			context.user,
-			context.req.body.variables.input,
-		);
+		return this.authService.login(context.user);
 	}
 
 	@Mutation(() => LoginResponse, {
