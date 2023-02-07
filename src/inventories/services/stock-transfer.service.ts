@@ -274,9 +274,7 @@ export class StockTransferService {
 				name: user.name,
 				_id: user._id,
 			},
-			company: user.companies.find(
-				(company) => company._id.toString() === companyId,
-			),
+			company: user.company,
 			number: (stockTransfer?.number || 0) + 1,
 			requests,
 			user: {

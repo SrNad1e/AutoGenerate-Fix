@@ -224,9 +224,7 @@ export class StockOutputService {
 				_id: user._id,
 			},
 			status: StatusStockOutput[status],
-			company: user.companies.find(
-				(company) => company._id.toString() === companyId,
-			),
+			company: user.company,
 			number: (stockOutput?.number || 0) + 1,
 		});
 
