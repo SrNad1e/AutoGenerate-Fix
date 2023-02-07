@@ -39,11 +39,11 @@ export class AuthService {
 	): Promise<LoginResponse> {
 		const companies = user.companies?.map((company) => company._id.toString());
 
-		if (user.username !== 'admin' && !companies.includes(companyId)) {
+		/*	if (user.username !== 'admin' && !companies.includes(companyId)) {
 			throw new UnauthorizedException(
 				`El usuario no tiene acceso a la compañia`,
 			);
-		}
+		}*/
 
 		if (user.status === StatusUser.INACTIVE) {
 			throw new UnauthorizedException(`El usuario se encuentra inactivo`);
