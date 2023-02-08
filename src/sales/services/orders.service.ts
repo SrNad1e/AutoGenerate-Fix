@@ -12,7 +12,10 @@ import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { ConveyorsService } from 'src/configurations/services/conveyors.service';
 import { ShopsService } from 'src/configurations/services/shops.service';
-import { TypeCreditHistory } from 'src/credits/entities/credit-history.entity';
+import {
+	TypeCreditHistory,
+	TypeDocument,
+} from 'src/credits/entities/credit-history.entity';
 import { StatusCredit } from 'src/credits/entities/credit.entity';
 import { CreditHistoryService } from 'src/credits/services/credit-history.service';
 import { CreditsService } from 'src/credits/services/credits.service';
@@ -628,7 +631,7 @@ export class OrdersService {
 
 					if (credit) {
 						await this.creditHistoryService.thawedCreditHistory(
-							order?._id?.toString(),
+							order?.number,
 							credit.total,
 							user,
 							companyId,
@@ -1456,28 +1459,28 @@ export class OrdersService {
 
 		if (creditUpdate) {
 			await this.creditHistoryService.thawedCreditHistory(
-				orderId,
+				order.number,
 				creditOrder.total,
 				user,
 				order.company._id.toString(),
 			);
 
 			await this.creditHistoryService.frozenCreditHistory(
-				orderId,
+				order.number,
 				creditUpdate.total,
 				user,
 				order.company._id.toString(),
 			);
 		} else if (creditNew) {
 			await this.creditHistoryService.frozenCreditHistory(
-				orderId,
+				order.number,
 				creditNew.total,
 				user,
 				order.company._id.toString(),
 			);
 		} else if (creditDelete) {
 			await this.creditHistoryService.thawedCreditHistory(
-				orderId,
+				order.number,
 				creditOrder.total,
 				user,
 				order.company._id.toString(),
@@ -2393,12 +2396,14 @@ export class OrdersService {
 				case TypePayment.CREDIT:
 					if (statusPayment === StatusOrderDetail.CONFIRMED) {
 						await this.creditHistoryService.thawedCreditHistory(
-							order?._id?.toString(),
+							order.number,
 							total,
 							user,
 							companyId,
 						);
 						await this.creditHistoryService.addCreditHistory(
+							order.number,
+							TypeDocument.ORDER,
 							order?._id?.toString(),
 							total,
 							user,
@@ -2413,6 +2418,8 @@ export class OrdersService {
 
 					if (statusPayment === StatusOrderDetail.NEW) {
 						await this.creditHistoryService.deleteCreditHistory(
+							order.number,
+							TypeDocument.ORDER,
 							order?._id?.toString(),
 							total,
 							user,
@@ -2420,7 +2427,7 @@ export class OrdersService {
 						);
 
 						await this.creditHistoryService.frozenCreditHistory(
-							order?._id?.toString(),
+							order.number,
 							total,
 							user,
 							companyId,

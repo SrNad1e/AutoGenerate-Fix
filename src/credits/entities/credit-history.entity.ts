@@ -3,7 +3,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
-import { Order } from 'src/sales/entities/order.entity';
 import { Credit } from './credit.entity';
 
 export enum TypeCreditHistory {
@@ -14,6 +13,13 @@ export enum TypeCreditHistory {
 }
 
 registerEnumType(TypeCreditHistory, { name: 'TypeCreditHistory' });
+
+export enum TypeDocument {
+	ORDER = 'order',
+	RECEIPT = 'receipt',
+}
+
+registerEnumType(TypeDocument, { name: 'TypeDocument' });
 
 @Schema({ timestamps: true })
 @ObjectType({ description: 'Crédito del cliente' })
@@ -27,9 +33,19 @@ export class CreditHistory extends Document {
 	@Prop({ type: String, required: true })
 	type: TypeCreditHistory;
 
-	@Field(() => Order, { description: 'Pedido que gestiona el crédito' })
-	@Prop({ type: Types.ObjectId, ref: Order.name })
-	order: Types.ObjectId;
+	@Field(() => Number, {
+		description: 'Número del documento que relaiza el proceso del pedido',
+		nullable: true,
+	})
+	@Prop({ type: Number })
+	documentNumber?: number;
+
+	@Field(() => TypeDocument, {
+		description: 'Tipo de documento que genera el movimiento',
+		nullable: true,
+	})
+	@Prop({ type: String })
+	documentType?: TypeDocument;
 
 	@Field(() => Number, { description: 'Valor del movimiento' })
 	@Prop({ type: Number })
