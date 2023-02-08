@@ -31,7 +31,7 @@ const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
-	{ path: 'company', model: Company.name },
+	{ path: 'companies', model: Company.name },
 	{
 		path: 'customer',
 		populate: [
@@ -136,7 +136,7 @@ export class UsersService {
 		}
 
 		if (user?.company) {
-			filters.company = user.company._id;
+			filters.company = new Types.ObjectId(user.company);
 		}
 
 		const options: PaginateOptions = {
@@ -297,6 +297,7 @@ export class UsersService {
 			roleId,
 			shopId,
 			username,
+			companyId,
 		}: UpdateUserInput,
 		userUpdate: User,
 		idCompany: string,
@@ -372,6 +373,15 @@ export class UsersService {
 			}
 		}
 
+		let company;
+		if (companyId) {
+			company = this.companiesService.findById(companyId);
+
+			if (!company) {
+				throw new NotFoundException('La empresa no existe');
+			}
+		}
+
 		return this.userModel
 			.findByIdAndUpdate(
 				id,
@@ -384,6 +394,7 @@ export class UsersService {
 						customer: customer?._id,
 						pointOfSale: pointOfSale?._id,
 						role: role?._id,
+						company: company?._id,
 						username,
 						user: {
 							username: userUpdate.username,
