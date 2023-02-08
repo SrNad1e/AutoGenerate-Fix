@@ -8,6 +8,7 @@ import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
 import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
@@ -26,6 +27,7 @@ export class AuthorizationsService {
 		@InjectModel(AuthorizationDian.name)
 		private readonly authorizationModel: PaginateModel<AuthorizationDian>,
 		private readonly shopsService: ShopsService,
+		private readonly receiptsService: ReceiptsService,
 	) {}
 
 	async findAll(
@@ -65,7 +67,7 @@ export class AuthorizationsService {
 	}
 
 	async create(
-		{ shopId, ...params }: CreateAuthorizationInput,
+		{ shopId, prefix, ...params }: CreateAuthorizationInput,
 		user: User,
 		companyId: string,
 	) {
@@ -75,8 +77,11 @@ export class AuthorizationsService {
 			throw new BadRequestException('La tienda no existe');
 		}
 
+		await this.receiptsService.createReceiptNumber(prefix, companyId);
+
 		return this.authorizationModel.create({
 			...params,
+			prefix,
 			shop: shop._id,
 			user: {
 				username: user.username,

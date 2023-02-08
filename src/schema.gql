@@ -4670,6 +4670,9 @@ type Receipt {
   """Punto de venta que genera el recibo"""
   pointOfSale: Box!
 
+  """Prefijo recibo de caja"""
+  prefix: String!
+
   """Estado del recibo de caja"""
   status: StatusReceipt!
 
