@@ -7,7 +7,4 @@ export class LoginUserInput {
 
 	@Field({ description: 'Contraseña de usuario' })
 	password: string;
-
-	@Field({ description: 'Identificador de la compañía' })
-	companyId: string;
 }
