@@ -188,6 +188,7 @@ export class UsersService {
 			customerId,
 			password,
 			status,
+			companyId,
 			...params
 		}: CreateUserInput,
 		userCreate: User,
@@ -215,7 +216,9 @@ export class UsersService {
 			throw new NotFoundException('La tienda no se encuentra registrada');
 		}
 
-		const company = await this.companiesService.findById(idCompany);
+		const company = await this.companiesService.findById(
+			companyId || idCompany,
+		);
 
 		if (!company) {
 			throw new NotFoundException('La empresa no se encuentra registrada');
@@ -268,7 +271,7 @@ export class UsersService {
 			shop: shop?._id,
 			customer: customer?._id,
 			pointOfSale: pointOfSale?._id,
-			companies: [company?._id],
+			company: company?._id,
 			status: StatusUser[status],
 			...params,
 			user: {
