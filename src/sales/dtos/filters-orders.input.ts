@@ -29,13 +29,13 @@ export class FiltersOrdersInput {
 		description: 'Ordenamiento (1 es ascendente, -1 es descendente)',
 		nullable: true,
 	})
-	sort: SortOrder;
+	sort?: SortOrder;
 
 	@Field(() => Number, {
 		description: 'Número consecutivo del pedido',
 		nullable: true,
 	})
-	number: number;
+	number?: number;
 
 	@Field(() => String, {
 		description: 'Identificador del cliente',
@@ -53,13 +53,13 @@ export class FiltersOrdersInput {
 		description: 'Fecha inicial para la busqueda',
 		nullable: true,
 	})
-	dateInitial: string;
+	dateInitial?: string;
 
 	@Field(() => String, {
 		description: 'Fecha final para la busqueda',
 		nullable: true,
 	})
-	dateFinal: string;
+	dateFinal?: string;
 
 	@Field(() => StatusOrder, {
 		description: 'Estado del pedido',
