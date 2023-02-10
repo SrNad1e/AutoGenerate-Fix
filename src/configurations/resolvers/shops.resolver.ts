@@ -4,6 +4,7 @@ import {
 	Permissions,
 	RequirePermissions,
 } from 'src/configurations/libs/permissions.decorator';
+import { AddGoalHistoryInput } from '../dtos/add-goalHistory-shop.input';
 import { CreateShopInput } from '../dtos/create-shop.input';
 import { FiltersShopsInput } from '../dtos/filters-shops.input';
 import { ResponseShops } from '../dtos/response-shops';
@@ -64,6 +65,22 @@ export class ShopsResolver {
 			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
+		);
+	}
+
+	@Mutation(() => Shop, {
+		name: 'addGoalHistory',
+		description: 'Se encarga de agregar un historico de meta a una tienda',
+	})
+	addGoalHistory(
+		@Args('AddGoalHistoryInput', {
+			description: 'Historicos de meta que se van agregar',
+		})
+		_: AddGoalHistoryInput,
+		@Context() context,
+	) {
+		return  this.shopsService.addGoalHistory(
+			context.req.body.variables.input,
 		);
 	}
 

@@ -3,6 +3,8 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
+	forwardRef
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -83,6 +85,7 @@ export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
 		private readonly customersService: CustomersService,
+		@Inject(forwardRef(() => ShopsService))
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
@@ -96,7 +99,7 @@ export class OrdersService {
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
 		private readonly pointofSalesService: PointOfSalesService,
-	) {}
+	) { }
 
 	async findAll(
 		{
@@ -199,7 +202,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: order?.customer?._id.toString(),
 			});
-		} catch {}
+		} catch { }
 
 		return {
 			order,
@@ -303,7 +306,7 @@ export class OrdersService {
 				credit = await this.creditsService.findOne({
 					customerId: oldOrder?.customer?._id?.toString(),
 				});
-			} catch {}
+			} catch { }
 
 			return {
 				credit,
@@ -1408,7 +1411,7 @@ export class OrdersService {
 						credit = await this.creditsService.findOne({
 							customerId: order?.customer?._id.toString(),
 						});
-					} catch {}
+					} catch { }
 					if (credit?.status !== StatusCredit.ACTIVE) {
 						throw new BadRequestException(
 							'El crédito del cliente se encuentra suspendido',
@@ -1615,7 +1618,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?._id.toString(),
 			});
-		} catch {}
+		} catch { }
 
 		return {
 			credit,

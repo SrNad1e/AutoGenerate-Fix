@@ -2,7 +2,7 @@ import {
 	CloseZInvoicingNumber,
 	CloseZInvoicingNumberSchema,
 } from './entities/close-z-invoicing-number.entity';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CrmModule } from 'src/crm/crm.module';
 
@@ -52,11 +52,11 @@ import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 
 @Module({
 	imports: [
-		InventoriesModule,
+		forwardRef(() => InventoriesModule),
 		CrmModule,
-		ProductsModule,
+		forwardRef(() => ProductsModule),
 		TreasuryModule,
-		ConfigurationsModule,
+		forwardRef(() => ConfigurationsModule),
 		CreditsModule,
 		MongooseModule.forFeatureAsync([
 			{
