@@ -31,7 +31,7 @@ const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
-	{ path: 'companies', model: Company.name },
+	{ path: 'company', model: Company.name },
 	{
 		path: 'customer',
 		populate: [
@@ -136,7 +136,7 @@ export class UsersService {
 		}
 
 		if (user?.company) {
-			filters.company = new Types.ObjectId(user.company);
+			filters.company = user.company._id;
 		}
 
 		const options: PaginateOptions = {
