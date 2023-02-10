@@ -1,3 +1,7 @@
+import {
+	CloseZInvoicingNumber,
+	CloseZInvoicingNumberSchema,
+} from './entities/close-z-invoicing-number.entity';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CrmModule } from 'src/crm/crm.module';
@@ -91,7 +95,7 @@ import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 				name: CloseZInvoicing.name,
 				useFactory: async () => {
 					const schema = CloseZInvoicingSchema;
-					schema.index({ number: 1, company: -1 }, { unique: true });
+					schema.index({ number: 1, company: 1, prefix: 1 }, { unique: true });
 					return schema;
 				},
 			},
@@ -100,6 +104,14 @@ import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 				useFactory: async () => {
 					const schema = DailyClosingSchema;
 					schema.index({ pointOfSale: 1, closeDate: -1 }, { unique: true });
+					return schema;
+				},
+			},
+			{
+				name: CloseZInvoicingNumber.name,
+				useFactory: async () => {
+					const schema = CloseZInvoicingNumberSchema;
+					schema.index({ company: 1, prefix: -1 }, { unique: true });
 					return schema;
 				},
 			},

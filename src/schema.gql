@@ -571,6 +571,9 @@ type CloseZInvoicing {
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
 
+  """Prefijo del número"""
+  prefix: String!
+
   """Transacciones reportadas por el usuario"""
   quantityBank: Float!
 
