@@ -268,7 +268,7 @@ export class UsersService {
 			shop: shop?._id,
 			customer: customer?._id,
 			pointOfSale: pointOfSale?._id,
-			companies: [company?._id],
+			company: company?._id,
 			status: StatusUser[status],
 			...params,
 			user: {
