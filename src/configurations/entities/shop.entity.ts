@@ -13,11 +13,33 @@ export enum StatusShop {
 
 registerEnumType(StatusShop, { name: 'StatusShop' });
 
+@ObjectType({description: 'Historial de metas de la tienda'})
+export class GoalHistory {
+    @Field(() => Date, { description: 'Fecha del registro' })
+	@Prop({ type: Date, required: true })
+	date: Date;
+
+	@Field(() => Number, { description: 'Meta de la tienda' })
+	@Prop({ type: Number })
+	goal: number;
+
+    @Field(() => Number, { description: 'Meta alcanzada por la tienda' })
+	@Prop({ type: Number })
+	goalAchieved: number;
+}
+
 @Schema({ timestamps: true })
 @ObjectType()
 export class Shop extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
+
+	@Field(() => [GoalHistory], {
+		description: 'Historico de metas de la tienda',
+		nullable: true,
+	})
+	@Prop({ type: Array, default: [] })
+	goalHistory: GoalHistory[];
 
 	@Field(() => String, { description: 'Nombre de la tienda' })
 	@Prop({ type: String, required: true, unique: true })

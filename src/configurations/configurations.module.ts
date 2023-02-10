@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
@@ -49,9 +49,11 @@ import { TokensService } from './services/tokens.service';
 import { InterapidisimoService } from './services/interapidisimo.service';
 import { FedexService } from './services/fedex.service';
 import { Product, ProductSchema } from 'src/products/entities/product.entity';
+import { SalesModule } from 'src/sales/sales.module';
 
 @Module({
 	imports: [
+		forwardRef(() => SalesModule),
 		PassportModule,
 		CrmModule,
 		SendMailModule,
@@ -165,4 +167,4 @@ import { Product, ProductSchema } from 'src/products/entities/product.entity';
 		WarehousesService,
 	],
 })
-export class ConfigurationsModule {}
+export class ConfigurationsModule { }
