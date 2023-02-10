@@ -61,7 +61,7 @@ export class StockRequestService {
 		private readonly warehousesService: WarehousesService,
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
-	) {}
+	) { }
 
 	async findAll(
 		{
@@ -288,7 +288,7 @@ export class StockRequestService {
 				(user.username !== 'admin' &&
 					stockRequest.company._id.toString() !== companyId) ||
 				user.shop['defaultWarehouse']['_id'].toString() !==
-					stockRequest.warehouseDestination._id.toString()
+				stockRequest.warehouseDestination._id.toString()
 			) {
 				throw new UnauthorizedException(
 					`El usuario no se encuentra autorizado para hacer cambios en la solicitud`,
@@ -525,7 +525,7 @@ export class StockRequestService {
 			status: StatusProduct.ACTIVE,
 		});
 
-		const productsRequest = products
+		const productsWarehouse = products
 			.map((product) => {
 				const stock = product.stock.find(
 					(item) => item.warehouse.toString() === warehouse._id.toString(),
@@ -533,7 +533,8 @@ export class StockRequestService {
 
 				return { ...product, stock };
 			})
-			.filter((product) => product?.stock?.quantity < warehouse?.min);
+
+		const productsRequest = productsWarehouse.filter((product) => product?.stock?.quantity < warehouse?.min);
 
 		const details = [];
 
