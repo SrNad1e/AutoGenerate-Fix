@@ -108,7 +108,7 @@ export class ProductsService {
 		private readonly sizesService: SizesService,
 		private readonly referencesService: ReferencesService,
 		private readonly warehousesService: WarehousesService,
-	) {}
+	) { }
 
 	async findAll(
 		{
@@ -582,11 +582,9 @@ export class ProductsService {
 				product?.stock[0]?.quantity < quantity
 			) {
 				throw new BadRequestException({
-					message: `El producto ${product?.reference['name']}/${
-						product?.barcode
-					} no tiene suficientes unidades, stock: ${
-						product?.stock[0]?.quantity || 0
-					}`,
+					message: `El producto ${product?.reference['name']}/${product?.barcode
+						} no tiene suficientes unidades, stock: ${product?.stock[0]?.quantity || 0
+						}`,
 					data: product,
 				});
 			}
@@ -620,8 +618,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (StatusProduct[status]) {
-			filters.status = StatusProduct[status];
+		if (status) {
+			filters.status = status;
 		}
 
 		const response = await this.referencesService.getReferences({ name });

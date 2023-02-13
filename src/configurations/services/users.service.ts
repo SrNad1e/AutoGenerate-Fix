@@ -188,6 +188,7 @@ export class UsersService {
 			customerId,
 			password,
 			status,
+			companyId,
 			...params
 		}: CreateUserInput,
 		userCreate: User,
@@ -215,7 +216,9 @@ export class UsersService {
 			throw new NotFoundException('La tienda no se encuentra registrada');
 		}
 
-		const company = await this.companiesService.findById(idCompany);
+		const company = await this.companiesService.findById(
+			companyId || idCompany,
+		);
 
 		if (!company) {
 			throw new NotFoundException('La empresa no se encuentra registrada');
@@ -294,6 +297,7 @@ export class UsersService {
 			roleId,
 			shopId,
 			username,
+			companyId,
 		}: UpdateUserInput,
 		userUpdate: User,
 		idCompany: string,
@@ -369,6 +373,15 @@ export class UsersService {
 			}
 		}
 
+		let company;
+		if (companyId) {
+			company = this.companiesService.findById(companyId);
+
+			if (!company) {
+				throw new NotFoundException('La empresa no existe');
+			}
+		}
+
 		return this.userModel
 			.findByIdAndUpdate(
 				id,
@@ -381,6 +394,7 @@ export class UsersService {
 						customer: customer?._id,
 						pointOfSale: pointOfSale?._id,
 						role: role?._id,
+						company: company?._id,
 						username,
 						user: {
 							username: userUpdate.username,
