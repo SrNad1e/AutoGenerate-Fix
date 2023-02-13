@@ -226,6 +226,8 @@ export class InvoicesService {
 			},
 		]);
 
+		console.log(totalOrdersDay);
+
 		//calcular valor correspondiente al día dependiendo del peso
 		const totalSales = totalOrdersDay.reduce(
 			(sum, item) => sum + item.total,
@@ -288,11 +290,13 @@ export class InvoicesService {
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, cashTotal } = totalOrdersDay[i];
 
-			const dI = dayjs(initialDate).add(i, 'd').format('YYYY/MM/DD');
+			const di = dayjs(initialDate)
+				.startOf('month')
+				.add(day - 1, 'd');
 
-			const dF = dayjs(dateInitial)
-				.add(i + 1, 'd')
-				.format('YYYY/MM/DD');
+			const dI = di.format('YYYY/MM/DD');
+
+			const dF = di.add(1, 'd').format('YYYY/MM/DD');
 
 			const orders = await this.orderModel.aggregate([
 				{
