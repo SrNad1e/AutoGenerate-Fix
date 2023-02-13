@@ -1,5 +1,5 @@
-import { TypeDocument } from './../../credits/entities/credit-history.entity';
 import { AuthorizationDian } from './../../sales/entities/authorization.entity';
+import { TypeDocument } from './../../credits/entities/credit-history.entity';
 import {
 	BadRequestException,
 	Injectable,

@@ -104,7 +104,9 @@ export class ClosesZinvoicingService {
 
 		if (shopId) {
 			const pointOfSales = await this.pointOfSalesService.findAll(
-				{ shopId },
+				{
+					shopId,
+				},
 				user,
 				companyId,
 			);
@@ -114,7 +116,9 @@ export class ClosesZinvoicingService {
 					(pointOfSale) => new Types.ObjectId(pointOfSale._id),
 				);
 
-				filters.pointOfSale = { $in: ids };
+				filters.pointOfSale = {
+					$in: ids,
+				};
 			} else {
 				filters.pointOfSale = '';
 			}
@@ -156,11 +160,33 @@ export class ClosesZinvoicingService {
 			);
 		}
 
-		/*if (pointOfSale.closing) {
+		// validar si hay movimientos del dia despues al dia del cierre
+
+		const orders = await this.ordersService.findAll(
+			{
+				dateInitial: dayjs(pointOfSale?.closeDate)
+					.add(1, 'd')
+					.format('YYYY/MM/DD'),
+				dateFinal: dayjs(pointOfSale?.closeDate)
+					.add(1, 'd')
+					.format('YYYY/MM/DD'),
+				shopId: pointOfSale?.shop?._id.toString(),
+				limit: 1,
+				page: 1,
+			},
+			user,
+			companyId,
+		);
+
+		if (orders.totalDocs > 0) {
 			throw new NotFoundException(
-				'El punto de venta se encuentra en proceso de cierre, espere unos minutos y revise el listado',
+				`El punto de venta tiene movimientos el día ${dayjs(
+					pointOfSale?.closeDate,
+				)
+					.add(1, 'd')
+					.format('YYYY/MM/DD')}, cierre ese día y continue con el proceso `,
 			);
-		}*/
+		}
 
 		await this.pointOfSalesService.update(
 			pointOfSaleId,
@@ -310,7 +336,7 @@ export class ClosesZinvoicingService {
 
 			const totalBox = box.total - cash;
 
-			//se valida el cierre si hay cierres y se crea el registro de los errores
+			// se valida el cierre si hay cierres y se crea el registro de los errores
 
 			if (totalBox > 0) {
 				await this.errorsCashService.addRegister(
