@@ -412,7 +412,7 @@ export class InvoicesService {
 		await this.authorizationsService.update(
 			autorization._id.toString(),
 			{
-				lastNumber: currentNumber,
+				lastNumber: currentNumber - 1,
 				lastDateInvoicing: new Date(finalDate),
 			},
 			{ username: 'admin' } as User,
