@@ -226,8 +226,6 @@ export class InvoicesService {
 			},
 		]);
 
-		console.log(totalOrdersDay);
-
 		//calcular valor correspondiente al día dependiendo del peso
 		const totalSales = totalOrdersDay.reduce(
 			(sum, item) => sum + item.total,
@@ -286,6 +284,7 @@ export class InvoicesService {
 		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;
 		let valueInvoicingBank = 0;
+		let currentNumber = autorization.lastNumber + 1;
 
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, cashTotal } = totalOrdersDay[i];
@@ -404,21 +403,21 @@ export class InvoicesService {
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
-					autorization.lastNumber + i + 1,
+					currentNumber,
 				);
-			}
-			await this.authorizationsService.update(
-				autorization._id.toString(),
-				{
-					lastNumber:
-						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
-					lastDateInvoicing: new Date(initialDate),
-				},
-				{ username: 'admin' } as User,
-				shop.company.toString(),
-			);
-		}
 
+				currentNumber++;
+			}
+		}
+		await this.authorizationsService.update(
+			autorization._id.toString(),
+			{
+				lastNumber: currentNumber,
+				lastDateInvoicing: new Date(initialDate),
+			},
+			{ username: 'admin' } as User,
+			shop.company.toString(),
+		);
 		return {
 			invoiceQuantityCash,
 			invoiceQuantityBank,
