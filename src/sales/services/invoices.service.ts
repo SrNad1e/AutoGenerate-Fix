@@ -413,7 +413,7 @@ export class InvoicesService {
 			autorization._id.toString(),
 			{
 				lastNumber: currentNumber,
-				lastDateInvoicing: new Date(initialDate),
+				lastDateInvoicing: new Date(finalDate),
 			},
 			{ username: 'admin' } as User,
 			shop.company.toString(),
