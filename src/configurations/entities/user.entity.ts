@@ -74,15 +74,15 @@ export class User extends Document {
 	pointOfSale: Types.ObjectId;
 
 	@Prop({
-		type: [Types.ObjectId],
+		type: Types.ObjectId,
 		ref: 'Company',
 		autopopulate: true,
 		required: true,
 	})
-	@Field(() => [Company], {
-		description: 'Empresas a la que pertenece el usuario',
+	@Field(() => Company, {
+		description: 'Compañía de acceso para el usuario',
 	})
-	companies: Types.ObjectId[];
+	company: Types.ObjectId;
 
 	@Prop({ type: String, default: 'active' })
 	@Field(() => StatusUser, {

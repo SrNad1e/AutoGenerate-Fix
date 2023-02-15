@@ -33,17 +33,14 @@ export class AuthService {
 		private readonly tokensService: TokensService,
 	) {}
 
-	async login(
-		user: User,
-		{ companyId }: LoginUserInput,
-	): Promise<LoginResponse> {
-		const companies = user.companies?.map((company) => company._id.toString());
+	async login(user: User): Promise<LoginResponse> {
+		/*const companies = user.companies?.map((company) => company._id.toString());
 
-		if (user.username !== 'admin' && !companies.includes(companyId)) {
+			if (user.username !== 'admin' && !companies.includes(companyId)) {
 			throw new UnauthorizedException(
 				`El usuario no tiene acceso a la compañia`,
 			);
-		}
+		}*/
 
 		if (user.status === StatusUser.INACTIVE) {
 			throw new UnauthorizedException(`El usuario se encuentra inactivo`);
@@ -56,7 +53,7 @@ export class AuthService {
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
-				companyId,
+				companyId: user.company._id,
 				sub: user._id,
 			}),
 			user,
@@ -195,13 +192,13 @@ export class AuthService {
 				password,
 			},
 			token.user as unknown as User,
-			token.user['companies'][0]?.toString(),
+			token.user['company']?.toString(),
 		);
 
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
-				companyId: token.user['companies'][0]?.toString(),
+				companyId: token.user['company']?.toString(),
 				sub: user._id,
 			}),
 			user,

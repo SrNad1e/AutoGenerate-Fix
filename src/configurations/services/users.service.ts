@@ -31,7 +31,7 @@ const populate = [
 	{ path: 'role', model: Role.name },
 	{ path: 'shop', model: Shop.name },
 	{ path: 'pointOfSale', model: PointOfSale.name },
-	{ path: 'companies', model: Company.name },
+	{ path: 'company', model: Company.name },
 	{
 		path: 'customer',
 		populate: [
@@ -135,8 +135,8 @@ export class UsersService {
 			filters.isWeb = isWeb;
 		}
 
-		if (user?.companies) {
-			filters.company = { $in: user?.companies?.map((company) => company._id) };
+		if (user?.company) {
+			filters.company = user.company._id;
 		}
 
 		const options: PaginateOptions = {
@@ -268,7 +268,7 @@ export class UsersService {
 			shop: shop?._id,
 			customer: customer?._id,
 			pointOfSale: pointOfSale?._id,
-			companies: [company?._id],
+			company: company?._id,
 			status: StatusUser[status],
 			...params,
 			user: {
@@ -304,9 +304,10 @@ export class UsersService {
 			throw new NotFoundException(`Usuario que intenta actualizar no existe`);
 		}
 
-		const companies = user.companies.map((company) => company._id.toString());
-
-		if (userUpdate.username !== 'admin' && !companies.includes(idCompany)) {
+		if (
+			userUpdate.username !== 'admin' &&
+			user.company._id.toString() !== idCompany
+		) {
 			throw new UnauthorizedException(
 				'El usuario no puede ser modificado, consulta al administrador',
 			);

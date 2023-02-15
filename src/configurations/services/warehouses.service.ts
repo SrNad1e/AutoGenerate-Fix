@@ -6,13 +6,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
-import { CompaniesService } from 'src/configurations/services/companies.service';
 import { FiltersWarehousesInput } from '../dtos/filters-warehouses.input';
 import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { CreateWarehouseInput } from '../dtos/create-warehouse.input';
 import { UpdateWarehouseInput } from '../dtos/update-warehouse.input';
-import { ProductsService } from 'src/products/services/products.service';
 import { Product } from 'src/products/entities/product.entity';
 
 @Injectable()

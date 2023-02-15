@@ -230,9 +230,7 @@ export class StockAdjustmentService {
 				_id: user._id,
 			},
 			status: StatusStockAdjustment[status],
-			company: user.companies.find(
-				(company) => company._id.toString() === companyId,
-			),
+			company: user.company,
 			number: (stockAdjustment?.number || 0) + 1,
 			...options,
 		});
