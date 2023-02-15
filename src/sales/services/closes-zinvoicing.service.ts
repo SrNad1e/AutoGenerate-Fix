@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CloseZInvoicingNumber } from './../entities/close-z-invoicing-number.entity';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
@@ -57,6 +62,8 @@ export class ClosesZinvoicingService {
 	constructor(
 		@InjectModel(CloseZInvoicing.name)
 		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
+		@InjectModel(CloseZInvoicingNumber.name)
+		private readonly closeZInvoicingNumberModel: PaginateModel<CloseZInvoicingNumber>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly ordersService: OrdersService,
 		private readonly expensesService: ExpensesService,
@@ -97,7 +104,9 @@ export class ClosesZinvoicingService {
 
 		if (shopId) {
 			const pointOfSales = await this.pointOfSalesService.findAll(
-				{ shopId },
+				{
+					shopId,
+				},
 				user,
 				companyId,
 			);
@@ -107,7 +116,9 @@ export class ClosesZinvoicingService {
 					(pointOfSale) => new Types.ObjectId(pointOfSale._id),
 				);
 
-				filters.pointOfSale = { $in: ids };
+				filters.pointOfSale = {
+					$in: ids,
+				};
 			} else {
 				filters.pointOfSale = '';
 			}
@@ -149,11 +160,33 @@ export class ClosesZinvoicingService {
 			);
 		}
 
-		/*if (pointOfSale.closing) {
+		// validar si hay movimientos del dia despues al dia del cierre
+
+		const orders = await this.ordersService.findAll(
+			{
+				dateInitial: dayjs(pointOfSale?.closeDate)
+					.add(1, 'd')
+					.format('YYYY/MM/DD'),
+				dateFinal: dayjs(pointOfSale?.closeDate)
+					.add(1, 'd')
+					.format('YYYY/MM/DD'),
+				shopId: pointOfSale?.shop?._id.toString(),
+				limit: 1,
+				page: 1,
+			},
+			user,
+			companyId,
+		);
+
+		if (orders.totalDocs > 0) {
 			throw new NotFoundException(
-				'El punto de venta se encuentra en proceso de cierre, espere unos minutos y revise el listado',
+				`El punto de venta tiene movimientos el día ${dayjs(
+					pointOfSale?.closeDate,
+				)
+					.add(1, 'd')
+					.format('YYYY/MM/DD')}, cierre ese día y continue con el proceso `,
 			);
-		}*/
+		}
 
 		await this.pointOfSalesService.update(
 			pointOfSaleId,
@@ -195,16 +228,10 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-		const closeZ = await this.closeZInvoicingModel
-			.findOne({
-				company: new Types.ObjectId(companyId),
-			})
-			.sort({
-				_id: -1,
-			})
-			.lean();
-
-		const number = (closeZ?.number || 0) + 1;
+		const number = await this.getCloseZNumber(
+			pointOfSale?.authorization['prefix'],
+			companyId,
+		);
 
 		const payments = await this.receiptsService.getPaymentsNoCredit(
 			dateInitial,
@@ -294,7 +321,7 @@ export class ClosesZinvoicingService {
 
 			const totalBox = box.total - cash;
 
-			//se valida el cierre si hay cierres y se crea el registro de los errores
+			// se valida el cierre si hay cierres y se crea el registro de los errores
 
 			if (totalBox > 0) {
 				await this.errorsCashService.addRegister(
@@ -332,6 +359,11 @@ export class ClosesZinvoicingService {
 			);
 		}
 
+		await this.updateCloseZNumber(
+			pointOfSale?.authorization['prefix'],
+			companyId,
+		);
+
 		return {
 			...response['_doc'],
 			pointOfSale: {
@@ -339,5 +371,55 @@ export class ClosesZinvoicingService {
 				authorization: response?.pointOfSale['authorization']._doc,
 			},
 		};
+	}
+
+	async getCloseZNumber(prefix: string, companyId: string) {
+		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+
+		if (!closeZNumber) {
+			throw new BadRequestException(
+				'El prefijo del recibo no existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		return closeZNumber.lastNumber + 1;
+	}
+
+	async createCloseZNumber(prefix: string, companyId: string) {
+		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+
+		if (closeZNumber) {
+			throw new BadRequestException(
+				'Ya existe una numeración de cierre Z con el mismo prefijo',
+			);
+		}
+
+		return this.closeZInvoicingNumberModel.create({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+	}
+
+	async updateCloseZNumber(prefix: string, companyId: string) {
+		const closeZNumber = await this.closeZInvoicingNumberModel.findOne({
+			company: new Types.ObjectId(companyId),
+			prefix,
+		});
+
+		if (!closeZNumber) {
+			throw new BadRequestException(
+				'El prefijo del cierre no existe, por favor comuníquese con el administrador',
+			);
+		}
+
+		closeZNumber.lastNumber += 1;
+
+		return closeZNumber.save();
 	}
 }
