@@ -18,6 +18,13 @@ import { ResponseInvoicing } from '../dtos/response-invoicing';
 
 require('dayjs/locale/es-mx');
 
+const populate = [
+	{
+		path: 'company',
+		model: 'Company',
+	},
+];
+
 @Injectable()
 export class InvoicesService {
 	constructor(
@@ -85,6 +92,7 @@ export class InvoicesService {
 			limit,
 			page,
 			sort,
+			populate,
 			lean: true,
 		};
 
