@@ -661,6 +661,9 @@ type Company {
   """Correo de la compañia"""
   email: String!
 
+  """Si la compañia es principal"""
+  isMain: Boolean!
+
   """Url del logo de la compañía"""
   logo: String!
 

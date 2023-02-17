@@ -55,6 +55,10 @@ export class Company extends Document {
 		description: 'Fecha de actualización de la compañia',
 	})
 	updatedAt: Date;
+
+	@Field(() => Boolean, { description: 'Si la compañia es principal' })
+	@Prop({ type: Boolean, default: false })
+	isMain: boolean;
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
