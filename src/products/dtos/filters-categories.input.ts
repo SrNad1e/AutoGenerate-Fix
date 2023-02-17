@@ -26,6 +26,12 @@ export class FiltersCategoriesInput {
 	})
 	name?: string;
 
+	@Field(() => String, {
+		description: 'Compañía',
+		nullable: true,
+	})
+	companyId?: string;
+
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 
