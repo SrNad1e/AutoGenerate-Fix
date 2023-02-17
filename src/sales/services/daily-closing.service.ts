@@ -183,8 +183,6 @@ export class DailyClosingService {
 			};
 		}
 
-		console.log(closeDate);
-
 		const dailyClosing = new this.dailyClosingModel({
 			company: new Types.ObjectId(companyId),
 			closeDate: new Date(closeDate),

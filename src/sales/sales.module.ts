@@ -71,7 +71,10 @@ import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 				name: Invoice.name,
 				useFactory: async () => {
 					const schema = InvoiceSchema;
-					schema.index({ number: 1, authorization: -1 }, { unique: true });
+					schema.index(
+						{ number: 1, 'authorization._id': -1 },
+						{ unique: true },
+					);
 					return schema;
 				},
 			},

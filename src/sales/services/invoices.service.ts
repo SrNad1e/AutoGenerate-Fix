@@ -18,6 +18,13 @@ import { ResponseInvoicing } from '../dtos/response-invoicing';
 
 require('dayjs/locale/es-mx');
 
+const populate = [
+	{
+		path: 'company',
+		model: 'Company',
+	},
+];
+
 @Injectable()
 export class InvoicesService {
 	constructor(
@@ -96,6 +103,7 @@ export class InvoicesService {
 			limit,
 			page,
 			sort,
+			populate,
 			lean: true,
 		};
 
@@ -314,14 +322,18 @@ export class InvoicesService {
 		let invoiceQuantityCash = 0;
 		let valueInvoicingBank = 0;
 		let valueInvoicingCash = 0;
+		let currentNumber = autorization.lastNumber + 1;
+
 		for (let i = 0; i < totalOrdersDay.length; i++) {
 			const { day, year, month, cashTotal } = totalOrdersDay[i];
 
-			const dI = dayjs(initialDate).add(i, 'd').format('YYYY/MM/DD');
+			const di = dayjs(initialDate)
+				.startOf('month')
+				.add(day - 1, 'd');
 
-			const dF = dayjs(dateInitial)
-				.add(i + 1, 'd')
-				.format('YYYY/MM/DD');
+			const dI = di.format('YYYY/MM/DD');
+
+			const dF = di.add(1, 'd').format('YYYY/MM/DD');
 
 			const orders = await this.orderModel.aggregate([
 				{
@@ -430,21 +442,21 @@ export class InvoicesService {
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
 					{ username: 'admin' } as User,
-					autorization.lastNumber + i + 1,
+					currentNumber,
 				);
-			}
-			await this.authorizationsService.update(
-				autorization._id.toString(),
-				{
-					lastNumber:
-						autorization.lastNumber + invoiceQuantityCash + invoiceQuantityBank,
-					lastDateInvoicing: new Date(initialDate),
-				},
-				{ username: 'admin' } as User,
-				shop.company.toString(),
-			);
-		}
 
+				currentNumber++;
+			}
+		}
+		await this.authorizationsService.update(
+			autorization._id.toString(),
+			{
+				lastNumber: currentNumber - 1,
+				lastDateInvoicing: new Date(finalDate),
+			},
+			{ username: 'admin' } as User,
+			shop.company.toString(),
+		);
 		return {
 			invoiceQuantityCash,
 			invoiceQuantityBank,
