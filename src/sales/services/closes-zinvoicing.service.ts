@@ -164,12 +164,8 @@ export class ClosesZinvoicingService {
 
 		const orders = await this.ordersService.findAll(
 			{
-				dateInitial: dayjs(pointOfSale?.closeDate)
-					.add(1, 'd')
-					.format('YYYY/MM/DD'),
-				dateFinal: dayjs(pointOfSale?.closeDate)
-					.add(1, 'd')
-					.format('YYYY/MM/DD'),
+				dateInitial: dayjs(closeDate).subtract(1, 'd').format('YYYY/MM/DD'),
+				dateFinal: dayjs(closeDate).subtract(1, 'd').format('YYYY/MM/DD'),
 				shopId: pointOfSale?.shop?._id.toString(),
 				limit: 1,
 				page: 1,
@@ -178,13 +174,12 @@ export class ClosesZinvoicingService {
 			companyId,
 		);
 
-		if (orders.totalDocs > 0) {
+		if (
+			orders.totalDocs > 0 &&
+			dayjs(pointOfSale?.closeDate).isAfter(dayjs(closeDate).subtract(1, 'd'))
+		) {
 			throw new NotFoundException(
-				`El punto de venta tiene movimientos el día ${dayjs(
-					pointOfSale?.closeDate,
-				)
-					.add(1, 'd')
-					.format('YYYY/MM/DD')}, cierre ese día y continue con el proceso `,
+				`Hay cierres pendientes por realizar, debe cerrarlos para continuar con el proceso `,
 			);
 		}
 
@@ -381,7 +376,7 @@ export class ClosesZinvoicingService {
 
 		if (!closeZNumber) {
 			throw new BadRequestException(
-				'El prefijo del recibo no existe, por favor comuníquese con el administrador',
+				'El prefijo del cierre no existe, por favor comuníquese con el administrador',
 			);
 		}
 
