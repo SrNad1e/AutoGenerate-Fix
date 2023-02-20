@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
+import { filter } from 'rxjs';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -1846,6 +1847,7 @@ export class OrdersService {
 			};
 		}
 
+/*
 		const salesReport = await this.orderModel.aggregate([
 			...aggregate,
 			{
@@ -1873,6 +1875,96 @@ export class OrdersService {
 				},
 			},
 		]);
+*/
+		let salesReport: any = [];
+		//consul by day
+		if (newGroupDates == GroupDates.DAY) {
+			const salesReportCont = await this.orderModel.aggregate([
+				{
+					$match: filters,
+				},
+				{
+					$lookup: {
+						from: 'categorylevel1',
+						localField: 'details.product.reference.categoryLevel1',
+						foreignField: '_id',
+						as: 'categoryLevel1',
+					},
+				},
+				{
+					$unwind: '$categoryLevel1',
+				},
+				{
+					$group: {
+						_id: [
+    						'$closeDate',
+						],
+						quantity: { $first: { $sum: 1 } },
+						date: { $first: '$closeDate' },
+						category: { $first: '$categoryLevel1' },
+						shop: { $first: '$shop' },
+						total: { $sum: 1 },
+					},
+				},
+				{
+					$project: {
+						_id: 0,
+						shop: 1,
+						date: 1,
+						category: 1,
+						total: 1,
+						quantity: 1,
+					},
+				},
+			]);
+			salesReport = salesReportCont;
+		} //By Month
+		else if (newGroupDates == GroupDates.MONTH) {
+			const salesReportCont = await this.orderModel.aggregate([
+				{
+					$match: filters,
+				},
+				{
+					$lookup: {
+						from: 'categorylevel1',
+						localField: 'details.product.reference.categoryLevel1',
+						foreignField: '_id',
+						as: 'categoryLevel1',
+					},
+				},
+				{
+					$unwind: '$categoryLevel1',
+				},
+				{
+					$group: {
+						_id: [{ $month: '$closeDate' }, { $dayOfMonth: '$closeDate' }],
+						//myCount: { $sum: 1 },
+						quantity: { $sum: { $first: '$details.quantity' } },
+						date: { $first: '$closeDate' },
+						category: { $first: '$categoryLevel1' },
+						shop: { $first: '$shop' },
+						total: { $sum: 1 },
+					},
+				},
+				{
+					$project: {
+						_id: 1,
+						shop: 1,
+						date: 1,
+						category: 1,
+						total: 1,
+						quantity: 1,
+					},
+				},
+			]);
+			salesReport = salesReportCont;
+		}
+
+		console.log("Respuesta :: ",salesReport);
+		console.log("filtros: ", shopId)
+		console.log("Periodo: ", newGroupDates)
+		console.log("Agrupado por categorias: ",isGroupByCategory)
+
 
 		return {
 			paymentsSalesReport,

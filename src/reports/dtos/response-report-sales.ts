@@ -9,6 +9,9 @@ class SalesReport {
 	@Field(() => Date, { description: 'Fecha de la venta' })
 	date: Date;
 
+	@Field(() => Date, { description: 'Fecha de la venta' })
+	dateDay: number;
+
 	@Field(() => Shop, { description: 'Tienda' })
 	shop: Shop;
 
@@ -23,6 +26,7 @@ class SalesReport {
 
 	@Field(() => Number, { description: 'Valor total de la venta' })
 	total: number;
+
 }
 
 @ObjectType({ description: 'Medios de pago' })

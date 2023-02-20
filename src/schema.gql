@@ -6290,6 +6290,9 @@ type SalesReport {
   """Fecha de la venta"""
   date: DateTime!
 
+  """Fecha de la venta"""
+  dateDay: DateTime!
+
   """
   Cantidad de productos de la categoría vendidos o cantidad de pedidos generados
   """

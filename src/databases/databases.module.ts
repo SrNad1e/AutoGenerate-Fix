@@ -9,16 +9,11 @@ import config from 'src/config';
 @Module({
 	imports: [
 		MongooseModule.forRootAsync({
-			useFactory: (configService: ConfigType<typeof config>) => {
-				const { connection, host, dbName, user, password } =
-					configService.mongo;
+			useFactory: async (configService: ConfigType<typeof config>) => {
+				configService.mongoAtlas;
 				return {
-					uri: `${connection}://${host}`,
-					dbName,
-					user,
-					pass: password,
-					retryWrites: true,
-					w: 'majority',
+					uri: configService.mongoAtlas.uri,
+					useUnifiedTopology: true,
 					connectionFactory: (connection) => {
 						connection.plugin(require('mongoose-paginate-v2'));
 						connection.plugin(require('mongoose-aggregate-paginate-v2'));

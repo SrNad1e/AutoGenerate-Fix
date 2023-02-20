@@ -1,6 +1,10 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('config', () => ({
+	mongoAtlas: {
+		uri: process.env.MONGO_ATLAS_URI,
+		useUnifiedTopology: true,
+	},
 	mongo: {
 		dbName: process.env.MONGO_DB,
 		user: process.env.MONGO_USER,
