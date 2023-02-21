@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -21,6 +22,8 @@ import { FiltersCreditsInput } from '../dtos/filters-credits.input';
 import { UpdateCreditInput } from '../dtos/update-credit.input';
 import { TypeCreditHistory } from '../entities/credit-history.entity';
 import { Credit, StatusCredit } from '../entities/credit.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -43,6 +46,8 @@ export class CreditsService {
 		private readonly creditModel: AggregatePaginateModel<Credit> &
 			PaginateModel<Credit>,
 		private readonly customersService: CustomersService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -59,7 +64,7 @@ export class CreditsService {
 	) {
 		const filters: FilterQuery<Credit> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 

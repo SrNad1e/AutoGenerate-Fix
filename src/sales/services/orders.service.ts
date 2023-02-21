@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -65,6 +66,8 @@ import { PointOfSale } from '../entities/pointOfSale.entity';
 import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -96,6 +99,8 @@ export class OrdersService {
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -118,7 +123,7 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Order> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -1133,7 +1138,10 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			order.company.toString() !== companyId
+		) {
 			throw new UnauthorizedException(
 				'El usuario no tiene permisos para actualizar el pedido',
 			);
@@ -1533,7 +1541,10 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			order.company.toString() !== companyId
+		) {
 			throw new UnauthorizedException(
 				'El usuario no tiene permisos para actualizar el pedido',
 			);

@@ -1,5 +1,5 @@
 import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -15,6 +15,8 @@ import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { AuthorizationsService } from './authorizations.service';
 import { ResponseInvoicing } from '../dtos/response-invoicing';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 require('dayjs/locale/es-mx');
 
@@ -35,6 +37,8 @@ export class InvoicesService {
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly shopsService: ShopsService,
 		private readonly authorizationsService: AuthorizationsService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -51,7 +55,7 @@ export class InvoicesService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Invoice> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -102,7 +106,7 @@ export class InvoicesService {
 	async findById(id: string, user: User, companyId: string) {
 		const filters: FilterQuery<Invoice> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -256,7 +260,7 @@ export class InvoicesService {
 				shopId,
 			},
 			{
-				username: 'admin',
+				username: this.configService.USER_ADMIN,
 			} as User,
 			'',
 		);
@@ -410,7 +414,7 @@ export class InvoicesService {
 
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
-					{ username: 'admin' } as User,
+					{ username: this.configService.USER_ADMIN } as User,
 					currentNumber,
 				);
 
@@ -423,7 +427,7 @@ export class InvoicesService {
 				lastNumber: currentNumber - 1,
 				lastDateInvoicing: new Date(finalDate),
 			},
-			{ username: 'admin' } as User,
+			{ username: this.configService.USER_ADMIN } as User,
 			shop.company.toString(),
 		);
 		return {

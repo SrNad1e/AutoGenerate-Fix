@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
 
@@ -8,12 +8,16 @@ import { CreateCompanyInput } from '../dtos/create-company.input';
 import { FiltersCompaniesInput } from '../dtos/filters-companies.input';
 import { UpdateCompanyInput } from '../dtos/update-company.input';
 import { Company } from '../entities/company.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class CompaniesService {
 	constructor(
 		@InjectModel(Company.name)
 		private readonly companyModel: PaginateModel<Company>,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll({
@@ -54,7 +58,7 @@ export class CompaniesService {
 	}
 
 	async create(params: CreateCompanyInput, user: User) {
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			throw new UnauthorizedException('El usuario no esta autorizado');
 		}
 
@@ -69,7 +73,7 @@ export class CompaniesService {
 	}
 
 	async update(id: string, params: UpdateCompanyInput, user: User) {
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			throw new UnauthorizedException('El usuario no esta autorizado');
 		}
 

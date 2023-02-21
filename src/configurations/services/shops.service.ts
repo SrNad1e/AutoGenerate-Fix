@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
@@ -15,6 +16,8 @@ import { UpdateShopInput } from '../dtos/update-shop.input';
 import { Shop, StatusShop } from '../../configurations/entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -36,6 +39,8 @@ export class ShopsService {
 		@InjectModel(Warehouse.name)
 		private readonly warehouseModel: PaginateModel<Warehouse>,
 		private readonly companiesService: CompaniesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -45,7 +50,7 @@ export class ShopsService {
 	) {
 		const filters: FilterQuery<Shop> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -143,7 +148,10 @@ export class ShopsService {
 			throw new BadRequestException('La tienda no existe');
 		}
 
-		if (user.username !== 'admin' && shop.company.toString() !== idCompany) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			shop.company.toString() !== idCompany
+		) {
 			throw new UnauthorizedException(
 				'No tiene permisos para hacer cambios en esta tienda',
 			);
@@ -241,7 +249,7 @@ export class ShopsService {
 						createdAt: shopMysql.created_at,
 						user: {
 							name: 'Administrador del Sistema',
-							username: 'admin',
+							username: this.configService.USER_ADMIN,
 						},
 					});
 					await newShop.save();
