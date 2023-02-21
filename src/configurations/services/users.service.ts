@@ -140,10 +140,6 @@ export class UsersService {
 			filters.isWeb = isWeb;
 		}
 
-		if (user?.company) {
-			filters.company = user.company._id;
-		}
-
 		const options: PaginateOptions = {
 			limit,
 			page,
