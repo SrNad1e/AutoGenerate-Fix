@@ -1902,7 +1902,7 @@ export class OrdersService {
 				},
 			};
 		}
-		//console.log("Agrupado por categorias: ", group)
+
 		const salesReport = await this.orderModel.aggregate([
 			{
 				$match: filters,
@@ -1932,12 +1932,6 @@ export class OrdersService {
 				},
 			},
 		]);
-
-		console.log("Respuesta :: ",salesReport);
-		console.log("filtros: ", shopId)
-		console.log("Periodo: ", newGroupDates)
-		console.log("Agrupado por categorias: ",isGroupByCategory)
-
 
 		return {
 			paymentsSalesReport,
