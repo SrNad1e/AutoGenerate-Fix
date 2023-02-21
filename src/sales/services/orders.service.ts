@@ -4,7 +4,7 @@ import {
 	NotFoundException,
 	UnauthorizedException,
 	Inject,
-	forwardRef
+	forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -68,6 +68,8 @@ import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { PointOfSalesService } from './point-of-sales.service';
 import { StatusWebHistoriesService } from './status-web-histories.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -99,7 +101,9 @@ export class OrdersService {
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
 		private readonly pointofSalesService: PointOfSalesService,
-	) { }
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
+	) {}
 
 	async findAll(
 		{
@@ -121,7 +125,7 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Order> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -202,7 +206,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: order?.customer?._id.toString(),
 			});
-		} catch { }
+		} catch {}
 
 		return {
 			order,
@@ -306,7 +310,7 @@ export class OrdersService {
 				credit = await this.creditsService.findOne({
 					customerId: oldOrder?.customer?._id?.toString(),
 				});
-			} catch { }
+			} catch {}
 
 			return {
 				credit,
@@ -1136,7 +1140,10 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			order.company.toString() !== companyId
+		) {
 			throw new UnauthorizedException(
 				'El usuario no tiene permisos para actualizar el pedido',
 			);
@@ -1411,7 +1418,7 @@ export class OrdersService {
 						credit = await this.creditsService.findOne({
 							customerId: order?.customer?._id.toString(),
 						});
-					} catch { }
+					} catch {}
 					if (credit?.status !== StatusCredit.ACTIVE) {
 						throw new BadRequestException(
 							'El crédito del cliente se encuentra suspendido',
@@ -1536,7 +1543,10 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			order.company.toString() !== companyId
+		) {
 			throw new UnauthorizedException(
 				'El usuario no tiene permisos para actualizar el pedido',
 			);
@@ -1618,7 +1628,7 @@ export class OrdersService {
 			credit = await this.creditsService.findOne({
 				customerId: newOrder?.customer?._id.toString(),
 			});
-		} catch { }
+		} catch {}
 
 		return {
 			credit,

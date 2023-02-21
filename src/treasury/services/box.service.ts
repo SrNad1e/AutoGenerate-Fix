@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -11,11 +12,15 @@ import { CreateBoxInput } from '../dtos/create-box.input';
 import { FiltersBoxesInput } from '../dtos/filters-boxes.input';
 import { UpdateBoxInput } from '../dtos/update-box.input';
 import { Box } from '../entities/box.entity';
+import { ConfigType } from '@nestjs/config';
+import config from 'src/config';
 
 @Injectable()
 export class BoxService {
 	constructor(
 		@InjectModel(Box.name) private readonly boxModel: PaginateModel<Box>,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -25,7 +30,7 @@ export class BoxService {
 	) {
 		const filters: FilterQuery<Box> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 

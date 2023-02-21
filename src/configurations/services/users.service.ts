@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -26,6 +27,8 @@ import { Shop } from '../entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { CustomerType } from 'src/crm/entities/customerType.entity';
 import { DocumentType } from 'src/crm/entities/documentType.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{ path: 'role', model: Role.name },
@@ -90,6 +93,8 @@ export class UsersService {
 		private readonly companiesService: CompaniesService,
 		private readonly rolesService: RolesService,
 		private readonly customersService: CustomersService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -108,7 +113,7 @@ export class UsersService {
 	) {
 		const filters: FilterQuery<User> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -133,10 +138,6 @@ export class UsersService {
 
 		if (isWeb !== undefined) {
 			filters.isWeb = isWeb;
-		}
-
-		if (user?.company) {
-			filters.company = user.company._id;
 		}
 
 		const options: PaginateOptions = {
@@ -309,7 +310,7 @@ export class UsersService {
 		}
 
 		if (
-			userUpdate.username !== 'admin' &&
+			userUpdate.username !== this.configService.USER_ADMIN &&
 			user.company._id.toString() !== idCompany
 		) {
 			throw new UnauthorizedException(

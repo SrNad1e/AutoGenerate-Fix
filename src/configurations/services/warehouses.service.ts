@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -12,6 +13,8 @@ import { User } from 'src/configurations/entities/user.entity';
 import { CreateWarehouseInput } from '../dtos/create-warehouse.input';
 import { UpdateWarehouseInput } from '../dtos/update-warehouse.input';
 import { Product } from 'src/products/entities/product.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class WarehousesService {
@@ -20,6 +23,8 @@ export class WarehousesService {
 		private readonly warehouseModel: PaginateModel<Warehouse>,
 		@InjectModel(Product.name)
 		private readonly productModel: PaginateModel<Product>,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -37,7 +42,7 @@ export class WarehousesService {
 	) {
 		const filters: FilterQuery<Warehouse> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -118,7 +123,7 @@ export class WarehousesService {
 		}
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			warehouse.company.toString() !== idCompany
 		) {
 			throw new UnauthorizedException(

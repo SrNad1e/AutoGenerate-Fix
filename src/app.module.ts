@@ -66,6 +66,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 				FEDEX_COUNTRY_DEFAULT: Joi.string().required(),
 				API_URL: Joi.string().required(),
 				API_WEB: Joi.string().required(),
+				USER_ADMIN: Joi.string().required(),
 			}),
 		}),
 		DatabasesModule,

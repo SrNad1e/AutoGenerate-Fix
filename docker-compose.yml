@@ -8,6 +8,7 @@ services:
       - mongo
     environment:
       PORT: 8080
+      USER_ADMIN: admin
       #Mongo
       MONGO_DB: pos_qa
       MONGO_USER: cirotex
@@ -75,7 +76,7 @@ services:
 
 networks:
   default:
-    name:  cirotex_network
+    name: cirotex_network
 
 volumes:
   mongo-data:

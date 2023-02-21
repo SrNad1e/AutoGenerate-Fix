@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, Inject } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import {
@@ -10,10 +10,16 @@ import { FiltersInvoicesInput } from '../dtos/filters-invoices.input';
 import { ResponseInvoices } from '../dtos/response-invoices';
 import { ResponseInvoicing } from '../dtos/response-invoicing';
 import { InvoicesService } from '../services/invoices.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Resolver()
 export class InvoicesResolver {
-	constructor(private readonly invoicesService: InvoicesService) {}
+	constructor(
+		private readonly invoicesService: InvoicesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
+	) {}
 
 	@Query(() => ResponseInvoices, {
 		name: 'invoices',
@@ -50,7 +56,7 @@ export class InvoicesResolver {
 		_: DataGenerateInvoicesInput,
 		@Context() context,
 	) {
-		if (context.req.user.user.username !== 'admin') {
+		if (context.req.user.user.username !== this.configService.USER_ADMIN) {
 			throw new UnauthorizedException('No tienes acceso para este proceso');
 		}
 
