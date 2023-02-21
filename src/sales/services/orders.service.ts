@@ -1876,89 +1876,62 @@ export class OrdersService {
 			},
 		]);
 */
-		let salesReport: any = [];
 		//consul by day
 		if (newGroupDates == GroupDates.DAY) {
-			const salesReportCont = await this.orderModel.aggregate([
-				{
-					$match: filters,
+			group = {
+				$group: {
+					_id: ['$closeDate', '$details.product.reference.categoryLevel1'],
+					quantity: { $sum: 1 }, //{ $first: { $sum: '$details.quantity' } },
+					date: { $first: '$closeDate' },
+					category: { $first: '$categoryLevel1' },
+					shop: { $first: '$shop' },
+					total: { $sum: 1 },
 				},
-				{
-					$lookup: {
-						from: 'categorylevel1',
-						localField: 'details.product.reference.categoryLevel1',
-						foreignField: '_id',
-						as: 'categoryLevel1',
-					},
-				},
-				{
-					$unwind: '$categoryLevel1',
-				},
-				{
-					$group: {
-						_id: [
-    						'$closeDate',
-						],
-						quantity: { $first: { $sum: 1 } },
-						date: { $first: '$closeDate' },
-						category: { $first: '$categoryLevel1' },
-						shop: { $first: '$shop' },
-						total: { $sum: 1 },
-					},
-				},
-				{
-					$project: {
-						_id: 0,
-						shop: 1,
-						date: 1,
-						category: 1,
-						total: 1,
-						quantity: 1,
-					},
-				},
-			]);
-			salesReport = salesReportCont;
+			};
 		} //By Month
 		else if (newGroupDates == GroupDates.MONTH) {
-			const salesReportCont = await this.orderModel.aggregate([
-				{
-					$match: filters,
+			group = {
+				$group: {
+					_id: [{ $month: '$closeDate' }, { $dayOfMonth: '$closeDate' }],
+					//myCount: { $sum: 1 },
+					quantity: { $sum: { $first: '$details.quantity' } },
+					date: { $first: '$closeDate' },
+					category: { $first: '$categoryLevel1' },
+					shop: { $first: '$shop' },
+					total: { $sum: '$details.quantity' },
 				},
-				{
-					$lookup: {
-						from: 'categorylevel1',
-						localField: 'details.product.reference.categoryLevel1',
-						foreignField: '_id',
-						as: 'categoryLevel1',
-					},
-				},
-				{
-					$unwind: '$categoryLevel1',
-				},
-				{
-					$group: {
-						_id: [{ $month: '$closeDate' }, { $dayOfMonth: '$closeDate' }],
-						//myCount: { $sum: 1 },
-						quantity: { $sum: { $first: '$details.quantity' } },
-						date: { $first: '$closeDate' },
-						category: { $first: '$categoryLevel1' },
-						shop: { $first: '$shop' },
-						total: { $sum: 1 },
-					},
-				},
-				{
-					$project: {
-						_id: 1,
-						shop: 1,
-						date: 1,
-						category: 1,
-						total: 1,
-						quantity: 1,
-					},
-				},
-			]);
-			salesReport = salesReportCont;
+			};
 		}
+		//console.log("Agrupado por categorias: ", group)
+		const salesReport = await this.orderModel.aggregate([
+			{
+				$match: filters,
+			},
+			{
+				$lookup: {
+					from: 'categorylevel1',
+					localField: 'details.product.reference.categoryLevel1',
+					foreignField: '_id',
+					as: 'categoryLevel1',
+				},
+			},
+			{
+				$unwind: '$categoryLevel1',
+			},
+			{
+				...group,
+			},
+			{
+				$project: {
+					_id: 1,
+					shop: 1,
+					date: 1,
+					category: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
 
 		console.log("Respuesta :: ",salesReport);
 		console.log("filtros: ", shopId)
