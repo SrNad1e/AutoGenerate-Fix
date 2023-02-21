@@ -269,6 +269,7 @@ export class ClosesZinvoicingService {
 			pointOfSale: pointOfSale._id,
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
 			closeDate: new Date(closeDate.split(' ')[0]),
+			prefix: pointOfSale?.authorization['prefix'],
 			quantityBank,
 			...summaryOrder,
 			refunds,
