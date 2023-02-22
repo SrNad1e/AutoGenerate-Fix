@@ -238,13 +238,14 @@ export class CreditsService {
 		}
 
 		if (amount) {
-			if (amount < credit?.amount && available < amount) {
+			const amountused = credit?.balance + credit?.frozenAmount;
+			if (amount < credit?.amount && amountused > amount) {
 				throw new BadRequestException(
-					`El crédito del cliente no tiene cupo disponible, cupo $ ${available}`,
+					`El monto aprobado no puede ser menor al cupo usado del cliente`,
 				);
 			}
 
-			available = amount - credit?.balance - credit?.frozenAmount;
+			available = amount - amountused;
 		}
 
 		return this.creditModel.findByIdAndUpdate(
