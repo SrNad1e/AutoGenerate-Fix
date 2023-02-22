@@ -376,7 +376,7 @@ export class UsersService {
 
 		let company;
 		if (companyId) {
-			company = this.companiesService.findById(companyId);
+			company = await this.companiesService.findById(companyId);
 
 			if (!company) {
 				throw new NotFoundException('La empresa no existe');
