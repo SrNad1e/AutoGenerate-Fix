@@ -50,6 +50,10 @@ import { InterapidisimoService } from './services/interapidisimo.service';
 import { FedexService } from './services/fedex.service';
 import { Product, ProductSchema } from 'src/products/entities/product.entity';
 import { SalesModule } from 'src/sales/sales.module';
+import {
+	Reference,
+	ReferenceSchema,
+} from 'src/products/entities/reference.entity';
 
 @Module({
 	imports: [
@@ -110,6 +114,10 @@ import { SalesModule } from 'src/sales/sales.module';
 				name: Product.name,
 				schema: ProductSchema,
 			},
+			{
+				name: Reference.name,
+				schema: ReferenceSchema,
+			},
 		]),
 		MongooseModule.forFeatureAsync([
 			{
@@ -167,4 +175,4 @@ import { SalesModule } from 'src/sales/sales.module';
 		WarehousesService,
 	],
 })
-export class ConfigurationsModule { }
+export class ConfigurationsModule {}

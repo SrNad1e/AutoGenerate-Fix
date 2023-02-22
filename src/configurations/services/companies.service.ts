@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel } from 'mongoose';
+import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 
@@ -10,6 +10,7 @@ import { UpdateCompanyInput } from '../dtos/update-company.input';
 import { Company } from '../entities/company.entity';
 import config from 'src/config';
 import { ConfigType } from '@nestjs/config';
+import { Reference } from 'src/products/entities/reference.entity';
 
 @Injectable()
 export class CompaniesService {
@@ -18,6 +19,8 @@ export class CompaniesService {
 		private readonly companyModel: PaginateModel<Company>,
 		@Inject(config.KEY)
 		private readonly configService: ConfigType<typeof config>,
+		@InjectModel(Reference.name)
+		private readonly referenceModel: PaginateModel<Reference>,
 	) {}
 
 	async findAll({
@@ -62,7 +65,10 @@ export class CompaniesService {
 			throw new UnauthorizedException('El usuario no esta autorizado');
 		}
 
-		return this.companyModel.create({
+		//actualizar todos los productos que contengan a la compañia main
+		const companyMain = await this.companyModel.findOne({ isMain: true });
+
+		const newCompany = await this.companyModel.create({
 			...params,
 			user: {
 				username: user.username,
@@ -70,6 +76,19 @@ export class CompaniesService {
 				_id: user._id,
 			},
 		});
+
+		await this.referenceModel.updateMany(
+			{
+				companies: companyMain._id,
+			},
+			{
+				$push: {
+					companies: new Types.ObjectId(newCompany._id),
+				},
+			},
+		);
+
+		return newCompany;
 	}
 
 	async update(id: string, params: UpdateCompanyInput, user: User) {
