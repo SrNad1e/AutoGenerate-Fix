@@ -91,7 +91,6 @@ export class CategoriesService {
 			sort,
 			populate,
 		};
-
 		return this.categoryLevel1Model.paginate(filters, options);
 	}
 
@@ -202,6 +201,7 @@ export class CategoriesService {
 			}
 			const newCategory = new this.categoryLevel1Model({
 				name,
+				company: new Types.ObjectId(companyId),
 				user: {
 					username: user.username,
 					name: user.name,
@@ -229,6 +229,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel2Model({
 				name,
+				company: new Types.ObjectId(companyId),
 				user: {
 					username: user.username,
 					name: user.name,
