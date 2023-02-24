@@ -1846,46 +1846,16 @@ export class OrdersService {
 				},
 			};
 		}
-
-/*
-		const salesReport = await this.orderModel.aggregate([
-			...aggregate,
-			{
-				$lookup: {
-					from: 'categorylevel1',
-					localField: 'details.product.reference.categoryLevel1',
-					foreignField: '_id',
-					as: 'categoryLevel1',
-				},
-			},
-			{
-				$match: filters,
-			},
-			{
-				...group,
-			},
-			{
-				$project: {
-					_id: 0,
-					shop: 1,
-					date: 1,
-					category: { $arrayElemAt: ['$category', 0] },
-					total: 1,
-					quantity: 1,
-				},
-			},
-		]);
-*/
 		//consul by day
 		if (newGroupDates == GroupDates.DAY) {
 			group = {
 				$group: {
-					_id: ['$closeDate', '$details.product.reference.categoryLevel1'],
-					quantity: { $sum: 1 }, //{ $first: { $sum: '$details.quantity' } },
+					_id: ['$categoryLevel1._id', '$closeDate'],
+					quantity: { $first: { $sum: '$details.quantity' } },
 					date: { $first: '$closeDate' },
 					category: { $first: '$categoryLevel1' },
 					shop: { $first: '$shop' },
-					total: { $sum: 1 },
+					total: { $sum: '$details.quantity' },
 				},
 			};
 		} //By Month
@@ -1932,7 +1902,6 @@ export class OrdersService {
 				},
 			},
 		]);
-
 		return {
 			paymentsSalesReport,
 			customersSalesReport,
