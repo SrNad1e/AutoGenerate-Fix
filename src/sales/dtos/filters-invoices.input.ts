@@ -53,6 +53,12 @@ export class FiltersInvoicesInput {
 	})
 	paymentIds?: string[];
 
+	@Field(() => String, {
+		description: 'Identificador de la tienda',
+		nullable: true,
+	})
+	shopId?: string;
+
 	@Field(() => Boolean, {
 		description: 'Si la factura de encuentra se encuentra activa',
 		nullable: true,

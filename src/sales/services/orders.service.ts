@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
+import * as utc from 'dayjs/plugin/utc';
+import * as timezone from 'dayjs/plugin/timezone';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
@@ -70,6 +72,8 @@ import { PointOfSalesService } from './point-of-sales.service';
 import { StatusWebHistoriesService } from './status-web-histories.service';
 import config from 'src/config';
 import { ConfigType } from '@nestjs/config';
+import { FiltersSalesReportInvoicingInput } from 'src/reports/dtos/filters-sales-report-invoicing.input';
+import { ResponseReportSalesInvoicing } from 'src/reports/dtos/response-report-sales-invoicing';
 
 const populate = [
 	{
@@ -103,7 +107,10 @@ export class OrdersService {
 		private readonly pointofSalesService: PointOfSalesService,
 		@Inject(config.KEY)
 		private readonly configService: ConfigType<typeof config>,
-	) {}
+	) {
+		dayjs.extend(utc);
+		dayjs.extend(timezone);
+	}
 
 	async findAll(
 		{
@@ -2516,5 +2523,225 @@ export class OrdersService {
 		}
 
 		return newPayments;
+	}
+
+	async reportSalesInvoicing(
+		{ dateFinal, dateInitial, shopId }: FiltersSalesReportInvoicingInput,
+		companyId: string,
+	): Promise<ResponseReportSalesInvoicing> {
+		//validar la tienda
+		if (shopId) {
+			const shop = await this.shopsService.findById(shopId);
+			if (!shop) {
+				throw new BadRequestException('La tienda no existe');
+			}
+		}
+
+		const filters = {
+			company: new Types.ObjectId(companyId),
+			status: StatusOrder.CLOSED,
+			closeDate: {
+				$gte: new Date(dayjs.utc(dateInitial).tz('America/Bogota').format()),
+				$lte: new Date(dayjs.utc(dateFinal).tz('America/Bogota').format()),
+			},
+		};
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
+		}
+
+		//consultar los pagos por valor y cantidad
+		const paymentsSalesReport = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					payment: { $first: '$payments.payment' },
+					total: {
+						$sum: '$payments.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		//consultar las ventas por tipo de cliente
+		const customersSalesReport = await this.orderModel.aggregate([
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$customer.customerType._id',
+					typeCustomer: { $first: '$customer.customerType' },
+					customerName: { $first: '$customer.firstName' },
+					document: { $first: '$customer.document' },
+					total: {
+						$sum: '$summary.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					typeCustomer: 1,
+					customerName: 1,
+					document: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		//consultar summary de ventas valor, cantidad de facturas, margen %, cmv
+		const summarySalesReport = await this.orderModel.aggregate([
+			{
+				$unwind: '$details',
+			},
+			{
+				$match: filters,
+			},
+			{
+				$lookup: {
+					from: 'brands',
+					localField: 'details.product.reference.brand',
+					foreignField: '_id',
+					as: 'brand',
+				},
+			},
+			{
+				$lookup: {
+					from: 'categorylevel1',
+					localField: 'details.product.reference.categoryLevel1',
+					foreignField: '_id',
+					as: 'categorylevel',
+				},
+			},
+			{
+				$set: {
+					brand: { $arrayElemAt: ['$brand.name', 0] },
+					categorylevel: { $arrayElemAt: ['$categorylevel.name', 0] },
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					total: {
+						$sum: {
+							$multiply: ['$details.quantity', '$details.price'],
+						},
+					},
+					quantity: {
+						$sum: 1,
+					},
+					cost: {
+						$sum: {
+							$multiply: [
+								'$details.quantity',
+								'$details.product.reference.cost',
+							],
+						},
+					},
+					closeDate: { $first: '$closeDate' },
+					idOrder: { $first: '$_id' },
+					products: {
+						$push: {
+							price: '$details.price',
+							cost: '$details.product.reference.cost',
+							name: '$details.product.reference.name',
+							barcode: '$details.product.barcode',
+							color: '$details.product.color.name_internal',
+							size: '$details.product.size.value',
+							brand: '$brand',
+							categoryLevel1: '$categorylevel',
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1,
+					quantity: 1,
+					cmv: {
+						$subtract: ['$total', '$cost'],
+					},
+					margin: {
+						$divide: [
+							{
+								$subtract: ['$total', '$cost'],
+							},
+							'$total',
+						],
+					},
+					closeDate: 1,
+					idOrder: 1,
+					products: 1,
+				},
+			},
+		]);
+
+		//consultar las ventas por valor y cantidad
+		const salesReport = await this.orderModel.aggregate([
+			{
+				$lookup: {
+					from: 'CategoryLevel1',
+					localField: 'categoryLevel1',
+					foreignField: '_id',
+					as: 'categoryLevel1',
+				},
+			},
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$shop._id',
+					shop: {
+						$first: '$shop',
+					},
+					total: {
+						$sum: '$summary.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					shop: 1,
+					category: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return {
+			paymentsSalesReport,
+			customersSalesReport,
+			summarySalesReport: summarySalesReport[0],
+			salesReport,
+		};
 	}
 }
