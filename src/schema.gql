@@ -1519,6 +1519,24 @@ type CustomerSalesReport {
   typeCustomer: CustomerType!
 }
 
+"""Ventas de tipos de clientes"""
+type CustomerSalesReportInvoicing {
+  """Nombre del cliente"""
+  customerName: String!
+
+  """Numero documento del cliente"""
+  document: String!
+
+  """Cantidad de ventas"""
+  quantity: Float!
+
+  """Valor total de las ventas"""
+  total: Float!
+
+  """Tipo de cliente"""
+  typeCustomer: CustomerType!
+}
+
 """Tipos de clientes"""
 type CustomerType {
   """Identificación de mongo"""
@@ -2582,6 +2600,9 @@ input FiltersInvoicesInput {
   """Identificador del punto de venta"""
   pointOfSaleId: String
 
+  """Identificador de la tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
 }
@@ -2871,6 +2892,18 @@ input FiltersSalesReportInput {
 
   """Si es true se agrupan por categoria"""
   isGroupByCategory: Boolean!
+
+  """Id de la tienda"""
+  shopId: String
+}
+
+"""Filtros para el reporte de ventas"""
+input FiltersSalesReportInvoicingInput {
+  """Fecha final del reporte"""
+  dateFinal: String!
+
+  """Fecha inicial del reporte"""
+  dateInitial: String!
 
   """Id de la tienda"""
   shopId: String
@@ -4007,6 +4040,18 @@ type PaymentsSalesReport {
   total: Float!
 }
 
+"""Medios de pago"""
+type PaymentsSalesReportInvoicing {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de veces de uso del medio de pago"""
+  quantity: Float!
+
+  """Valor total recaudado con el recibo de pago"""
+  total: Float!
+}
+
 """Permisos a los que tiene el usuario"""
 type Permission {
   """Identificador de mongo"""
@@ -4261,6 +4306,33 @@ type Product {
   user: User!
 }
 
+"""Detalle del producto"""
+type ProductDetail {
+  """Codigo de barras del producto"""
+  barcode: String!
+
+  """Marca del producto"""
+  brand: String!
+
+  """Categoria nivel 1 del producto"""
+  categoryLevel1: String!
+
+  """Color del producto"""
+  color: String!
+
+  """Costo del producto"""
+  cost: Float!
+
+  """Nombre del producto"""
+  name: String!
+
+  """Precio del producto"""
+  price: Float!
+
+  """Talla del producto"""
+  size: String!
+}
+
 type Query {
   """Listado de atributos"""
   attribs(
@@ -4510,6 +4582,12 @@ type Query {
     """Filtros para obtener las ventas"""
     filtersSalesReportInput: FiltersSalesReportInput!
   ): ResponseReportSales!
+
+  """Consulta las ventas por rango de fechas"""
+  reportSalesInvoicing(
+    """Filtros para obtener las ventas"""
+    filtersSalesReportInput: FiltersSalesReportInvoicingInput!
+  ): ResponseReportSalesInvoicing!
 
   """Lista de devoluciones de pedidos"""
   returnsOrder(
@@ -5802,6 +5880,21 @@ type ResponseReportSales {
   summarySalesReport: SummarySalesReport
 }
 
+"""Reportde de ventas generales"""
+type ResponseReportSalesInvoicing {
+  """Ventas por tipo de cliente"""
+  customersSalesReport: [CustomerSalesReportInvoicing!]
+
+  """Medios de pago"""
+  paymentsSalesReport: [PaymentsSalesReportInvoicing!]
+
+  """Ventas detalladas"""
+  salesReport: [SalesReportInvoicing!]
+
+  """Resumen de ventas"""
+  summarySalesReport: SummarySalesReportInvoicing
+}
+
 """Lista de devoluciones de ordenes"""
 type ResponseReturnsOrder {
   """Lista de devoluci0nes"""
@@ -6287,6 +6380,23 @@ input RuleInput {
 
 """Ventas detalladas con base a los filtros"""
 type SalesReport {
+  """Categoría"""
+  category: CategoryLevel1
+
+  """
+  Cantidad de productos de la categoría vendidos o cantidad de pedidos generados
+  """
+  quantity: Float!
+
+  """Tienda"""
+  shop: Shop!
+
+  """Valor total de la venta"""
+  total: Float!
+}
+
+"""Ventas detalladas con base a los filtros"""
+type SalesReportInvoicing {
   """Categoría"""
   category: CategoryLevel1
 
@@ -7374,6 +7484,30 @@ type SummarySalesReport {
 
   """Margen de ventas en porcentaje"""
   margin: Float!
+
+  """Cantidad de ventas"""
+  quantity: Float!
+
+  """Valor total de las ventas"""
+  total: Float!
+}
+
+"""Resumen de ventas"""
+type SummarySalesReportInvoicing {
+  """Fecha de cierre de la venta"""
+  closeDate: DateTime!
+
+  """CMV"""
+  cmv: Float!
+
+  """Identificador de la venta"""
+  idOrder: String!
+
+  """Margen de ventas en porcentaje"""
+  margin: Float!
+
+  """Productos de la venta"""
+  products: [ProductDetail!]!
 
   """Cantidad de ventas"""
   quantity: Float!
