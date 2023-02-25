@@ -2582,6 +2582,9 @@ input FiltersInvoicesInput {
   """Identificador del punto de venta"""
   pointOfSaleId: String
 
+  """Identificador de la tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
 }
@@ -2963,6 +2966,33 @@ input FiltersStockAdjustmentsInput {
   warehouseId: String
 }
 
+"""Filtros para la lista de inventarios"""
+input FiltersStockInput {
+  """Id de color"""
+  colorId: String
+
+  """Identificadores de mongo"""
+  ids: [String!]
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para la busqueda del producto, barcode, reference, description"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Id de talla"""
+  sizeId: String
+
+  """Estado del producto"""
+  status: String
+
+  """Bodega de inventario o "all" para traer todos los inventarios"""
+  warehouseId: String
+}
+
 """Filtros para el listado de entradas de productos"""
 input FiltersStockInputsInput {
   """Fecha final para la busqueda"""
@@ -3200,6 +3230,27 @@ type ImageTypes {
 
   """Enlace de imagen pequeña"""
   small: String!
+}
+
+"""Inventarios"""
+type InventoryReport {
+  """Codigo de barras"""
+  barcode: String!
+
+  """Color del producto"""
+  color: Color!
+
+  """Referencia del producto"""
+  reference: Reference!
+
+  """Talla del producto"""
+  size: Size!
+
+  """Cantidad en bodega"""
+  stockQuantity: Float!
+
+  """Bodega"""
+  warehouse: Warehouse!
 }
 
 """Factura"""
@@ -4474,6 +4525,12 @@ type Query {
     """Filtros para obtener el primer producto de la busqueda"""
     filtersProductInput: FiltersProductInput = {}
   ): Product!
+
+  """Consulta el stock de los productos"""
+  productStock(
+    """Filtros para obtener el stock de los productos"""
+    filtersProductStock: FiltersStockInput!
+  ): ResponseStock!
 
   """Lista los productos"""
   products(
@@ -5905,6 +5962,39 @@ type ResponseShops {
 type ResponseSizes {
   """Lista de tallas"""
   docs: [Size!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de los productos"""
+type ResponseStock {
+  """Lista de productos con inventario"""
+  docs: [InventoryReport!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!

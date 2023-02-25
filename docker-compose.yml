@@ -9,11 +9,11 @@ services:
     environment:
       PORT: 8080
       #Mongo
-      MONGO_DB: pos_qa
+      MONGO_DB: pos_pre
       MONGO_USER: cirotex
       MONGO_PASSWORD: prueba
       MONGO_PORT: 27017
-      MONGO_HOST: mongo
+      MONGO_HOST: 192.168.70.254
       MONGO_CONNECTION: mongodb
       # JWT
       SECRET_TOKEN: prueba
