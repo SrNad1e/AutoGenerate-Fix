@@ -127,6 +127,7 @@ export class ProductsService {
 		user: Partial<User>,
 		companyId: string,
 	) {
+		
 		const filters: FilterQuery<Product> = {};
 		const aggregate = [];
 
@@ -148,10 +149,10 @@ export class ProductsService {
 			filters.status = StatusProduct[status] || status;
 		}
 
-		if (name) {
+		if (name) {			
 			const references = await this.referencesService.findAll(
 				{
-					name,
+					name
 				},
 				false,
 				companyId,

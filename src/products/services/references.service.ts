@@ -93,8 +93,8 @@ export class ReferencesService {
 
 		if (name) {
 			filters.$text = {
-				$search: name,
-			};
+				$search : "\""+name+"\""
+			}
 		}
 
 		if (companyId) {
