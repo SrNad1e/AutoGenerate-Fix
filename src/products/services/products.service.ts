@@ -171,10 +171,8 @@ export class ProductsService {
 						_id: product.reference['_id'].toString(),
 					});
 
-					if (
-						reference &&
-						!reference.companies.includes(new Types.ObjectId('companyId'))
-					) {
+					const companies = reference.companies.map((item) => item.toString());
+					if (reference && !companies.includes(companyId)) {
 						throw new BadRequestException(
 							'El producto no está disponible para esta compañia',
 						);
