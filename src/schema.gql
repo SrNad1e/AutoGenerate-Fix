@@ -56,6 +56,15 @@ enum ActionProductsOrder {
   UPDATE
 }
 
+"""Datos para agregar historial de metas a la tienda"""
+input AddGoalHistoryInput {
+  """Historico de metas"""
+  goalHistory: GoalHistoryInput
+
+  """Id de la tienda a la cual se va agregar el historico"""
+  shopId: String!
+}
+
 """Datos para agregar medios de pago al pedido"""
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
@@ -3223,6 +3232,30 @@ input GenerateDailyClosingInput {
   shopId: String!
 }
 
+"""Historial de metas de la tienda"""
+type GoalHistory {
+  """Fecha del registro"""
+  date: DateTime!
+
+  """Meta de la tienda"""
+  goal: Float!
+
+  """Meta alcanzada por la tienda"""
+  goalAchieved: Float!
+}
+
+"""Historial de meta que se va agregar a la tienda"""
+input GoalHistoryInput {
+  """Fecha del registro"""
+  date: DateTime!
+
+  """Meta de la tienda"""
+  goal: Float!
+
+  """Meta alcanzada por la tienda"""
+  goalAchieved: Float
+}
+
 enum GroupDates {
   DAY
   MONTH
@@ -3326,6 +3359,12 @@ input LoginUserInput {
 }
 
 type Mutation {
+  """Se encarga de agregar un historico de meta a una tienda"""
+  addGoalHistory(
+    """Historicos de meta que se van agregar"""
+    AddGoalHistoryInput: AddGoalHistoryInput!
+  ): Shop!
+
   """Se encarga de agregar medios de pago"""
   addPaymentsOrder(
     """Medios de pago y orden a actualizar"""
@@ -6496,6 +6535,9 @@ type Shop {
 
   """Meta asiganda a la tienda"""
   goal: Float!
+
+  """Historico de metas de la tienda"""
+  goalHistory: [GoalHistory!]
 
   """Es centro de distribución"""
   isMain: Boolean!
