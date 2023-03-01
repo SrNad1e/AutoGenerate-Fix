@@ -82,7 +82,6 @@ const populate = [
 export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
-		@InjectModel(ReturnOrder.name)
 		private readonly customersService: CustomersService,
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
