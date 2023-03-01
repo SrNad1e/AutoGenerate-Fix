@@ -3,6 +3,7 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
@@ -22,6 +23,8 @@ import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
 import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { ReturnsOrderService } from './returns-order.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate: PopulateOptions[] = [
 	{
@@ -71,6 +74,8 @@ export class ClosesZinvoicingService {
 		private readonly boxesService: BoxService,
 		private readonly errorsCashService: ErrorsCashService,
 		private readonly returnsOrderService: ReturnsOrderService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -87,7 +92,7 @@ export class ClosesZinvoicingService {
 	) {
 		const filters: FilterQuery<CloseZInvoicing> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -246,6 +251,21 @@ export class ClosesZinvoicingService {
 			pointOfSale._id.toString(),
 		);
 
+		const paymentsOrder = await this.ordersService.getPaymentsOrder({
+			dateInitial,
+			dateFinal,
+			pointOfSaleId: pointOfSale._id.toString(),
+		});
+
+		const paymentsCoupons = paymentsOrder.filter(
+			(p) =>
+				!payments.find(
+					(pay) => pay.payment.toString() === p.payment.toString(),
+				),
+		);
+
+		const newPayments = payments.concat(paymentsCoupons);
+
 		const newClose = new this.closeZInvoicingModel({
 			cashRegister: cashRegister,
 			number,
@@ -258,7 +278,7 @@ export class ClosesZinvoicingService {
 			quantityBank,
 			...summaryOrder,
 			refunds,
-			payments,
+			payments: newPayments,
 			user: {
 				username: user.username,
 				name: user.name,

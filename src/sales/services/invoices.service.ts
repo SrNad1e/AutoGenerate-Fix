@@ -1,5 +1,5 @@
 import { SummaryInvoice, PaymentInvoice } from './../entities/invoice.entity';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -15,6 +15,8 @@ import { Order } from '../entities/order.entity';
 import { PointOfSalesService } from './point-of-sales.service';
 import { AuthorizationsService } from './authorizations.service';
 import { ResponseInvoicing } from '../dtos/response-invoicing';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 require('dayjs/locale/es-mx');
 
@@ -35,6 +37,8 @@ export class InvoicesService {
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly shopsService: ShopsService,
 		private readonly authorizationsService: AuthorizationsService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -46,13 +50,14 @@ export class InvoicesService {
 			dateFinal,
 			dateInitial,
 			pointOfSaleId,
-			shopId
+			paymentIds,
+			shopId,
 		}: FiltersInvoicesInput,
 		user: User,
 		companyId: string,
 	) {
 		const filters: FilterQuery<Invoice> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -89,9 +94,13 @@ export class InvoicesService {
 			}
 		}
 
-
 		if (shopId) {
 			filters['shop._id'] = new Types.ObjectId(shopId);
+		}
+
+		if (paymentIds) {
+			const ids = paymentIds.map((id) => new Types.ObjectId(id));
+			filters['payments.payment._id'] = { $in: ids };
 		}
 
 		const options = {
@@ -108,7 +117,7 @@ export class InvoicesService {
 	async findById(id: string, user: User, companyId: string) {
 		const filters: FilterQuery<Invoice> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -183,8 +192,14 @@ export class InvoicesService {
 		dateInitial,
 		shopId,
 	}: DataGenerateInvoicesInput): Promise<ResponseInvoicing> {
-		const finalDate = dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD');
-		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
+		const finalDate = dayjs(dateFinal)
+			.locale('co')
+			.add(1, 'd')
+			.format('YYYY/MM/DD');
+		const initialDate = dayjs(dateInitial)
+			.locale('co')
+			.startOf('d')
+			.format('YYYY/MM/DD');
 
 		//validar rangos de fecha
 		if (dayjs(finalDate).isBefore(dateInitial)) {
@@ -223,12 +238,24 @@ export class InvoicesService {
 					number: {
 						$first: '$number',
 					},
+					month: {
+						$first: {
+							$month: '$closeDate',
+						},
+					},
+					year: {
+						$first: {
+							$year: '$closeDate',
+						},
+					},
 				},
 			},
 			{
 				$project: {
 					_id: 0,
 					day: '$_id',
+					month: 1,
+					year: 1,
 					total: 1,
 					number: 1,
 				},
@@ -262,7 +289,7 @@ export class InvoicesService {
 				shopId,
 			},
 			{
-				username: 'admin',
+				username: this.configService.USER_ADMIN,
 			} as User,
 			'',
 		);
@@ -298,10 +325,11 @@ export class InvoicesService {
 		let invoiceQuantityBank = 0;
 		let invoiceQuantityCash = 0;
 		let valueInvoicingBank = 0;
+		let valueInvoicingCash = 0;
 		let currentNumber = autorization.lastNumber + 1;
 
 		for (let i = 0; i < totalOrdersDay.length; i++) {
-			const { day, cashTotal } = totalOrdersDay[i];
+			const { day, year, month, cashTotal } = totalOrdersDay[i];
 
 			const di = dayjs(initialDate)
 				.startOf('month')
@@ -369,6 +397,7 @@ export class InvoicesService {
 					orderId: order._id.toString(),
 					closeDate: order.closeDate,
 				});
+
 				posUp++;
 				if (total < cashTotal) {
 					order = orders[posDown];
@@ -382,7 +411,7 @@ export class InvoicesService {
 					break;
 				}
 			}
-
+			valueInvoicingCash = total;
 			invoiceQuantityCash += ordersInvoicing.length;
 
 			ordersInvoicing = ordersInvoicing.concat(
@@ -416,7 +445,7 @@ export class InvoicesService {
 
 				await this.create(
 					{ orderId, pointOfSaleId: pointOfSales?.docs[0]?._id?.toString() },
-					{ username: 'admin' } as User,
+					{ username: this.configService.USER_ADMIN } as User,
 					currentNumber,
 				);
 
@@ -429,14 +458,14 @@ export class InvoicesService {
 				lastNumber: currentNumber - 1,
 				lastDateInvoicing: new Date(finalDate),
 			},
-			{ username: 'admin' } as User,
+			{ username: this.configService.USER_ADMIN } as User,
 			shop.company.toString(),
 		);
 		return {
 			invoiceQuantityCash,
 			invoiceQuantityBank,
 			valueInvoicingBank,
-			valueInvoicingCash: cash,
+			valueInvoicingCash,
 		};
 	}
 }

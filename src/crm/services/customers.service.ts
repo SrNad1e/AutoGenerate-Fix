@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Cron } from '@nestjs/schedule';
+import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
@@ -31,11 +33,11 @@ export class CustomersService {
 	constructor(
 		@InjectModel(Customer.name)
 		private readonly customerModel: PaginateModel<Customer>,
+		@InjectModel(Order.name)
+		private readonly orderModel: PaginateModel<Order>,
 		private readonly documentTypesService: DocumentTypesService,
 		private readonly customerTypeService: CustomerTypeService,
 		private readonly citiesService: CitiesService,
-		@InjectModel(Order.name)
-		private readonly orderModel: PaginateModel<Order>,
 	) {}
 
 	async findAll({
@@ -226,6 +228,17 @@ export class CustomersService {
 			};
 		}
 
+		const customerType = await this.customerTypeService.findOne('Mayorista');
+
+		let wolesalerDate;
+		let firstPurchase = false;
+		//validar que el usuario se valla a actuvar como mayorista
+
+		if (customerTypeId === customerType._id.toString()) {
+			wolesalerDate = new Date();
+			firstPurchase = true;
+		}
+
 		const newCustomer = await this.customerModel.findByIdAndUpdate(
 			{ _id: id },
 			{
@@ -243,6 +256,8 @@ export class CustomersService {
 						_id: user._id,
 					},
 					addresses: newAddresses.length > 0 ? newAddresses : undefined,
+					wolesalerDate,
+					firstPurchase,
 					...params,
 				},
 			},
@@ -289,5 +304,80 @@ export class CustomersService {
 			.findOne({ assigningUser: userId })
 			.populate(populate)
 			.lean();
+	}
+
+	/**
+	 * @description se encargar de pasar a detal a los clientes que no cumplen con la meta mensual
+	 */
+	@Cron('* * 22 * * *')
+	async processWolesaler() {
+		const customerTypeWholesaler = await this.customerTypeService.findOne(
+			'Mayorista',
+		);
+		const customerTypeDetal = await this.customerTypeService.findOne('Detal');
+
+		const customersValidate = [];
+
+		const customersSixty = await this.customerModel.find({
+			customerType: customerTypeWholesaler._id,
+			firstPurchase: true,
+		});
+
+		customersSixty.forEach((customer) => {
+			const dateNow = dayjs(customer.wolesalerDate);
+			const diffTime = dayjs().diff(dateNow, 'day');
+
+			if (diffTime >= 60) {
+				customersValidate.push(customer);
+			}
+		});
+
+		const customersThirty = await this.customerModel.find({
+			customerType: customerTypeWholesaler._id,
+			firstPurchase: false,
+		});
+
+		customersThirty.forEach((customer) => {
+			const dateNow = dayjs(customer.wolesalerDate);
+			const diffTime = dayjs().diff(dateNow, 'day');
+
+			if (diffTime >= 30) {
+				customersValidate.push(customer);
+			}
+		});
+
+		for (let i = 0; i < customersValidate.length; i++) {
+			const { _id } = customersValidate[i];
+
+			const initialDate = dayjs().subtract(30, 'day').format('YYYY/MM/DD');
+			const finalDate = dayjs().add(1, 'day').format('YYYY/MM/DD');
+
+			const orders = await this.orderModel.find({
+				'customer._id': _id,
+				status: StatusOrder.CLOSED,
+				createdAt: {
+					$gte: new Date(initialDate),
+					$lte: new Date(finalDate),
+				},
+			});
+
+			const total = orders.reduce((acc, order) => acc + order.summary.total, 0);
+
+			if (total >= 200000) {
+				await this.customerModel.findByIdAndUpdate(_id, {
+					$set: {
+						wolesalerDate: new Date(),
+						firstPurchase: false,
+					},
+				});
+			} else {
+				await this.customerModel.findByIdAndUpdate(_id, {
+					$set: {
+						customerType: customerTypeDetal._id,
+						firstPurchase: false,
+					},
+				});
+			}
+		}
 	}
 }

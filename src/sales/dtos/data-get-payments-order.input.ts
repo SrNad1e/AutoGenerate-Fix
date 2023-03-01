@@ -15,8 +15,8 @@ export class DataGetPaymentsOrderInput {
 	dateFinal: string;
 
 	@Field(() => String, {
-		description: 'Identificador de la tienda a calcular',
+		description: 'Identificador del punto de venta a calcular',
 		nullable: true,
 	})
-	shopId?: string;
+	pointOfSaleId?: string;
 }

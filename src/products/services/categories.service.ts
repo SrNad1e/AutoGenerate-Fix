@@ -40,8 +40,13 @@ export class CategoriesService {
 		limit = 10,
 		page = 1,
 		sort,
+		companyId,
 	}: FiltersCategoriesInput) {
 		const filters: FilterQuery<CategoryLevel1> = {};
+
+		if (companyId) {
+			filters.company = new Types.ObjectId(companyId);
+		}
 
 		if (name) {
 			filters.name = { $regex: name, $options: 'i' };
@@ -86,7 +91,6 @@ export class CategoriesService {
 			sort,
 			populate,
 		};
-
 		return this.categoryLevel1Model.paginate(filters, options);
 	}
 
@@ -95,6 +99,7 @@ export class CategoriesService {
 		name,
 		_id,
 		parentId,
+		companyId,
 		sort,
 		limit = 10,
 		page = 1,
@@ -110,6 +115,10 @@ export class CategoriesService {
 
 		if (_id) {
 			filters._id = new Types.ObjectId(_id);
+		}
+
+		if (companyId) {
+			filters.company = new Types.ObjectId(companyId);
 		}
 
 		const options = {
@@ -131,18 +140,26 @@ export class CategoriesService {
 		}
 	}
 
-	async findOne({ name }: FiltersCategoryInput) {
-		const categoryLevel1 = await this.categoryLevel1Model.findOne({ name });
+	async findOne({ name, companyId }: FiltersCategoryInput) {
+		const filters: FilterQuery<CategoryLevel1> = {
+			name,
+		};
+
+		if (companyId) {
+			filters.company = new Types.ObjectId(companyId);
+		}
+
+		const categoryLevel1 = await this.categoryLevel1Model.findOne(filters);
 
 		if (categoryLevel1) {
 			return { level: 1, data: categoryLevel1 };
 		}
 
-		const categoryLevel2 = await this.categoryLevel2Model.findOne({ name });
+		const categoryLevel2 = await this.categoryLevel2Model.findOne(filters);
 		if (categoryLevel2) {
 			return { level: 2, data: categoryLevel2 };
 		}
-		const categoryLevel3 = await this.categoryLevel3Model.findOne({ name });
+		const categoryLevel3 = await this.categoryLevel3Model.findOne(filters);
 
 		return { level: 3, data: categoryLevel3 };
 	}
@@ -172,6 +189,7 @@ export class CategoriesService {
 	async create(
 		{ name, level, parentId }: CreateCategoryInput,
 		user: Partial<User>,
+		companyId: string,
 	) {
 		if (level === 1) {
 			const category = await this.categoryLevel1Model.findOne({ name });
@@ -183,6 +201,7 @@ export class CategoriesService {
 			}
 			const newCategory = new this.categoryLevel1Model({
 				name,
+				company: new Types.ObjectId(companyId),
 				user: {
 					username: user.username,
 					name: user.name,
@@ -210,6 +229,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel2Model({
 				name,
+				company: new Types.ObjectId(companyId),
 				user: {
 					username: user.username,
 					name: user.name,
@@ -246,6 +266,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel3Model({
 				name,
+				company: new Types.ObjectId(companyId),
 				user: {
 					username: user.username,
 					name: user.name,

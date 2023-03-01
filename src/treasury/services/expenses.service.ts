@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -16,6 +17,8 @@ import { Box } from '../entities/box.entity';
 import { Expense, StatusExpense } from '../entities/expense.entity';
 import { BoxHistoryService } from './box-history.service';
 import { BoxService } from './box.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -31,6 +34,8 @@ export class ExpensesService {
 		private readonly expenseModel: PaginateModel<Expense>,
 		private readonly boxService: BoxService,
 		private readonly boxHistoryService: BoxHistoryService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -49,7 +54,7 @@ export class ExpensesService {
 	) {
 		const filters: FilterQuery<Expense> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -108,7 +113,10 @@ export class ExpensesService {
 				throw new BadRequestException('La caja no existe');
 			}
 
-			if (box?.company?.toString() !== companyId && user.username !== 'admin') {
+			if (
+				box?.company?.toString() !== companyId &&
+				user.username !== this.configService.USER_ADMIN
+			) {
 				throw new UnauthorizedException(
 					'El usuario no esta autorizado para realizar cambios en esta caja',
 				);
@@ -172,7 +180,7 @@ export class ExpensesService {
 
 		if (
 			expense?.company.toString() !== companyId &&
-			user.username !== 'admin'
+			user.username !== this.configService.USER_ADMIN
 		) {
 			throw new UnauthorizedException(
 				`El usuario no tiene permisos para actualizar este egreso`,
