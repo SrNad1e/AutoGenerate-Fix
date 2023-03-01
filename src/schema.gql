@@ -379,8 +379,8 @@ type CategoryLevel1 {
   """Nombre de la categoría"""
   childs: [CategoryLevel2!]
 
-  """Compañía"""
-  company: Company!
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -403,8 +403,8 @@ type CategoryLevel2 {
   """Categorías inferiores"""
   childs: [CategoryLevel3!]
 
-  """Compañía"""
-  company: Company!
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -427,8 +427,8 @@ type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
 
-  """Compañía"""
-  company: Company!
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -660,6 +660,9 @@ type Company {
 
   """Correo de la compañia"""
   email: String!
+
+  """Si la compañia es principal"""
+  isMain: Boolean!
 
   """Url del logo de la compañía"""
   logo: String!
@@ -2596,6 +2599,9 @@ input FiltersInvoicesInput {
 
   """Identificador del punto de venta"""
   pointOfSaleId: String
+
+  """Identificador de la tienda"""
+  shopId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice

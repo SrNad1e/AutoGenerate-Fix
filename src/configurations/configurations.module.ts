@@ -1,3 +1,5 @@
+import { CategoryLevel1Schema } from './../products/entities/category-level1.entity';
+import { CategoryLevel1 } from 'src/products/entities/category-level1.entity';
 import { Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -49,6 +51,14 @@ import { TokensService } from './services/tokens.service';
 import { InterapidisimoService } from './services/interapidisimo.service';
 import { FedexService } from './services/fedex.service';
 import { Product, ProductSchema } from 'src/products/entities/product.entity';
+import {
+	CategoryLevel2,
+	CategoryLevel2Schema,
+} from 'src/products/entities/category-level2.entity';
+import {
+	CategoryLevel3,
+	CategoryLevel3Schema,
+} from 'src/products/entities/category-level3.entity';
 
 @Module({
 	imports: [
@@ -71,6 +81,9 @@ import { Product, ProductSchema } from 'src/products/entities/product.entity';
 		}),
 		MongooseModule.forFeature([
 			{ name: 'Company', schema: CompanySchema },
+			{ name: CategoryLevel1.name, schema: CategoryLevel1Schema },
+			{ name: CategoryLevel2.name, schema: CategoryLevel2Schema },
+			{ name: CategoryLevel3.name, schema: CategoryLevel3Schema },
 			{ name: Conveyor.name, schema: ConveyorSchema },
 			{
 				name: Image.name,
