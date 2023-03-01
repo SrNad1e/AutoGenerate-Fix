@@ -96,6 +96,7 @@ export class ReferencesService {
 				$search: name,
 			};
 		}
+		console.log(companyId);
 
 		if (companyId) {
 			filters.companies = {

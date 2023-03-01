@@ -33,4 +33,7 @@ export class FiltersCategoriesLevelInput {
 
 	@Field(() => SortCategories, { description: 'Ordenamiento', nullable: true })
 	sort?: SortCategories;
+
+	@Field(() => String, { description: 'Compañía', nullable: true })
+	companyId?: string;
 }

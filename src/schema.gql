@@ -379,6 +379,9 @@ type CategoryLevel1 {
   """Nombre de la categoría"""
   childs: [CategoryLevel2!]
 
+  """Compañía"""
+  company: Company!
+
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
 
@@ -400,6 +403,9 @@ type CategoryLevel2 {
   """Categorías inferiores"""
   childs: [CategoryLevel3!]
 
+  """Compañía"""
+  company: Company!
+
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
 
@@ -420,6 +426,9 @@ type CategoryLevel2 {
 type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañía"""
+  company: Company!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -2153,6 +2162,9 @@ input FiltersCategoriesInput {
   """Identificador de la categoría padre"""
   _id: String
 
+  """Compañía"""
+  companyId: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -2170,6 +2182,9 @@ input FiltersCategoriesInput {
 input FiltersCategoriesLevelInput {
   """Identificador de la categoría"""
   _id: String
+
+  """Compañía"""
+  companyId: String
 
   """Nivel de categoria"""
   level: Float!
