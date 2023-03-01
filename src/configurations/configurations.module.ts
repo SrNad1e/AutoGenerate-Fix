@@ -1,3 +1,5 @@
+import { CategoryLevel1Schema } from './../products/entities/category-level1.entity';
+import { CategoryLevel1 } from 'src/products/entities/category-level1.entity';
 import { Module, forwardRef } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -54,6 +56,14 @@ import {
 	Reference,
 	ReferenceSchema,
 } from 'src/products/entities/reference.entity';
+import {
+	CategoryLevel2,
+	CategoryLevel2Schema,
+} from 'src/products/entities/category-level2.entity';
+import {
+	CategoryLevel3,
+	CategoryLevel3Schema,
+} from 'src/products/entities/category-level3.entity';
 
 @Module({
 	imports: [
@@ -77,6 +87,9 @@ import {
 		}),
 		MongooseModule.forFeature([
 			{ name: 'Company', schema: CompanySchema },
+			{ name: CategoryLevel1.name, schema: CategoryLevel1Schema },
+			{ name: CategoryLevel2.name, schema: CategoryLevel2Schema },
+			{ name: CategoryLevel3.name, schema: CategoryLevel3Schema },
 			{ name: Conveyor.name, schema: ConveyorSchema },
 			{
 				name: Image.name,

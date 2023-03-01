@@ -43,9 +43,9 @@ export class CategoryLevel1 extends Document {
 	})
 	updatedAt: Date;
 
-	@Field(() => Company, { description: 'Compañía' })
+	@Field(() => [Company], { description: 'Compañías' })
 	@Prop({ type: Types.ObjectId, ref: Company.name, autopopulate: true })
-	company: Types.ObjectId;
+	companies: Types.ObjectId[];
 }
 
 export const CategoryLevel1Schema =
