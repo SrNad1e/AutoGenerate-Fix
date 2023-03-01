@@ -2409,7 +2409,7 @@ export class OrdersService {
 							isCredit: false,
 							boxId:
 								payment?.type === 'cash'
-									? pointOfSale['box']?.toString()
+									? pointOfSale['box']?._id?.toString()
 									: undefined,
 						};
 
