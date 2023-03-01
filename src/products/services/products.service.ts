@@ -162,6 +162,25 @@ export class ProductsService {
 					$in: references.docs.map((item) => item._id),
 				};
 			} else {
+				const product = await this.productModel.findOne({
+					barcode: name,
+				});
+
+				if (product) {
+					const reference = await this.referencesService.findOne({
+						_id: product.reference['_id'].toString(),
+					});
+
+					if (
+						reference &&
+						!reference.companies.includes(new Types.ObjectId('companyId'))
+					) {
+						throw new BadRequestException(
+							'El producto no está disponible para esta compañia',
+						);
+					}
+				}
+
 				filters.barcode = name;
 			}
 		}
