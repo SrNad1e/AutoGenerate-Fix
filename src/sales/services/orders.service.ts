@@ -1,3 +1,4 @@
+import { Box } from 'src/treasury/entities/box.entity';
 import {
 	BadRequestException,
 	Injectable,
@@ -62,10 +63,8 @@ import {
 	StatusOrderDetail,
 } from '../entities/order.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
-import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { StatusWebHistoriesService } from './status-web-histories.service';
-import { Shop } from 'src/configurations/entities/shop.entity';
 
 const populate = [
 	{
@@ -74,7 +73,10 @@ const populate = [
 	},
 	{
 		path: 'pointOfSale',
-		model: PointOfSale.name,
+		populate: {
+			path: 'box',
+			model: Box.name,
+		},
 	},
 ];
 
