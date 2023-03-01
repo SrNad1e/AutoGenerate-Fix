@@ -1,34 +1,56 @@
 import { Field, ObjectType } from "@nestjs/graphql";
+import { User } from "src/configurations/entities/user.entity";
 import { Warehouse } from "src/configurations/entities/warehouse.entity";
 import { Color } from "src/products/entities/color.entity";
 import { Reference } from "src/products/entities/reference.entity";
 import { Size } from "src/products/entities/size.entity";
 
+
+@ObjectType({ description: 'Inventario por bodegas del producto' })
+class StockProduct {
+	@Field(() => Warehouse, { description: 'Identificador de la bodega', nullable: true })
+	warehouse: Warehouse;
+
+	@Field(() => Number, { description: 'Cantidad de productos en la bodega' })
+	quantity: number;
+
+	@Field(() => User, { description: 'Usuario que crea los datos de envío' })
+	user: User;
+
+	@Field(() => Date, { description: 'Fecha de creación del dato de envio' })
+	createdAt: Date;
+
+	@Field(() => Date, {
+		description: 'Fecha de actualización del dato de envio',
+	})
+	updatedAt: Date;
+}
+
 @ObjectType({ description: 'Inventarios' })
 class InventoryReport {
-    @Field(() => Warehouse, { description: 'Bodega' })
-    warehouse: Warehouse;
+	@Field(() => StockProduct, { description: 'Bodega', nullable: true })
+	stock: StockProduct;
 
-    @Field(() => String, { description: 'Codigo de barras' })
-    barcode: string;
+	@Field(() => String, { description: 'Codigo de barras' })
+	barcode: string;
 
-    @Field(() => Reference, {
-        description: 'Referencia del producto',
-    })
-    reference: Reference;
+	@Field(() => Reference, {
+		description: 'Referencia del producto',
+	})
+	reference: Reference;
 
-    @Field(() => Color, { description: 'Color del producto' })
-    color: Color;
+	@Field(() => Color, { description: 'Color del producto' })
+	color: Color;
 
-    @Field(() => Size, { description: 'Talla del producto' })
-    size: Size;
+	@Field(() => Size, { description: 'Talla del producto' })
+	size: Size;
 
-    @Field(() => Number, { description: 'Cantidad en bodega' })
-    stockQuantity: number;
+	@Field(() => Warehouse, { description: 'bodega del producto', nullable: true })
+	productWarehouse: Warehouse
 }
 
 @ObjectType({ description: 'Respuesta al listado de los productos' })
-export class ResponseStock{
+export class ResponseStock {
 	@Field(() => [InventoryReport], { description: 'Lista de productos con inventario' })
 	docs: InventoryReport[];
 

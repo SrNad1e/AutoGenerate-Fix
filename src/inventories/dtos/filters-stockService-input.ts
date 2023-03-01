@@ -2,12 +2,6 @@ import { InputType, Field } from "@nestjs/graphql";
 
 @InputType({ description: 'Filtros para la lista de inventarios' })
 export class FiltersStockInput {
-	@Field(() => [String], {
-		description: 'Identificadores de mongo',
-		nullable: true,
-	})
-	ids?: string[];
-
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
 

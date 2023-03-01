@@ -2971,9 +2971,6 @@ input FiltersStockInput {
   """Id de color"""
   colorId: String
 
-  """Identificadores de mongo"""
-  ids: [String!]
-
   """Cantidad de registros"""
   limit: Float
 
@@ -3240,17 +3237,17 @@ type InventoryReport {
   """Color del producto"""
   color: Color!
 
+  """bodega del producto"""
+  productWarehouse: Warehouse
+
   """Referencia del producto"""
   reference: Reference!
 
   """Talla del producto"""
   size: Size!
 
-  """Cantidad en bodega"""
-  stockQuantity: Float!
-
   """Bodega"""
-  warehouse: Warehouse!
+  stock: StockProduct
 }
 
 """Factura"""
@@ -4109,6 +4106,7 @@ enum Permissions {
   ACCESS_INVENTORY_OUTPUTS
   ACCESS_INVENTORY_PRODUCTS
   ACCESS_INVENTORY_REFERENCES
+  ACCESS_INVENTORY_REPORTS
   ACCESS_INVENTORY_REQUESTS
   ACCESS_INVENTORY_SIZES
   ACCESS_INVENTORY_TRANSFERS
@@ -4202,6 +4200,7 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_STOCK_PRODUCTS
   READ_TREASURY_BOXES
   READ_TREASURY_ERRORS_CASH
   READ_TREASURY_EXPENSES
@@ -4529,7 +4528,7 @@ type Query {
   """Consulta el stock de los productos"""
   productStock(
     """Filtros para obtener el stock de los productos"""
-    filtersProductStock: FiltersStockInput!
+    filtersProductStock: FiltersStockInput = {}
   ): ResponseStock!
 
   """Lista los productos"""
@@ -7260,6 +7259,24 @@ type StockOutput {
 
   """Bodega de la salida"""
   warehouse: Warehouse!
+}
+
+"""Inventario por bodegas del producto"""
+type StockProduct {
+  """Fecha de creación del dato de envio"""
+  createdAt: DateTime!
+
+  """Cantidad de productos en la bodega"""
+  quantity: Float!
+
+  """Fecha de actualización del dato de envio"""
+  updatedAt: DateTime!
+
+  """Usuario que crea los datos de envío"""
+  user: User!
+
+  """Identificador de la bodega"""
+  warehouse: Warehouse
 }
 
 """Solicitud de productos"""

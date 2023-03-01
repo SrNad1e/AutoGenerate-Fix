@@ -45,6 +45,7 @@ import { StockTransferErrorsService } from './services/stock-transfer-errors.ser
 import { StockTransferErrorsResolver } from './resolvers/stock-transfer-errors.resolver';
 import { StockResolver } from './resolvers/stock-service.resolver';
 import { StockService } from './services/stock.service';
+import { Product, ProductSchema } from 'src/products/entities/product.entity';
 
 @Module({
 	imports: [
@@ -87,6 +88,7 @@ import { StockService } from './services/stock.service';
 				name: StockTransferError.name,
 				schema: StockTransferErrorSchema,
 			},
+			{ name: Product.name, schema: ProductSchema },
 		]),
 	],
 	providers: [
