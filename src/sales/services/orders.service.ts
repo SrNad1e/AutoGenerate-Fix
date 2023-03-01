@@ -1,3 +1,4 @@
+import { Box } from 'src/treasury/entities/box.entity';
 import {
 	BadRequestException,
 	Injectable,
@@ -66,7 +67,6 @@ import {
 	StatusOrderDetail,
 } from '../entities/order.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
-import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
 import { PointOfSalesService } from './point-of-sales.service';
 import { StatusWebHistoriesService } from './status-web-histories.service';
@@ -82,7 +82,10 @@ const populate = [
 	},
 	{
 		path: 'pointOfSale',
-		model: PointOfSale.name,
+		populate: {
+			path: 'box',
+			model: Box.name,
+		},
 	},
 ];
 
@@ -703,52 +706,6 @@ export class OrdersService {
 							status: StatusOrderDetail.CONFIRMED,
 						});
 					}
-
-					/*	if (
-						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
-					) {
-						const pointOfSale = order.pointOfSale || user.pointOfSale;
-
-						const valuesReceipt = {
-							value: total,
-							paymentId: payment?._id?.toString(),
-							isCredit: false,
-							pointOfSaleId: pointOfSale?._id?.toString(),
-							concept: `Abono a pedido ${order?.number}`,
-							boxId:
-								payment?.type === 'cash'
-									? pointOfSale['box']?.toString()
-									: undefined,
-						};
-
-						const { receipt } = await this.receiptsService.create(
-							valuesReceipt,
-							user,
-							companyId,
-						);
-						newPayments.push({
-							...order?.payments[i],
-							receipt: receipt?._id,
-						});
-					} else if (payment.type === TypePayment.CREDIT) {
-						newPayments.push(order?.payments[i]);
-
-						await this.creditHistoryService.thawedCreditHistory(
-							order?._id?.toString(),
-							total,
-							user,
-							companyId,
-						);
-
-						await this.creditHistoryService.addCreditHistory(
-							order?._id?.toString(),
-							total,
-							user,
-							companyId,
-						);
-					} else {
-						newPayments.push(order?.payments[i]);
-					}*/
 				}
 
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
@@ -2483,7 +2440,7 @@ export class OrdersService {
 							isCredit: false,
 							boxId:
 								payment?.type === 'cash'
-									? pointOfSale['box']?.toString()
+									? pointOfSale['box']?._id?.toString()
 									: undefined,
 						};
 
