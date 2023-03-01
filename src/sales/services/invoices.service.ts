@@ -46,6 +46,7 @@ export class InvoicesService {
 			dateFinal,
 			dateInitial,
 			pointOfSaleId,
+			shopId
 		}: FiltersInvoicesInput,
 		user: User,
 		companyId: string,
@@ -86,6 +87,11 @@ export class InvoicesService {
 			if (pointOfSale) {
 				filters['authorization._id'] = pointOfSale?.authorization?._id;
 			}
+		}
+
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
 		}
 
 		const options = {

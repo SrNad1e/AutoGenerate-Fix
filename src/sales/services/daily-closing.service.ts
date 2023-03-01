@@ -79,7 +79,7 @@ export class DailyClosingService {
 			const initialDate = dayjs(dateInitial).startOf('day').toDate();
 			const finalDate = dayjs(dateFinal).endOf('day').toDate();
 
-			filters.date = {
+			filters.closeDate = {
 				$gte: initialDate,
 				$lte: finalDate,
 			};
