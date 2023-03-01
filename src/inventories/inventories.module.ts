@@ -43,6 +43,9 @@ import {
 } from './entities/stock-trasnsfer-error.entity';
 import { StockTransferErrorsService } from './services/stock-transfer-errors.service';
 import { StockTransferErrorsResolver } from './resolvers/stock-transfer-errors.resolver';
+import { StockResolver } from './resolvers/stock-service.resolver';
+import { StockService } from './services/stock.service';
+import { Product, ProductSchema } from 'src/products/entities/product.entity';
 
 @Module({
 	imports: [
@@ -85,6 +88,7 @@ import { StockTransferErrorsResolver } from './resolvers/stock-transfer-errors.r
 				name: StockTransferError.name,
 				schema: StockTransferErrorSchema,
 			},
+			{ name: Product.name, schema: ProductSchema },
 		]),
 	],
 	providers: [
@@ -101,6 +105,8 @@ import { StockTransferErrorsResolver } from './resolvers/stock-transfer-errors.r
 		StockAdjustmentResolver,
 		StockTransferErrorsService,
 		StockTransferErrorsResolver,
+		StockResolver,
+		StockService
 	],
 	controllers: [],
 	exports: [StockHistoryService],

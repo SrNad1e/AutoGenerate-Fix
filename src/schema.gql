@@ -3032,6 +3032,30 @@ input FiltersStockAdjustmentsInput {
   warehouseId: String
 }
 
+"""Filtros para la lista de inventarios"""
+input FiltersStockInput {
+  """Id de color"""
+  colorId: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para la busqueda del producto, barcode, reference, description"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Id de talla"""
+  sizeId: String
+
+  """Estado del producto"""
+  status: String
+
+  """Bodega de inventario o "all" para traer todos los inventarios"""
+  warehouseId: String
+}
+
 """Filtros para el listado de entradas de productos"""
 input FiltersStockInputsInput {
   """Fecha final para la busqueda"""
@@ -3293,6 +3317,27 @@ type ImageTypes {
 
   """Enlace de imagen pequeña"""
   small: String!
+}
+
+"""Inventarios"""
+type InventoryReport {
+  """Codigo de barras"""
+  barcode: String!
+
+  """Color del producto"""
+  color: Color!
+
+  """bodega del producto"""
+  productWarehouse: Warehouse
+
+  """Referencia del producto"""
+  reference: Reference!
+
+  """Talla del producto"""
+  size: Size!
+
+  """Bodega"""
+  stock: StockProduct
 }
 
 """Factura"""
@@ -4169,6 +4214,7 @@ enum Permissions {
   ACCESS_INVENTORY_OUTPUTS
   ACCESS_INVENTORY_PRODUCTS
   ACCESS_INVENTORY_REFERENCES
+  ACCESS_INVENTORY_REPORTS
   ACCESS_INVENTORY_REQUESTS
   ACCESS_INVENTORY_SIZES
   ACCESS_INVENTORY_TRANSFERS
@@ -4262,6 +4308,7 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_STOCK_PRODUCTS
   READ_TREASURY_BOXES
   READ_TREASURY_ERRORS_CASH
   READ_TREASURY_EXPENSES
@@ -4612,6 +4659,12 @@ type Query {
     """Filtros para obtener el primer producto de la busqueda"""
     filtersProductInput: FiltersProductInput = {}
   ): Product!
+
+  """Consulta el stock de los productos"""
+  productStock(
+    """Filtros para obtener el stock de los productos"""
+    filtersProductStock: FiltersStockInput = {}
+  ): ResponseStock!
 
   """Lista los productos"""
   products(
@@ -6093,6 +6146,39 @@ type ResponseSizes {
   totalPages: Float!
 }
 
+"""Respuesta al listado de los productos"""
+type ResponseStock {
+  """Lista de productos con inventario"""
+  docs: [InventoryReport!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Lista de ajustes de productos"""
 type ResponseStockAdjustments {
   """Lista de ajustes"""
@@ -7352,6 +7438,24 @@ type StockOutput {
 
   """Bodega de la salida"""
   warehouse: Warehouse!
+}
+
+"""Inventario por bodegas del producto"""
+type StockProduct {
+  """Fecha de creación del dato de envio"""
+  createdAt: DateTime!
+
+  """Cantidad de productos en la bodega"""
+  quantity: Float!
+
+  """Fecha de actualización del dato de envio"""
+  updatedAt: DateTime!
+
+  """Usuario que crea los datos de envío"""
+  user: User!
+
+  """Identificador de la bodega"""
+  warehouse: Warehouse
 }
 
 """Solicitud de productos"""
