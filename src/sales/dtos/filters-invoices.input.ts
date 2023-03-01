@@ -27,19 +27,19 @@ export class FiltersInvoicesInput {
 		description: 'Fecha inicial para la busqueda',
 		nullable: true,
 	})
-	dateInitial: string;
+	dateInitial?: string;
 
 	@Field(() => String, {
 		description: 'Fecha final para la busqueda',
 		nullable: true,
 	})
-	dateFinal: string;
+	dateFinal?: string;
 
 	@Field(() => String, {
 		description: 'Identificador del punto de venta',
 		nullable: true,
 	})
-	pointOfSaleId: string;
+	pointOfSaleId?: string;
 
 	@Field(() => String, {
 		description: 'Identificador de la tienda',
@@ -47,11 +47,17 @@ export class FiltersInvoicesInput {
 	})
 	shopId?: string;
 
+	@Field(() => [String], {
+		description: 'Identificador de los medios de pago',
+		nullable: true,
+	})
+	paymentIds?: string[];
+
 	@Field(() => Boolean, {
 		description: 'Si la factura de encuentra se encuentra activa',
 		nullable: true,
 	})
-	active: boolean;
+	active?: boolean;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;

@@ -5,6 +5,7 @@ import { Document, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
 
 import { CategoryLevel2 } from './category-level2.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 @ObjectType({ description: 'Categoría del producto nivel 1' })
 @Schema({ timestamps: true })
@@ -41,19 +42,11 @@ export class CategoryLevel1 extends Document {
 		description: 'Fecha de actualización de la categoría',
 	})
 	updatedAt: Date;
+
+	@Field(() => Company, { description: 'Compañía' })
+	@Prop({ type: Types.ObjectId, ref: Company.name, autopopulate: true })
+	company: Types.ObjectId;
 }
 
 export const CategoryLevel1Schema =
 	SchemaFactory.createForClass(CategoryLevel1);
-
-/*@Entity({ name: 'categories' })
-export class CategoryMysql {
-	@PrimaryGeneratedColumn()
-	id: number;
-
-	@Column({ type: 'varchar' })
-	name: string;
-
-	@Column({ type: 'int' })
-	parent_id: number;
-}*/

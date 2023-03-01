@@ -105,7 +105,7 @@ export class PaymentCredit {
 	@Field(() => Payment, {
 		description: 'Medio de pago',
 	})
-	payment: Types.ObjectId;
+	payment: Payment;
 }
 
 @Schema({ timestamps: true, collection: 'closesXInvoicing' })
@@ -164,7 +164,7 @@ export class CloseXInvoicing extends Document {
 		description: 'Medios de pago usados para cruzar créditos',
 		nullable: true,
 	})
-	@Prop({ type: Array })
+	@Prop({ type: Array, default: [] })
 	paymentsCredit?: PaymentCredit[];
 
 	@Field(() => Number, {

@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { InjectModel } from '@nestjs/mongoose';
@@ -30,6 +31,8 @@ import {
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
 import { StatusProduct } from 'src/products/entities/product.entity';
+import { ConfigType } from '@nestjs/config';
+import config from 'src/config';
 
 const populate = [
 	{
@@ -69,6 +72,8 @@ export class StockOutputService {
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -87,7 +92,7 @@ export class StockOutputService {
 	) {
 		const filters: FilterQuery<StockOutput> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
@@ -136,7 +141,7 @@ export class StockOutputService {
 
 	async findById(_id: string, user: Partial<User>, companyId: string) {
 		const filters: FilterQuery<StockOutput> = { _id };
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 		const response = await this.stockOutputModel
@@ -260,7 +265,7 @@ export class StockOutputService {
 		const stockOutput = await this.stockOutputModel.findById(id).lean();
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			stockOutput.company._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(

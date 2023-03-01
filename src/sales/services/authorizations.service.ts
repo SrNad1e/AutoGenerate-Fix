@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -14,6 +15,8 @@ import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
 import { ClosesZinvoicingService } from './closes-zinvoicing.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -30,6 +33,8 @@ export class AuthorizationsService {
 		private readonly shopsService: ShopsService,
 		private readonly receiptsService: ReceiptsService,
 		private readonly closeZService: ClosesZinvoicingService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -39,7 +44,7 @@ export class AuthorizationsService {
 	) {
 		const filters: FilterQuery<AuthorizationDian> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -116,7 +121,7 @@ export class AuthorizationsService {
 		}
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			authorization?.company.toString() !== companyId
 		) {
 			throw new UnauthorizedException(

@@ -1,7 +1,9 @@
+import { ConfigType } from '@nestjs/config';
 import { AuthorizationDian } from './../../sales/entities/authorization.entity';
 import { TypeDocument } from './../../credits/entities/credit-history.entity';
 import {
 	BadRequestException,
+	Inject,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
@@ -26,6 +28,7 @@ import { Order, StatusOrder } from 'src/sales/entities/order.entity';
 import { CreditsService } from 'src/credits/services/credits.service';
 import { PointOfSale } from 'src/sales/entities/pointOfSale.entity';
 import { ReceiptNumber } from '../entities/receipt-number.entity';
+import config from 'src/config';
 
 const populate = [
 	{
@@ -49,6 +52,8 @@ export class ReceiptsService {
 		private readonly boxHistoryService: BoxHistoryService,
 		private readonly creditHistoryService: CreditHistoryService,
 		private readonly creditsService: CreditsService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -69,7 +74,7 @@ export class ReceiptsService {
 	) {
 		const filters: FilterQuery<Receipt> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -258,7 +263,7 @@ export class ReceiptsService {
 
 		if (
 			receipt?.company.toString() !== companyId &&
-			user.username !== 'admin'
+			user.username !== this.configService.USER_ADMIN
 		) {
 			throw new UnauthorizedException(
 				`El usuario no tiene permisos para actualizar este recibo`,

@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel } from 'mongoose';
@@ -18,6 +19,8 @@ import {
 } from '../entities/discountRule.entity';
 import { CustomersService } from './customers.service';
 import { UpdateDiscountRuleInput } from '../dtos/update-discount-rule.input';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class DiscountRulesService {
@@ -25,6 +28,8 @@ export class DiscountRulesService {
 		@InjectModel(DiscountRule.name)
 		private readonly discountRuler: PaginateModel<DiscountRule>,
 		private readonly customersService: CustomersService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -42,7 +47,7 @@ export class DiscountRulesService {
 	) {
 		const filters: FilterQuery<DiscountRule> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters['rules.documentIds'] = companyId;
 		}
 
@@ -147,7 +152,7 @@ export class DiscountRulesService {
 		}
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			!!discountRule?.rules?.find((item) =>
 				item?.documentIds.includes(companyId),
 			)

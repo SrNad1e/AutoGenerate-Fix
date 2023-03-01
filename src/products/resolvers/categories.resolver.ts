@@ -68,6 +68,7 @@ export class CategoriesResolver {
 		return this.categoriesService.create(
 			context.req.body.variables.input,
 			context.req.user.user,
+			context.req.user.companyId,
 		);
 	}
 
