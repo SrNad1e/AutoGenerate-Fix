@@ -231,7 +231,7 @@ export class Order extends Document {
 	@Prop({ type: Array, default: [] })
 	details: DetailOrder[];
 
-	@Field(() => PointOfSale, { description: 'Punto de venta asigando' })
+	@Field(() => PointOfSale, { description: 'Punto de venta asigando', nullable: true })
 	@Prop({
 		type: Types.ObjectId,
 		ref: PointOfSale.name,
