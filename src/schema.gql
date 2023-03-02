@@ -4001,7 +4001,7 @@ type Order {
   payments: [PaymentOrder!]
 
   """Punto de venta asigando"""
-  pointOfSale: PointOfSale!
+  pointOfSale: PointOfSale
 
   """Tienda donde se solicita el pedido"""
   shop: Shop!
