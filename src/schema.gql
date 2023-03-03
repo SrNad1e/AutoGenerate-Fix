@@ -1214,6 +1214,9 @@ input CreateRoleInput {
 
   """Identificadores de los permisos asignados"""
   permissionIds: [String!]!
+
+  """Orden por gerarquía"""
+  rank: Float
 }
 
 """Datos para la creación de la tienda"""
@@ -2581,6 +2584,9 @@ input FiltersInvoicesInput {
 
   """Identificador del punto de venta"""
   pointOfSaleId: String
+
+  """Identificador de la tienda"""
+  shopId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
@@ -6254,6 +6260,9 @@ type Role {
   """Permisos al los quie tiene el rol"""
   permissions: [Permission!]!
 
+  """Orden por gerarquía"""
+  rank: Float!
+
   """Fecha en la que se actualizó el rol"""
   updatedAt: DateTime!
 
@@ -7781,6 +7790,9 @@ input UpdateRoleInput {
 
   """Identificadores de los permisos seleccionados"""
   permissionIds: [String!]
+
+  """Orden por gerarquía"""
+  rank: Float
 }
 
 """Datos para actualizar la tienda"""
