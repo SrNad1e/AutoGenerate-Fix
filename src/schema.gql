@@ -2582,6 +2582,9 @@ input FiltersInvoicesInput {
   """Identificador del punto de venta"""
   pointOfSaleId: String
 
+  """Identificador de la tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
 }
@@ -7263,6 +7266,9 @@ type StockTransfer {
 type StockTransferError {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañía del traslado"""
+  company: Company!
 
   """Fecha de creación del traslado"""
   createdAt: DateTime!
