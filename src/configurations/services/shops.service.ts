@@ -21,7 +21,7 @@ import {
 } from '../../configurations/entities/shop.entity';
 import { Warehouse } from '../entities/warehouse.entity';
 import { User } from 'src/configurations/entities/user.entity';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { AddGoalHistoryInput } from '../dtos/add-goalHistory-shop.input';
 import { OrdersService } from 'src/sales/services/orders.service';
 import config from 'src/config';
