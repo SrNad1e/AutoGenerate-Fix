@@ -126,6 +126,7 @@ export class CategoriesService {
 		const options = {
 			limit,
 			page,
+			populate,
 			lean: true,
 			sort,
 		};
@@ -135,6 +136,7 @@ export class CategoriesService {
 				return this.categoryLevel1Model.paginate(filters, options);
 			case 2:
 				return this.categoryLevel2Model.paginate({ ...filters }, options);
+
 			case 3:
 				return this.categoryLevel3Model.paginate({ ...filters }, options);
 			default:
