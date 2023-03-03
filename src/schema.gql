@@ -7452,6 +7452,9 @@ type StockTransferError {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía del traslado"""
+  company: Company!
+
   """Fecha de creación del traslado"""
   createdAt: DateTime!
 
