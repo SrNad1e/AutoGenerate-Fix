@@ -76,13 +76,15 @@ export class ErrorsCashService {
 		}
 
 		if (closeZNumber) {
-			const closeZ = await this.closeZInvoicingModel.findOne({
+			const closeZ = await this.closeZInvoicingModel.find({
 				number: closeZNumber,
 				company: new Types.ObjectId(companyId),
 			});
 
 			if (closeZ) {
-				filters.closeZ = closeZ._id;
+				filters.closeZ = {
+					$in: closeZ.map((c) => c._id),
+				};
 			}
 		}
 
