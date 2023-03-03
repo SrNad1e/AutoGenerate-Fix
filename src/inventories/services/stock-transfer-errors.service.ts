@@ -31,16 +31,18 @@ export class StockTransferErrorsService {
 		private readonly stockHistoryService: StockHistoryService,
 	) {}
 
-	async findAll({
-		limit = 10,
-		page = 1,
-		verifield,
-		sort,
-	}: FiltersStockTransfersErrorInput) {
+	async findAll(
+		{ limit = 10, page = 1, verifield, sort }: FiltersStockTransfersErrorInput,
+		user: User,
+	) {
 		const filters: FilterQuery<StockTransferError> = {};
 
 		if (verifield !== undefined) {
 			filters.verified = verifield;
+		}
+
+		if (!['admin', 'master'].includes(user.username)) {
+			filters.company = new Types.ObjectId(user.company._id);
 		}
 
 		const options = {
@@ -211,6 +213,7 @@ export class StockTransferErrorsService {
 			return this.stockTransferErrorModel.create({
 				stockTransfer: new Types.ObjectId(stockTransferId),
 				details: newDetails,
+				company: new Types.ObjectId(user.company._id),
 			});
 		}
 	}
