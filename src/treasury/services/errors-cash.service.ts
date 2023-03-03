@@ -56,6 +56,7 @@ export class ErrorsCashService {
 			typeError,
 			value,
 			verified,
+			boxId
 		}: FiltersErrorsCashInput,
 		user: User,
 		companyId: string,
@@ -77,6 +78,10 @@ export class ErrorsCashService {
 
 		if (newTypeError) {
 			filters.typeError = newTypeError;
+		}
+
+		if (boxId) {
+			filters.boxOrigin = new Types.ObjectId(boxId);
 		}
 
 		if (closeZNumber) {
