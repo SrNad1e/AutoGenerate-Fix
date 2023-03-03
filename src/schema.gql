@@ -2582,6 +2582,9 @@ input FiltersInvoicesInput {
   """Identificador del punto de venta"""
   pointOfSaleId: String
 
+  """Identificador de la tienda"""
+  shopId: String
+
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
 }
