@@ -2540,6 +2540,9 @@ input FiltersDocumentTypesInput {
 
 """Listado de errores de efectivo"""
 input FiltersErrorsCashInput {
+  """tiendas"""
+  boxId: String
+
   """Número del cierre que efectúa el error"""
   closeZNumber: Float
 
