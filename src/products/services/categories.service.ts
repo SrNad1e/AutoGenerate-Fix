@@ -1,3 +1,4 @@
+import { CompaniesService } from 'src/configurations/services/companies.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -32,6 +33,7 @@ export class CategoriesService {
 		private readonly categoryLevel2Model: PaginateModel<CategoryLevel2>,
 		@InjectModel(CategoryLevel3.name)
 		private readonly categoryLevel3Model: PaginateModel<CategoryLevel3>,
+		private readonly companiesService: CompaniesService,
 	) {}
 
 	async findAll({
@@ -45,7 +47,7 @@ export class CategoriesService {
 		const filters: FilterQuery<CategoryLevel1> = {};
 
 		if (companyId) {
-			filters.company = new Types.ObjectId(companyId);
+			filters.companies = new Types.ObjectId(companyId);
 		}
 
 		if (name) {
@@ -118,12 +120,13 @@ export class CategoriesService {
 		}
 
 		if (companyId) {
-			filters.company = new Types.ObjectId(companyId);
+			filters.companies = new Types.ObjectId(companyId);
 		}
 
 		const options = {
 			limit,
 			page,
+			populate,
 			lean: true,
 			sort,
 		};
@@ -133,6 +136,7 @@ export class CategoriesService {
 				return this.categoryLevel1Model.paginate(filters, options);
 			case 2:
 				return this.categoryLevel2Model.paginate({ ...filters }, options);
+
 			case 3:
 				return this.categoryLevel3Model.paginate({ ...filters }, options);
 			default:
@@ -146,7 +150,7 @@ export class CategoriesService {
 		};
 
 		if (companyId) {
-			filters.company = new Types.ObjectId(companyId);
+			filters.companies = new Types.ObjectId(companyId);
 		}
 
 		const categoryLevel1 = await this.categoryLevel1Model.findOne(filters);
@@ -191,6 +195,19 @@ export class CategoriesService {
 		user: Partial<User>,
 		companyId: string,
 	) {
+		const company = await this.companiesService.findById(companyId);
+
+		let companies = [new Types.ObjectId(companyId)];
+		if (company.isMain) {
+			const companiesSearch = await this.companiesService.findAll({
+				limit: 1000,
+			});
+
+			companies = companiesSearch.docs.map(
+				(item) => new Types.ObjectId(item._id),
+			);
+		}
+
 		if (level === 1) {
 			const category = await this.categoryLevel1Model.findOne({ name });
 
@@ -199,9 +216,10 @@ export class CategoriesService {
 					`El nombre ${name} ya ha sido asignado a una categoría`,
 				);
 			}
+
 			const newCategory = new this.categoryLevel1Model({
 				name,
-				company: new Types.ObjectId(companyId),
+				companies,
 				user: {
 					username: user.username,
 					name: user.name,
@@ -229,7 +247,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel2Model({
 				name,
-				company: new Types.ObjectId(companyId),
+				companies,
 				user: {
 					username: user.username,
 					name: user.name,
@@ -266,7 +284,7 @@ export class CategoriesService {
 
 			const newCategory = new this.categoryLevel3Model({
 				name,
-				company: new Types.ObjectId(companyId),
+				companies,
 				user: {
 					username: user.username,
 					name: user.name,

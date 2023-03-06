@@ -388,8 +388,8 @@ type CategoryLevel1 {
   """Nombre de la categoría"""
   childs: [CategoryLevel2!]
 
-  """Compañía"""
-  company: Company!
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -412,8 +412,8 @@ type CategoryLevel2 {
   """Categorías inferiores"""
   childs: [CategoryLevel3!]
 
-  """Compañía"""
-  company: Company!
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -436,8 +436,8 @@ type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
 
-  """Compañía"""
-  company: Company!
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -1235,6 +1235,9 @@ input CreateRoleInput {
 
   """Identificadores de los permisos asignados"""
   permissionIds: [String!]!
+
+  """Orden por gerarquía"""
+  rank: Float
 }
 
 """Datos para la creación de la tienda"""
@@ -6502,6 +6505,9 @@ type Role {
   """Permisos al los quie tiene el rol"""
   permissions: [Permission!]!
 
+  """Orden por gerarquía"""
+  rank: Float!
+
   """Fecha en la que se actualizó el rol"""
   updatedAt: DateTime!
 
@@ -7553,6 +7559,9 @@ type StockTransferError {
   """Identificador de mongo"""
   _id: String!
 
+  """Compañía del traslado"""
+  company: Company!
+
   """Fecha de creación del traslado"""
   createdAt: DateTime!
 
@@ -8094,6 +8103,9 @@ input UpdateRoleInput {
 
   """Identificadores de los permisos seleccionados"""
   permissionIds: [String!]
+
+  """Orden por gerarquía"""
+  rank: Float
 }
 
 """Datos para actualizar la tienda"""

@@ -24,6 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 			await this.usersService.findById(payload.sub);
 		const newRole = {
 			_id: role._id,
+			rank: role['rank'],
 			permissions: role['permissions'].map((permission) => ({
 				action: permission.action,
 			})),

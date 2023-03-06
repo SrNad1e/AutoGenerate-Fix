@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { StockTransfer } from './stock-transfer.entity';
+import { Company } from 'src/configurations/entities/company.entity';
 
 export enum StatusDetailTransferError {
 	MISSING = 'missing',
@@ -79,6 +80,10 @@ export class StockTransferError extends Document {
 
 	@Field(() => Date, { description: 'Fecha de actualización del traslado' })
 	updatedAt: Date;
+
+	@Prop({ type: Types.ObjectId, required: true })
+	@Field(() => Company, { description: 'Compañía del traslado' })
+	company: Types.ObjectId;
 }
 
 export const StockTransferErrorSchema =

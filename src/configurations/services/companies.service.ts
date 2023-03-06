@@ -1,6 +1,7 @@
+import { CategoryLevel1 } from 'src/products/entities/category-level1.entity';
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, PaginateModel, Types } from 'mongoose';
+import { FilterQuery, PaginateModel } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 
@@ -11,6 +12,8 @@ import { Company } from '../entities/company.entity';
 import config from 'src/config';
 import { ConfigType } from '@nestjs/config';
 import { Reference } from 'src/products/entities/reference.entity';
+import { CategoryLevel2 } from 'src/products/entities/category-level2.entity';
+import { CategoryLevel3 } from 'src/products/entities/category-level3.entity';
 
 @Injectable()
 export class CompaniesService {
@@ -21,6 +24,12 @@ export class CompaniesService {
 		private readonly configService: ConfigType<typeof config>,
 		@InjectModel(Reference.name)
 		private readonly referenceModel: PaginateModel<Reference>,
+		@InjectModel(CategoryLevel1.name)
+		private readonly categoryLevel1: PaginateModel<CategoryLevel1>,
+		@InjectModel(CategoryLevel2.name)
+		private readonly categoryLevel2: PaginateModel<CategoryLevel2>,
+		@InjectModel(CategoryLevel3.name)
+		private readonly categoryLevel3: PaginateModel<CategoryLevel3>,
 	) {}
 
 	async findAll({
@@ -83,12 +92,43 @@ export class CompaniesService {
 			},
 			{
 				$push: {
-					companies: new Types.ObjectId(newCompany._id),
+					companies: newCompany?._id,
 				},
 			},
 		);
 
-		return newCompany;
+		await this.categoryLevel1.updateMany(
+			{
+				companies: companyMain._id,
+			},
+			{
+				$push: {
+					companies: newCompany?._id,
+				},
+			},
+		);
+
+		await this.categoryLevel2.updateMany(
+			{
+				companies: companyMain._id,
+			},
+			{
+				$push: {
+					companies: newCompany?._id,
+				},
+			},
+		);
+
+		await this.categoryLevel3.updateMany(
+			{
+				companies: companyMain._id,
+			},
+			{
+				$push: {
+					companies: newCompany?._id,
+				},
+			},
+		);
 	}
 
 	async update(id: string, params: UpdateCompanyInput, user: User) {
