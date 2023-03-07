@@ -12,6 +12,7 @@ import * as dayjs from 'dayjs';
 import * as utc from 'dayjs/plugin/utc';
 import * as timezone from 'dayjs/plugin/timezone';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
+import { filter } from 'rxjs';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
 import { User } from 'src/configurations/entities/user.entity';
@@ -1822,9 +1823,37 @@ export class OrdersService {
 				},
 			};
 		}
+		//consul by day
+		if (newGroupDates == GroupDates.DAY) {
+			group = {
+				$group: {
+					_id: ['$categoryLevel1._id', '$closeDate'],
+					quantity: { $first: { $sum: '$details.quantity' } },
+					date: { $first: '$closeDate' },
+					category: { $first: '$categoryLevel1' },
+					shop: { $first: '$shop' },
+					total: { $sum: '$details.quantity' },
+				},
+			};
+		} //By Month
+		else if (newGroupDates == GroupDates.MONTH) {
+			group = {
+				$group: {
+					_id: [{ $month: '$closeDate' }, { $dayOfMonth: '$closeDate' }],
+					//myCount: { $sum: 1 },
+					quantity: { $sum: { $first: '$details.quantity' } },
+					date: { $first: '$closeDate' },
+					category: { $first: '$categoryLevel1' },
+					shop: { $first: '$shop' },
+					total: { $sum: '$details.quantity' },
+				},
+			};
+		}
 
 		const salesReport = await this.orderModel.aggregate([
-			...aggregate,
+			{
+				$match: filters,
+			},
 			{
 				$lookup: {
 					from: 'categorylevel1',
@@ -1834,23 +1863,22 @@ export class OrdersService {
 				},
 			},
 			{
-				$match: filters,
+				$unwind: '$categoryLevel1',
 			},
 			{
 				...group,
 			},
 			{
 				$project: {
-					_id: 0,
+					_id: 1,
 					shop: 1,
 					date: 1,
-					category: { $arrayElemAt: ['$category', 0] },
+					category: 1,
 					total: 1,
 					quantity: 1,
 				},
 			},
 		]);
-
 		return {
 			paymentsSalesReport,
 			customersSalesReport,
