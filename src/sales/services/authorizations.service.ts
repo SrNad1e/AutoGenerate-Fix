@@ -2,16 +2,21 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
 import { User } from 'src/configurations/entities/user.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
+import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { CreateAuthorizationInput } from '../dtos/create-authorization.input';
 import { FiltersAuthorizationInput } from '../dtos/filters-authorization.input';
 import { UpdateAuthorizationInput } from '../dtos/update-authorization.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
+import { ClosesZinvoicingService } from './closes-zinvoicing.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -26,6 +31,10 @@ export class AuthorizationsService {
 		@InjectModel(AuthorizationDian.name)
 		private readonly authorizationModel: PaginateModel<AuthorizationDian>,
 		private readonly shopsService: ShopsService,
+		private readonly receiptsService: ReceiptsService,
+		private readonly closeZService: ClosesZinvoicingService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -35,7 +44,7 @@ export class AuthorizationsService {
 	) {
 		const filters: FilterQuery<AuthorizationDian> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -65,7 +74,7 @@ export class AuthorizationsService {
 	}
 
 	async create(
-		{ shopId, ...params }: CreateAuthorizationInput,
+		{ shopId, prefix, ...params }: CreateAuthorizationInput,
 		user: User,
 		companyId: string,
 	) {
@@ -75,8 +84,12 @@ export class AuthorizationsService {
 			throw new BadRequestException('La tienda no existe');
 		}
 
+		await this.receiptsService.createReceiptNumber(prefix, companyId);
+		await this.closeZService.createCloseZNumber(prefix, companyId);
+
 		return this.authorizationModel.create({
 			...params,
+			prefix,
 			shop: shop._id,
 			user: {
 				username: user.username,
@@ -108,7 +121,7 @@ export class AuthorizationsService {
 		}
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			authorization?.company.toString() !== companyId
 		) {
 			throw new UnauthorizedException(

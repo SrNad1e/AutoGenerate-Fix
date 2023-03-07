@@ -1,5 +1,5 @@
 import { CreateDailyClosingInput } from './../dtos/create-daily-closing.input';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
@@ -9,6 +9,8 @@ import { DailyClosing } from '../entities/dailyClosing';
 import { PointOfSalesService } from './point-of-sales.service';
 import { InvoicesService } from './invoices.service';
 import { GenerateDailyClosingInput } from '../dtos/generate-daily-closing.input';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate: PopulateOptions[] = [
 	{
@@ -51,6 +53,8 @@ export class DailyClosingService {
 		private readonly dailyClosingModel: PaginateModel<DailyClosing>,
 		private readonly pointOfSalesService: PointOfSalesService,
 		private readonly invoicesService: InvoicesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -67,7 +71,7 @@ export class DailyClosingService {
 	) {
 		const filters: FilterQuery<DailyClosing> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -79,7 +83,7 @@ export class DailyClosingService {
 			const initialDate = dayjs(dateInitial).startOf('day').toDate();
 			const finalDate = dayjs(dateFinal).endOf('day').toDate();
 
-			filters.date = {
+			filters.closeDate = {
 				$gte: initialDate,
 				$lte: finalDate,
 			};
@@ -182,8 +186,6 @@ export class DailyClosingService {
 				tax,
 			};
 		}
-
-		console.log(closeDate);
 
 		const dailyClosing = new this.dailyClosingModel({
 			company: new Types.ObjectId(companyId),

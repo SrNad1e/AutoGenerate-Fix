@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -28,6 +29,8 @@ import { Image } from 'src/configurations/entities/image.entity';
 import { User } from 'src/configurations/entities/user.entity';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -108,6 +111,8 @@ export class ProductsService {
 		private readonly sizesService: SizesService,
 		private readonly referencesService: ReferencesService,
 		private readonly warehousesService: WarehousesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -162,6 +167,23 @@ export class ProductsService {
 					$in: references.docs.map((item) => item._id),
 				};
 			} else {
+				const product = await this.productModel.findOne({
+					barcode: name,
+				});
+
+				if (product) {
+					const reference = await this.referencesService.findOne({
+						_id: product.reference['_id'].toString(),
+					});
+
+					const companies = reference.companies.map((item) => item.toString());
+					if (reference && !companies.includes(companyId)) {
+						throw new BadRequestException(
+							'El producto no está disponible para esta compañia',
+						);
+					}
+				}
+
 				filters.barcode = name;
 			}
 		}
@@ -347,7 +369,7 @@ export class ProductsService {
 				limit: -1,
 			},
 			{
-				username: 'admin',
+				username: this.configService.USER_ADMIN,
 			},
 			companyId,
 		);
@@ -620,8 +642,8 @@ export class ProductsService {
 			filters.size = sizeId;
 		}
 
-		if (StatusProduct[status]) {
-			filters.status = StatusProduct[status];
+		if (status) {
+			filters.status = status;
 		}
 
 		const response = await this.referencesService.getReferences({ name });

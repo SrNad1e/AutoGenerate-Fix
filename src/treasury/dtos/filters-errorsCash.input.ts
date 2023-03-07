@@ -19,6 +19,9 @@ export class FiltersErrorsCashInput {
     @Field({ description: 'Número del cierre que efectúa el error', nullable: true })
     closeZNumber?: number;
 
+    @Field(() => String, { description: 'tiendas', nullable: true })
+	boxId?: string;
+
     @Field(() => Boolean, {
         description: 'Si ya fue verificado',
         nullable: true

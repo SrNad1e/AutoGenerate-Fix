@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -31,6 +32,8 @@ import { StockHistoryService } from './stock-history.service';
 import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
 import { StatusProduct } from 'src/products/entities/product.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -74,6 +77,8 @@ export class StockAdjustmentService {
 		private readonly warehousesService: WarehousesService,
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -92,7 +97,7 @@ export class StockAdjustmentService {
 	) {
 		const filters: FilterQuery<StockAdjustment> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
@@ -145,7 +150,7 @@ export class StockAdjustmentService {
 	async findById(_id: string, user: User, companyId: string) {
 		const filters: FilterQuery<StockAdjustment> = { _id };
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters['company._id'] = new Types.ObjectId(companyId);
 		}
 
@@ -230,9 +235,7 @@ export class StockAdjustmentService {
 				_id: user._id,
 			},
 			status: StatusStockAdjustment[status],
-			company: user.companies.find(
-				(company) => company._id.toString() === companyId,
-			),
+			company: user.company,
 			number: (stockAdjustment?.number || 0) + 1,
 			...options,
 		});
@@ -294,7 +297,7 @@ export class StockAdjustmentService {
 	) {
 		const stockAdjustment = await this.stockAdjustmetnModel.findById(id).lean();
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			stockAdjustment.company._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(

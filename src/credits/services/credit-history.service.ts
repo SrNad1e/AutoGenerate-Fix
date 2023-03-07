@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 
@@ -12,6 +12,8 @@ import {
 } from '../entities/credit-history.entity';
 import { CreditsService } from './credits.service';
 import { Receipt } from 'src/treasury/entities/receipt.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class CreditHistoryService {
@@ -23,6 +25,8 @@ export class CreditHistoryService {
 		@InjectModel(Receipt.name)
 		private readonly receiptModel: PaginateModel<Receipt>,
 		private readonly creditsService: CreditsService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findOne(
@@ -40,7 +44,7 @@ export class CreditHistoryService {
 	) {
 		const filters: FilterQuery<CreditHistory> = {};
 
-		if (user?.username !== 'admin') {
+		if (user?.username !== this.configService.USER_ADMIN) {
 			filters['credit.company'] = new Types.ObjectId(companyId);
 		}
 

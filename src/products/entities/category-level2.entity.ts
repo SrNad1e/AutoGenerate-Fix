@@ -1,3 +1,4 @@
+import { Company } from 'src/configurations/entities/company.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Types } from 'mongoose';
@@ -53,6 +54,10 @@ export class CategoryLevel2 extends Document {
 		description: 'Fecha de actualización de la categoría',
 	})
 	updatedAt: Date;
+
+	@Field(() => [Company], { description: 'Compañías' })
+	@Prop({ type: Types.ObjectId, ref: Company.name, autopopulate: true })
+	companies: Types.ObjectId[];
 }
 
 export const CategoryLevel2Schema =

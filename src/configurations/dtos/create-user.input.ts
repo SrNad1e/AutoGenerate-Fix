@@ -43,4 +43,10 @@ export class CreateUserInput {
 		nullable: true,
 	})
 	status?: StatusUser;
+
+	@Field(() => String, {
+		description: 'Compañía a la que pertecene el usuario',
+		nullable: true,
+	})
+	companyId?: string;
 }

@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	Injectable,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel, Types, FilterQuery, _FilterQuery } from 'mongoose';
@@ -14,12 +15,16 @@ import { FiltersCouponInput } from '../dtos/filters-coupon.input';
 import { FiltersCouponsInput } from '../dtos/filters-coupons.input';
 import { UpdateCouponInput } from '../dtos/update-coupon.input';
 import { Coupon, StatusCoupon } from '../entities/coupon.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class CouponsService {
 	constructor(
 		@InjectModel(Coupon.name)
 		private readonly couponModel: PaginateModel<Coupon>,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -28,7 +33,7 @@ export class CouponsService {
 		companyId: string,
 	) {
 		const filters: _FilterQuery<Coupon> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -57,7 +62,7 @@ export class CouponsService {
 	async findOne({ code }: FiltersCouponInput, user: User, companyId: string) {
 		const filters: FilterQuery<Coupon> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -133,7 +138,7 @@ export class CouponsService {
 
 		if (
 			coupon?.company?.toString() !== companyId &&
-			user.username !== 'admin'
+			user.username !== this.configService.USER_ADMIN
 		) {
 			throw new UnauthorizedException(
 				'Usuario no tiene permisos para actualizar el cupón',

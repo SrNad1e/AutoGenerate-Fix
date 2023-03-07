@@ -150,7 +150,11 @@ export class Customer extends Document {
 
 	@Field(() => Date, { description: 'Fecha de mayorista', nullable: true })
 	@Prop({ type: Date })
-	WolesalerDate?: Date;
+	wolesalerDate?: Date;
+
+	@Field(() => Boolean, { description: 'Primera compra del cliente' })
+	@Prop({ type: Boolean, default: false })
+	firstPurchase: boolean;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

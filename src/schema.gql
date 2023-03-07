@@ -56,6 +56,15 @@ enum ActionProductsOrder {
   UPDATE
 }
 
+"""Datos para agregar historial de metas a la tienda"""
+input AddGoalHistoryInput {
+  """Historico de metas"""
+  goalHistory: GoalHistoryInput
+
+  """Id de la tienda a la cual se va agregar el historico"""
+  shopId: String!
+}
+
 """Datos para agregar medios de pago al pedido"""
 input AddPaymentsOrderInput {
   """Id del pedido que se requiere agreagar o editar productos"""
@@ -379,6 +388,9 @@ type CategoryLevel1 {
   """Nombre de la categoría"""
   childs: [CategoryLevel2!]
 
+  """Compañías"""
+  companies: [Company!]!
+
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
 
@@ -400,6 +412,9 @@ type CategoryLevel2 {
   """Categorías inferiores"""
   childs: [CategoryLevel3!]
 
+  """Compañías"""
+  companies: [Company!]!
+
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
 
@@ -420,6 +435,9 @@ type CategoryLevel2 {
 type CategoryLevel3 {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañías"""
+  companies: [Company!]!
 
   """Fecha de creación de la categoría"""
   createdAt: DateTime!
@@ -571,6 +589,9 @@ type CloseZInvoicing {
   """Punto de venta que registra el cierre"""
   pointOfSale: PointOfSale!
 
+  """Prefijo del número"""
+  prefix: String!
+
   """Transacciones reportadas por el usuario"""
   quantityBank: Float!
 
@@ -648,6 +669,9 @@ type Company {
 
   """Correo de la compañia"""
   email: String!
+
+  """Si la compañia es principal"""
+  isMain: Boolean!
 
   """Url del logo de la compañía"""
   logo: String!
@@ -1211,6 +1235,9 @@ input CreateRoleInput {
 
   """Identificadores de los permisos asignados"""
   permissionIds: [String!]!
+
+  """Orden por gerarquía"""
+  rank: Float
 }
 
 """Datos para la creación de la tienda"""
@@ -1341,6 +1368,9 @@ input CreateStockTransferInput {
 
 """Datos para la creación de un usuario"""
 input CreateUserInput {
+  """Compañía a la que pertecene el usuario"""
+  companyId: String
+
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
@@ -1452,9 +1482,6 @@ type CreditHistory {
 
 """Cliente"""
 type Customer {
-  """Fecha de mayorista"""
-  WolesalerDate: DateTime
-
   """Identificador de mongo"""
   _id: String!
 
@@ -1485,6 +1512,9 @@ type Customer {
   """Nombres del cliente"""
   firstName: String!
 
+  """Primera compra del cliente"""
+  firstPurchase: Boolean!
+
   """Cliente por defecto"""
   isDefault: Boolean!
 
@@ -1502,10 +1532,31 @@ type Customer {
 
   """Usuario que creó o editó el cliente"""
   user: User!
+
+  """Fecha de mayorista"""
+  wolesalerDate: DateTime
 }
 
 """Ventas de tipos de clientes"""
 type CustomerSalesReport {
+  """Cantidad de ventas"""
+  quantity: Float!
+
+  """Valor total de las ventas"""
+  total: Float!
+
+  """Tipo de cliente"""
+  typeCustomer: CustomerType!
+}
+
+"""Ventas de tipos de clientes"""
+type CustomerSalesReportInvoicing {
+  """Nombre del cliente"""
+  customerName: String!
+
+  """Numero documento del cliente"""
+  document: String!
+
   """Cantidad de ventas"""
   quantity: Float!
 
@@ -2150,6 +2201,9 @@ input FiltersCategoriesInput {
   """Identificador de la categoría padre"""
   _id: String
 
+  """Compañía"""
+  companyId: String
+
   """Cantidad de registros"""
   limit: Float
 
@@ -2167,6 +2221,9 @@ input FiltersCategoriesInput {
 input FiltersCategoriesLevelInput {
   """Identificador de la categoría"""
   _id: String
+
+  """Compañía"""
+  companyId: String
 
   """Nivel de categoria"""
   level: Float!
@@ -2486,6 +2543,9 @@ input FiltersDocumentTypesInput {
 
 """Listado de errores de efectivo"""
 input FiltersErrorsCashInput {
+  """tiendas"""
+  boxId: String
+
   """Número del cierre que efectúa el error"""
   closeZNumber: Float
 
@@ -2576,8 +2636,14 @@ input FiltersInvoicesInput {
   """Desde donde arranca la página"""
   page: Float
 
+  """Identificador de los medios de pago"""
+  paymentIds: [String!]
+
   """Identificador del punto de venta"""
   pointOfSaleId: String
+
+  """Identificador de la tienda"""
+  shopId: String
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortInovice
@@ -2873,6 +2939,18 @@ input FiltersSalesReportInput {
   shopId: String
 }
 
+"""Filtros para el reporte de ventas"""
+input FiltersSalesReportInvoicingInput {
+  """Fecha final del reporte"""
+  dateFinal: String!
+
+  """Fecha inicial del reporte"""
+  dateInitial: String!
+
+  """Id de la tienda"""
+  shopId: String
+}
+
 """Filtros usados para consultar las tiendas"""
 input FiltersShopsInput {
   """Identificador de la tienda"""
@@ -2957,6 +3035,30 @@ input FiltersStockAdjustmentsInput {
   total: Float
 
   """Id de la bodega"""
+  warehouseId: String
+}
+
+"""Filtros para la lista de inventarios"""
+input FiltersStockInput {
+  """Id de color"""
+  colorId: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Comodín para la busqueda del producto, barcode, reference, description"""
+  name: String
+
+  """Página actual"""
+  page: Float
+
+  """Id de talla"""
+  sizeId: String
+
+  """Estado del producto"""
+  status: String
+
+  """Bodega de inventario o "all" para traer todos los inventarios"""
   warehouseId: String
 }
 
@@ -3160,6 +3262,30 @@ input GenerateDailyClosingInput {
   shopId: String!
 }
 
+"""Historial de metas de la tienda"""
+type GoalHistory {
+  """Fecha del registro"""
+  date: DateTime!
+
+  """Meta de la tienda"""
+  goal: Float!
+
+  """Meta alcanzada por la tienda"""
+  goalAchieved: Float!
+}
+
+"""Historial de meta que se va agregar a la tienda"""
+input GoalHistoryInput {
+  """Fecha del registro"""
+  date: DateTime!
+
+  """Meta de la tienda"""
+  goal: Float!
+
+  """Meta alcanzada por la tienda"""
+  goalAchieved: Float
+}
+
 enum GroupDates {
   DAY
   MONTH
@@ -3197,6 +3323,27 @@ type ImageTypes {
 
   """Enlace de imagen pequeña"""
   small: String!
+}
+
+"""Inventarios"""
+type InventoryReport {
+  """Codigo de barras"""
+  barcode: String!
+
+  """Color del producto"""
+  color: Color!
+
+  """bodega del producto"""
+  productWarehouse: Warehouse
+
+  """Referencia del producto"""
+  reference: Reference!
+
+  """Talla del producto"""
+  size: Size!
+
+  """Bodega"""
+  stock: StockProduct
 }
 
 """Factura"""
@@ -3255,9 +3402,6 @@ type LoginResponse {
 
 """Datos para hacer login"""
 input LoginUserInput {
-  """Identificador de la compañía"""
-  companyId: String!
-
   """Contraseña de usuario"""
   password: String!
 
@@ -3266,6 +3410,12 @@ input LoginUserInput {
 }
 
 type Mutation {
+  """Se encarga de agregar un historico de meta a una tienda"""
+  addGoalHistory(
+    """Historicos de meta que se van agregar"""
+    AddGoalHistoryInput: AddGoalHistoryInput!
+  ): Shop!
+
   """Se encarga de agregar medios de pago"""
   addPaymentsOrder(
     """Medios de pago y orden a actualizar"""
@@ -3857,7 +4007,7 @@ type Order {
   payments: [PaymentOrder!]
 
   """Punto de venta asigando"""
-  pointOfSale: PointOfSale!
+  pointOfSale: PointOfSale
 
   """Tienda donde se solicita el pedido"""
   shop: Shop!
@@ -4007,6 +4157,18 @@ type PaymentsSalesReport {
   total: Float!
 }
 
+"""Medios de pago"""
+type PaymentsSalesReportInvoicing {
+  """Medio de pago"""
+  payment: Payment!
+
+  """Cantidad de veces de uso del medio de pago"""
+  quantity: Float!
+
+  """Valor total recaudado con el recibo de pago"""
+  total: Float!
+}
+
 """Permisos a los que tiene el usuario"""
 type Permission {
   """Identificador de mongo"""
@@ -4058,6 +4220,7 @@ enum Permissions {
   ACCESS_INVENTORY_OUTPUTS
   ACCESS_INVENTORY_PRODUCTS
   ACCESS_INVENTORY_REFERENCES
+  ACCESS_INVENTORY_REPORTS
   ACCESS_INVENTORY_REQUESTS
   ACCESS_INVENTORY_SIZES
   ACCESS_INVENTORY_TRANSFERS
@@ -4151,6 +4314,7 @@ enum Permissions {
   READ_INVOICING_ORDERS
   READ_INVOICING_POINTOFSALES
   READ_INVOICING_RETURNS
+  READ_STOCK_PRODUCTS
   READ_TREASURY_BOXES
   READ_TREASURY_ERRORS_CASH
   READ_TREASURY_EXPENSES
@@ -4259,6 +4423,33 @@ type Product {
 
   """Usuario que crea el producto"""
   user: User!
+}
+
+"""Detalle del producto"""
+type ProductDetail {
+  """Codigo de barras del producto"""
+  barcode: String!
+
+  """Marca del producto"""
+  brand: String!
+
+  """Categoria nivel 1 del producto"""
+  categoryLevel1: String!
+
+  """Color del producto"""
+  color: String!
+
+  """Costo del producto"""
+  cost: Float!
+
+  """Nombre del producto"""
+  name: String!
+
+  """Precio del producto"""
+  price: Float!
+
+  """Talla del producto"""
+  size: String!
 }
 
 type Query {
@@ -4475,6 +4666,12 @@ type Query {
     filtersProductInput: FiltersProductInput = {}
   ): Product!
 
+  """Consulta el stock de los productos"""
+  productStock(
+    """Filtros para obtener el stock de los productos"""
+    filtersProductStock: FiltersStockInput = {}
+  ): ResponseStock!
+
   """Lista los productos"""
   products(
     """Filtros para consoltar los productos"""
@@ -4510,6 +4707,12 @@ type Query {
     """Filtros para obtener las ventas"""
     filtersSalesReportInput: FiltersSalesReportInput!
   ): ResponseReportSales!
+
+  """Consulta las ventas por rango de fechas"""
+  reportSalesInvoicing(
+    """Filtros para obtener las ventas"""
+    filtersSalesReportInput: FiltersSalesReportInvoicingInput!
+  ): ResponseReportSalesInvoicing!
 
   """Lista de devoluciones de pedidos"""
   returnsOrder(
@@ -4672,6 +4875,9 @@ type Receipt {
 
   """Punto de venta que genera el recibo"""
   pointOfSale: Box!
+
+  """Prefijo recibo de caja"""
+  prefix: String!
 
   """Estado del recibo de caja"""
   status: StatusReceipt!
@@ -5799,6 +6005,21 @@ type ResponseReportSales {
   summarySalesReport: SummarySalesReport
 }
 
+"""Reportde de ventas generales"""
+type ResponseReportSalesInvoicing {
+  """Ventas por tipo de cliente"""
+  customersSalesReport: [CustomerSalesReportInvoicing!]
+
+  """Medios de pago"""
+  paymentsSalesReport: [PaymentsSalesReportInvoicing!]
+
+  """Ventas detalladas"""
+  salesReport: [SalesReportInvoicing!]
+
+  """Resumen de ventas"""
+  summarySalesReport: SummarySalesReportInvoicing
+}
+
 """Lista de devoluciones de ordenes"""
 type ResponseReturnsOrder {
   """Lista de devoluci0nes"""
@@ -5902,6 +6123,39 @@ type ResponseShops {
 type ResponseSizes {
   """Lista de tallas"""
   docs: [Size!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta al listado de los productos"""
+type ResponseStock {
+  """Lista de productos con inventario"""
+  docs: [InventoryReport!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -6251,6 +6505,9 @@ type Role {
   """Permisos al los quie tiene el rol"""
   permissions: [Permission!]!
 
+  """Orden por gerarquía"""
+  rank: Float!
+
   """Fecha en la que se actualizó el rol"""
   updatedAt: DateTime!
 
@@ -6292,6 +6549,23 @@ type SalesReport {
 
   """Fecha de la venta"""
   dateDay: DateTime!
+
+  """
+  Cantidad de productos de la categoría vendidos o cantidad de pedidos generados
+  """
+  quantity: Float!
+
+  """Tienda"""
+  shop: Shop!
+
+  """Valor total de la venta"""
+  total: Float!
+}
+
+"""Ventas detalladas con base a los filtros"""
+type SalesReportInvoicing {
+  """Categoría"""
+  category: CategoryLevel1
 
   """
   Cantidad de productos de la categoría vendidos o cantidad de pedidos generados
@@ -6359,6 +6633,9 @@ type Shop {
 
   """Meta asiganda a la tienda"""
   goal: Float!
+
+  """Historico de metas de la tienda"""
+  goalHistory: [GoalHistory!]
 
   """Es centro de distribución"""
   isMain: Boolean!
@@ -7175,6 +7452,24 @@ type StockOutput {
   warehouse: Warehouse!
 }
 
+"""Inventario por bodegas del producto"""
+type StockProduct {
+  """Fecha de creación del dato de envio"""
+  createdAt: DateTime!
+
+  """Cantidad de productos en la bodega"""
+  quantity: Float!
+
+  """Fecha de actualización del dato de envio"""
+  updatedAt: DateTime!
+
+  """Usuario que crea los datos de envío"""
+  user: User!
+
+  """Identificador de la bodega"""
+  warehouse: Warehouse
+}
+
 """Solicitud de productos"""
 type StockRequest {
   """Identificador de mongo"""
@@ -7266,6 +7561,9 @@ type StockTransfer {
 type StockTransferError {
   """Identificador de mongo"""
   _id: String!
+
+  """Compañía del traslado"""
+  company: Company!
 
   """Fecha de creación del traslado"""
   createdAt: DateTime!
@@ -7377,6 +7675,30 @@ type SummarySalesReport {
 
   """Margen de ventas en porcentaje"""
   margin: Float!
+
+  """Cantidad de ventas"""
+  quantity: Float!
+
+  """Valor total de las ventas"""
+  total: Float!
+}
+
+"""Resumen de ventas"""
+type SummarySalesReportInvoicing {
+  """Fecha de cierre de la venta"""
+  closeDate: DateTime!
+
+  """CMV"""
+  cmv: Float!
+
+  """Identificador de la venta"""
+  idOrder: String!
+
+  """Margen de ventas en porcentaje"""
+  margin: Float!
+
+  """Productos de la venta"""
+  products: [ProductDetail!]!
 
   """Cantidad de ventas"""
   quantity: Float!
@@ -7784,6 +8106,9 @@ input UpdateRoleInput {
 
   """Identificadores de los permisos seleccionados"""
   permissionIds: [String!]
+
+  """Orden por gerarquía"""
+  rank: Float
 }
 
 """Datos para actualizar la tienda"""
@@ -7908,6 +8233,9 @@ input UpdateStockTransferInput {
 
 """Datos para actualizar el usuario"""
 input UpdateUserInput {
+  """Compañía a la que pertecene el usuario"""
+  companyId: String
+
   """Identificador del cliente asignado al usuario"""
   customerId: String
 
@@ -7968,8 +8296,8 @@ type User {
   """Identificador de mongo"""
   _id: String!
 
-  """Empresas a la que pertenece el usuario"""
-  companies: [Company!]!
+  """Compañía de acceso para el usuario"""
+  company: Company!
 
   """Nombre de usuario"""
   createdAt: DateTime!

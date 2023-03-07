@@ -80,7 +80,7 @@ import { CrmModule } from 'src/crm/crm.module';
 		CategoriesService,
 		CategoriesResolver,
 	],
-	exports: [ProductsService],
+	exports: [ProductsService, ReferencesService],
 	controllers: [ProductsController],
 })
 export class ProductsModule {}

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
 import { FilterQuery, PaginateModel, PopulateOptions, Types } from 'mongoose';
@@ -13,6 +13,8 @@ import { CloseXInvoicing } from '../entities/close-x-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
 import { ReturnsOrderService } from './returns-order.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate: PopulateOptions[] = [
 	{
@@ -58,6 +60,8 @@ export class ClosesXInvoicingService {
 		private readonly expensesService: ExpensesService,
 		private readonly receiptsService: ReceiptsService,
 		private readonly returnsOrderService: ReturnsOrderService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -74,7 +78,7 @@ export class ClosesXInvoicingService {
 	) {
 		const filters: FilterQuery<CloseXInvoicing> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -188,6 +192,21 @@ export class ClosesXInvoicingService {
 			pointOfSale._id.toString(),
 		);
 
+		const paymentsOrder = await this.ordersService.getPaymentsOrder({
+			dateInitial,
+			dateFinal,
+			pointOfSaleId: pointOfSale._id.toString(),
+		});
+
+		const paymentsCoupons = paymentsOrder.filter(
+			(p) =>
+				!payments.find(
+					(pay) => pay.payment.toString() === p.payment.toString(),
+				),
+		);
+
+		const newPayments = payments.concat(paymentsCoupons);
+
 		const newClose = new this.closeXInvoicingModel({
 			cashRegister: cashRegister,
 			number,
@@ -199,7 +218,7 @@ export class ClosesXInvoicingService {
 			quantityBank,
 			...summaryOrder,
 			refunds,
-			payments,
+			payments: newPayments,
 			user: {
 				username: user.username,
 				name: user.name,

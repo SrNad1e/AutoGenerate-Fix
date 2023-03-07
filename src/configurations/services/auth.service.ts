@@ -1,8 +1,10 @@
+import { ConfigType } from '@nestjs/config';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,13 +15,13 @@ import { PaginateModel } from 'mongoose';
 import { CustomersService } from 'src/crm/services/customers.service';
 import { SendMailService } from 'src/send-mail/services/send-mail.service';
 import { LoginResponse } from '../dtos/login-response';
-import { LoginUserInput } from '../dtos/login-user.input';
 import { SignUpInput } from '../dtos/signup.input';
 import { Shop } from '../entities/shop.entity';
 import { StatusUser, User } from '../entities/user.entity';
 import { RolesService } from './roles.service';
 import { TokensService } from './tokens.service';
 import { UsersService } from './users.service';
+import config from 'src/config';
 
 @Injectable()
 export class AuthService {
@@ -31,20 +33,11 @@ export class AuthService {
 		private readonly rolesService: RolesService,
 		private readonly sendMailService: SendMailService,
 		private readonly tokensService: TokensService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
-	async login(
-		user: User,
-		{ companyId }: LoginUserInput,
-	): Promise<LoginResponse> {
-		const companies = user.companies?.map((company) => company._id.toString());
-
-		if (user.username !== 'admin' && !companies.includes(companyId)) {
-			throw new UnauthorizedException(
-				`El usuario no tiene acceso a la compañia`,
-			);
-		}
-
+	async login(user: User): Promise<LoginResponse> {
 		if (user.status === StatusUser.INACTIVE) {
 			throw new UnauthorizedException(`El usuario se encuentra inactivo`);
 		}
@@ -56,7 +49,7 @@ export class AuthService {
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
-				companyId,
+				companyId: user.company._id,
 				sub: user._id,
 			}),
 			user,
@@ -95,7 +88,7 @@ export class AuthService {
 					...params,
 				},
 				{
-					username: 'admin',
+					username: this.configService.USER_ADMIN,
 				} as User,
 			);
 		} else {
@@ -134,7 +127,7 @@ export class AuthService {
 			},
 			{
 				name: 'Administrador del sistema',
-				username: 'admin',
+				username: this.configService.USER_ADMIN,
 			} as User,
 			companyId,
 		);
@@ -195,13 +188,13 @@ export class AuthService {
 				password,
 			},
 			token.user as unknown as User,
-			token.user['companies'][0]?.toString(),
+			token.user['company']?.toString(),
 		);
 
 		return {
 			access_token: this.jwtService.sign({
 				username: user.username,
-				companyId: token.user['companies'][0]?.toString(),
+				companyId: token.user['company']?.toString(),
 				sub: user._id,
 			}),
 			user,

@@ -2,6 +2,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -27,6 +28,8 @@ import { AttribsService } from './attribs.service';
 import { User } from 'src/configurations/entities/user.entity';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
 import { DiscountRulesService } from 'src/crm/services/discount-rules.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{ path: 'brand', model: Brand.name },
@@ -66,6 +69,8 @@ export class ReferencesService {
 		private readonly sizesService: SizesService,
 		private readonly attribsService: AttribsService,
 		private readonly discountRulesService: DiscountRulesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -111,6 +116,7 @@ export class ReferencesService {
 				$search: name,
 			};
 		}
+		console.log(companyId);
 
 		if (companyId) {
 			filters.companies = {
@@ -428,7 +434,10 @@ export class ReferencesService {
 
 		const companies = reference.companies.map((company) => company.toString());
 
-		if (user.username !== 'admin' && !companies.includes(companyId)) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			!companies.includes(companyId)
+		) {
 			throw new UnauthorizedException(
 				'La referencia no está habilitada para la sucursal del usuario',
 			);

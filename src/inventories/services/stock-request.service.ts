@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -26,6 +27,8 @@ import { Warehouse } from 'src/configurations/entities/warehouse.entity';
 import { ShopsService } from 'src/configurations/services/shops.service';
 import { WarehousesService } from 'src/configurations/services/warehouses.service';
 import { StatusProduct } from 'src/products/entities/product.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = {
 	path: 'details',
@@ -61,6 +64,8 @@ export class StockRequestService {
 		private readonly warehousesService: WarehousesService,
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -80,7 +85,7 @@ export class StockRequestService {
 	) {
 		const filters: FilterQuery<StockRequest> = {};
 		try {
-			if (user.username !== 'admin') {
+			if (user.username !== this.configService.USER_ADMIN) {
 				filters['company._id'] = new Types.ObjectId(companyId);
 			}
 
@@ -259,9 +264,7 @@ export class StockRequestService {
 			warehouseDestination,
 			details: detailsRequest,
 			status: StatusStockRequest[status],
-			company: user.companies.find(
-				(company) => company._id.toString() === companyId,
-			),
+			company: user.company,
 			number: (stockRequest?.number || 0) + 1,
 			user: {
 				username: user.username,
@@ -287,7 +290,7 @@ export class StockRequestService {
 			}
 
 			if (
-				(user.username !== 'admin' &&
+				(user.username !== this.configService.USER_ADMIN &&
 					stockRequest.company._id.toString() !== companyId) ||
 				user.shop['defaultWarehouse']['_id'].toString() !==
 					stockRequest.warehouseDestination._id.toString()
@@ -527,15 +530,17 @@ export class StockRequestService {
 			status: StatusProduct.ACTIVE,
 		});
 
-		const productsRequest = products
-			.map((product) => {
-				const stock = product.stock.find(
-					(item) => item.warehouse.toString() === warehouse._id.toString(),
-				);
+		const productsWarehouse = products.map((product) => {
+			const stock = product.stock.find(
+				(item) => item.warehouse.toString() === warehouse._id.toString(),
+			);
 
-				return { ...product, stock };
-			})
-			.filter((product) => product?.stock?.quantity < warehouse?.min);
+			return { ...product, stock };
+		});
+
+		const productsRequest = productsWarehouse.filter(
+			(product) => product?.stock?.quantity < warehouse?.min,
+		);
 
 		const details = [];
 

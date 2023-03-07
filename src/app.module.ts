@@ -19,9 +19,11 @@ import { ConfigurationsModule } from './configurations/configurations.module';
 import { CreditsModule } from './credits/credits.module';
 import { SendMailModule } from './send-mail/send-mail.module';
 import { ReportsModule } from './reports/reports.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
 	imports: [
+		ScheduleModule.forRoot(),
 		GraphQLModule.forRoot({
 			autoSchemaFile: 'src/schema.gql',
 			sortSchema: true,
@@ -64,6 +66,7 @@ import { ReportsModule } from './reports/reports.module';
 				FEDEX_COUNTRY_DEFAULT: Joi.string().required(),
 				API_URL: Joi.string().required(),
 				API_WEB: Joi.string().required(),
+				USER_ADMIN: Joi.string().required(),
 			}),
 		}),
 		DatabasesModule,
