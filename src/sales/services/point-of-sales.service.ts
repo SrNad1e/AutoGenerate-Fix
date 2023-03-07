@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
@@ -15,6 +16,8 @@ import { FiltersPointOfSalesInput } from '../dtos/filters-point-of-sales.input';
 import { UpdatePointOfSaleInput } from '../dtos/update-pointOfSale.input';
 import { AuthorizationDian } from '../entities/authorization.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
+import { ConfigType } from '@nestjs/config';
+import config from 'src/config';
 
 const populate = [
 	{
@@ -36,6 +39,8 @@ export class PointOfSalesService {
 	constructor(
 		@InjectModel(PointOfSale.name)
 		private readonly pointOfSaleModel: PaginateModel<PointOfSale>,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -44,7 +49,7 @@ export class PointOfSalesService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<PointOfSale> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -116,7 +121,7 @@ export class PointOfSalesService {
 		}*/
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			pointOfSale.company.toString() !== companyId
 		) {
 			throw new UnauthorizedException(

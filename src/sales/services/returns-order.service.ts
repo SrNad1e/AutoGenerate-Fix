@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import * as dayjs from 'dayjs';
@@ -17,6 +17,8 @@ import { DocumentTypeStockHistory } from 'src/inventories/dtos/create-stockHisto
 import { PointOfSalesService } from './point-of-sales.service';
 import { PointOfSale } from '../entities/pointOfSale.entity';
 import { ResumeDayReturnsOrderInput } from '../dtos/resume-day-returns.order.input';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -49,6 +51,8 @@ export class ReturnsOrderService {
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly couponsService: CouponsService,
 		private readonly pointOfSalesService: PointOfSalesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -67,7 +71,7 @@ export class ReturnsOrderService {
 	) {
 		const filters: FilterQuery<ReturnOrder> = {};
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 

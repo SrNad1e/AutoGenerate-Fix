@@ -34,6 +34,7 @@ export class StockTransferErrorsResolver {
 	) {
 		return this.stockTrasnferErrorsService.findAll(
 			context.req.body.variables.input,
+			context.req.user.user,
 		);
 	}
 

@@ -20,5 +20,11 @@ export class CreateRoleInput {
 		description: 'Estado del rol',
 		nullable: true,
 	})
-	active: boolean;
+	active?: boolean;
+
+	@Field(() => Number, {
+		description: 'Orden por gerarquía',
+		nullable: true,
+	})
+	rank?: number;
 }

@@ -114,7 +114,7 @@ export class SizesService {
 				weight: key + 1,
 				user: {
 					name: 'Administrador del Sistema',
-					username: 'admin',
+					username: this.configService.USER_ADMIN,
 				},
 			}));
 

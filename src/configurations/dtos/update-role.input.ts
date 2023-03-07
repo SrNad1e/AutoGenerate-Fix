@@ -16,4 +16,10 @@ export class UpdateRoleInput {
 
 	@Field(() => Boolean, { description: 'Estado del rol' })
 	active?: boolean;
+
+	@Field(() => Number, {
+		description: 'Orden por gerarquía',
+		nullable: true,
+	})
+	rank?: number;
 }

@@ -33,6 +33,10 @@ export class Role {
 	@Prop({ type: Object, required: true })
 	user: Partial<User>;
 
+	@Field(() => Number, { description: 'Orden por gerarquía' })
+	@Prop({ type: Number, default: 1 })
+	rank: number;
+
 	@Field({ description: 'Fecha de creación del rol' })
 	createdAt: Date;
 

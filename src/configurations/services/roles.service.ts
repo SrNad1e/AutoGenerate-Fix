@@ -25,15 +25,17 @@ export class RolesService {
 		private readonly permissionsService: PermissionsService,
 	) {}
 
-	async findAll({
-		_id,
-		active,
-		name,
-		limit = 10,
-		page = 1,
-		sort,
-	}: FiltersRolesInput) {
+	async findAll(
+		{ _id, active, name, limit = 10, page = 1, sort }: FiltersRolesInput,
+		user: User,
+	) {
 		const filters: FilterQuery<Role> = {};
+
+		if (!['master', 'admin'].includes(user.username)) {
+			filters.rank = {
+				$gte: user.role['rank'],
+			};
+		}
 
 		if (_id) {
 			filters._id = new Types.ObjectId(_id);
@@ -70,7 +72,7 @@ export class RolesService {
 	}
 
 	async create(
-		{ active, changeWarehouse, name, permissionIds }: CreateRoleInput,
+		{ active, changeWarehouse, name, permissionIds, rank }: CreateRoleInput,
 		user: User,
 	) {
 		const role = await this.findOne({ name });
@@ -99,6 +101,7 @@ export class RolesService {
 			changeWarehouse,
 			permissions,
 			name,
+			rank,
 			user: {
 				username: user.username,
 				name: user.name,
@@ -111,7 +114,7 @@ export class RolesService {
 
 	async update(
 		roleId: string,
-		{ active, changeWarehouse, name, permissionIds }: UpdateRoleInput,
+		{ active, changeWarehouse, name, permissionIds, rank }: UpdateRoleInput,
 		user: User,
 	) {
 		const role = await this.findById(roleId);
@@ -148,6 +151,7 @@ export class RolesService {
 				$set: {
 					permissions: permissions.length > 0 ? permissions : undefined,
 					active,
+					rank,
 					changeWarehouse,
 					name,
 					user: {

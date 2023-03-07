@@ -8,13 +8,15 @@ services:
       - mongo
     environment:
       PORT: 8080
+      USER_ADMIN: admin
       #Mongo
-      MONGO_DB: pos_qa
-      MONGO_USER: cirotex
-      MONGO_PASSWORD: prueba
+      MONGO_DB: cirotex
+      MONGO_USER: danielLobo
+      MONGO_PASSWORD: Santa_Marta
       MONGO_PORT: 27017
-      MONGO_HOST: mongo
-      MONGO_CONNECTION: mongodb
+      MONGO_HOST: qat.stpcp.mongodb.net
+      MONGO_CONNECTION: mongodb+srv
+      MONGO_ATLAS_URI: mongodb+srv://danielLobo:Santa_Marta@qat.stpcp.mongodb.net/test
       # JWT
       SECRET_TOKEN: prueba
       EXPIRE_TOKEN: 24h
@@ -75,7 +77,7 @@ services:
 
 networks:
   default:
-    name:  cirotex_network
+    name: cirotex_network
 
 volumes:
   mongo-data:

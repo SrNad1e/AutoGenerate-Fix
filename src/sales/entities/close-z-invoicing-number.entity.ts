@@ -14,12 +14,13 @@ export class CloseZInvoicingNumber extends Document {
 	prefix: string;
 
 	@Field(() => Number, { description: 'Número consecutivo' })
-	@Prop({ type: Number, requiere: true })
+	@Prop({ type: Number, default: 0 })
 	lastNumber: number;
 
 	@Field(() => Company, {
 		description: 'Compañía a la que pertence el npumero de cierre',
 	})
+	@Prop({ type: Types.ObjectId, requiere: true })
 	company: Types.ObjectId;
 }
 

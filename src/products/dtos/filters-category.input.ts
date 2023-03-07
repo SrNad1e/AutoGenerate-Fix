@@ -4,4 +4,7 @@ import { Field, InputType } from '@nestjs/graphql';
 export class FiltersCategoryInput {
 	@Field(() => String, { description: 'Nombre de la categoría' })
 	name: string;
+
+	@Field(() => String, { description: 'Compañía', nullable: true })
+	companyId?: string;
 }

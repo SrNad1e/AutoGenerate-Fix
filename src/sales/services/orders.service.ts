@@ -1,11 +1,16 @@
+import { Box } from 'src/treasury/entities/box.entity';
 import {
 	BadRequestException,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
+	forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
+import * as utc from 'dayjs/plugin/utc';
+import * as timezone from 'dayjs/plugin/timezone';
 import { FilterQuery, PaginateModel, PaginateOptions, Types } from 'mongoose';
 
 import { Conveyor } from 'src/configurations/entities/conveyor.entity';
@@ -62,9 +67,13 @@ import {
 	StatusOrderDetail,
 } from '../entities/order.entity';
 import { PointOfSale } from '../entities/pointOfSale.entity';
-import { ReturnOrder } from '../entities/return-order.entity';
 import { StatusWeb } from '../entities/status-web-history';
+import { PointOfSalesService } from './point-of-sales.service';
 import { StatusWebHistoriesService } from './status-web-histories.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
+import { FiltersSalesReportInvoicingInput } from 'src/reports/dtos/filters-sales-report-invoicing.input';
+import { ResponseReportSalesInvoicing } from 'src/reports/dtos/response-report-sales-invoicing';
 
 const populate = [
 	{
@@ -73,7 +82,10 @@ const populate = [
 	},
 	{
 		path: 'pointOfSale',
-		model: PointOfSale.name,
+		populate: {
+			path: 'box',
+			model: Box.name,
+		},
 	},
 ];
 
@@ -81,9 +93,8 @@ const populate = [
 export class OrdersService {
 	constructor(
 		@InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>,
-		@InjectModel(ReturnOrder.name)
-		private readonly returnModel: PaginateModel<ReturnOrder>,
 		private readonly customersService: CustomersService,
+		@Inject(forwardRef(() => ShopsService))
 		private readonly shopsService: ShopsService,
 		private readonly productsService: ProductsService,
 		private readonly stockHistoryService: StockHistoryService,
@@ -96,7 +107,13 @@ export class OrdersService {
 		private readonly creditsService: CreditsService,
 		private readonly customerTypesService: CustomerTypeService,
 		private readonly statusWebHistoriesService: StatusWebHistoriesService,
-	) {}
+		private readonly pointofSalesService: PointOfSalesService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
+	) {
+		dayjs.extend(utc);
+		dayjs.extend(timezone);
+	}
 
 	async findAll(
 		{
@@ -118,7 +135,7 @@ export class OrdersService {
 		companyId: string,
 	) {
 		const filters: FilterQuery<Order> = {};
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -689,52 +706,6 @@ export class OrdersService {
 							status: StatusOrderDetail.CONFIRMED,
 						});
 					}
-
-					/*	if (
-						![TypePayment.CREDIT, TypePayment.BONUS].includes(payment?.type)
-					) {
-						const pointOfSale = order.pointOfSale || user.pointOfSale;
-
-						const valuesReceipt = {
-							value: total,
-							paymentId: payment?._id?.toString(),
-							isCredit: false,
-							pointOfSaleId: pointOfSale?._id?.toString(),
-							concept: `Abono a pedido ${order?.number}`,
-							boxId:
-								payment?.type === 'cash'
-									? pointOfSale['box']?.toString()
-									: undefined,
-						};
-
-						const { receipt } = await this.receiptsService.create(
-							valuesReceipt,
-							user,
-							companyId,
-						);
-						newPayments.push({
-							...order?.payments[i],
-							receipt: receipt?._id,
-						});
-					} else if (payment.type === TypePayment.CREDIT) {
-						newPayments.push(order?.payments[i]);
-
-						await this.creditHistoryService.thawedCreditHistory(
-							order?._id?.toString(),
-							total,
-							user,
-							companyId,
-						);
-
-						await this.creditHistoryService.addCreditHistory(
-							order?._id?.toString(),
-							total,
-							user,
-							companyId,
-						);
-					} else {
-						newPayments.push(order?.payments[i]);
-					}*/
 				}
 
 				const pointOfSale = order.pointOfSale || user.pointOfSale;
@@ -1133,7 +1104,10 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			order.company.toString() !== companyId
+		) {
 			throw new UnauthorizedException(
 				'El usuario no tiene permisos para actualizar el pedido',
 			);
@@ -1533,7 +1507,10 @@ export class OrdersService {
 	) {
 		const order = await this.orderModel.findById(orderId).lean();
 
-		if (user.username !== 'admin' && order.company.toString() !== companyId) {
+		if (
+			user.username !== this.configService.USER_ADMIN &&
+			order.company.toString() !== companyId
+		) {
 			throw new UnauthorizedException(
 				'El usuario no tiene permisos para actualizar el pedido',
 			);
@@ -1804,6 +1781,9 @@ export class OrdersService {
 				shop: {
 					$first: '$shop',
 				},
+				date: {
+					$first: '$closeDate',
+				},
 				total: {
 					$sum: '$summary.total',
 				},
@@ -1823,7 +1803,13 @@ export class OrdersService {
 				$group: {
 					_id: ['$shop._id', '$details.product.reference.categoryLevel1._id'],
 					category: {
-						$first: '$details.product.reference.categoryLevel1',
+						$first: '$categoryLevel1',
+					},
+					date: {
+						$first: '$closeDate',
+					},
+					shop: {
+						$first: '$shop',
 					},
 					total: {
 						$sum: {
@@ -1831,19 +1817,18 @@ export class OrdersService {
 						},
 					},
 					quantity: {
-						$sum: 1,
+						$sum: '$details.quantity',
 					},
 				},
 			};
 		}
-		//consultar las ventas por valor y cantidad
 
 		const salesReport = await this.orderModel.aggregate([
 			...aggregate,
 			{
 				$lookup: {
-					from: 'CategoryLevel1',
-					localField: 'categoryLevel1',
+					from: 'categorylevel1',
+					localField: 'details.product.reference.categoryLevel1',
 					foreignField: '_id',
 					as: 'categoryLevel1',
 				},
@@ -1858,7 +1843,8 @@ export class OrdersService {
 				$project: {
 					_id: 0,
 					shop: 1,
-					category: 1,
+					date: 1,
+					category: { $arrayElemAt: ['$category', 0] },
 					total: 1,
 					quantity: 1,
 				},
@@ -2232,7 +2218,7 @@ export class OrdersService {
 	async getPaymentsOrder({
 		dateFinal,
 		dateInitial,
-		shopId,
+		pointOfSaleId,
 	}: DataGetPaymentsOrderInput) {
 		const finalDate = dayjs(dateFinal).format('YYYY/MM/DD');
 		const initialDate = dayjs(dateInitial).format('YYYY/MM/DD');
@@ -2243,10 +2229,10 @@ export class OrdersService {
 			);
 		}
 
-		let shop;
+		let pointOfSale;
 
-		if (shopId) {
-			shop = await this.shopsService.findById(shopId);
+		if (pointOfSaleId) {
+			pointOfSale = await this.pointofSalesService.findById(pointOfSaleId);
 		}
 
 		const aggreagtePayments = [
@@ -2259,7 +2245,7 @@ export class OrdersService {
 						$gte: new Date(initialDate),
 						$lt: new Date(dayjs(finalDate).add(1, 'd').format('YYYY/MM/DD')),
 					},
-					'shop._id': shop?._id,
+					pointOfSale: pointOfSale?._id,
 					status: StatusOrder.CLOSED,
 				},
 			},
@@ -2454,7 +2440,7 @@ export class OrdersService {
 							isCredit: false,
 							boxId:
 								payment?.type === 'cash'
-									? pointOfSale['box']?.toString()
+									? pointOfSale['box']?._id?.toString()
 									: undefined,
 						};
 
@@ -2494,5 +2480,225 @@ export class OrdersService {
 		}
 
 		return newPayments;
+	}
+
+	async reportSalesInvoicing(
+		{ dateFinal, dateInitial, shopId }: FiltersSalesReportInvoicingInput,
+		companyId: string,
+	): Promise<ResponseReportSalesInvoicing> {
+		//validar la tienda
+		if (shopId) {
+			const shop = await this.shopsService.findById(shopId);
+			if (!shop) {
+				throw new BadRequestException('La tienda no existe');
+			}
+		}
+
+		const filters = {
+			company: new Types.ObjectId(companyId),
+			status: StatusOrder.CLOSED,
+			closeDate: {
+				$gte: new Date(dayjs.utc(dateInitial).tz('America/Bogota').format()),
+				$lte: new Date(dayjs.utc(dateFinal).tz('America/Bogota').format()),
+			},
+		};
+
+		if (shopId) {
+			filters['shop._id'] = new Types.ObjectId(shopId);
+		}
+
+		//consultar los pagos por valor y cantidad
+		const paymentsSalesReport = await this.orderModel.aggregate([
+			{
+				$unwind: '$payments',
+			},
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$payments.payment._id',
+					payment: { $first: '$payments.payment' },
+					total: {
+						$sum: '$payments.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					payment: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		//consultar las ventas por tipo de cliente
+		const customersSalesReport = await this.orderModel.aggregate([
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$customer.customerType._id',
+					typeCustomer: { $first: '$customer.customerType' },
+					customerName: { $first: '$customer.firstName' },
+					document: { $first: '$customer.document' },
+					total: {
+						$sum: '$summary.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					typeCustomer: 1,
+					customerName: 1,
+					document: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		//consultar summary de ventas valor, cantidad de facturas, margen %, cmv
+		const summarySalesReport = await this.orderModel.aggregate([
+			{
+				$unwind: '$details',
+			},
+			{
+				$match: filters,
+			},
+			{
+				$lookup: {
+					from: 'brands',
+					localField: 'details.product.reference.brand',
+					foreignField: '_id',
+					as: 'brand',
+				},
+			},
+			{
+				$lookup: {
+					from: 'categorylevel1',
+					localField: 'details.product.reference.categoryLevel1',
+					foreignField: '_id',
+					as: 'categorylevel',
+				},
+			},
+			{
+				$set: {
+					brand: { $arrayElemAt: ['$brand.name', 0] },
+					categorylevel: { $arrayElemAt: ['$categorylevel.name', 0] },
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					total: {
+						$sum: {
+							$multiply: ['$details.quantity', '$details.price'],
+						},
+					},
+					quantity: {
+						$sum: 1,
+					},
+					cost: {
+						$sum: {
+							$multiply: [
+								'$details.quantity',
+								'$details.product.reference.cost',
+							],
+						},
+					},
+					closeDate: { $first: '$closeDate' },
+					idOrder: { $first: '$_id' },
+					products: {
+						$push: {
+							price: '$details.price',
+							cost: '$details.product.reference.cost',
+							name: '$details.product.reference.name',
+							barcode: '$details.product.barcode',
+							color: '$details.product.color.name_internal',
+							size: '$details.product.size.value',
+							brand: '$brand',
+							categoryLevel1: '$categorylevel',
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					total: 1,
+					quantity: 1,
+					cmv: {
+						$subtract: ['$total', '$cost'],
+					},
+					margin: {
+						$divide: [
+							{
+								$subtract: ['$total', '$cost'],
+							},
+							'$total',
+						],
+					},
+					closeDate: 1,
+					idOrder: 1,
+					products: 1,
+				},
+			},
+		]);
+
+		//consultar las ventas por valor y cantidad
+		const salesReport = await this.orderModel.aggregate([
+			{
+				$lookup: {
+					from: 'CategoryLevel1',
+					localField: 'categoryLevel1',
+					foreignField: '_id',
+					as: 'categoryLevel1',
+				},
+			},
+			{
+				$match: filters,
+			},
+			{
+				$group: {
+					_id: '$shop._id',
+					shop: {
+						$first: '$shop',
+					},
+					total: {
+						$sum: '$summary.total',
+					},
+					quantity: {
+						$sum: 1,
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					shop: 1,
+					category: 1,
+					total: 1,
+					quantity: 1,
+				},
+			},
+		]);
+
+		return {
+			paymentsSalesReport,
+			customersSalesReport,
+			summarySalesReport: summarySalesReport[0],
+			salesReport,
+		};
 	}
 }

@@ -5,10 +5,7 @@ import { CategoryLevel1 } from 'src/products/entities/category-level1.entity';
 import { Payment } from 'src/treasury/entities/payment.entity';
 
 @ObjectType({ description: 'Ventas detalladas con base a los filtros' })
-class SalesReport {
-	@Field(() => Date, { description: 'Fecha de la venta' })
-	date: Date;
-
+class SalesReportInvoicing {
 	@Field(() => Shop, { description: 'Tienda' })
 	shop: Shop;
 
@@ -26,7 +23,7 @@ class SalesReport {
 }
 
 @ObjectType({ description: 'Medios de pago' })
-class PaymentsSalesReport {
+class PaymentsSalesReportInvoicing {
 	@Field(() => Payment, { description: 'Medio de pago' })
 	payment: Payment;
 
@@ -42,9 +39,15 @@ class PaymentsSalesReport {
 }
 
 @ObjectType({ description: 'Ventas de tipos de clientes' })
-class CustomerSalesReport {
+class CustomerSalesReportInvoicing {
 	@Field(() => CustomerType, { description: 'Tipo de cliente' })
 	typeCustomer: CustomerType;
+
+	@Field(() => String, { description: 'Nombre del cliente' })
+	customerName: string;
+
+	@Field(() => String, { description: 'Numero documento del cliente' })
+	document: string;
 
 	@Field(() => Number, { description: 'Cantidad de ventas' })
 	quantity: number;
@@ -54,7 +57,10 @@ class CustomerSalesReport {
 }
 
 @ObjectType({ description: 'Resumen de ventas' })
-class SummarySalesReport {
+class SummarySalesReportInvoicing {
+	@Field(() => String, { description: 'Identificador de la venta' })
+	idOrder: string;
+
 	@Field(() => Number, { description: 'Cantidad de ventas' })
 	quantity: number;
 
@@ -66,31 +72,66 @@ class SummarySalesReport {
 
 	@Field(() => Number, { description: 'Margen de ventas en porcentaje' })
 	margin: number;
+
+	@Field(() => Date, { description: 'Fecha de cierre de la venta' })
+	closeDate: Date;
+
+	@Field(() => [ProductDetail], { description: 'Productos de la venta' })
+	products: ProductDetail[];
+}
+
+@ObjectType({ description: 'Detalle del producto' })
+class ProductDetail {
+	@Field(() => Number, { description: 'Precio del producto' })
+	price: number;
+
+	@Field(() => Number, { description: 'Costo del producto' })
+	cost: number;
+
+	@Field(() => String, { description: 'Nombre del producto' })
+	name: string;
+
+	@Field(() => String, { description: 'Codigo de barras del producto' })
+	barcode: string;
+
+	@Field(() => String, { description: 'Color del producto' })
+	color: string;
+
+	@Field(() => String, { description: 'Talla del producto' })
+	size: string;
+
+	@Field(() => String, { description: 'Marca del producto' })
+	brand: string;
+
+	@Field(() => String, {
+		description: 'Categoria nivel 1 del producto',
+	})
+	categoryLevel1: string;
 }
 
 @ObjectType({ description: 'Reportde de ventas generales' })
-export class ResponseReportSales {
-	@Field(() => [SalesReport], {
+export class ResponseReportSalesInvoicing {
+	@Field(() => [SalesReportInvoicing], {
 		description: 'Ventas detalladas',
 		nullable: true,
 	})
-	salesReport?: SalesReport[];
+	salesReport?: SalesReportInvoicing[];
 
-	@Field(() => [PaymentsSalesReport], {
+	@Field(() => [PaymentsSalesReportInvoicing], {
 		description: 'Medios de pago',
 		nullable: true,
 	})
-	paymentsSalesReport?: PaymentsSalesReport[];
+	paymentsSalesReport?: PaymentsSalesReportInvoicing[];
 
-	@Field(() => [CustomerSalesReport], {
+	@Field(() => [CustomerSalesReportInvoicing], {
 		description: 'Ventas por tipo de cliente',
 		nullable: true,
 	})
-	customersSalesReport?: CustomerSalesReport[];
+	customersSalesReport?: CustomerSalesReportInvoicing[];
 
-	@Field(() => SummarySalesReport, {
+	@Field(() => SummarySalesReportInvoicing, {
 		description: 'Resumen de ventas',
 		nullable: true,
 	})
-	summarySalesReport?: SummarySalesReport;
+	summarySalesReport?: SummarySalesReportInvoicing;
 }

@@ -1,4 +1,6 @@
-import { Module } from '@nestjs/common';
+import { CategoryLevel1Schema } from './../products/entities/category-level1.entity';
+import { CategoryLevel1 } from 'src/products/entities/category-level1.entity';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
@@ -49,9 +51,23 @@ import { TokensService } from './services/tokens.service';
 import { InterapidisimoService } from './services/interapidisimo.service';
 import { FedexService } from './services/fedex.service';
 import { Product, ProductSchema } from 'src/products/entities/product.entity';
+import { SalesModule } from 'src/sales/sales.module';
+import {
+	Reference,
+	ReferenceSchema,
+} from 'src/products/entities/reference.entity';
+import {
+	CategoryLevel2,
+	CategoryLevel2Schema,
+} from 'src/products/entities/category-level2.entity';
+import {
+	CategoryLevel3,
+	CategoryLevel3Schema,
+} from 'src/products/entities/category-level3.entity';
 
 @Module({
 	imports: [
+		forwardRef(() => SalesModule),
 		PassportModule,
 		CrmModule,
 		SendMailModule,
@@ -71,6 +87,9 @@ import { Product, ProductSchema } from 'src/products/entities/product.entity';
 		}),
 		MongooseModule.forFeature([
 			{ name: 'Company', schema: CompanySchema },
+			{ name: CategoryLevel1.name, schema: CategoryLevel1Schema },
+			{ name: CategoryLevel2.name, schema: CategoryLevel2Schema },
+			{ name: CategoryLevel3.name, schema: CategoryLevel3Schema },
 			{ name: Conveyor.name, schema: ConveyorSchema },
 			{
 				name: Image.name,
@@ -107,6 +126,10 @@ import { Product, ProductSchema } from 'src/products/entities/product.entity';
 			{
 				name: Product.name,
 				schema: ProductSchema,
+			},
+			{
+				name: Reference.name,
+				schema: ReferenceSchema,
 			},
 		]),
 		MongooseModule.forFeatureAsync([

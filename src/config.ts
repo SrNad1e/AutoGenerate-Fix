@@ -47,4 +47,5 @@ export default registerAs('config', () => ({
 	},
 	API_URL: process.env.API_URL,
 	API_WEB: process.env.API_WEB,
+	USER_ADMIN: process.env.USER_ADMIN,
 }));

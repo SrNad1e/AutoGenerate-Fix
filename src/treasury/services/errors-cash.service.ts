@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, PaginateModel, Types } from 'mongoose';
 import { User } from 'src/configurations/entities/user.entity';
@@ -10,6 +10,8 @@ import { VerifiedErrorsCashInput } from '../dtos/verified-errors-cash.input';
 import { Box } from '../entities/box.entity';
 import { ErrorCash, TypeErrorCash } from '../entities/error-cash.entity';
 import { BoxService } from './box.service';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -41,6 +43,8 @@ export class ErrorsCashService {
 		@InjectModel(CloseZInvoicing.name)
 		private readonly closeZInvoicingModel: PaginateModel<CloseZInvoicing>,
 		private readonly boxesService: BoxService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -52,6 +56,7 @@ export class ErrorsCashService {
 			typeError,
 			value,
 			verified,
+			boxId
 		}: FiltersErrorsCashInput,
 		user: User,
 		companyId: string,
@@ -59,7 +64,7 @@ export class ErrorsCashService {
 		const filters: FilterQuery<ErrorCash> = {};
 		const newTypeError = TypeErrorCash[typeError] || typeError;
 
-		if (user.username !== 'admin') {
+		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
 		}
 
@@ -75,14 +80,20 @@ export class ErrorsCashService {
 			filters.typeError = newTypeError;
 		}
 
+		if (boxId) {
+			filters.boxOrigin = new Types.ObjectId(boxId);
+		}
+
 		if (closeZNumber) {
-			const closeZ = await this.closeZInvoicingModel.findOne({
+			const closeZ = await this.closeZInvoicingModel.find({
 				number: closeZNumber,
 				company: new Types.ObjectId(companyId),
 			});
 
 			if (closeZ) {
-				filters.closeZ = closeZ._id;
+				filters.closeZ = {
+					$in: closeZ.map((c) => c._id),
+				};
 			}
 		}
 

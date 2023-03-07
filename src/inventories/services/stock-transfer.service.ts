@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
+	Inject,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as dayjs from 'dayjs';
@@ -40,6 +41,8 @@ import { WarehousesService } from 'src/configurations/services/warehouses.servic
 import { StatusDetailTransferError } from '../entities/stock-trasnsfer-error.entity';
 import { StockTransferErrorsService } from './stock-transfer-errors.service';
 import { DetailsStockTransferErrorCreateInput } from '../dtos/create-stockTransferError.input';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 const populate = [
 	{
@@ -82,6 +85,8 @@ export class StockTransferService {
 		private readonly stockHistoryService: StockHistoryService,
 		private readonly stockRequestService: StockRequestService,
 		private readonly stockTransferErrorsService: StockTransferErrorsService,
+		@Inject(config.KEY)
+		private readonly configService: ConfigType<typeof config>,
 	) {}
 
 	async findAll(
@@ -102,7 +107,7 @@ export class StockTransferService {
 		const filters: FilterQuery<StockTransfer> = {};
 
 		try {
-			if (user.username !== 'admin') {
+			if (user.username !== this.configService.USER_ADMIN) {
 				filters['company._id'] = new Types.ObjectId(companyId);
 			}
 
@@ -332,7 +337,7 @@ export class StockTransferService {
 		}
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			stockTransfer?.company?._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(
@@ -729,7 +734,7 @@ export class StockTransferService {
 		}
 
 		if (
-			user.username !== 'admin' &&
+			user.username !== this.configService.USER_ADMIN &&
 			stockTransfer?.company?._id.toString() !== companyId
 		) {
 			throw new UnauthorizedException(
@@ -741,7 +746,7 @@ export class StockTransferService {
 			throw new BadRequestException('El traslado no se encuentra enviado');
 		}
 
-		const detailsArray = stockTransfer.details
+		/*const detailsArray = stockTransfer.details
 			.filter(
 				(detail) =>
 					detail.status === StatusDetailTransfer.CONFIRMED &&
@@ -757,7 +762,7 @@ export class StockTransferService {
 			throw new BadRequestException(
 				`El producto ${detailsVerified.productId} ya se encuentra confirmado`,
 			);
-		}
+		}*/
 
 		let newDetails = [...stockTransfer.details];
 
