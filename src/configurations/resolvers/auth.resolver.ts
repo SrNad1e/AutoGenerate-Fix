@@ -22,7 +22,6 @@ export class AuthResolver {
 		_: LoginUserInput,
 		@Context() context,
 	): Promise<LoginResponse> {
-		console.log("Response Login ", this.authService.login(context.user))
 		return this.authService.login(context.user);
 	}
 

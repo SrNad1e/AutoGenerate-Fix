@@ -45,7 +45,6 @@ export class AuthService {
 		if (user.status === StatusUser.SUSPEND) {
 			throw new UnauthorizedException(`El usuario se encuentra suspendido`);
 		}
-		console.log("Load data :: ", user)
 		return {
 			
 			

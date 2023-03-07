@@ -116,8 +116,6 @@ export class ReferencesService {
 				$search : "\""+name+"\""
 			}
 		}
-		console.log(companyId);
-
 		if (companyId) {
 			filters.companies = {
 				$elemMatch: { $eq: new Types.ObjectId(companyId) },
