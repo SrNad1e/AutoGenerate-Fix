@@ -45,8 +45,9 @@ export class AuthService {
 		if (user.status === StatusUser.SUSPEND) {
 			throw new UnauthorizedException(`El usuario se encuentra suspendido`);
 		}
-
 		return {
+			
+			
 			access_token: this.jwtService.sign({
 				username: user.username,
 				companyId: user.company._id,

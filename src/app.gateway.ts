@@ -32,8 +32,6 @@ export class AppGateway
 
 	@SubscribeMessage('msgToServer')
 	handleMessage(client: Socket, text: string): void {
-		console.log(text);
-
 		this.wss.emit('msgToClient', text);
 	}
 }
