@@ -45,8 +45,8 @@ class InventoryReport {
 	@Field(() => Size, { description: 'Talla del producto' })
 	size: Size;
 
-	@Field(() => Warehouse, { description: 'bodega del producto', nullable: true })
-	productWarehouse: Warehouse
+	@Field(() => [Warehouse], { description: 'bodega del producto', nullable: true })
+	productWarehouse: [Warehouse]
 }
 
 @ObjectType({ description: 'Respuesta al listado de los productos' })
