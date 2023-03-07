@@ -21,9 +21,7 @@ const project: any = {
 	color: {
 		$arrayElemAt: ['$color', 0],
 	},
-	productWarehouse: {
-		$arrayElemAt: ['$productWarehouse', 0]
-	}
+	productWarehouse: 1
 };
 
 @Injectable()
@@ -69,7 +67,7 @@ export class StockService {
 		}
 
 		if (warehouseId) {
-			filteredWarehouse['productWarehouse._id'] = new Types.ObjectId(warehouseId)
+			filteredWarehouse['stock.warehouse'] = new Types.ObjectId(warehouseId)
 		}
 
 		const options = {
@@ -106,15 +104,15 @@ export class StockService {
 				},
 			},
 			{
-				$unwind: '$stock'
+				$lookup: {
+					from: 'warehouses',
+					localField: 'stock.warehouse',
+					foreignField: '_id',
+					as: "productWarehouse",
+				}
 			},
 			{
-				$lookup: {
-					from: "warehouses",
-					localField: "stock.warehouse",
-					foreignField: "_id",
-					as: "productWarehouse"
-				},
+				$unwind: '$stock'
 			},
 			{
 				$project: project,

@@ -3334,7 +3334,7 @@ type InventoryReport {
   color: Color!
 
   """bodega del producto"""
-  productWarehouse: Warehouse
+  productWarehouse: [Warehouse!]
 
   """Referencia del producto"""
   reference: Reference!
