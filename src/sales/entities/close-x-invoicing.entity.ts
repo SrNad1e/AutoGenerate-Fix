@@ -173,6 +173,13 @@ export class CloseXInvoicing extends Document {
 	@Prop({ type: Object, default: 0 })
 	quantityBank: number;
 
+	@Field(() => Number, {
+		description: 'Ventas por datafono reportadas por el usuario',
+		nullable: true
+	})
+	@Prop({ type: Object, default: 0 })
+	quantityDataphone?: number;
+
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cierre',
 	})

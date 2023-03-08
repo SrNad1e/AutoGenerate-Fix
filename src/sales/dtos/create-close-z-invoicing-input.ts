@@ -14,4 +14,7 @@ export class CreateCloseZInvoicingInput {
 
 	@Field(() => Number, { description: 'Cantidad de trasnferencias reportadas' })
 	quantityBank: number;
+
+	@Field(() => Number, { description: 'Cantidad de ventas por datafono reportadas' })
+	quantityDataphone?: number;
 }

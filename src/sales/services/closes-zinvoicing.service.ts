@@ -25,6 +25,7 @@ import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { ReturnsOrderService } from './returns-order.service';
 import config from 'src/config';
 import { ConfigType } from '@nestjs/config';
+import { CreateCloseZInvoicingInput } from '../dtos/create-close-z-invoicing-input';
 
 const populate: PopulateOptions[] = [
 	{
@@ -144,7 +145,8 @@ export class ClosesZinvoicingService {
 			closeDate,
 			pointOfSaleId,
 			quantityBank,
-		}: CreateCloseXInvoicingInput,
+			quantityDataphone
+		}: CreateCloseZInvoicingInput,
 		user: User,
 		companyId: string,
 	) {
@@ -276,6 +278,7 @@ export class ClosesZinvoicingService {
 			closeDate: new Date(closeDate.split(' ')[0]),
 			prefix: pointOfSale?.authorization['prefix'],
 			quantityBank,
+			quantityDataphone,
 			...summaryOrder,
 			refunds,
 			payments: newPayments,

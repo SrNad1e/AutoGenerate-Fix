@@ -11,6 +11,7 @@ export enum TypePayment {
 	BANK = 'bank',
 	CREDIT = 'credit',
 	BONUS = 'bonus',
+	DATAPHONE = 'dataphone'
 }
 
 registerEnumType(TypePayment, { name: 'TypePayment' });

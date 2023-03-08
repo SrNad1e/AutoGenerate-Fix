@@ -134,6 +134,7 @@ export class ClosesXInvoicingService {
 			closeDate,
 			pointOfSaleId,
 			quantityBank,
+			quantityDataphone
 		}: CreateCloseXInvoicingInput,
 		user: User,
 		companyId: string,
@@ -216,6 +217,7 @@ export class ClosesXInvoicingService {
 			expenses: expenses?.docs?.map((expense) => expense?._id) || [],
 			closeDate: new Date(closeDate.split(' ')[0]),
 			quantityBank,
+			quantityDataphone,
 			...summaryOrder,
 			refunds,
 			payments: newPayments,
