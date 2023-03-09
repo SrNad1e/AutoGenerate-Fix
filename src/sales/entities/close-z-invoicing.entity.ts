@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
@@ -13,6 +13,15 @@ import {
 	SummaryOrderClose,
 } from './close-x-invoicing.entity';
 import { User } from 'src/configurations/entities/user.entity';
+
+export enum VerifiedClose {
+	VERIFIED = 'verified',
+	UNVERIFIED = 'unverified',
+}
+
+registerEnumType(VerifiedClose, {
+	name: 'VerifiedClose',
+});
 
 @Schema({ timestamps: true, collection: 'closesZInvoicing' })
 @ObjectType({ description: 'Cierre Z de facturación' })
@@ -54,6 +63,12 @@ export class CloseZInvoicing extends Document {
 	@Field(() => Date, { description: 'Fecha de cierre' })
 	@Prop({ type: Date, required: true })
 	closeDate: Date;
+
+	@Field(() => VerifiedClose, {
+		description: 'si el cierre ha sido verificado',
+	})
+	@Prop({ type: String, required: true })
+	verifiedStatus: VerifiedClose;
 
 	@Field(() => SummaryOrderClose, { description: 'Datos de las ordenes' })
 	@Prop({ type: Object, requiere: true })

@@ -26,6 +26,7 @@ import { ReturnsOrderService } from './returns-order.service';
 import config from 'src/config';
 import { ConfigType } from '@nestjs/config';
 import { CreateCloseZInvoicingInput } from '../dtos/create-close-z-invoicing-input';
+import { VerifiedCloseZInput } from '../dtos/verified-close-z-input';
 
 const populate: PopulateOptions[] = [
 	{
@@ -73,11 +74,10 @@ export class ClosesZinvoicingService {
 		private readonly expensesService: ExpensesService,
 		private readonly receiptsService: ReceiptsService,
 		private readonly boxesService: BoxService,
-		private readonly errorsCashService: ErrorsCashService,
 		private readonly returnsOrderService: ReturnsOrderService,
 		@Inject(config.KEY)
 		private readonly configService: ConfigType<typeof config>,
-	) {}
+	) { }
 
 	async findAll(
 		{
@@ -287,6 +287,7 @@ export class ClosesZinvoicingService {
 				name: user.name,
 				_id: user._id,
 			},
+			verifiedStatus: 'unverified'
 		});
 
 		const response = await (await newClose.save()).populate(populate);
@@ -337,34 +338,6 @@ export class ClosesZinvoicingService {
 			const total = boxMain?.total + cash - diff;
 
 			await this.boxesService.updateTotal(boxMain._id.toString(), total);
-
-			const totalBox = box.total - cash;
-
-			// se valida el cierre si hay cierres y se crea el registro de los errores
-
-			if (totalBox > 0) {
-				await this.errorsCashService.addRegister(
-					{
-						closeZId: response?._id?.toString(),
-						typeError: TypeErrorCash.MISSING,
-						value: totalBox,
-					},
-					user,
-					companyId,
-				);
-			}
-
-			if (totalBox < 0) {
-				await this.errorsCashService.addRegister(
-					{
-						closeZId: response?._id?.toString(),
-						typeError: TypeErrorCash.SURPLUS,
-						value: totalBox * -1,
-					},
-					user,
-					companyId,
-				);
-			}
 
 			await this.boxesService.updateTotal(box._id.toString(), 0);
 		} else {
@@ -440,5 +413,13 @@ export class ClosesZinvoicingService {
 		closeZNumber.lastNumber += 1;
 
 		return closeZNumber.save();
+	}
+
+	async verifiedClose({ closeZId, verifiedStatus }: VerifiedCloseZInput) {
+		return this.closeZInvoicingModel.findByIdAndUpdate(closeZId, {
+			$set: {
+				verifiedStatus
+			}
+		})
 	}
 }
