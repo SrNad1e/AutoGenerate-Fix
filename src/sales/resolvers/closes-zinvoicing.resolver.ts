@@ -7,6 +7,7 @@ import {
 import { CreateCloseZInvoicingInput } from '../dtos/create-close-z-invoicing-input';
 import { FiltersClosesZInvoicingInput } from '../dtos/filters-closes-z-invoicing-input';
 import { ResponseClosesZInvoicing } from '../dtos/response-closes-z-invoicing';
+import { VerifiedCloseZInput } from '../dtos/verified-close-z-input';
 import { CloseZInvoicing } from '../entities/close-z-invoicing.entity';
 import { ClosesZinvoicingService } from '../services/closes-zinvoicing.service';
 
@@ -57,6 +58,25 @@ export class ClosesZinvoicingResolver {
 			context.req.body.variables.input,
 			context.req.user.user,
 			context.req.user.companyId,
+		);
+	}
+
+	@Mutation(() => CloseZInvoicing, {
+		name: 'updateCloseZInvoicing',
+		description: 'actualiza un cierre Z de facturación',
+	})
+	update(
+		@Args({
+			name: 'updateCloseZInvoicing',
+			nullable: true,
+			defaultValue: {},
+			description: 'Datos para actualizar el cierre z de facturación',
+		})
+		_: VerifiedCloseZInput,
+		@Context() context,
+	) {
+		return this.closesZInvoicingService.verifiedClose(
+			context.req.body.variables.input,
 		);
 	}
 }
