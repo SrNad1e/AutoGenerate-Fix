@@ -100,7 +100,7 @@ export class ClosesZinvoicingService {
 			filters.verifiedStatus = VerifiedClose[verifiedStatus];
 		}
 
-		if (value === 0 || value > 0) {
+		if (value >= 0) {
 			filters['summaryOrder.value'] = value
 		}
 
