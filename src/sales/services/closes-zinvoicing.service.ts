@@ -11,16 +11,13 @@ import * as dayjs from 'dayjs';
 
 import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { FiltersClosesZInvoicingInput } from '../dtos/filters-closes-z-invoicing-input';
-import { CloseZInvoicing } from '../entities/close-z-invoicing.entity';
+import { CloseZInvoicing, VerifiedClose } from '../entities/close-z-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
-import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { User } from 'src/configurations/entities/user.entity';
 import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { BoxService } from 'src/treasury/services/box.service';
-import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
-import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { ReturnsOrderService } from './returns-order.service';
 import config from 'src/config';
@@ -81,6 +78,8 @@ export class ClosesZinvoicingService {
 
 	async findAll(
 		{
+			verifiedStatus,
+			value,
 			closeDate,
 			number,
 			shopId,
@@ -95,6 +94,14 @@ export class ClosesZinvoicingService {
 
 		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (verifiedStatus) {
+			filters.verifiedStatus = VerifiedClose[verifiedStatus];
+		}
+
+		if (value === 0 || value > 0) {
+			filters['summaryOrder.value'] = value
 		}
 
 		if (closeDate) {
