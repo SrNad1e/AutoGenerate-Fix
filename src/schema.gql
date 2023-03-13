@@ -612,6 +612,9 @@ type CloseZInvoicing {
 
   """Usuario que creó o editó el cierre"""
   user: User!
+
+  """si el cierre ha sido verificado"""
+  verifiedStatus: VerifiedClose!
 }
 
 """Color del producto"""
@@ -2320,6 +2323,12 @@ input FiltersClosesZInvoicingInput {
 
   """Ordenamiento (1 es ascendente, -1 es descendente)"""
   sort: SortCloseZInvoicing
+
+  """Valor del cierre"""
+  value: Float
+
+  """estado del cierre"""
+  verifiedStatus: VerifiedClose
 }
 
 """Filtros para la lista de colores"""
@@ -3749,6 +3758,12 @@ type Mutation {
     """Datos para actualizar la ciudad"""
     updateCityInput: UpadteCityInput!
   ): City!
+
+  """actualiza un cierre Z de facturación"""
+  updateCloseZInvoicing(
+    """Datos para actualizar el cierre z de facturación"""
+    updateCloseZInvoicing: VerifiedCloseZInput = {}
+  ): CloseZInvoicing!
 
   """Actualiza el color"""
   updateColor(
@@ -8347,6 +8362,20 @@ type User {
 
   """Cuenta de usuario"""
   username: String!
+}
+
+enum VerifiedClose {
+  UNVERIFIED
+  VERIFIED
+}
+
+"""Datos para verificar los cierres z"""
+input VerifiedCloseZInput {
+  """Identificador del cierre que se va a verificar"""
+  closeZId: String!
+
+  """Estado de verificado del cierre"""
+  verifiedStatus: VerifiedClose!
 }
 
 """Datos para verificar los errores de pedido"""

@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { VerifiedClose } from '../entities/close-z-invoicing.entity';
 
 @InputType({ description: 'Ordenamiento de cierre z' })
 export class SortCloseZInvoicing {
@@ -33,13 +34,25 @@ export class FiltersClosesZInvoicingInput {
 		description: 'Número del cierre',
 		nullable: true,
 	})
-	number: number;
+	number?: number;
+
+	@Field(() => Number, {
+		description: 'Valor del cierre',
+		nullable: true,
+	})
+	value?: number;
 
 	@Field(() => String, {
 		description: 'Tienda del cierre',
 		nullable: true,
 	})
-	shopId: string;
+	shopId?: string;
+
+	@Field(() => VerifiedClose, {
+		description: 'estado del cierre',
+		nullable: true
+	})
+	verifiedStatus?: VerifiedClose;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
@@ -57,5 +70,5 @@ export class FiltersClosesZInvoicingInput {
 		description: 'Fecha del cierre',
 		nullable: true,
 	})
-	closeDate: string;
+	closeDate?: string;
 }

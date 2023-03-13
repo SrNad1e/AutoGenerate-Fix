@@ -11,21 +11,19 @@ import * as dayjs from 'dayjs';
 
 import { ExpensesService } from 'src/treasury/services/expenses.service';
 import { FiltersClosesZInvoicingInput } from '../dtos/filters-closes-z-invoicing-input';
-import { CloseZInvoicing } from '../entities/close-z-invoicing.entity';
+import { CloseZInvoicing, VerifiedClose } from '../entities/close-z-invoicing.entity';
 import { OrdersService } from './orders.service';
 import { PointOfSalesService } from './point-of-sales.service';
-import { CreateCloseXInvoicingInput } from '../dtos/create-close-x-invoicing-input';
 import { User } from 'src/configurations/entities/user.entity';
 import { Expense, StatusExpense } from 'src/treasury/entities/expense.entity';
 import { ReceiptsService } from 'src/treasury/services/receipts.service';
 import { BoxService } from 'src/treasury/services/box.service';
-import { ErrorsCashService } from 'src/treasury/services/errors-cash.service';
-import { TypeErrorCash } from 'src/treasury/entities/error-cash.entity';
 import { TypePayment } from 'src/treasury/entities/payment.entity';
 import { ReturnsOrderService } from './returns-order.service';
 import config from 'src/config';
 import { ConfigType } from '@nestjs/config';
 import { CreateCloseZInvoicingInput } from '../dtos/create-close-z-invoicing-input';
+import { VerifiedCloseZInput } from '../dtos/verified-close-z-input';
 
 const populate: PopulateOptions[] = [
 	{
@@ -73,14 +71,15 @@ export class ClosesZinvoicingService {
 		private readonly expensesService: ExpensesService,
 		private readonly receiptsService: ReceiptsService,
 		private readonly boxesService: BoxService,
-		private readonly errorsCashService: ErrorsCashService,
 		private readonly returnsOrderService: ReturnsOrderService,
 		@Inject(config.KEY)
 		private readonly configService: ConfigType<typeof config>,
-	) {}
+	) { }
 
 	async findAll(
 		{
+			verifiedStatus,
+			value,
 			closeDate,
 			number,
 			shopId,
@@ -95,6 +94,14 @@ export class ClosesZinvoicingService {
 
 		if (user.username !== this.configService.USER_ADMIN) {
 			filters.company = new Types.ObjectId(companyId);
+		}
+
+		if (verifiedStatus) {
+			filters.verifiedStatus = VerifiedClose[verifiedStatus];
+		}
+
+		if (value >= 0) {
+			filters['summaryOrder.value'] = value
 		}
 
 		if (closeDate) {
@@ -287,6 +294,7 @@ export class ClosesZinvoicingService {
 				name: user.name,
 				_id: user._id,
 			},
+			verifiedStatus: 'unverified'
 		});
 
 		const response = await (await newClose.save()).populate(populate);
@@ -337,34 +345,6 @@ export class ClosesZinvoicingService {
 			const total = boxMain?.total + cash - diff;
 
 			await this.boxesService.updateTotal(boxMain._id.toString(), total);
-
-			const totalBox = box.total - cash;
-
-			// se valida el cierre si hay cierres y se crea el registro de los errores
-
-			if (totalBox > 0) {
-				await this.errorsCashService.addRegister(
-					{
-						closeZId: response?._id?.toString(),
-						typeError: TypeErrorCash.MISSING,
-						value: totalBox,
-					},
-					user,
-					companyId,
-				);
-			}
-
-			if (totalBox < 0) {
-				await this.errorsCashService.addRegister(
-					{
-						closeZId: response?._id?.toString(),
-						typeError: TypeErrorCash.SURPLUS,
-						value: totalBox * -1,
-					},
-					user,
-					companyId,
-				);
-			}
 
 			await this.boxesService.updateTotal(box._id.toString(), 0);
 		} else {
@@ -440,5 +420,13 @@ export class ClosesZinvoicingService {
 		closeZNumber.lastNumber += 1;
 
 		return closeZNumber.save();
+	}
+
+	async verifiedClose({ closeZId, verifiedStatus }: VerifiedCloseZInput) {
+		return this.closeZInvoicingModel.findByIdAndUpdate(closeZId, {
+			$set: {
+				verifiedStatus
+			}
+		})
 	}
 }
