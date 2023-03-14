@@ -1627,7 +1627,7 @@ export class OrdersService {
 		//generar los rangos de fechas
 		switch (newGroupDates) {
 			case GroupDates.DAY:
-				finalDate = new Date(dayjs(dateFinal).add(1, 'd').format('YYYY/MM/DD'));
+				finalDate = new Date(dayjs(dateFinal).add(0, 'd').format('YYYY/MM/DD'));
 
 				initialDate = new Date(dayjs(dateInitial).format('YYYY/MM/DD'));
 				break;
@@ -1661,10 +1661,10 @@ export class OrdersService {
 			status: StatusOrder.CLOSED,
 			closeDate: {
 				$gte: initialDate,
-				$lte: finalDate,
+				$lt: finalDate,
 			},
 		};
-
+		
 		if (shopId) {
 			filters['shop._id'] = new Types.ObjectId(shopId);
 		}
@@ -1823,36 +1823,15 @@ export class OrdersService {
 				},
 			};
 		}
-		//consul by day
-		if (newGroupDates == GroupDates.DAY) {
-			group = {
-				$group: {
-					_id: ['$categoryLevel1._id', '$closeDate'],
-					quantity: { $first: { $sum: '$details.quantity' } },
-					date: { $first: '$closeDate' },
-					category: { $first: '$categoryLevel1' },
-					shop: { $first: '$shop' },
-					total: { $sum: '$details.quantity' },
-				},
-			};
-		} //By Month
-		else if (newGroupDates == GroupDates.MONTH) {
-			group = {
-				$group: {
-					_id: [{ $month: '$closeDate' }, { $dayOfMonth: '$closeDate' }],
-					//myCount: { $sum: 1 },
-					quantity: { $sum: { $first: '$details.quantity' } },
-					date: { $first: '$closeDate' },
-					category: { $first: '$categoryLevel1' },
-					shop: { $first: '$shop' },
-					total: { $sum: '$details.quantity' },
-				},
-			};
-		}
-
 		const salesReport = await this.orderModel.aggregate([
 			{
 				$match: filters,
+			},
+			{
+				$unwind: {
+					path: '$details',
+					preserveNullAndEmptyArrays: true,
+				}
 			},
 			{
 				$lookup: {
@@ -1863,22 +1842,23 @@ export class OrdersService {
 				},
 			},
 			{
-				$unwind: '$categoryLevel1',
-			},
-			{
-				...group,
+				$unwind: {
+					path: '$categoryLevel1',
+					preserveNullAndEmptyArrays: true,
+				}
 			},
 			{
 				$project: {
-					_id: 1,
-					shop: 1,
-					date: 1,
-					category: 1,
-					total: 1,
-					quantity: 1,
-				},
-			},
+				  'shop': 1, 
+				  'category': '$categoryLevel1',
+				  'total': '$details.quantity', 
+				  'quantity':'$details.quantity', 
+				  'categoryLevel1': 1, 
+				  'date':'$closeDate'
+				}
+			}
 		]);
+		
 		return {
 			paymentsSalesReport,
 			customersSalesReport,
