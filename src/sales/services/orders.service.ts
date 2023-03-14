@@ -1661,7 +1661,7 @@ export class OrdersService {
 			status: StatusOrder.CLOSED,
 			closeDate: {
 				$gte: initialDate,
-				$lt: finalDate,
+				$lte: finalDate,
 			},
 		};
 		
