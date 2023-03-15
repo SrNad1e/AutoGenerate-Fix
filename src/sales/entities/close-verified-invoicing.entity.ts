@@ -1,4 +1,4 @@
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
@@ -13,21 +13,17 @@ import {
 	SummaryOrderClose,
 } from './close-x-invoicing.entity';
 import { User } from 'src/configurations/entities/user.entity';
+import { CloseZInvoicing } from './close-z-invoicing.entity';
 
-export enum VerifiedClose {
-	VERIFIED = 'verified',
-	UNVERIFIED = 'unverified',
-}
-
-registerEnumType(VerifiedClose, {
-	name: 'VerifiedClose',
-});
-
-@Schema({ timestamps: true, collection: 'closesZInvoicing' })
-@ObjectType({ description: 'Cierre Z de facturación' })
-export class CloseZInvoicing extends Document {
+@Schema({ timestamps: true, collection: 'closesVerified' })
+@ObjectType({ description: 'Cierre verificado de facturación' })
+export class CloseVerified extends Document {
 	@Field(() => String, { description: 'Identificador de mongo' })
 	_id: Types.ObjectId;
+
+    @Field(() => CloseZInvoicing, { description: 'cierre que se verifico' })
+	@Prop({ type: Types.ObjectId, ref: CloseZInvoicing.name, required: true })
+	closeZ: Types.ObjectId;
 
 	@Field(() => CashRegister, {
 		description: 'Listado de billetes y monedas registrados',
@@ -64,12 +60,6 @@ export class CloseZInvoicing extends Document {
 	@Prop({ type: Date, required: true })
 	closeDate: Date;
 
-	@Field(() => VerifiedClose, {
-		description: 'si el cierre ha sido verificado',
-	})
-	@Prop({ type: String })
-	verifiedStatus: VerifiedClose;
-
 	@Field(() => SummaryOrderClose, { description: 'Datos de las ordenes' })
 	@Prop({ type: Object, requiere: true })
 	summaryOrder: SummaryOrderClose;
@@ -78,12 +68,24 @@ export class CloseZInvoicing extends Document {
 	@Prop({ type: [Types.ObjectId], default: [] })
 	expenses?: Types.ObjectId[];
 
+	@Field(() => Number, {
+		description: 'Egresos corregido',
+	})
+	@Prop({ type: Number })
+	newExpense: number;
+
 	@Field(() => RefundOrderClose, {
 		description: 'Devoluciones generadas',
 		nullable: true,
 	})
 	@Prop({ type: Array, default: {} })
 	refunds: RefundOrderClose;
+
+	@Field(() => String, {
+		description: 'Observacion al corregir un cierre'
+	})
+	@Prop({type: String})
+	observation: string;
 
 	@Field(() => [PaymentOrderClose], {
 		description: 'Listado de pagos',
@@ -93,17 +95,43 @@ export class CloseZInvoicing extends Document {
 	payments: PaymentOrderClose[];
 
 	@Field(() => Number, {
+		description: 'Total de pagos registrados corregidos'
+	})
+	@Prop({type: Number})
+	newTotalPaymentRegister: number;
+
+	@Field(() => Number, {
+		description: 'Total de pagos reportados corregidos'
+	})
+	@Prop({type: Number})
+	newTotalPaymentReport: number;
+
+	@Field(() => Number, {
 		description: 'Transacciones reportadas por el usuario',
 	})
-	@Prop({ type: Object, default: 0 })
+	@Prop({ type: Number, default: 0 })
 	quantityBank: number;
 
 	@Field(() => Number, {
 		description: 'Ventas por datafono reportadas por el usuario',
 		nullable: true
 	})
-	@Prop({ type: Object, default: 0 })
+	@Prop({ type: Number, default: 0 })
 	quantityDataphone?: number;
+
+	@Field(() => Number, {
+		description: 'Ventas por transaccion corregida',
+		nullable: true
+	})
+	@Prop({ type: Number, default: 0 })
+	newQuantityBank: number;
+
+	@Field(() => Number, {
+		description: 'Ventas por datafono corregida',
+		nullable: true
+	})
+	@Prop({ type: Number, default: 0 })
+	newQuantityDataphone: number;
 
 	@Field(() => User, {
 		description: 'Usuario que creó o editó el cierre',
@@ -118,5 +146,5 @@ export class CloseZInvoicing extends Document {
 	updatedAt: Date;
 }
 
-export const CloseZInvoicingSchema =
-	SchemaFactory.createForClass(CloseZInvoicing);
+export const CloseVerifiedSchema =
+	SchemaFactory.createForClass(CloseVerified);
