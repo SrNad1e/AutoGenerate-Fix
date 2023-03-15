@@ -425,7 +425,7 @@ export class ClosesZinvoicingService {
 	async verifiedClose({ closeZId, verifiedStatus }: VerifiedCloseZInput) {
 		return this.closeZInvoicingModel.findByIdAndUpdate(closeZId, {
 			$set: {
-				verifiedStatus: VerifiedClose[verifiedStatus] || verifiedStatus
+				verifiedStatus: VerifiedClose[verifiedStatus]
 			}
 		}).populate(populate)
 	}
