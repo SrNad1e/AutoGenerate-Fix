@@ -49,6 +49,9 @@ import { StatusWebHistoriesService } from './services/status-web-histories.servi
 import { DailyClosingService } from './services/daily-closing.service';
 import { DailyClosing, DailyClosingSchema } from './entities/dailyClosing';
 import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
+import { ClosesVerifiedResolver } from './resolvers/close-verified.resolver';
+import { CloseVerifiedService } from './services/close-verified.service';
+import { CloseVerified, CloseVerifiedSchema } from './entities/close-verified-invoicing.entity';
 
 @Module({
 	imports: [
@@ -103,6 +106,14 @@ import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 				},
 			},
 			{
+				name: CloseVerified.name,
+				useFactory: async () => {
+					const schema = CloseVerifiedSchema;
+					schema.index({ number: 1, company: 1, prefix: 1 }, { unique: true });
+					return schema;
+				},
+			},
+			{
 				name: DailyClosing.name,
 				useFactory: async () => {
 					const schema = DailyClosingSchema;
@@ -152,6 +163,8 @@ import { DailyClosingResolver } from './resolvers/daily-closing.resolver';
 		StatusWebHistoriesService,
 		DailyClosingService,
 		DailyClosingResolver,
+		ClosesVerifiedResolver,
+		CloseVerifiedService
 	],
 	exports: [OrdersService, PointOfSalesService],
 })
