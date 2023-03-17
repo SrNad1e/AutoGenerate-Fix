@@ -1426,6 +1426,21 @@ input CreateWarehouseInput {
   name: String!
 }
 
+"""Datos para la creación de una zona"""
+input CreateZoneInput {
+  """Descricion de la zona"""
+  description: String
+
+  """Nombre de la zona"""
+  name: String!
+
+  """Identifica el estado de la zona"""
+  state: Boolean
+
+  """Descricion de la zona"""
+  user: String
+}
+
 """Crédito del cliente"""
 type Credit {
   """Identificador de mongo"""
@@ -3271,6 +3286,24 @@ input FiltersWarehousesInput {
   sort: SortWarehouse
 }
 
+"""Datos para consultar la zona"""
+input FiltersZoneInput {
+  """Identificador del rol"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la zona"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortZone
+}
+
 """Datos para crear cierre diario por fechas"""
 input GenerateDailyClosingInput {
   """Fecha inicial"""
@@ -3669,6 +3702,12 @@ type Mutation {
     createWarehouseInput: CreateWarehouseInput!
   ): Warehouse!
 
+  """Crea una zona"""
+  createZone(
+    """Datos para la creación del rol"""
+    createZoneInput: CreateZoneInput!
+  ): Zone!
+
   """Genera los cierres diarios"""
   generateDailyClosing(
     """Datos para crear generar los cierres fiscales"""
@@ -3969,6 +4008,15 @@ type Mutation {
     """Datos para actualizar la bodega"""
     updateWarehouseInput: UpdateWarehouseInput!
   ): Warehouse!
+
+  """Actualiza un rol"""
+  updateZone(
+    """Identificador del rol para actualizar"""
+    id: String!
+
+    """Datos para actualizar el rol"""
+    updateZoneInput: UpdateZoneInput!
+  ): Zone!
 
   """Verifica un producto de un traslado en error"""
   verifiedErrorsCash(
@@ -4860,6 +4908,12 @@ type Query {
     """Filtros para consultar las bodegas"""
     filtersWarehousesInput: FiltersWarehousesInput = {}
   ): ResponseWarehouses!
+
+  """Listado de las zonas"""
+  zona(
+    """Filtros para las zonas"""
+    filtersZoneInput: FiltersZoneInput = {}
+  ): ResponseZone!
 }
 
 """Rangos de precio por regiones"""
@@ -6476,6 +6530,39 @@ type ResponseWarehouses {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de la zona"""
+type ResponseZone {
+  """Lista de roles"""
+  docs: [Zone!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Devoluciones de facturación"""
 type ReturnOrder {
   """Identificador de mongo"""
@@ -7241,6 +7328,14 @@ input SortWarehouse {
   active: Float
   createdAt: Float
   isMain: Float
+  name: Float
+  updatedAt: Float
+}
+
+"""Ordenamiento para el listado de las zonas"""
+input SortZone {
+  active: Float
+  createdAt: Float
   name: Float
   updatedAt: Float
 }
@@ -8307,6 +8402,18 @@ input UpdateWarehouseInput {
   name: String
 }
 
+"""Datos para actualizar el rol"""
+input UpdateZoneInput {
+  """Descricion de la zona"""
+  description: String
+
+  """Nombre de la zona"""
+  name: String!
+
+  """Identifica el estado de la zona"""
+  state: Boolean
+}
+
 """Enlaces de diferences tipos"""
 type Urls {
   """Enlaces de tipo jpeg"""
@@ -8431,6 +8538,30 @@ type Warehouse {
   updatedAt: DateTime!
 
   """Usuario que creó el usuario"""
+  user: User!
+}
+
+"""Zona de envios"""
+type Zone {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha creada de la zona"""
+  createdAt: DateTime!
+
+  """Descricion de la zona"""
+  description: String!
+
+  """Nombre de las zonas"""
+  name: String!
+
+  """Estado de la zona"""
+  state: Boolean!
+
+  """Fecha de la actualizacion de la zona"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o modificó el rol"""
   user: User!
 }
 

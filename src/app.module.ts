@@ -20,6 +20,7 @@ import { CreditsModule } from './credits/credits.module';
 import { SendMailModule } from './send-mail/send-mail.module';
 import { ReportsModule } from './reports/reports.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ShipmentModule } from './shipment/shipment.module';
 
 @Module({
 	imports: [
@@ -79,6 +80,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 		CreditsModule,
 		SendMailModule,
 		ReportsModule,
+		ShipmentModule,
 	],
 	providers: [AppGateway],
 })
