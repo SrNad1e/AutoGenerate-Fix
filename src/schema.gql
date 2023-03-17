@@ -1328,6 +1328,24 @@ input CreateReferenceInput {
   width: Float!
 }
 
+"""Datos para la creación de una zona"""
+input CreateRegionInput {
+  """Nombre de la ciudad"""
+  city: String!
+
+  """Descricion de la zona"""
+  country: String
+
+  """departamento de la region"""
+  dpto: String
+
+  """Descricion de la zona"""
+  idZone: String
+
+  """Identifica el estado de la zona"""
+  state: Boolean
+}
+
 input CreateReturnOrderInput {
   """Productos que se devuelven del pedido"""
   details: [DetailReturnInput!]!
@@ -1523,6 +1541,21 @@ input CreateWarehouseInput {
 
   """Nombre de la bodega"""
   name: String!
+}
+
+"""Datos para la creación de una zona"""
+input CreateZoneInput {
+  """Descricion de la zona"""
+  description: String
+
+  """Nombre de la zona"""
+  name: String!
+
+  """Identifica el estado de la zona"""
+  state: Boolean
+
+  """Descricion de la zona"""
+  user: String
 }
 
 """Crédito del cliente"""
@@ -2993,6 +3026,27 @@ input FiltersReferencesInput {
   sort: SortReference
 }
 
+"""Datos para consultar la zona"""
+input FiltersRegionInput {
+  """Identificador del rol"""
+  _id: String
+
+  """Nombre de la zona"""
+  city: String
+
+  """ids de la zona"""
+  idZones: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortRegion
+}
+
 """Filtros de listado de devoluciones del pedido"""
 input FiltersReturnsOrderInput {
   """Si la devolucion de encuentra se encuentra activo"""
@@ -3370,6 +3424,24 @@ input FiltersWarehousesInput {
   sort: SortWarehouse
 }
 
+"""Datos para consultar la zona"""
+input FiltersZoneInput {
+  """Identificador del rol"""
+  _id: String
+
+  """Cantidad de registros"""
+  limit: Float
+
+  """Nombre de la zona"""
+  name: String
+
+  """Página"""
+  page: Float
+
+  """Ordenamiento"""
+  sort: SortZone
+}
+
 """Datos para crear cierre diario por fechas"""
 input GenerateDailyClosingInput {
   """Fecha inicial"""
@@ -3710,6 +3782,12 @@ type Mutation {
     createReferenceInput: CreateReferenceInput!
   ): Reference!
 
+  """Crea una region"""
+  createRegion(
+    """Datos para la creación del rol"""
+    createRegionInput: CreateRegionInput!
+  ): Region!
+
   """Se encarga de crear la devolución del pedido"""
   createReturnOrder(
     """Parámetros para la creación de la devolución de pedido"""
@@ -3773,6 +3851,12 @@ type Mutation {
     """Datos para la creación de la bodega"""
     createWarehouseInput: CreateWarehouseInput!
   ): Warehouse!
+
+  """Crea una zona"""
+  createZone(
+    """Datos para la creación del rol"""
+    createZoneInput: CreateZoneInput!
+  ): Zone!
 
   """Genera los cierres diarios"""
   generateDailyClosing(
@@ -3987,6 +4071,15 @@ type Mutation {
     updateReferenceInput: UpdateReferenceInput!
   ): Reference!
 
+  """Actualiza una region"""
+  updateRegion(
+    """Identificador del rol para actualizar"""
+    id: String!
+
+    """Datos para actualizar el rol"""
+    updateRegionInput: UpdateRegionInput!
+  ): Region!
+
   """Actualiza un rol"""
   updateRole(
     """Identificador del rol para actualizar"""
@@ -4074,6 +4167,15 @@ type Mutation {
     """Datos para actualizar la bodega"""
     updateWarehouseInput: UpdateWarehouseInput!
   ): Warehouse!
+
+  """Actualiza un rol"""
+  updateZone(
+    """Identificador del rol para actualizar"""
+    id: String!
+
+    """Datos para actualizar el rol"""
+    updateZoneInput: UpdateZoneInput!
+  ): Zone!
 
   """Verifica un producto de un traslado en error"""
   verifiedErrorsCash(
@@ -4840,6 +4942,12 @@ type Query {
     filtersReferencesInput: FiltersReferencesInput = {}
   ): ResponseReferences!
 
+  """Listado de las regiones"""
+  regions(
+    """Filtros para las zonas"""
+    filtersRegionInput: FiltersRegionInput = {}
+  ): ResponseRegion!
+
   """Consulta las ventas por rango de fechas"""
   reportSales(
     """Filtros para obtener las ventas"""
@@ -4971,6 +5079,12 @@ type Query {
     """Filtros para consultar las bodegas"""
     filtersWarehousesInput: FiltersWarehousesInput = {}
   ): ResponseWarehouses!
+
+  """Listado de las zonas"""
+  zona(
+    """Filtros para las zonas"""
+    filtersZoneInput: FiltersZoneInput = {}
+  ): ResponseZone!
 }
 
 """Rangos de precio por regiones"""
@@ -5151,6 +5265,36 @@ type RefundOrderClose {
 
   """Valor de las devoluciones"""
   value: Float
+}
+
+"""Region de envios"""
+type Region {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Nombre de la ciudad"""
+  city: String!
+
+  """Nombre del departamento de la ciudad"""
+  country: String!
+
+  """Fecha creada de la ciudad"""
+  createdAt: DateTime!
+
+  """Nombre del departamento de la ciudad"""
+  dpto: String!
+
+  """Estado de la region"""
+  state: Boolean!
+
+  """Fecha de la actualizacion de la ciudad"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o modificó la ciudad"""
+  user: User!
+
+  """Usuario que creó o modificó la ciudad"""
+  zone: Zone!
 }
 
 """Respuesta al listado de los atributos"""
@@ -6128,6 +6272,39 @@ type ResponseReferences {
   totalPages: Float!
 }
 
+"""Respuesta a la consulta de la zona"""
+type ResponseRegion {
+  """Lista de roles"""
+  docs: [Region!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
 """Reportde de ventas generales"""
 type ResponseReportSales {
   """Ventas por tipo de cliente"""
@@ -6558,6 +6735,39 @@ type ResponseUsers {
 type ResponseWarehouses {
   """Lista de salidas"""
   docs: [Warehouse!]!
+
+  """¿Encuentra página siguiente?"""
+  hasNextPage: Boolean!
+
+  """¿Encuentra página anterior?"""
+  hasPrevPage: Boolean!
+
+  """Total de docuementos solicitados"""
+  limit: Float!
+
+  """Página siguente"""
+  nextPage: Float!
+
+  """Página actual"""
+  page: Float!
+
+  """"""
+  pagingCounter: Float!
+
+  """Página anterior"""
+  prevPage: Float!
+
+  """Total de documentos"""
+  totalDocs: Float!
+
+  """Total de páginas"""
+  totalPages: Float!
+}
+
+"""Respuesta a la consulta de la zona"""
+type ResponseZone {
+  """Lista de roles"""
+  docs: [Zone!]!
 
   """¿Encuentra página siguiente?"""
   hasNextPage: Boolean!
@@ -7187,6 +7397,14 @@ input SortReference {
   updatedAt: Float
 }
 
+"""Ordenamiento para el listado de las zonas"""
+input SortRegion {
+  active: Float
+  city: Float
+  createdAt: Float
+  updatedAt: Float
+}
+
 """Ordenamiento de las devoluciones en pedido"""
 input SortReturnOrder {
   """Ordenamiento por fecha de creación"""
@@ -7352,6 +7570,14 @@ input SortWarehouse {
   active: Float
   createdAt: Float
   isMain: Float
+  name: Float
+  updatedAt: Float
+}
+
+"""Ordenamiento para el listado de las zonas"""
+input SortZone {
+  active: Float
+  createdAt: Float
   name: Float
   updatedAt: Float
 }
@@ -8232,6 +8458,24 @@ input UpdateReferenceInput {
   width: Float
 }
 
+"""Datos para la creación de una zona"""
+input UpdateRegionInput {
+  """Nombre de la ciudad"""
+  city: String!
+
+  """Descricion de la zona"""
+  country: String
+
+  """departamento de la region"""
+  dpto: String
+
+  """Descricion de la zona"""
+  idZone: String
+
+  """Identifica el estado de la zona"""
+  state: Boolean
+}
+
 """Datos para actualizar el rol"""
 input UpdateRoleInput {
   """Estado del rol"""
@@ -8418,6 +8662,18 @@ input UpdateWarehouseInput {
   name: String
 }
 
+"""Datos para actualizar el rol"""
+input UpdateZoneInput {
+  """Descricion de la zona"""
+  description: String
+
+  """Nombre de la zona"""
+  name: String!
+
+  """Identifica el estado de la zona"""
+  state: Boolean
+}
+
 """Enlaces de diferences tipos"""
 type Urls {
   """Enlaces de tipo jpeg"""
@@ -8542,6 +8798,30 @@ type Warehouse {
   updatedAt: DateTime!
 
   """Usuario que creó el usuario"""
+  user: User!
+}
+
+"""Zona de envios"""
+type Zone {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Fecha creada de la zona"""
+  createdAt: DateTime!
+
+  """Descricion de la zona"""
+  description: String!
+
+  """Nombre de las zonas"""
+  name: String!
+
+  """Estado de la zona"""
+  state: Boolean!
+
+  """Fecha de la actualizacion de la zona"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o modificó el rol"""
   user: User!
 }
 
