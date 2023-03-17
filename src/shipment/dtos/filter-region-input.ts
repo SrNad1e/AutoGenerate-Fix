@@ -21,8 +21,10 @@ export class FiltersRegionInput {
 	_id?: string;
 
 	@Field(() => String, { description: 'Nombre de la zona', nullable: true })
-	city: string;
+	city?: string;
 
+	@Field(() => String, { description: 'ids de la zona', nullable: true })
+	idZones?: string;
 
 	@Field({ description: 'Cantidad de registros', nullable: true })
 	limit?: number;
