@@ -509,6 +509,81 @@ input CityInput {
   updatedAt: DateTime
 }
 
+"""Cierre verificado de facturación"""
+type CloseVerified {
+  """Identificador de mongo"""
+  _id: String!
+
+  """Listado de billetes y monedas registrados"""
+  cashRegister: CashRegister!
+
+  """Fecha de cierre"""
+  closeDate: DateTime!
+
+  """cierre que se verifico"""
+  closeZ: CloseZInvoicing!
+
+  """Compañía a la que pertence el cierre"""
+  company: Company!
+
+  """Fecha de creación"""
+  createdAt: DateTime!
+
+  """Egresos del día"""
+  expenses: [Expense!]
+
+  """Egresos corregido"""
+  newExpense: Float!
+
+  """Ventas por transaccion corregida"""
+  newQuantityBank: Float
+
+  """Ventas por datafono corregida"""
+  newQuantityDataphone: Float
+
+  """Total de pagos registrados corregidos"""
+  newTotalPaymentRegister: Float!
+
+  """Total de pagos reportados corregidos"""
+  newTotalPaymentReport: Float!
+
+  """Número consecutivo"""
+  number: Float!
+
+  """Observacion al corregir un cierre"""
+  observation: String!
+
+  """Listado de pagos"""
+  payments: [PaymentOrderClose!]
+
+  """Medios de pago usados para cruzar créditos"""
+  paymentsCredit: [PaymentCredit!]
+
+  """Punto de venta que registra el cierre"""
+  pointOfSale: PointOfSale!
+
+  """Prefijo del número"""
+  prefix: String!
+
+  """Transacciones reportadas por el usuario"""
+  quantityBank: Float!
+
+  """Ventas por datafono reportadas por el usuario"""
+  quantityDataphone: Float
+
+  """Devoluciones generadas"""
+  refunds: RefundOrderClose
+
+  """Datos de las ordenes"""
+  summaryOrder: SummaryOrderClose!
+
+  """Fecha de actualización"""
+  updatedAt: DateTime!
+
+  """Usuario que creó o editó el cierre"""
+  user: User!
+}
+
 """Cierre X de facturación"""
 type CloseXInvoicing {
   """Identificador de mongo"""
@@ -921,6 +996,30 @@ input CreateCityInput {
 
   """Tipo de zona"""
   zone: ZoneType!
+}
+
+"""Datos para crear un cierre verificado"""
+input CreateCloseVerifiedInput {
+  """Cantidad de transferencias reportadas"""
+  bankReport: Float!
+
+  """Dinero registrado"""
+  cashRegister: Float!
+
+  """Dinero reportado"""
+  cashReport: Float!
+
+  """Identificador del cierre z que se va a verificar"""
+  closeZId: String!
+
+  """Cantidad de ventas por datafono reportadas"""
+  dataphoneReport: Float!
+
+  """egresos"""
+  expenses: Float!
+
+  """Observacion"""
+  observation: String!
 }
 
 """Datos para crear un cierre X"""
@@ -3548,6 +3647,12 @@ type Mutation {
     createCityInput: CreateCityInput!
   ): City!
 
+  """Crea un cierre verificado"""
+  createCloseVerified(
+    """Datos para crear el cierre verificado"""
+    createCloseVerified: CreateCloseVerifiedInput = {}
+  ): CloseVerified!
+
   """Crea un cierre X de facturación"""
   createCloseXInvoicing(
     """Datos para crear el cierre x de facturación"""
@@ -4569,6 +4674,12 @@ type Query {
     """Filtros para consultar el listado de clientes"""
     filtersCitiesInput: FiltersCitiesInput = {}
   ): ResponseCities!
+
+  """consultar un cierre verificado"""
+  closeVerified(
+    """Identificador del cierre"""
+    id: String!
+  ): CloseVerified!
 
   """Lista de cierres x"""
   closesXInvoicing(
